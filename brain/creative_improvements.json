@@ -10975,5 +10975,23 @@
     "category": "amplify guard",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-11T00:50:00Z",
+    "idea": "Contrarian fade fee-hurdle: skip pc- LONG fade when expected move < 2x round-trip fee (or bump fade notional above fee-crossing size)",
+    "rationale": "Fade is directionally correct (shadow flip 64.6% n=350, real WR 40% vs baseline 27-38%) but structurally fee-negative: gross/trade +0.0036..0.0063 vs fee/trade ~0.0104 at $11.69 avg notional. Weekly gross stalled at +0.130 since 11-04. Kill would destroy a working instrument over a sizing problem.",
+    "expected_impact": "NET>=0 promote gate reachable without killing the 64.6% shadow edge",
+    "category": "fee/size engineering",
+    "status": "suggested",
+    "risk": "low (needs shadow first, pairs with 11-18 watch read)"
+  },
+  {
+    "date": "2026-11-11T00:50:00Z",
+    "idea": "atr-trend- SHORT blocked-setups clone-hunt (registered amplify-atr-trend-short-clonehunt)",
+    "rationale": "42/42 raw blocked would-win looks like free money but token-day dedup = n=5 (ETC/BABY/HYPER/BCH/WLFI multi-gate same-day stacking). Below bar. Collection-only proposal so the question resolves with data instead of intuition.",
+    "expected_impact": "if n>=15 deduped holds >=70% WW: +$0.50/30d exempt candidate; if collapses: gates confirmed correct",
+    "category": "clone-hunt",
+    "status": "suggested (registered in shadow_disposition)",
+    "risk": "low (zero behavior)"
   }
 ]

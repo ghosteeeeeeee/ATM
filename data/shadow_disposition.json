@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-10T20:55:00Z",
+  "updated": "2026-11-11T00:45:00Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -755,16 +755,16 @@
       "id": "watch-contrarian-live",
       "stream": "CONTRARIAN-LIVE pump-chain- fade real-trade watch — PostgreSQL brain trades (pc- LONG opens since started)",
       "kind": "watch",
-      "disposition": "EXTEND 7d to 2026-11-11 — early Z-FLIP conversion check run 2026-11-04 (hail-mary item 4)",
+      "disposition": "EXTEND 7d to 2026-11-18 — deadline adjudicated 2026-11-11 (brain_auditor #246): kill gate NOT triggered, promote gate still unmet on fees",
       "status": "open",
       "started": "2026-10-27",
-      "deadline": "2026-11-11T00:00:00Z",
+      "deadline": "2026-11-18T00:00:00Z",
       "threshold": "bar: >= 1 REAL fade trade (pc- LONG open since started) + Z-FLIP conversion check at the 11-03 dispo",
       "progress_eval": "contrarian_live",
       "default_action": "report-only: if still 0 real trades at deadline, either extend watch 7d with evidence or disable CONTRARIAN_LIVE_PREFIXES (CEO) — do NOT leave it drifting unwatched",
       "owner": "main-session",
       "evidence": "fresh 2026-11-04 (registry progress_eval SQL): n=32 real pc- LONG fills, gross +$0.130, fees $0.335, NET -$0.205, WR 45.2% (14W/17L/1fl) vs pre-fade baseline 13T 38.5% (+6.7pp directional). Conversion: 178 CONTRARIAN-LIVE approvals (33 tokens) -> 22/33 tokens filled = 66.7%; 0 Z-FLIP skips BUT that check is near-vacuous (96.6% of pc- signals carry z<0, LONG branch needs z>0 — see BUG-078). Promote gate (NET>=0) unmet: avg gross +$0.0041/trade < fee $0.0108/trade = structurally fee-negative at current size -> fade-size/fee review at 11-10/11-11. Kill gate (0 fills) not triggered. NOTE: prior evidence_20261103 (n=33/NET-0.37/baseline 27.3% n=22) did NOT reproduce — superseded by these numbers.",
-      "notes": "migrated from brain/trial_tracking_dashboard.md (archived 2026-10-31). Pairs with done entry flip-contrarian-pc (its notes carry the same 11-03 watch). | progress_eval 'contrarian_live' counts PG pc- LONG opens since 'started' (review HIGH-1: old log-grep path logs/decider*.log never existed; logs rotate, approved != executed). | 16:30Z refresh: fade cooled to +0.07 (22T) — still positive; 11-03 disposition judges (extend-to-11-10 rec stands).",
+      "notes": "migrated from brain/trial_tracking_dashboard.md (archived 2026-10-31). Pairs with done entry flip-contrarian-pc (its notes carry the same 11-03 watch). | progress_eval 'contrarian_live' counts PG pc- LONG opens since 'started' (review HIGH-1: old log-grep path logs/decider*.log never existed; logs rotate, approved != executed). | 16:30Z refresh: fade cooled to +0.07 (22T) — still positive; 11-03 disposition judges (extend-to-11-10 rec stands). | 11-11 deadline adjudicated: EXTEND to 11-18 (brain_auditor #246).",
       "evidence_20261101": {
         "pc_long_since_1027": "9T +0.31 WR 44.4% (cooled from 11T +0.45)",
         "shadow_join": "pc- flip-WR 64.6% n=350 (re-ran 04:30Z)",
@@ -799,6 +799,20 @@
         "conversion": "CONTRARIAN-LIVE 18 fires 11-03; Z-FLIP 0 skips",
         "cell_split": "pc- token heterogeneity chi2 p=0.37 = UNIFORM — amplify-pc-fade-cell-split NO CHANGE stands",
         "measured_at": "2026-11-03T21:05:00Z"
+      },
+      "evidence_20261111": {
+        "fills": "36T pc- family LONG since 10-27 (30 bare pc- + 6 pc-,v6 combos), all closed, 0 open",
+        "gross": "+0.130 (FULL incl v6) / +0.190 (bare pc- only)",
+        "fees": "0.375 full / 0.317 bare",
+        "net": "-0.245 full / -0.127 bare — PROMOTE GATE (NET>=0) STILL UNMET",
+        "wr": "40.0% bare (30T) vs pre-fade baseline 27-38%",
+        "weekly_gross": "W44 +0.11 / W45 +0.11 / W46 -0.09 (1T) — gross STALLED since 11-04 (+0.130 then, +0.130 now; 4 new fills netted ~0)",
+        "activity": "fade still fires (7 CONTRARIAN-LIVE lines, last 2026-11-10 01:39 JUP) but cooled: 4T/7d net 0.000",
+        "join": "contrarian_outcome_join re-ran 2026-11-11T00:30Z (mandate): pc- flip-WR 64.6% n=350 (226W/124L) STANDS, token chi2 p=0.3747 uniform; overall flip 43.8% n=1609 = blanket flip loses; rider 38.0% do-NOT",
+        "kill_gate": "NOT triggered (0-fills rule; 36 fills)",
+        "subcohort": "v6-combo fade (6T) gross -0.060 vs bare pc- +0.190 — v6 combos drag; exclude from future promote math or kill fade on v6 combos at 11-18 read",
+        "recommendation": "EXTEND to 11-18 with fee-hurdle review (gross/trade 0.0036-0.0063 vs fee/trade ~0.0104 = structurally fee-negative at $11.69 avg notional). Do NOT disable: shadow edge real (64.6% n=350), kill gate unmet, instrument works. CEO option: fade-size bump or min-expected-move>2x fee filter (see creative_improvements fee-hurdle idea).",
+        "measured_at": "2026-11-11T00:45:00Z"
       }
     },
     {
@@ -1544,6 +1558,22 @@
       "collision_check": "vs amplify-prearm-breakeven-lock (11-14): OPPOSITE direction (tighten vs loosen) — pre-reg both, adjudicate jointly 11-14, ship at most ONE. vs mfe-cut-arm-be (11-14): MFE-CUT cuts at 130m for mfe<0.20; proposed TAT cap 90m < 130m so ages do not overlap — TAT binds first on sources with ~52min age. vs #119 hold-longer atr_sl result (+$0.19/30m = noise): that was atr_sl_hit cohort, this is TAT cohort — different exits, both labeled open-anchor-free (walk starts at close_time+1).",
       "supersedes": "#238 prose pre-reg 'TAT age sweep for bb-squeeze+ (40/55/70m)' — never landed in this registry (governance gap closed); broadened to pooled cohort for power",
       "adjudicated_by": "brain_auditor #245"
+    },
+    {
+      "id": "amplify-atr-trend-short-clonehunt",
+      "stream": "atr-trend- SHORT blocked-setups clone-hunt (cell: 8T 87.5% WR +0.30, 75% arm, 14d; live since 2026-11-06)",
+      "kind": "amplify",
+      "proposal_type": "(c) clone-hunt: mine gate_shadow for BLOCKED atr-trend- SHORT setups + counterfactual-walk candles",
+      "status": "open",
+      "started": "2026-11-11",
+      "deadline": "2026-11-18T00:00:00Z",
+      "owner": "brain_auditor weekly AMPLIFY run #246",
+      "evidence": "Audit #246 screen. gate_shadow 30d: atr-trend- SHORT blocked 42 raw events, 42/42 would_win (100%), avg would_pnl +0.076, sum +3.18 — BUT token-day dedup collapses to n=5 (ETC/BABY/HYPER/BCH/WLFI, same-day multi-gate stacking: BTC-CHOP-GATE 9, SHORT-REGIME-GATE 7, CONTINUUM-BULL 6, CONFLUENCE 6). n=5 deduped << house bar n>=15. Sibling grind-breakout- SHORT CONFLUENCE-GATE-BLOCK 10 raw dedups to 2. Control: hh-hl+ blocked 0/21 would-win and continuum-trend+ blocked sum -10.51 = those gates correctly bleeding losers (do NOT exempt).",
+      "threshold": "SHIP only if ALL: (i) gate_shadow token-day dedup (token|YYYYMMDD) blocked n>=15; (ii) would-win >=70% on deduped set; (iii) 30d 1m-candle walk on exempted events net >= +$0.50 pnl_usdt (UNITS GUARD: derive entry/exit x amount_usdt, never mix with pnl_pct); (iv) fk of would-be-loser share among exempted <20%; (v) live cell atr-trend- NORMAL SHORT 30d net stays >0 at read. Default NO SHIP — collection-only until (i) met.",
+      "default_action": "NO SHIP — keep all gates global; report n at 11-18",
+      "measurement": "python3 - sqlite brain/gate_shadow.db events WHERE outcome_signal='atr-trend-' AND direction='SHORT' AND blocked_at>=30d AND would_win IS NOT NULL; dedup GROUP BY token, date(blocked_at,'unixepoch'); then 1m walk via existing clone-hunt pattern (see amplify-vb-high-short-clonehunt)",
+      "not_a_duplicate_of": "amplify-atr-trend-short-cell-watch (#243, due 11-16) = winner-cell promotion on LIVE fills; this = blocked-setups clone-hunt on gate_shadow. Different data source, different lever.",
+      "risk": "low (collection-only, zero behavior)"
     }
   ]
 }

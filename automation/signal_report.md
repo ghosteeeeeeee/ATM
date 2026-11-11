@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-10 15:23 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-10 21:23 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,744 | **WR:** 51.4% | **PnL:** -117.69%
+- **Total trades (all time):** 3,746 | **WR:** 51.4% | **PnL:** -117.72%
 - **Date range:** 2026-07-29 → 2026-11-10
 
 ---
@@ -23,7 +23,7 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| ai-trader-pending | SHORT | 4 | 50.0% | -1.08 | ❓ | Needs more data |
+| jup_yolo_mirrored | SHORT | 2 | 50.0% | -0.18 | ❓ | Needs more data |
 
 ---
 
@@ -41,7 +41,7 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] ai-trader-pending SHORT** — WR=50.0%, PnL=-1.08% over 4 trades. Monitor next cycle.
+1. **[WATCH] jup_yolo_mirrored SHORT** — WR=50.0%, PnL=-0.18% over 2 trades. Monitor next cycle.
 
 ---
 
@@ -53,6 +53,7 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-11-10 | b4b7322 | memory: hourly analysis 2026-11-10 17:22 — storm packet (win... |
 | 2026-11-09 | 1f5cf45 | logs: hourly analysis 2026-11-09 13:22 — no config change, 0... |
 | 2026-11-09 | e9035a2 | logs: hourly analysis 2026-11-09 00:20 — no config change, 0... |
 | 2026-11-08 | e91eea0 | skills: full-analysis gains MTF ADX/ATR lifecycle (CEO rules... |
@@ -62,6 +63,5 @@ None found. Top performers are already enabled.
 | 2026-11-06 | e62ff98 | automation: hourly analysis 2026-11-06 14:30 — no config cha... |
 | 2026-11-06 | 8a229b1 | scripts: 2 LOG-ONLY counterfactual shadows — BTC-chop standa... |
 | 2026-11-06 | 03bde6d | signals: linreg_fade round 2 — cross-sectional trigger + mak... |
-| 2026-11-05 | f47df12 | signals: add linreg_fade — RenTech-style univariate regressi... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

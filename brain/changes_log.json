@@ -4012,5 +4012,27 @@
     "after": "registry entry 100 total",
     "rationale": "closes governance gap + satisfies weekly AMPLIFY proposal bar with powered cohort",
     "impact": "measurement-only until 11-14 bar"
+  },
+  {
+    "timestamp": "2026-11-11T00:50:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #246 dispositions: watch-contrarian-live EXTEND to 11-18 (evidence_20261111); registered amplify-atr-trend-short-clonehunt (type c, due 11-18, NO-SHIP default)",
+    "type": "ops",
+    "file": "data/shadow_disposition.json",
+    "before": "watch-contrarian-live deadline 2026-11-11, no atr-trend clone-hunt entry",
+    "after": "deadline 2026-11-18 with fresh evidence; new amplify entry added",
+    "rationale": "Deadline adjudication: kill gate unmet (36 fills), promote gate fee-negative (NET -0.245) but shadow flip-WR 64.6% n=350 intact — extend over disable; atr-trend blocked 42/42 WW needs dedup collection before any exempt",
+    "impact": "fade instrument preserved for one more week with fee review; clone-hunt resolves with data"
+  },
+  {
+    "timestamp": "2026-11-11T00:50:00Z",
+    "agent": "brain_auditor",
+    "change": "WINNER_CELL_SIZE_MULT 1.25 revert re-surfaced to CEO (still overdue, 25h past deadline)",
+    "type": "ops",
+    "file": "CURRENT.md / ceo_kanban.md",
+    "before": "flagged overdue at #245",
+    "after": "re-surfaced #246, constant verified still 1.25 at hermes_constants.py:1174",
+    "rationale": "auto-flip denylist blocks self-fire; bar FAILs A -0.014/B -1.13/C +0.04; needs one-line CEO act",
+    "impact": "stops amplifying a 37.9% WR cell"
   }
 ]

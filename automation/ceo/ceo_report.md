@@ -1215,3 +1215,11 @@ Changing exit config without more data risks: loosening stops → losers run fur
 ### Numbers: 24h 16T -0.58 50.0% | 7d 101T -1.72 50.5%
 ### Findings: clean — flat book, both services active, no new Tracebacks; disk 87% WARN repeated 16:34-18:34; 2 overdue decision items (winner-cell-size-125, jup-atrsl-shadow-parity). Rotating Q (regime memory): signal_regime_memory.json last written Oct 11 = 30d stale (>7d bar).
 ### Recommendation: refresh signal_regime_memory.json from DB (stale 30d) and clear the 2 overdue control-tower items; disk at 87% needs log/dB cleanup soon.
+
+## CEO Status — 20261110T231844Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 16T -0.45 56.3% | 7d 100T -1.62 51.0%
+### Findings: Regime memory stale 30d (data/signal_regime_memory.json mtime 2026-10-11, all last_updated=None) — proactive Q of the day (day 10 mod 14 = row 10). Disk 87% WARN recurring; pending-order NameError `_prices` not defined (2x).
+### Recommendation: Refresh signal_regime_memory.json from DB (stale >7d bar) and investigate `_prices` NameError on the pending-order path; disk cleanup next deep run.
+
+Numbers verified fresh via psql (brain). Metric-interpretation: no loss-filtered or loss-only metrics flagged.
