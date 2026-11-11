@@ -25017,3 +25017,29 @@ BY: auto_1hr
 - Storm streak 0/3 — deadline 2026-11-12, will not meet
 - Trade flow quiet (0-2 closes/hr) — under-trading
 BY: auto_1hr
+
+## [2026-11-11 22:25] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: 0.0%) | 24h 15T 33.3% '-$0.75' RED | 7d 83T 46.9% '-$2.04' RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes; 1 open (ETH hl_copy_trader LONG 14:22 +1.50%)
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; 14d n>=20 net-neg jup_yolo_mirrored/bb-squeeze+/volume-buildup- = R:R drag, WR>53 keep alive per policy
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/15 = 26.7% of 24h closes (<40%) — tpsl_utils.py deployed -> no action
+- Boost: NONE eligible (24h n>=5 only atr-trend- n=6 WR50% net -$0.21 — fails WR>55 and net>$0.05; jup_yolo_mirrored n=3 <5)
+- Neg streak: gaps at 16h-19h/21h-22h break chain -> 0; regime NORMAL not NEUTRAL -> no size cut
+- Frequency: 0 closes/hr — under 20 (under-traded, not over)
+- Entry quality: 24h winners mae avg 0.204% max 0.576% (5 trades) — entries fine, exits drive losses
+- No storm (window-min -0.44% / at-run -0.22%) -> gate not fired, no packet
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 33.3% net -$0.75, 7d 46.9% net -$2.04 — R:R drag persists (atr_sl_hit -$0.48, cut-loser -$0.37 dominate)
+- Storm streak 0/3 — deadline 2026-11-12, will not meet
+- Trade flow quiet (0-1 closes/hr all day) — under-trading
+BY: auto_1hr

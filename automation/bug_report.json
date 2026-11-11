@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-11 11:28:38",
+  "timestamp": "2026-11-11 19:28:39",
   "total_checks": 20,
   "passed": 13,
   "critical_count": 7,
@@ -14,7 +14,7 @@
     {
       "name": "sql_injection",
       "msg": "40 files with f-string SQL",
-      "file": "session_brain.py:498",
+      "file": "session_brain.py:499",
       "fix": "Use parameterized queries: cursor.execute('SELECT ... WHERE col = ?', (value,))"
     },
     {

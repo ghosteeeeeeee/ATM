@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-11 15:23 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-11 21:23 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,759 | **WR:** 51.3% | **PnL:** -123.10%
+- **Total trades (all time):** 3,761 | **WR:** 51.3% | **PnL:** -124.12%
 - **Date range:** 2026-07-29 → 2026-11-11
 
 ---
@@ -24,7 +24,6 @@ None found.
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
 | atr-trend- | SHORT | 6 | 50.0% | -1.90 | ❓ | Borderline |
-| ai-trader-pending | SHORT | 3 | 33.3% | +0.19 | ❓ | Needs more data |
 
 ---
 
@@ -43,7 +42,6 @@ None found. Top performers are already enabled.
 ## RECOMMENDATIONS
 
 1. **[WATCH] atr-trend- SHORT** — WR=50.0%, PnL=-1.90% over 6 trades. Monitor next cycle.
-2. **[WATCH] ai-trader-pending SHORT** — WR=33.3%, PnL=+0.19% over 3 trades. Monitor next cycle.
 
 ---
 
