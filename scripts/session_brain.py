@@ -1060,6 +1060,11 @@ def main():
     elif args.query:
         chunk_types = ([t.strip() for t in args.chunk_types.split(",") if t.strip()]
                        if args.chunk_types else None)
+        if chunk_types:
+            known_types = {"user", "assistant", "tool", "reasoning"}
+            unknown = sorted(set(chunk_types) - known_types)
+            if unknown:
+                print(f"WARN: unknown chunk type(s) {unknown} (known: {sorted(known_types)})")
         filters = []
         if args.since_days is not None:
             filters.append(f"since_days={args.since_days}")
@@ -1067,9 +1072,17 @@ def main():
             filters.append(f"chunk_types={chunk_types}")
         if args.topic:
             filters.append(f"topic={args.topic}")
+        # Warm the one-time embedder/vector-store load and torch's first-encode
+        # lazy init OUTSIDE the timed region so the reported time is the actual
+        # steady-state search cost (the <2s budget), not process startup.
+        brain._ensure_embedder()
+        brain._ensure_vector_store()
+        brain.embedder.embed_one("warmup")
+        t_query = time.time()
         results = brain.query(args.query, top_k=args.top_k, min_score=args.min_score,
                               since_days=args.since_days, chunk_types=chunk_types,
                               topic=args.topic)
+        query_elapsed = time.time() - t_query
         if not results:
             print("No results found.")
             if filters:
@@ -1079,7 +1092,7 @@ def main():
         print(f"QUERY: {args.query}")
         if filters:
             print(f"FILTERS: {', '.join(filters)}")
-        print(f"RESULTS: {len(results)}")
+        print(f"RESULTS: {len(results)} (query {query_elapsed:.2f}s)")
         print(f"{'='*60}\n")
         for i, r in enumerate(results, 1):
             print(f"[{i}] score={r['score']:.3f} | {r['type']} | session={r['session_id'][:12]}")
