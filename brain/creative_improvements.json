@@ -11039,5 +11039,23 @@
     "category": "risk",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-12T00:45:00Z",
+    "idea": "Arm-rate KPI in auto_1hr (24h trailing_activated split)",
+    "rationale": "hourly cadence never showed the #1 trend-vs-chop diagnostic (armed 87% WR vs unarmed 24% WR 14d)",
+    "expected_impact": "reporting-only visibility; stall deterioration visible hourly",
+    "category": "observability",
+    "status": "shipped",
+    "risk": "none"
+  },
+  {
+    "date": "2026-11-12T00:45:00Z",
+    "idea": "Arm-rate admission gate (block entries when signal rolling-14d arm%<35 n>=10)",
+    "rationale": "entry-side complement to exit stack; cohort ai-trader-pending/jup SHORT/pump-chain+",
+    "expected_impact": "current data only +$0.56/14d, blocked winner-share 51.5% fails fk bar",
+    "category": "entry sniper",
+    "status": "rejected-on-current-data",
+    "risk": "medium"
   }
 ]

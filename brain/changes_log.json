@@ -4078,5 +4078,27 @@
     "after": "1.25 (unchanged — CEO domain)",
     "rationale": "Deadline was 2026-11-10T00:00Z; auditor must not touch sizing constant unilaterally",
     "impact": "CEO action required"
+  },
+  {
+    "timestamp": "2026-11-12T00:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Added 24h arm-rate KPI query + Step-3 diagnosis bullet to auto_1hr prompt (reporting only)",
+    "type": "config",
+    "file": "automation/auto_1hr_prompt.md",
+    "before": "auto_1hr reported WR/PnL/atr_sl_hit% but never trailing_activated split",
+    "after": "24h arm-rate (True/False) query printed every hourly run + diagnose bullet 5",
+    "rationale": "arm-rate is the trend-vs-chop diagnostic; hourly cadence was blind to stall deterioration",
+    "impact": "zero trading behavior change; stall visible hourly"
+  },
+  {
+    "timestamp": "2026-11-12T00:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Deadline reads: storm-confl-waiver EXTEND 11-19; linreg-fade-storm EXTEND 12-01; storm-readiness-packet DONE",
+    "type": "ops",
+    "file": "data/shadow_disposition.json",
+    "before": "all three open with deadline 2026-11-12",
+    "after": "waiver open/11-19 (streak 0/3, CEO no-convert); linreg open/12-01 (n=3/20); packet done (6 packets, A4 clean)",
+    "rationale": "pre-registered deadline day — bar evaluation, not outcome selection",
+    "impact": "shadow bookkeeping; no trading behavior change"
   }
 ]

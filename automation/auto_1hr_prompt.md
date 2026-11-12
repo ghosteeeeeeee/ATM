@@ -49,6 +49,22 @@ cur.execute("""
 print("\n24h by close reason:")
 for r in cur.fetchall():
     print(r)
+
+# Arm-rate KPI (brain_auditor #250): trail-armed vs never-armed split — THE
+# trend-vs-chop diagnostic. 14d baseline: armed 87% WR / unarmed 24% WR.
+# Unarmed share of closes >70% = chop entries dominating (stall stack owns
+# the fix — do NOT invent a new gate, just surface the number).
+cur.execute("""
+    SELECT trailing_activated, COUNT(*) as trades,
+           ROUND(100.0*SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END)/COUNT(*),1) as wr,
+           ROUND(SUM(pnl_usdt),2) as pnl
+    FROM trades
+    WHERE close_time > NOW() - INTERVAL '24 hours' AND status = 'closed'
+    GROUP BY trailing_activated
+""")
+print("\n24h arm-rate (True=trail armed):")
+for r in cur.fetchall():
+    print(r)
 conn.close()
 ```
 
@@ -59,6 +75,7 @@ Answer these:
 2. **SL behavior**: Is `atr_sl_hit` the dominant close reason? → SL too tight
 3. **Signal quality**: Which signals are losing money?
 4. **Trade frequency**: Overtrading or over-filtered?
+5. **Arm rate**: Is the unarmed cohort >70% of 24h closes (or unarmed WR near 0%)? → chop entries dominating; report it in the log line, no new gate
 
 ### 3b. Signal Inversion Check (PORTED from signal-reporter 2026-10-27)
 
