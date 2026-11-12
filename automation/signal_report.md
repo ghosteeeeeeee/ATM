@@ -1,15 +1,17 @@
 # Signal Performance Report
-**Generated:** 2026-11-12 15:23 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-12 21:23 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,773 | **WR:** 51.3% | **PnL:** -122.65%
+- **Total trades (all time):** 3,776 | **WR:** 51.3% | **PnL:** -123.36%
 - **Date range:** 2026-07-29 → 2026-11-12
 
 ---
 
 ## WINNERS (WR > 55%, PnL > 0)
 
-None found.
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| atr-trend- | SHORT | 2 | 50.0% | -0.50 | 6 | 83.3% | +1.47 | ❓ |
 
 ---
 
@@ -23,7 +25,7 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| ai-trader-pending | SHORT | 4 | 50.0% | +0.48 | ❓ | Needs more data |
+| ai-trader-pending | SHORT | 5 | 40.0% | +0.26 | ❓ | Borderline |
 
 ---
 
@@ -41,7 +43,8 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] ai-trader-pending SHORT** — WR=50.0%, PnL=+0.48% over 4 trades. Monitor next cycle.
+1. **[WATCH] ai-trader-pending SHORT** — WR=40.0%, PnL=+0.26% over 5 trades. Monitor next cycle.
+2. **[KEEP] 1 winning combos** — atr-trend-. LONG side dominant.
 
 ---
 

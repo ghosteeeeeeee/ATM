@@ -25611,3 +25611,29 @@ BY: auto_1hr
 - Unarmed cohort 53% of closes, WR 25% vs armed 100% — chop entries; stall stack owns fix
 - SUSHI open SHORT -0.90% — largest open drawdown, watch
 BY: auto_1hr
+
+## [2026-11-12 22:25] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** $-0.11 (WR: 0.0%) | 24h 16T 56.3% -$0.12 RED | 7d 92T 47.8% -$2.33 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 1 close (SUSHI atr-trend- SHORT atr_sl_hit -$0.11 / -3.04%); 1 open (BTC pending SHORT -0.04%)
+- Arm rate: unarmed 9/16 = 56.2% of 24h closes (<70%), WR 22.2% (-$0.38) vs armed 7/7 100% (+$0.26) — below threshold, stall stack owns fix, no new gate
+- Kill check: 1 close/hr, no 0% WR signal with 3+ closes this hour
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/16 = 12.5% of 24h closes (<40%); tpsl_utils deployed -> no alert
+- Boost: atr-trend- 7T 71.4% but net +$0.02 < $0.05 threshold + just boosted 1.0->1.25 at 17:23 (stability rule); others ineligible (ai-trader-pending 5T 40% WR; jup_yolo_mirrored 3T net -$0.08)
+- Neg streak: 21:00 -$0.11 = 1 consecutive negative hour (<3); 17:00 +$0.02 breaks before it -> no size cut
+- Frequency: 1 close/hr — well under 20
+- No storm (window-min -0.24% / at-run -0.16%) -> gate not fired
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h flipped RED -$0.12 (was -$0.01 breakeven at 21:22) on the SUSHI SL
+- 7d still RED 47.8% -$2.33
+- Unarmed cohort 56% of closes, WR 22% vs armed 100% — chop entries; stall stack owns fix
+BY: auto_1hr
