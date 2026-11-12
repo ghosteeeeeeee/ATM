@@ -1253,3 +1253,15 @@ Numbers verified fresh via psql (brain). Metric-interpretation: no loss-filtered
 ### Numbers: 24h 15T -0.89 26.7% | 7d 82T -2.09 46.3%
 ### Findings: RED overdue decision `winner-cell-size-125` (WINNER_CELL_SIZE_MULT 1.25→1.0 revert, ~44h past deadline); disk 88% WARN repeated; 24h WR 26.7% soft (n=15, mixed exits — not by-construction). Proactive Q (11 mod 14 = "new signals this week?"): 0 new signals developed 11-05..11-11.
 ### Recommendation: CEO issue the one-line winner-cell revert (or explicit extension); disk cleanup before it trips a hard threshold; delegate 1 new signal to signal_analyst.
+
+## CEO Status — 20261111T231846Z
+### Health: pipeline=active guardian=active open_pos=2
+### Numbers: 24h 13T -0.86 23.1% | 7d 82T -2.09 46.3%
+### Findings: disk 88% WARN (recurring 20:34–22:34Z); control tower 1 OVERDUE `winner-cell-size-125` (11-10, default REVERT to 1.0 if silent) + 3 due ≤24h (storm-waiver/linreg-fade/storm-readiness, all 11-12); proactive Q (11%14=row11): **0 new signals developed this week** — kanban shows only audits, no signal_analyst builds since 11-08.
+### Recommendation: Decide `winner-cell-size-125` (REVERT default) before it ages further; disk cleanup + delegate one new signal build to signal_analyst.
+
+## CEO Status — 20261112T031848Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 10T -0.63 30.0% | 7d 84T -2.22 46.4%
+### Findings: disk 89% WARN; winner-cell-size-125 revert ~1d overdue (1.25 still live); 3 decisions due today (storm packets); proactive=coin_tracker scores FRESH (agg max age ~1min, 113 symbols)
+### Recommendation: Revert WINNER_CELL_SIZE_MULT 1.25→1.0 now (4th resurface) and free disk before it hits 90%.
