@@ -525,8 +525,13 @@ def tweak_structure_fixed(decision, open_positions):
         # persist structure-lag state (72h prune, atomic — mirrors mxm)
         if _st_dirty[0]:
             _now = time.time()
+            # bug_hunter LOW-F3: a corrupt ENTRY (list/str, truthy but not a
+            # dict) crashed .get here → prune raised → state never saved
+            # again. Drop non-dicts instead; ts-less dicts stay (all writes
+            # stamp ts, so the set is bounded).
             _smap = {k: v for k, v in _smap.items()
-                     if float((v or {}).get('ts') or _now) > _now - 72 * 3600}
+                     if isinstance(v, dict)
+                     and float(v.get('ts') or _now) > _now - 72 * 3600}
             _tmp = _st_path + '.tmp'
             with open(_tmp, 'w') as _f:
                 _json.dump(_smap, _f)
