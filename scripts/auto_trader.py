@@ -472,35 +472,47 @@ def tweak_structure_fixed(decision, open_positions):
                 # (#16871: current-structure stop tagged by a 74121 bounce,
                 # +0.99% taken while direction ran to 73584).
                 _lag_stop(pos['id'], 'SHORT', sh_h, sl_h, atr_h, price, stop)
-                # F3 (bug_hunter MED): TP must stay BELOW live price for a
-                # short — a structure snap already crossed = instant exit.
+                # F3 (bug_hunter MED) + ENTRY-SIDE GUARD (CEO 2026-11-12
+                # rage fix): the snapped TP must stay BELOW live price AND
+                # strictly on the profit side of ENTRY. #16873's snap landed
+                # at 73439.50 = 32pts ABOVE entry 73406 → closed −0.22%
+                # labeled manual_tp_hit, preempting the structure stop
+                # before a 644pt move (#16878 same, −0.20%). Wrong-side
+                # structure → KEEP the original TP (the void giant-candle
+                # backstop) — a stop exit must never be pre-empted by a
+                # "take-profit" that books a loss.
                 if target < (sl - atr) and (sl + 0.05 * atr) < price * 0.999:
                     new_tp = round(sl + 0.05 * atr, 8)
-                    cur.execute("UPDATE trades SET target=%s WHERE id=%s "
-                                "AND status='open' AND target=%s",
-                                (new_tp, pos['id'], target))
-                    if cur.rowcount:
-                        conn.commit()
-                        t = {'trade': pos['id'], 'field': 'target',
-                             'old': target, 'new': new_tp, 'rule': 'R2'}
-                        tweaks.append(t)
-                        DB.log_event('INFO', f"tweak {t}")
+                    if new_tp <= entry * 0.999:   # ≥0.1% on the profit side
+                        cur.execute("UPDATE trades SET target=%s WHERE id=%s "
+                                    "AND status='open' AND target=%s",
+                                    (new_tp, pos['id'], target))
+                        if cur.rowcount:
+                            conn.commit()
+                            t = {'trade': pos['id'], 'field': 'target',
+                                 'old': target, 'new': new_tp, 'rule': 'R2'}
+                            tweaks.append(t)
+                            DB.log_event('INFO', f"tweak {t}")
             elif d == 'LONG':
                 # STRUCTURE-LAG mirror (CEO 2026-11-12): same rule —
                 # move only on new 1h structure, bump to the now-old swing.
                 _lag_stop(pos['id'], 'LONG', sh_h, sl_h, atr_h, price, stop)
-                # F3 mirror: TP must stay ABOVE live price for a long
+                # F3 mirror + ENTRY-SIDE GUARD: snapped TP must stay ABOVE
+                # live price AND strictly on the profit side of ENTRY
+                # (mirror of the #16873/#16878 fix — never a loss-labeling
+                # "take-profit").
                 if target > (sh + atr) and (sh - 0.05 * atr) > price * 1.001:
                     new_tp = round(sh - 0.05 * atr, 8)
-                    cur.execute("UPDATE trades SET target=%s WHERE id=%s "
-                                "AND status='open' AND target=%s",
-                                (new_tp, pos['id'], target))
-                    if cur.rowcount:
-                        conn.commit()
-                        t = {'trade': pos['id'], 'field': 'target',
-                             'old': target, 'new': new_tp, 'rule': 'R2'}
-                        tweaks.append(t)
-                        DB.log_event('INFO', f"tweak {t}")
+                    if new_tp >= entry * 1.001:   # ≥0.1% on the profit side
+                        cur.execute("UPDATE trades SET target=%s WHERE id=%s "
+                                    "AND status='open' AND target=%s",
+                                    (new_tp, pos['id'], target))
+                        if cur.rowcount:
+                            conn.commit()
+                            t = {'trade': pos['id'], 'field': 'target',
+                                 'old': target, 'new': new_tp, 'rule': 'R2'}
+                            tweaks.append(t)
+                            DB.log_event('INFO', f"tweak {t}")
         # persist structure-lag state (72h prune, atomic — mirrors mxm)
         if _st_dirty[0]:
             _now = time.time()
