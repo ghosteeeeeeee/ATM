@@ -573,3 +573,5 @@ BY: auto_1hr
 BY: auto_1hr
 ## TEAM UPDATES
 - [2026-11-10 17:22] auto_1hr: Storm-readiness packet — window-min -1.83% / at-run -0.55% | blocked 179 (short-rsi-hard-floor 28, combo_key-stale 53, expired-hotset 38, pump-chain-* 11, confluence single-type 5, oversold-knife 3, compaction_stale 18, other 23) | true-starvation 35 RSI>=35 | counterfactual $-0.39 (touch 35/35) NEGATIVE | waiver SHADOW=True ENFORCE=False | storm-confl-waiver streak 0/3 (needs >=3 consecutive positive, deadline 2026-11-12) — no config change
+## TEAM UPDATES
+- [2026-11-12 00:21] auto_1hr: no config change — 1T last hour (1W BTC ai-trader-pending SHORT +$0.02), 24h 13T 30.8% -$0.71 RED, 7d 83T 46.9% -$2.07 RED, no storm (window-min -1.06% / at-run +0.40%), no kill/boost candidates
