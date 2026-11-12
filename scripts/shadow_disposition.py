@@ -977,7 +977,10 @@ def _build_control_tower(entries, now_iso, problems, entry_errors,
     if undated:
         lines.append(f'## ⚠️ OPEN WITHOUT DEADLINE ({len(undated)}) — '
                      f'add one or they never fire a packet')
-        for e in undated:
+        # undated holds (deadline=None, entry) tuples — same shape as dated
+        # (root cause of 2026-11-12 tower render FAIL when #249 added the
+        # first deadline-less opens; loop used to treat the tuple as a dict)
+        for _d, e in undated:
             bar = str(e.get('threshold') or '—')
             lines.append(f"- `{e.get('id', '?')}` (owner: {e.get('owner', '?')}) "
                          f"— {bar[:120]}")

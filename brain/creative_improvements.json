@@ -11075,5 +11075,32 @@
     "category": "exit",
     "status": "rejected",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-12T12:58:08Z",
+    "idea": "SHIPPED: control-tower undated tuple unpack fix + deadline backfill (amplify-jup-long-flat-cell + amplify-grind-breakout-underdeploy -> 11-18)",
+    "rationale": "Nov 12 08:15 disposition failed tower render (tuple.get); undated opens never fire packets. Root cause introduced when #249 added first deadline-less entries.",
+    "expected_impact": "daily tower renders again; 2 AMPLIFY entries schedulable",
+    "category": "infra",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-12T12:58:08Z",
+    "idea": "floor_admit Q1 fisher p 0.138 -> 0.0206 at n=1640 (floor 49.0% vs always 41.6%) — significance limb may be met for 11-15 read",
+    "rationale": "Join re-ran this run; do not ship early — 30d same-sign still outstanding. Report at 11-15 disposition.",
+    "expected_impact": "informational",
+    "category": "shadow",
+    "status": "monitor",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-12T12:58:08Z",
+    "idea": "exact-mirror giveback: 3/3 hl_copy T1 trades with MFE>=1% (2.54-3.68%) all trailing_activated=False exit hard_max_loss — feeds amplify-xmirror-giveback evidence",
+    "rationale": "Engines skipped by design for exact-mirror; peaks round-trip to floor. Covered by in-flight 11-18 item, not a new proposal.",
+    "expected_impact": "evidence only",
+    "category": "exit",
+    "status": "monitor",
+    "risk": "low"
   }
 ]

@@ -4122,5 +4122,38 @@
     "after": "condition fired, escalated",
     "rationale": "#250 pre-registered escalation; KPI verified working this run",
     "impact": "exit-stack day 11-14 pull-forward decision now with CEO"
+  },
+  {
+    "timestamp": "2026-11-12T12:58:08Z",
+    "agent": "brain_auditor",
+    "change": "Fixed control-tower undated render loop: unpack (deadline, entry) tuples instead of treating as dicts",
+    "type": "code",
+    "file": "scripts/shadow_disposition.py",
+    "before": "for e in undated: e.get(...)",
+    "after": "for _d, e in undated: e.get(...)",
+    "rationale": "Nov 12 08:15 production WARN tower render failed; root cause = #249 added first deadline-less opens; selfcheck tower builder FAIL",
+    "impact": "tower renders daily again; selfcheck PASS; zero trading behavior"
+  },
+  {
+    "timestamp": "2026-11-12T12:58:08Z",
+    "agent": "brain_auditor",
+    "change": "Set deadline=2026-11-18T00:00:00Z on amplify-jup-long-flat-cell and amplify-grind-breakout-underdeploy (were None)",
+    "type": "ops",
+    "file": "data/shadow_disposition.json",
+    "before": "deadline=None (undated opens never fire packets)",
+    "after": "deadline=2026-11-18T00:00:00Z both entries",
+    "rationale": "Notes already said Due 11-18 for jup; undated section warning; paired batch from #249",
+    "impact": "both AMPLIFY entries now schedulable; 0 undated opens remain"
+  },
+  {
+    "timestamp": "2026-11-12T12:58:08Z",
+    "agent": "brain_auditor",
+    "change": "Re-rendered automation/ceo/control_tower.md after fix (was stale Nov 11 due to render fail)",
+    "type": "infra",
+    "file": "automation/ceo/control_tower.md",
+    "before": "generated 2026-11-11T08:15 (26h+ stale)",
+    "after": "generated 2026-11-12T12:53Z FRESH with undated section + both entries",
+    "rationale": "daily timer failed to write tower on 11-12",
+    "impact": "CEO tower view current"
   }
 ]
