@@ -25124,3 +25124,31 @@ BY: auto_1hr
 - Trade flow quiet (0 closes/hr) — under-trading
 - Storm streak 0/3 — deadline 2026-11-12, will not meet
 BY: auto_1hr
+
+## [2026-11-12 02:25] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** $-0.15 (WR: 0.0%) | 24h 11T 27.3% -$0.69 RED | 7d 84T 46.4% -$2.22 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 1 close (SOL jup_yolo_mirrored SHORT atr_sl_hit -$0.15 -3.64%); 1 open (ETH hl_copy_trader LONG +0.77%)
+- Arm rate: unarmed 9/11 = 81.8% of 24h closes (>70%) — chop entries dominating; unarmed WR 11.1% (-$0.76) vs armed 100% (+$0.07) — stall stack owns the fix, no new gate per policy
+- Kill check: 0 signals with 3+ closes last hour -> no trigger; 14d n>=20 net-neg signals R:R drag, WR>51 keep alive (checked prior run)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 5/11 = 45.5% of 24h closes (>40%) — tpsl_utils.py deployed (referenced by hermes_constants/decider_run/hl-sync-guardian) -> no alert
+- Boost: NONE eligible (24h max n=4 jup_yolo_mirrored WR50% net -$0.23; no signal n>=5)
+- Neg streak: 2h/3h/4h negative then gaps + 20h/23h positive breaks chain -> 0; regimes HIGH/NORMAL not NEUTRAL -> no size cut
+- Frequency: 1 close/hr — under 20 (under-traded)
+- Entry quality: 24h winners mae avg 0.050% max 0.088% (<0.5%, excellent) vs losers avg 0.655% max 1.129% — exits drive losses, entries fine
+- No storm (window-min -0.66% / at-run +0.55%) -> gate not fired
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 27.3% net -$0.69, 7d 46.4% net -$2.22 — R:R drag persists (atr_sl_hit -$0.63 dominates 24h)
+- Unarmed cohort 81.8% of closes with 11.1% WR — chop entries; watch stall stack
+- Trade flow quiet (1 close/hr) — under-trading
+- Storm streak 0/3 — deadline 2026-11-12, will not meet
+BY: auto_1hr
