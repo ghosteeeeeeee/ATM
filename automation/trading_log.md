@@ -25263,3 +25263,31 @@ BY: auto_1hr
 - Trade flow quiet (0 closes/hr) — under-trading
 - Storm streak 0/3 — deadline 2026-11-12, will not meet
 BY: auto_1hr
+
+## [2026-11-12 07:20] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a) | 24h 8T 25.0% -$0.57 RED | 7d 83T 45.8% -$2.35 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes; 2 open (BTC ai-trader-pending SHORT -0.19%, ETH hl_copy_trader LONG +0.04%)
+- Arm rate: unarmed 6/8 = 75% of 24h closes (>70%), WR 0% (-$0.64) vs armed 2/2 100% (+$0.07) — chop entries dominating; stall stack owns the fix, no new gate per policy
+- Kill check: 0 signals with 3+ closes last hour -> no trigger
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/8 = 50% of 24h closes (>40%) — tpsl_utils.py deployed -> no alert
+- Boost: NONE eligible (no signal n>=5 in 24h; max n=3 jup_yolo_mirrored WR33% net -$0.28)
+- Neg streak: 23:00 +0.02, 02:00 -$0.15, gaps break chain -> not 3 consecutive; regimes HIGH/NORMAL not NEUTRAL -> no size cut
+- Frequency: 0 closes/hr — under 20 (under-traded)
+- Entry quality: winners SL dist avg 0.483% vs losers 0.734% — exits drive losses, entries fine
+- No storm (window-min -0.36% / at-run -0.16%) -> gate not fired
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 25.0% net -$0.57, 7d 45.8% net -$2.35 — R:R drag persists (atr_sl_hit -$0.52 dominates 24h)
+- Unarmed cohort 75% of closes with 0% WR — chop entries; watch stall stack
+- Trade flow quiet (0 closes/hr) — under-trading
+- Storm streak 0/3 — deadline 2026-11-12, will not meet
+BY: auto_1hr
