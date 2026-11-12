@@ -324,35 +324,36 @@ def _arm_real_leg(order_id, leg, o, size, cfg, atr_1h):
 
 
 def tweak_structure_fixed(decision, open_positions):
-    """Structure-lag stop tuning (CEO 2026-11-12: "our stops should only
-    move when new structure is formed — we bump the stop to the now OLD
-    structure, so if that is broken we get taken out").
+    """Structure-lag stop tuning + TP-backstop contract
+    (CEO 2026-11-12: "stops only move when new structure is formed — bump
+    to the now OLD structure... the SL should catch the move in profit by
+    trailing lower as price breaks structure lower... TP should only kick
+    in if there's a giant candle between SL updates").
 
     Runs on EVERY managed open trade (ai-trader-*) on each 30-min watchdog
     cycle. For ladder/structural orders the mxm giveback-trail stands down
     (`dynamic_sl: false`), so THIS is their sole stop authority:
-      R1 structure-lag (_lag_stop) — per-trade state remembers the last 1h
-         zigzag swing. Structure unchanged → the stop is NOT touched
-         (interior bounces never move it — the #16871 lesson: a 74121
-         bounce tagged a current-structure stop for +0.99% while the run
-         went to 73583). New swing confirmed → the stop bumps to the
-         PREVIOUS (now-old) swing ±0.10 ATR, price-side clamped (never at
-         the live price), capped at ±5% (stale-structure guard), never
-         un-breaching an already-breached stop (the hit-check owns that
-         exit). Birth aligns to the current structure once.
-      R2 rule-10 TP — a TP overshooting the FIRST opposing structure by
-         more than 1 ATR snaps into it (short: 15m SL + 0.05 ATR;
-         long: 15m SH − 0.05 ATR), price-side guarded (F3).
+      R1 structure-lag (_lag_stop) — per-trade state remembers the last
+         15m zigzag swing (the EXECUTING structure — steps down fast
+         enough to trail profit during the move; one swing BEHIND, so a
+         retest must exceed the previous swing to hit = real structure
+         break only, interior noise can't — #16871). Structure unchanged
+         → stop untouched. New swing → bump to the PREVIOUS (now-old)
+         swing ±0.10 ATR, price-side clamped, ±5% stale cap, never
+         un-breaching a breached stop. Birth = SEED ONLY (the armed/ATR
+         stop the trade arrived with stands — never overridden).
+      TP: NEVER moved by the watchdog — the giant-candle backstop only.
+         (The rule-10 TP snap is REMOVED: it fired take-profits mid-move
+         — #16873/#16878 booked losses labeled manual_tp_hit, #16879
+         exited at 72270 while the void ran on.)
     Returns tweak dicts for the cycle summary.
     """
     tweaks = []
-    # R1 stops follow MAJOR (1h) structure — CEO 2026-11-10 (15m interior
-    # swings get hunted by flag whipsaws: #16851/52 stop 74114 hunted at
-    # 74285, real drop followed; the stop references the pattern boundary).
+    # R1/TP structure source: 15m (the executing structure — CEO
+    # 2026-11-12 trailing-down directive; the 1h source was too slow to
+    # step during #16879's move: zero trailing, TP did all the exiting).
     sd = (decision.get('structure_detail') or {}).get('15m') or {}
-    sh, sl, atr = sd.get('sh'), sd.get('sl'), sd.get('atr')   # R2 TP side (15m first-opposing)
-    sd_h = (decision.get('structure_detail') or {}).get('1h') or {}
-    sh_h, sl_h, atr_h = sd_h.get('sh'), sd_h.get('sl'), sd_h.get('atr')
+    sh, sl, atr = sd.get('sh'), sd.get('sl'), sd.get('atr')
     if not (sh and sl and atr):
         return tweaks
     try:
@@ -433,12 +434,13 @@ def tweak_structure_fixed(decision, open_positions):
                     want = price * 0.999           # never at/above price
                 want = max(want, price * 0.95)      # F-4 cap
             if prev is None:
-                # F-6: record state only when the bump landed (or was a
-                # no-op) — a CAS miss retries next cycle instead of
-                # consuming the structure change
-                if abs(stop - want) <= 1 or _apply_stop(want, stop, pid):
-                    _smap[key] = {'sh': cur_sh, 'sl': cur_sl, 'ts': time.time()}
-                    _st_dirty[0] = True
+                # SEED ONLY — never move the stop at birth. The armed/ATR
+                # structure stop the trade ARRIVED with stands (birth-align
+                # once loosened #16879's armed 73010 → 73669 = +659pts of
+                # needless risk; CEO 2026-11-12: "plan better"). The first
+                # formation after this steps it to the now-old structure.
+                _smap[key] = {'sh': cur_sh, 'sl': cur_sl, 'ts': time.time()}
+                _st_dirty[0] = True
                 return
             # F-5: side-specific — a SHORT bumps on swing-HIGH changes only
             changed = (cur_sh != prev['sh']) if side == 'SHORT' \
@@ -466,53 +468,23 @@ def tweak_structure_fixed(decision, open_positions):
                 continue
             d = str(pos.get('direction') or '').upper()
             if d == 'SHORT':
-                # STRUCTURE-LAG trailing (CEO 2026-11-12): the stop moves
-                # ONLY when the 1h zigzag forms a new swing, and then only
-                # to the now-OLD swing — interior bounces never touch it
-                # (#16871: current-structure stop tagged by a 74121 bounce,
-                # +0.99% taken while direction ran to 73584).
-                _lag_stop(pos['id'], 'SHORT', sh_h, sl_h, atr_h, price, stop)
-                # F3 (bug_hunter MED) + ENTRY-SIDE GUARD (CEO 2026-11-12
-                # rage fix): the snapped TP must stay BELOW live price AND
-                # strictly on the profit side of ENTRY. #16873's snap landed
-                # at 73439.50 = 32pts ABOVE entry 73406 → closed −0.22%
-                # labeled manual_tp_hit, preempting the structure stop
-                # before a 644pt move (#16878 same, −0.20%). Wrong-side
-                # structure → KEEP the original TP (the void giant-candle
-                # backstop) — a stop exit must never be pre-empted by a
-                # "take-profit" that books a loss.
-                if target < (sl - atr) and (sl + 0.05 * atr) < price * 0.999:
-                    new_tp = round(sl + 0.05 * atr, 8)
-                    if new_tp <= entry * 0.999:   # ≥0.1% on the profit side
-                        cur.execute("UPDATE trades SET target=%s WHERE id=%s "
-                                    "AND status='open' AND target=%s",
-                                    (new_tp, pos['id'], target))
-                        if cur.rowcount:
-                            conn.commit()
-                            t = {'trade': pos['id'], 'field': 'target',
-                                 'old': target, 'new': new_tp, 'rule': 'R2'}
-                            tweaks.append(t)
-                            DB.log_event('INFO', f"tweak {t}")
+                # STRUCTURE-LAG trailing on the EXECUTING (15m) structure,
+                # one swing behind (CEO 2026-11-12: "the SL should catch
+                # the move in profit by trailing lower as price continues
+                # to break structure lower"). 15m LHs form fast enough to
+                # step the stop down during the move; one-behind means a
+                # retest must exceed the PREVIOUS swing to hit = a real
+                # structure break, interior noise can't (#16871 lesson).
+                # TP is NEVER touched by the watchdog — giant-candle
+                # backstop only (R2 rule-10 snap REMOVED: it fired
+                # take-profits mid-move — #16879 exited at 72270 while
+                # the void ran on; "TP should only kick in if there's a
+                # giant candle between SL updates").
+                _lag_stop(pos['id'], 'SHORT', sh, sl, atr, price, stop)
             elif d == 'LONG':
-                # STRUCTURE-LAG mirror (CEO 2026-11-12): same rule —
-                # move only on new 1h structure, bump to the now-old swing.
-                _lag_stop(pos['id'], 'LONG', sh_h, sl_h, atr_h, price, stop)
-                # F3 mirror + ENTRY-SIDE GUARD: snapped TP must stay ABOVE
-                # live price AND strictly on the profit side of ENTRY
-                # (mirror of the #16873/#16878 fix — never a loss-labeling
-                # "take-profit").
-                if target > (sh + atr) and (sh - 0.05 * atr) > price * 1.001:
-                    new_tp = round(sh - 0.05 * atr, 8)
-                    if new_tp >= entry * 1.001:   # ≥0.1% on the profit side
-                        cur.execute("UPDATE trades SET target=%s WHERE id=%s "
-                                    "AND status='open' AND target=%s",
-                                    (new_tp, pos['id'], target))
-                        if cur.rowcount:
-                            conn.commit()
-                            t = {'trade': pos['id'], 'field': 'target',
-                                 'old': target, 'new': new_tp, 'rule': 'R2'}
-                            tweaks.append(t)
-                            DB.log_event('INFO', f"tweak {t}")
+                # STRUCTURE-LAG mirror on 15m, one swing behind; TP =
+                # giant-candle backstop only (R2 removed — see SHORT).
+                _lag_stop(pos['id'], 'LONG', sh, sl, atr, price, stop)
         # persist structure-lag state (72h prune, atomic — mirrors mxm)
         if _st_dirty[0]:
             _now = time.time()

@@ -317,16 +317,22 @@ duplicate real trade #16832).
     **exits only when structure ACTUALLY breaks** — no entry-relative
     cap (the ±0.5% cap was REMOVED by CEO 2026-11-09 17:00: it forced
     #16834's stop into the noise, 130pts above structure, and the move
-    then ran +691 without us; structure IS the risk bound). Auto arms
-    now carry the structure SL FROM BIRTH (15m swing ±0.10 ATR —
-    `_structure_sl`), and rule-10 snaps any void-TP into the first
-    opposing structure. Guardian/max-hold still apply. Since 2026-11-10
-    the fluid TRAIL and the watchdog structure-follow run TOGETHER on
-    every managed trade (contract item 2): the trail books profits on
-    2-min cycles with chop-surviving giveback, the watchdog aligns risk-
-    side stops to structure / deepens profit-side stops on 30-min — so
-    a winning trade books en route AND exits only when structure
-    actually breaks. (Counterfactual noted honestly:
+    then ran +691 without us; structure IS the risk bound). Since
+    2026-11-12 the watchdog's **STRUCTURE-LAG trailing** is the stop
+    authority on managed trades: state remembers the last **15m** swing
+    — structure unchanged → stop untouched; new swing → bump to the
+    now-OLD swing ±0.10 ATR (one behind, so only a REAL structure break
+    hits — interior retests can't, #16871); birth = SEED ONLY (the
+    armed stop stands, never overridden — a birth-align once loosened
+    #16879's 73010 → 73669 needlessly). The stop therefore TRAILS DOWN
+    on shorts as 15m LHs print (proven: 73112 → 72919 across two
+    formations), locking profit with structure. **TP is NEVER moved by
+    the watchdog — giant-candle backstop only**: the rule-10 TP snap is
+    REMOVED (it fired take-profits mid-move, booked losses labeled
+    manual_tp_hit on #16873/#16878, and cut #16879's winner at 72270
+    while the void ran on — CEO: "TP should only kick in if there's a
+    giant candle between SL updates"). Guardian/max-hold still apply.
+    (Counterfactual noted honestly:
     on #16827 itself the trail's exit beat the structure stop by
     ~1.7pts-of-margin — the fake-out resolved UP; the rule is for when
     the retest precedes the REAL leg.)
