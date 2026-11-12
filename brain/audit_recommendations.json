@@ -1,169 +1,167 @@
 {
-  "timestamp": "2026-11-12T00:45:00Z",
-  "run": 250,
+  "timestamp": "2026-11-12T04:39:20Z",
+  "run": 251,
   "session_brain_stats": {
-    "queries_run": 6,
-    "cited_hits": 4,
-    "prior_art_checked": [
-      "arm-rate admission gate",
-      "storm confluence waiver floor",
-      "jup R:R small-win large-loss"
-    ]
+    "queries_run": 8,
+    "usable_citations": 0,
+    "note": "Session brain returns empty excerpts/dates (titles only, scores 0.70-1.09) — dup-text rebuild still owed, flagged 7+ runs. All recommendations this run are monitor/hold (0 changes shipped), so no recommendation depends on a citation."
   },
   "questions_asked": [
     {
-      "question": "jup_yolo mirrored never-armed stall losses chop",
-      "results_found": 3,
-      "cited": true,
-      "citation": "[yolo dash, user, score=0.869] \"HYPE jup_yolo_mirrored signal keeps accumulating big losses ... hard_max_loss\""
-    },
-    {
-      "question": "storm short rsi floor waiver confluence starvation",
+      "question": "what did we say about jup_yolo_mirrored losses",
       "results_found": 5,
-      "cited": true,
-      "citation": "[calwndar, assistant, score=0.933] \"Storm confluence waiver — shipped shadow STORM_CONFLUENCE_WAIVER_SHADOW=True / ENFORCE=False\"; [calwndar, assistant, score=0.948] \"13 genuinely-qualified shorts = +$8.31, 13/13 touched +0.40%\""
-    },
-    {
-      "question": "jup_yolo long risk reward win small loss large",
-      "results_found": 5,
-      "cited": true,
-      "citation": "[yolo dash, user, score=0.869] jup hard_max_loss cluster; [exit asymmetry, assistant, score=0.918] \"RR-ENGINE HARD BLOCK — JUP LONG R:R=0.38 < 0.7\""
-    },
-    {
-      "question": "trail arm rate signal health admission gate shadow",
-      "results_found": 5,
-      "cited": true,
-      "citation": "[calwndar, user, score=0.941] shadow trail-block KILL: \"enforcing COSTS $0.41, 9 trail-winner blocks, fk 13.2%\" — prior trail-block shadow was killed"
-    },
-    {
-      "question": "have we tried blocking low arm-rate signals before",
-      "results_found": 1,
       "cited": false,
-      "note": "no direct prior art for arm%-based ADMISSION gate; closest = killed trail-block shadow (above) — do not re-propose trail blocking"
+      "note": "empty excerpts"
     },
     {
-      "question": "winner cell size multiplier revert decision",
+      "question": "have we tried arm-rate admission gate before",
       "results_found": 5,
-      "cited": true,
-      "citation": "[risk-budget decision, score=1.056] sizing/mult decisions routed to CEO"
+      "cited": false,
+      "note": "empty excerpts; prior-art known from #250 rejection in changes_log"
+    },
+    {
+      "question": "atr_sl_hit exit stack day plan",
+      "results_found": 5,
+      "cited": false,
+      "note": "empty excerpts"
+    },
+    {
+      "question": "winner cell size mult revert CEO",
+      "results_found": 5,
+      "cited": false,
+      "note": "empty excerpts; disposition file is source of truth"
+    },
+    {
+      "question": "stall unarmed entries never armed chop jup",
+      "results_found": 4,
+      "cited": false
+    },
+    {
+      "question": "pump-chain plus kill weight boost review",
+      "results_found": 4,
+      "cited": false
+    },
+    {
+      "question": "exit stack day mfe cut prearm breakeven plan",
+      "results_found": 4,
+      "cited": false
+    },
+    {
+      "question": "ETH copy trader stale open exit",
+      "results_found": 4,
+      "cited": false
     }
   ],
   "trade_summary_24h": {
-    "n": 12,
-    "pnl": -0.59,
-    "wr": 33.3,
-    "open": 1,
-    "by_signal": "atr-trend- 3T -0.19 | jup SHORT -0.18 | ai-trader-pending 3T -0.04 | r2v2-long5 -0.10 | pump-chain- -0.04 | jup LONG 2T +0.10",
-    "watchdog_steer_001": "VERIFIED — 12/20 losing streak real (12T -0.59 33.3% now)",
-    "root_cause": "never-armed chop/stall entries, NOT wrong-side structure",
-    "wrong_side_autopsy": "recovery_replay 48h (adverse-first, selfcheck PASS): n=14 = 0 never-adverse / 10 recovered / 4 NEVER (all immaterial -0.10..-0.13) -> WRONG-SIDE REFUTED 78th consecutive",
-    "regime": "btc_15m LONG_BIAS vs btc_4h SHORT_BIAS disagree, continuum BELOW, vol LOW, velocity SLOW, market CALM = mixed chop tape"
+    "trades": 10,
+    "wr": 30.0,
+    "pnl": -0.63,
+    "status": "RED",
+    "by_signal": "jup SHORT -0.33 (0/2), btc None -0.15, atr-trend- -0.12, atr-trend+ -0.11, pc- LONG -0.04, ai-trader-pending +0.02, jup LONG +0.10",
+    "7d": {
+      "trades": 84,
+      "wr": 46.4,
+      "pnl": -2.22
+    },
+    "open": "1 — ETH #16867 hl_copy LONG 13.9h +0.27% no SL/TP (exact-mirror T1)",
+    "watchdog_steer_001": "VERIFIED — 12/20 losing streak = unarmed chop entries, not wrong-side",
+    "arm_rate_24h": "unarmed 8/10=80% WR 12.5% vs armed 100% (auto_1hr 04:25)"
+  },
+  "autopsy_48h": {
+    "method": "recovery_replay.py adverse-first, selfcheck PASS",
+    "n": 14,
+    "never_adverse": 0,
+    "recovered": 10,
+    "never": 4,
+    "never_list": "FOGO -0.13, ZORA -0.12, AR -0.11, DYDX -0.10 (all immaterial)",
+    "verdict": "WRONG-SIDE REFUTED 79th consecutive run (#61 p=0.116, #84 t=-0.04)"
+  },
+  "arm_split": {
+    "7d": "ARMED 31T 93.5% +1.36 vs UNARMED 53T 18.9% -3.58",
+    "14d": "ARMED 164T 86.6% +8.02 vs UNARMED 195T 24.1% -11.94",
+    "stall_14d": "98T -11.58 (jup 45T -6.24 top feeder); armgap 7T -0.69",
+    "exits_14d": "atr_sl_hit 61T 0% -6.86 | hard_max 44T 0% -5.41 | PM-trail 124T 97.6% +7.00 | mfe_exit 39T 84.6% +1.84"
   },
   "shadow_analysis": {
-    "contrarian_join": "RE-RAN 00:30Z (mandate): overall flip 44.6% n=1747 decided; pc- 226W/124L = 64.6% STABLE; btc-pump-rider+ 553W/841L = 39.7% do-NOT flip",
-    "oscillator": "FROZEN + archived (fossil 20261027) — none",
+    "contrarian": "join RE-RAN 04:30Z (mandate): overall flip 44.6% n=1747; pc- 64.6% (226W/124L n=350) STABLE = flip candidate stands; btc-pump-rider+ 39.7% do-NOT-flip",
+    "oscillator": "FROZEN (archived) — none",
     "wyckoff": "RETIRED — none",
-    "floor_admit": "join fresh 11-10 20:36Z; floor_only 49.1% vs always_admit — next same-sign read 11-15",
-    "rr_shadow": "ORPHANED (24d stale, no producer) — do not cite",
-    "shadow_trader": "89k rows: exit A/B pm_trail +13,490 vs hard_max -15,928 = trail-or-nothing confirmed; grind-breakout- 93.8% n=32 top source (amplify registered #249)",
-    "overall": "3/5 usable (contrarian+floor+shadow_trader); oscillator/wyckoff/rr dead"
+    "floor_admit": "join due 11-15 same-sign read",
+    "rr_shadow": "ORPHANED — none",
+    "shadow_trader": "exit A/B fresh: pm_trail +13,589 vs hard_max -16,037 = trail-or-nothing reconfirmed; cut_loser -2,223; rr_engine -6,401",
+    "overall": "3/5 usable (contrarian + shadow_trader + floor pending)"
   },
   "drift_findings": [
     {
-      "item": "auto_1hr does not report arm-rate",
-      "detail": "hourly line reports atr_sl_hit%/WR/PnL but never trailing_activated split — the #1 trend-vs-chop diagnostic invisible to the hourly cadence",
-      "action": "FIXED this run: arm-rate KPI query + diagnosis bullet added to auto_1hr_prompt.md"
+      "item": "WINNER_CELL_SIZE_MULT still 1.25 at hermes_constants.py:1174",
+      "status": "CEO revert ~76h overdue (deadline was 00:00Z 11-10), 5th resurface; denylist blocks auditor execution (money-sizing = CEO per #208)"
     },
     {
-      "item": "WINNER_CELL_SIZE_MULT 1.25",
-      "detail": "default action REVERT to 1.0 failed 3-bar read on 11-10; money-sizing denylist blocks auditor self-execute; ~72h overdue now",
-      "action": "RESURFACED to CEO (4th time)"
+      "item": "session_brain empty excerpts",
+      "status": "rebuild owed 7+ runs — citation mandate unfulfillable this run"
     }
   ],
   "recurring_problems": [
-    "stall/never-armed bleed: 14d unarmed 195T 24.1% -$11.92 vs armed 165T 86.7% +$8.03; stall cohort 98T -$11.56 (jup 44T -$6.09 #1 feeder) — exit-stack day 11-14 owns the fix, NO new gate invented",
-    "atr_sl_hit = #1 bleed exit 14d 61T -$6.84 (17/61 never moved mfe<0.10, only 4 arm-gap) — stop-tighten/mfe-cut/prearm-BE reads due 11-14",
-    "R:R drag persists: jup LONG WR 61.3% but avg_loss -0.14 vs avg_win +0.06 (needs ~70% WR to break even); bb-squeeze+ arm 77% still -0.57 (armed but pays 2:1 against)"
+    "unarmed chop entries own the bleed (14d unarmed -11.94, stall cohort 98T -11.58) — exit-stack day 11-14 owns the fix, 0 new gates invented",
+    "jup_yolo_mirrored = #1 stall feeder 45T -6.24 — queue: jup-short-walk 11-14, jup batch 11-17"
   ],
   "missing_implementations": [],
   "creative_improvements": [
     {
-      "date": "2026-11-12T00:45:00Z",
-      "idea": "Arm-rate KPI in auto_1hr (24h trailing_activated split + diagnosis bullet)",
-      "rationale": "captains can't steer the trend-vs-chop line if the hourly cadence never shows it; 14d baseline armed 87% WR vs unarmed 24%",
-      "expected_impact": "reporting-only: stall deterioration visible hourly; zero trading behavior change",
-      "category": "observability",
-      "status": "SHIPPED this run",
-      "risk": "none"
+      "idea": "ARM-RATE ESCALATION CONDITION MET — #250 pre-registered 'unarmed >70% of closes for 3+ hourly runs = escalate stall-stack priority'; readings 01:21 75%, 02:25 81.8%, 04:25 80% = 3 consecutive. Escalated to CEO in kanban: pull exit-stack day (11-14) forward OR confirm date holds. Schedule change needs CEO because mfe-cut disposition was extended to 11-14 with rationale (#244).",
+      "category": "ops escalation",
+      "status": "escalated",
+      "risk": "low"
     },
     {
-      "date": "2026-11-12T00:45:00Z",
-      "idea": "Arm-rate admission gate (block new entries when signal rolling-14d arm% < 35, n>=10)",
-      "rationale": "entry-side complement to the exit stack: don't ENTER where the signal has been stalling; cohort today = ai-trader-pending SHORT 18.2% / jup SHORT 28.6% / pump-chain+ 26.7%",
-      "expected_impact": "current-data counterfactual only +$0.56/14d and blocked-cohort winner share 51.5% (fails <40% fk bar) — WEAK",
+      "idea": "pc+ kill-review EARLY PRE-SERVICE (due 11-13): 14d n=15 <40 pre-registered bar = INSUFFICIENT, monitor, cell-scoped EXTREME read at checkpoint (disposition already anticipates this); no default-KILL on sample-size rule",
+      "category": "kill review",
+      "status": "pre-served",
+      "risk": "low"
+    },
+    {
+      "idea": "hl_copy stale-hold cut rule MEASURED AND REJECTED-on-data: 30d hold buckets 16h+ n=2 -0.14 / 8-16h n=1 +0.03 / 4-8h n=3 +0.26 / <4h n=13 -0.52 — samples far below n=20 bar, no cut rule shippable; ETH #16867 steer stays report-only HOLD per readiness (cut if fades below entry without arming)",
       "category": "entry sniper",
-      "status": "REJECTED on current data (would need 30d fresh clearing fk<40% AND net>=$1.50/30d to revive)",
-      "risk": "medium (lagging meta-filter, self-defeating if signal recovers)",
-      "prior_art": "closest = trail-block shadow KILLED [calwndar 10-31] enforcing COSTS $0.41"
+      "status": "rejected",
+      "risk": "low"
     }
   ],
-  "config_changes_applied": [
-    {
-      "file": "automation/auto_1hr_prompt.md",
-      "type": "reporting",
-      "change": "added 24h arm-rate query (trailing_activated split) + Step-3 diagnosis bullet 5",
-      "trading_behavior": "NONE — reporting only"
-    },
-    {
-      "file": "data/shadow_disposition.json",
-      "type": "disposition",
-      "change": "storm-confl-waiver EXTEND to 11-19 (streak 0/3, CEO no-convert stands); linreg-fade-storm EXTEND to 12-01 (n=3/20 countable); storm-readiness-packet DONE (6 packets, A4 caveat clean)",
-      "trading_behavior": "NONE — shadow/deadline bookkeeping"
-    },
-    {
-      "file": "trading constants",
-      "type": "none",
-      "change": "0 hermes_constants changes — no pattern cleared significance bars this run (TREND-vs-RANGING regime split discarded: fisher p=0.505, all windows negative)"
-    }
-  ],
+  "config_changes_applied": [],
   "changes_from_last_run": [
     {
-      "run": 249,
-      "change": "AMPLIFY x2 (jup-FLAT cell, grind-breakout underdeploy)",
-      "verified": "registered intact, due 11-18 / 11-20; no early signal to read"
+      "change": "arm-rate KPI + diagnosis bullet in auto_1hr_prompt.md (#250)",
+      "verified": "WORKING — auto_1hr 01:21/02:25/04:25 all report arm-rate line with 'chop entries, stall stack owns fix, no new gate' diagnosis; escalation condition it watches has now triggered"
     },
     {
-      "run": 249,
-      "change": "stall_decomposition.py",
-      "verified": "re-ran 00:33Z: stall 98T -$11.56 armgap 7T -$0.69; jup still #1 feeder 44T -$6.09"
-    },
-    {
-      "run": 249,
-      "change": "winner-cell revert resurface",
-      "verified": "STILL 1.25 at constants:1174, ~72h overdue — resurface again"
-    },
-    {
-      "run": 249,
-      "change": "ETH #16867 null-SL cut-first flag",
-      "verified": "STILL OPEN 10h+, exact-mirror T1 (SL/TP cleared, engines skipped), +0.47% price move above entry — hold per flag, cut-first if fades below entry without arming"
-    },
-    {
-      "run": 249,
-      "change": "contrarian join mandate",
-      "verified": "re-ran 00:30Z fresh; pc- flip 64.6% stable"
+      "change": "storm dispositions EXTEND 11-19 / EXTEND 12-01 / DONE (#250)",
+      "verified": "open list confirms storm-confl-waiver due 11-19 open, linreg-fade-storm due 12-01 open, storm-readiness-packet done"
     }
   ],
-  "dispositions_due_1112": {
-    "storm-confl-waiver": "EXTENDED to 2026-11-19 — bar reset 0/3 (11-10 cf -$8.02), CEO NO-CONVERT 11-08 stands, default keep-shadow",
-    "linreg-fade-storm-admission-shadow": "EXTENDED to 2026-12-01 — n=3 countable (7 lines - 3 knife) vs n>=20, data-starved not refuted, floor stays 45",
-    "storm-readiness-packet": "DONE — threshold met: 6 packets since 10-30, A4 census caveat verified clean (0 short-regime-gate in packets), 11-05 diagnostic resolved"
+  "amplify_weekly": {
+    "winner_cells_30d_n_ge_10": [
+      "bb-squeeze+ NORMAL LONG 43T +0.75 WR65.1 — already covered by 4 open amplify-bbsqueeze-* entries",
+      "pump-chain+ EXTREME LONG 55T +0.49 — owned by kill-review due 11-13",
+      "volume-buildup- HIGH SHORT 19T +0.42 WR78.9 — amplify-vb-high-short-clonehunt open",
+      "pump-chain- NORMAL LONG 31T +0.15 — watch-contrarian-live open; net too small for new proposal"
+    ],
+    "new_proposal": "NONE — every n>=10 winner cell already has an in-flight disposition; stating per rule 3 rather than duplicating entries. Flip-KPI: no new shadow->live conversion this run."
   },
   "next_actions": [
-    "CEO (4th resurface): WINNER_CELL_SIZE_MULT 1.25->1.0 revert, ~72h OVERDUE, default=REVERT",
-    "CEO: ETH #16867 exact-mirror null-SL — hold while pro holds; cut-first if fades below entry (~-0.30%) without arming; no added size",
-    "11-13: pump-chain-plus-weight-kill-review + vb-high-short-clonehunt + linreg-fade-fill funnel",
-    "11-14 EXIT-STACK DAY: mfe-cut, prearm-breakeven, stop-tighten x3, tat-neverarmed, mult-150 adjudication (fold winner-cell questions post-revert)",
-    "11-15 floor same-sign | 11-17 jup batch (cluster/anti-chase/pro-selection) + atrsl parity | 11-18 contrarian fade + amplies",
-    "Watch: 24h arm-rate line in auto_1hr from next hourly run — if unarmed share >70% for 3+ consecutive hours, escalate stall stack priority"
-  ]
+    "CEO: winner-cell 1.25->1.0 revert (5th resurface, ~76h overdue) OR explicit extend",
+    "CEO: exit-stack day pull-forward decision (arm-rate escalation triggered) — else date holds 11-14",
+    "11-13: pump-chain+ kill-review (pre-read: n=15 INSUFFICIENT, cell-scoped EXTREME)",
+    "11-14: EXIT-STACK DAY (mfe-cut, prearm-BE, stop-tighten x3, jup-short-walk, tat-neverarmed, mult-150)",
+    "11-15: floor same-sign · 11-17 jup batch · session_brain rebuild (7+ runs owed)",
+    "ETH #16867: HOLD exact-mirror; cut-first if fades below entry (~-0.30%) without arming"
+  ],
+  "standing_verifies": {
+    "constants_git_diff": "EMPTY",
+    "ceo_protected": "39 flags present",
+    "live_trading": "True",
+    "ai_trader": "False",
+    "size_reduce": "absent = 1.0x",
+    "session_lock": "absent",
+    "tracebacks_today": 0,
+    "pipeline": "healthy 04:34Z"
+  }
 }

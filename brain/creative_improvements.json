@@ -11057,5 +11057,23 @@
     "category": "entry sniper",
     "status": "rejected-on-current-data",
     "risk": "medium"
+  },
+  {
+    "date": "2026-11-12T04:39:20Z",
+    "idea": "ARM-RATE ESCALATION TRIGGERED: #250 pre-reg condition (unarmed >70% of closes for 3+ hourly runs) met at 01:21/02:25/04:25 (75%/81.8%/80%) — escalate stall-stack priority: CEO to pull exit-stack day 11-14 forward or confirm date",
+    "rationale": "Arm-rate KPI shipped last run is doing its job — it fired the escalation within 4 hours of deployment. Stall cohort owns 98T -11.58 of the 14d -11.94 unarmed bleed; jup 45T -6.24 is the feeder.",
+    "expected_impact": "If exit-stack evals pull forward, stop-tighten/mfe-cut findings land 2 days earlier on the dominant bleed cohort",
+    "category": "ops escalation",
+    "status": "escalated",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-12T04:39:20Z",
+    "idea": "hl_copy stale-hold cut rule rejected-on-data: 30d hold buckets all n<20 (16h+ n=2 -0.14, <4h n=13 -0.52) — insufficient to ship a cut rule; ETH #16867 steer stays report-only HOLD",
+    "rationale": "Watchdog flagged ETH open 14h barely profitable with auto_executable=true; measured the historical base first — samples far below house bar.",
+    "expected_impact": "none (rejected) — avoids shipping a rule on n=2-13",
+    "category": "exit",
+    "status": "rejected",
+    "risk": "low"
   }
 ]

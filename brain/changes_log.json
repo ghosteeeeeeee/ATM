@@ -4100,5 +4100,27 @@
     "after": "waiver open/11-19 (streak 0/3, CEO no-convert); linreg open/12-01 (n=3/20); packet done (6 packets, A4 clean)",
     "rationale": "pre-registered deadline day — bar evaluation, not outcome selection",
     "impact": "shadow bookkeeping; no trading behavior change"
+  },
+  {
+    "timestamp": "2026-11-12T04:39:20Z",
+    "agent": "brain_auditor",
+    "change": "Resurfaced WINNER_CELL_SIZE_MULT 1.25->1.0 CEO revert (5th resurface, ~76h overdue); denylist blocks auditor execution (money-sizing=CEO)",
+    "type": "ops",
+    "file": "hermes_constants.py",
+    "before": "1.25",
+    "after": "1.25 (unchanged — CEO action)",
+    "rationale": "Bar re-measured by #245: FAIL on all three readings, default action REVERT; auditor cannot self-execute money-sizing",
+    "impact": "CEO action pending"
+  },
+  {
+    "timestamp": "2026-11-12T04:39:20Z",
+    "agent": "brain_auditor",
+    "change": "Arm-rate escalation condition MET (3 consecutive hourly runs unarmed >70%) — escalated stall-stack pull-forward decision to CEO in kanban",
+    "type": "ops",
+    "file": "automation/auto_1hr_prompt.md",
+    "before": "escalation condition watched",
+    "after": "condition fired, escalated",
+    "rationale": "#250 pre-registered escalation; KPI verified working this run",
+    "impact": "exit-stack day 11-14 pull-forward decision now with CEO"
   }
 ]
