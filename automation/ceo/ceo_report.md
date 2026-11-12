@@ -1265,3 +1265,10 @@ Numbers verified fresh via psql (brain). Metric-interpretation: no loss-filtered
 ### Numbers: 24h 10T -0.63 30.0% | 7d 84T -2.22 46.4%
 ### Findings: disk 89% WARN; winner-cell-size-125 revert ~1d overdue (1.25 still live); 3 decisions due today (storm packets); proactive=coin_tracker scores FRESH (agg max age ~1min, 113 symbols)
 ### Recommendation: Revert WINNER_CELL_SIZE_MULT 1.25→1.0 now (4th resurface) and free disk before it hits 90%.
+
+## CEO Status — 20261112T071848Z
+### Health: pipeline=active (timer-triggered) guardian=active open_pos=2
+### Numbers: 24h 8T -0.57 25.0% | 7d 83T -2.35 45.8%
+### Findings: 24h WR 25% on n=8 is thin-slice noise, not a signal; disk at 89% (repeated WARN) is the real watch item; repeated hotset/knife-floor exec-policy refusals in alerts (log noise, low severity). 7d still net-negative but improving vs prior -6.76/30d trend.
+### Recommendation: disk cleanup before it crosses 90%; no trading changes this run.
+### Proactive Q (day 12 mod 14 = accumulation phase): 94 coins in Wyckoff accumulation, scores fresh (0h). Top setup_score: MON 56.0, IOTA 51.5, GMT 49.8, AIXBT 49.2, ETC 48.6 — all LONG setup_type. BCH 58.2 flagged but its row is 1093h stale (ignore). Feed MON/IOTA/GMT to signal_analyst for a phase-transition signal candidate (weekly deep run).

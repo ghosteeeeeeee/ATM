@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-11T08:15:00.134007+00:00
-registry: 102 entries (open=48)
+# Shadow disposition report — 2026-11-12T08:15:00.144827+00:00
+registry: 104 entries (open=49)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -31,12 +31,9 @@ registry: 102 entries (open=48)
 - DONE amplify-weekly-mandate: MET 2026-11-02 (Monday weekly run): 30d winner-cell screen re-run (6 cells n>=10 net>0 — 4 VALIDATED, 2 OOS why-not'd), new proposal amplify-pc-fade-cell-split emitted, why-nots documented in kanban. Flip-KPI: 0 new conversions this run; in-flight watch-contrarian-live (11-03), storm-waiver (11-12). (?)
 - DONE fade-volgate-split-analysis: VALID — exemption candidate cleared (CEO rule met) (2026-10-29)
 - DONE fade-btc-crash-postflip: KEEP PERMANENT — full 24h read 2026-11-06T00:45Z: 9 unique crash=BLOCKED pump-chain- fade lines, coherence NO=5 YES=4 (56% NO) = STILL INCOHERENT; stage=crash-gate n=1 (ANIME WOULD-ALLOW vs live KILL), stage=inversion n=8 split 4/4. Per protocol (count only crash=BLOCKED, pump-chain- fade scope): NOT direction-coherent -> close KEEP pre-flip permanent per pre-registered default. Hoist NOT shipped. (2026-11-06T00:47:12.481255+00:00)
-- OPEN storm-confl-waiver: deadline=2026-11-12T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for storm-confl-waiver
-- OPEN linreg-fade-storm-admission-shadow: deadline=2026-11-12T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for linreg-fade-storm-admission-shadow
-- OPEN storm-readiness-packet: deadline=2026-11-12T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for storm-readiness-packet
+- OPEN storm-confl-waiver: deadline=2026-11-19T00:00:00Z | (no parseable source)
+- OPEN linreg-fade-storm-admission-shadow: deadline=2026-12-01T00:00:00Z | (no parseable source)
+- DONE storm-readiness-packet: DONE 2026-11-12 (audit #250): threshold MET — 6 [STORM-READINESS] packets emitted since 10-30 (10-30, 11-04, 11-05 x2, 11-08, 11-10); mechanism live under auto_1hr. A4 census-attribution caveat VERIFIED CLEAN: 0 "short-regime-gate" mentions across all packets (caveat never materialized). 11-05 no-packet diagnostic RESOLVED (packets did fire 15:21/16:21 that day). Storm-bar accumulation function proven (3/3 MET 11-08, reset 11-10) — bar custody continues under storm-confl-waiver (extended 11-19). (?)
 - DONE signal-zombie-purge: NO CHANGE (default action confirmed) — root cause materially better than the framing: the 'zombies' (decision='EXPIRED' AND executed=1) are already covered by the SECOND tier of a two-tier purge. scripts/archive-signals.py (daily hermes-archive-signals.timer 04:00Z) archives decision IN ('SKIPPED','EXPIRED','EXECUTED','COMPACTED','WAIT','FAILED') older than CUTOFF_HOURS_OTHERS=336h (14d) to /root/.hermes/archive/signals/signals_YYYY-MM.jsonl.gz — decision_reason FULLY PRESERVED — then DELETE+VACUUM. So option (a) retention>=14d AND option (b) archive-preserve are BOTH ALREADY IMPLEMENTED; the compactor's _purge_executed_signals (1h, EXECUTED/FAILED only) and _purge_stale_unexecuted (2h, executed=0 only) are just the fast-path. EVIDENCE: runtime DB min(created_at)=2026-10-25 (16,161 rows, nothing older than ~15d despite ~1000 zombies/day) and archive/signals/{2026-08,2026-09,2026-10,2026-11}.jsonl.gz all present. The ~15.9k 'zombies' are simply the in-retention-window forensic cohort = by design. Forensic history NOT at risk. No purge code change. 3-line ownership comment added to signal_compactor.py so this DECIDE is not re-opened. (2026-11-09T00:45:00Z)
 - DONE momentum-cache-regime-coverage: DONE — re-measured 2026-11-06T00:45Z after #225 universe fix + #226 STALE_THRESHOLD 32400: recent-traded universe n=65, fresh<4h=65 (100%), fresh<9h=65 (100%), 0 missing, 0 stale. Bar >=90% PASS. SQLite momentum_cache.db remains 0-byte orphan (PG source of truth, by design). (2026-11-06T00:47:12.481255+00:00)
 - DONE pump-detect-ceiling-mismatch: NO-CHANGE — replay NEGATIVE, both options dead, caps stand (2026-10-30)
@@ -53,6 +50,7 @@ registry: 102 entries (open=48)
 - DONE stop-asymmetry-highwr: SHIP-TO-SHADOW — SL at 1.0% price passes bar on both signals (WR not down); shadow-first spec delivered, NO live change (2026-10-31)
 - DONE short-relax-shadow-study: AGGREGATE UNATTRIBUTABLE — accept base rates (2026-10-31)
 - OPEN pump-chain-plus-weight-kill-review: deadline=2026-11-13T00:00:00Z | (no parseable source)
+  -> DECISION DUE within 24h for pump-chain-plus-weight-kill-review
 - DONE trial-wider-sl: KILL — bar dead both axes (CEO hail-mary 20261104T161050Z): wider arm 37.7% WR vs 55.0% bar AND vs 43.7% current arm (-6.0pp); PnL -506.6% vs -257.1% (wider worse both) (2026-11-04)
 - DONE trial-extended-time: KILL — bar dead both axes (CEO hail-mary 20261104T161050Z): extended arm -15.7pp WR-improvement vs +5.0pp bar (40.9% vs 56.6% current, n=16872); PnL axis divergence (+1422.5pp extended) documented, CEO ruled KILL over the divergence (2026-11-04)
 - OPEN watch-contrarian-live: deadline=2026-11-18T00:00:00Z | (no parseable source)
@@ -81,16 +79,19 @@ registry: 102 entries (open=48)
 - DONE daily-fill-cap-brake: ? (?)
 - OPEN amplify-ugb-bypass-hole: deadline=2026-12-15T00:00:00Z | (no parseable source)
 - OPEN amplify-vb-high-short-clonehunt: deadline=2026-11-13T00:00:00Z | (no parseable source)
+  -> DECISION DUE within 24h for amplify-vb-high-short-clonehunt
 - OPEN amplify-jup-short-high-cell: deadline=2026-11-19T00:00:00Z | (no parseable source)
 - OPEN amplify-ema300-underdeploy: deadline=2026-11-19T00:00:00Z | (no parseable source)
 - OPEN amplify-bbsqueeze-chop-exempt: deadline=2026-11-13T00:00:00Z | (no parseable source)
+  -> DECISION DUE within 24h for amplify-bbsqueeze-chop-exempt
 - OPEN jup-cluster-gate: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN jup-anti-chase: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN jup-pro-selection: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN btc-standalone-deny-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN setup-recall-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN linreg-fade-fill-funnel: deadline=2026-11-13T00:00:00Z | (no parseable source)
-- OPEN amplify-bbsqueeze-warrior-uninert: deadline=2026-11-14T00:00:00Z | data/combo_weights.json: 67 rows, 1.1d
+  -> DECISION DUE within 24h for linreg-fade-fill-funnel
+- OPEN amplify-bbsqueeze-warrior-uninert: deadline=2026-11-14T00:00:00Z | data/combo_weights.json: 67 rows, 0.1d
 - OPEN amplify-bbsqueeze-neutral-exempt: deadline=2026-11-14T00:00:00Z | (no parseable source)
 - OPEN atr-trend-accel-shadow: deadline=2026-12-06T00:00:00Z | (no parseable source)
 - OPEN amplify-prearm-breakeven-lock: deadline=2026-11-14T00:00:00Z | (no parseable source)
@@ -107,3 +108,5 @@ registry: 102 entries (open=48)
 - OPEN amplify-tat-neverarmed-age-widen: deadline=2026-11-14T00:00:00Z | (no parseable source)
 - OPEN amplify-atr-trend-short-clonehunt: deadline=2026-11-18T00:00:00Z | (no parseable source)
 - OPEN amplify-ugb-bypass-armgap: deadline=2026-11-18T00:00:00Z | (no parseable source)
+- OPEN amplify-jup-long-flat-cell: deadline=? | (no parseable source)
+- OPEN amplify-grind-breakout-underdeploy: deadline=? | (no parseable source)
