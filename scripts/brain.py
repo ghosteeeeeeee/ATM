@@ -329,17 +329,30 @@ def get_thoughts_by_tag(tag: str) -> list:
     finally:
         conn.close()
 
-def validate_levels(side: str, entry: float, sl, target) -> None:
+def validate_levels(side: str, entry: float, sl, target, signal: str = None) -> None:
     """Wrong-side level guard (bug_hunter F-1 2026-11-12, F-MED-1 sentinel
-    exemption): levels must sit ≥0.1% on the profit side of entry (round-trip
-    fees ~0.09%) — a wrong-side level births a loss-labeling "TP hit"
-    (#16873/#16878 class). 0/None = unset or the ATR-deferral SENTINEL
-    (decider delayed entries pass --sl 0 --target 0 for
-    position_manager._collect_atr_updates to fill on the first cycle) →
-    exempt. Raises ValueError; CLI maps it to parser.error (pre-side-effect).
+    exemption, V-1/V-2 hardening): levels must sit ≥0.1% on the profit side of
+    entry (round-trip fees ~0.09%) — a wrong-side level births a loss-labeling
+    "TP hit" (#16873/#16878 class). 0/None = unset or the ATR-deferral
+    SENTINEL (decider delayed entries pass --sl 0 --target 0 for
+    position_manager._collect_atr_updates to fill on the first cycle) → exempt
+    for NON-managed adds only (V-2: a managed trade never gets an ATR
+    first-set — a 0 level there = a ride with no TP/SL). V-1: side is
+    normalized and unknown sides raise — no silent validation skip.
+    Raises ValueError; CLI maps it to parser.error (pre-side-effect).
     """
+    side = str(side).lower()
+    if side not in ("long", "short"):
+        raise ValueError(f"unknown side {side!r} — validation would silently skip")
     if not entry or entry <= 0:
         return
+    _managed = False
+    if signal:
+        try:
+            from manual_exit_manager import is_managed_signal as _ims
+            _managed = _ims(str(signal))
+        except Exception:
+            _managed = False
     if target:
         if side == "short" and target > entry * 0.999:
             raise ValueError(f"target {target} wrong-side: short needs "
@@ -347,6 +360,10 @@ def validate_levels(side: str, entry: float, sl, target) -> None:
         if side == "long" and target < entry * 1.001:
             raise ValueError(f"target {target} wrong-side: long needs "
                              f"≥0.1% above entry {entry}")
+    elif _managed:
+        raise ValueError(f"managed signal {signal} needs an explicit target — "
+                         f"0/None is only an ATR-deferral sentinel for "
+                         f"non-managed adds")
     if sl:
         if side == "short" and sl < entry * 1.001:
             raise ValueError(f"sl {sl} wrong-side: short needs "
@@ -354,6 +371,10 @@ def validate_levels(side: str, entry: float, sl, target) -> None:
         if side == "long" and sl > entry * 0.999:
             raise ValueError(f"sl {sl} wrong-side: long needs "
                              f"≥0.1% below entry {entry}")
+    elif _managed:
+        raise ValueError(f"managed signal {signal} needs an explicit stop-loss — "
+                         f"0/None is only an ATR-deferral sentinel for "
+                         f"non-managed adds")
 
 def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float,
                exchange: str = "Hyperliquid", strategy: str = None, paper: bool = False,
@@ -1598,7 +1619,8 @@ if __name__ == "__main__":
             # effect; 0/None passes (ATR-deferral sentinel — decider delayed
             # entries rely on it). See brain.validate_levels.
             try:
-                validate_levels(args.side, args.entry, args.sl, args.target)
+                validate_levels(args.side, args.entry, args.sl, args.target,
+                                args.signal)
             except ValueError as _ve:
                 parser.error(str(_ve))
             trade_id = add_trade(
