@@ -1272,3 +1272,21 @@ Numbers verified fresh via psql (brain). Metric-interpretation: no loss-filtered
 ### Findings: 24h WR 25% on n=8 is thin-slice noise, not a signal; disk at 89% (repeated WARN) is the real watch item; repeated hotset/knife-floor exec-policy refusals in alerts (log noise, low severity). 7d still net-negative but improving vs prior -6.76/30d trend.
 ### Recommendation: disk cleanup before it crosses 90%; no trading changes this run.
 ### Proactive Q (day 12 mod 14 = accumulation phase): 94 coins in Wyckoff accumulation, scores fresh (0h). Top setup_score: MON 56.0, IOTA 51.5, GMT 49.8, AIXBT 49.2, ETC 48.6 — all LONG setup_type. BCH 58.2 flagged but its row is 1093h stale (ignore). Feed MON/IOTA/GMT to signal_analyst for a phase-transition signal candidate (weekly deep run).
+
+## CEO Status — 20261112T111849Z
+### Health: pipeline=active guardian=active open_pos=3
+### Numbers: 24h 10T -0.41 40.0% | 7d 85T -2.18 47.1%
+### Findings: disk 89% WARN (repeated 08:34-10:34Z); coin_tracker scores fresh (agg_scores max ts = now, 113 coins) but coin_HYPE frozen ~9d and ~35 coin tables empty.
+### Recommendation: prune/rotate logs before disk hits 95%.
+
+## CEO Status — 20261112T151849Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 14T -0.03 64.3% | 7d 90T -2.19 48.9%
+### Findings: Overdue `winner-cell-size-125` (2d, default REVERT to 1.0); disk 89% WARN; pending_order_monitor 1-step fail (hype-short pending). Regime Q: 4h SHORT_BIAS (111/127) vs 15m mostly NEUTRAL (106/129) overall SHORT_BIAS — both scanners fresh <4m; SHORT-aligned book, no action in status run.
+### Recommendation: Adjudicate winner-cell-size-125 today (silence reverts mult to 1.0); prune logs before disk hits 95%.
+
+## CEO Status — 20261112T191850Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 16T +0.04 62.5% | 7d 92T -2.33 47.8%
+### Findings: Clean — services up, 24h flat-green, 0 open positions. Disk 89% (WARN, recurring). Control tower: 1 OVERDUE — winner-cell-size-125 (due 11-10, 2d late, CEO label + T sign-off). Proactive Q (day12%14): accumulation coins — IMX 66.7, ICP 63.5, BABY 63.3, CRV 63.2, CFX 63.2 (agg_scores fresh now, 113 symbols tracked).
+### Recommendation: Clear the winner-cell-size-125 overdue item (sign-off or drop); watch disk at 89%.
