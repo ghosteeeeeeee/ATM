@@ -2786,7 +2786,14 @@ def refresh_current_prices(server: str = SERVER_NAME):
                                 _tp_wrong = ((direction == 'LONG' and _tgt <= _ep * 1.001) or
                                              (direction == 'SHORT' and _tgt >= _ep * 0.999))
                                 if _tp_wrong:
+                                    # F-LOW-1 (bug_hunter): floor the distance
+                                    # at 0.15% of fill (fees ~0.09%) — a
+                                    # sub-band distance re-triggered this fix
+                                    # every cycle (log spam + a sub-fee target
+                                    # the relabel still calls loss-side).
                                     _dist = abs(_tgt - entry) or (_ep * 0.01)
+                                    if _dist < _ep * 0.0015:
+                                        _dist = _ep * 0.0015
                                     _new_tgt = round(_ep + _dist, 8) if direction == 'LONG' \
                                         else round(_ep - _dist, 8)
                                     _set_cols += ", target = %s"

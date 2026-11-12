@@ -329,6 +329,32 @@ def get_thoughts_by_tag(tag: str) -> list:
     finally:
         conn.close()
 
+def validate_levels(side: str, entry: float, sl, target) -> None:
+    """Wrong-side level guard (bug_hunter F-1 2026-11-12, F-MED-1 sentinel
+    exemption): levels must sit ≥0.1% on the profit side of entry (round-trip
+    fees ~0.09%) — a wrong-side level births a loss-labeling "TP hit"
+    (#16873/#16878 class). 0/None = unset or the ATR-deferral SENTINEL
+    (decider delayed entries pass --sl 0 --target 0 for
+    position_manager._collect_atr_updates to fill on the first cycle) →
+    exempt. Raises ValueError; CLI maps it to parser.error (pre-side-effect).
+    """
+    if not entry or entry <= 0:
+        return
+    if target:
+        if side == "short" and target > entry * 0.999:
+            raise ValueError(f"target {target} wrong-side: short needs "
+                             f"≥0.1% below entry {entry}")
+        if side == "long" and target < entry * 1.001:
+            raise ValueError(f"target {target} wrong-side: long needs "
+                             f"≥0.1% above entry {entry}")
+    if sl:
+        if side == "short" and sl < entry * 1.001:
+            raise ValueError(f"sl {sl} wrong-side: short needs "
+                             f"≥0.1% above entry {entry}")
+        if side == "long" and sl > entry * 0.999:
+            raise ValueError(f"sl {sl} wrong-side: long needs "
+                             f"≥0.1% below entry {entry}")
+
 def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float,
                exchange: str = "Hyperliquid", strategy: str = None, paper: bool = False,
                stop_loss: float = None, target: float = None, server: str = "Hermes",
@@ -1567,28 +1593,14 @@ if __name__ == "__main__":
         args = parser.parse_args(sys.argv[2:])
         
         if args.subcommand == "add":
-            # LEVEL-SIDE VALIDATION (bug_hunter F-1 2026-11-12): a wrong-side
-            # target/SL births a loss-labeling "TP hit" (#16873/#16878 class).
-            # Shape vs the add price with a 0.1% margin (round-trip fees
-            # ~0.09%); validated BEFORE any order/DB side effect. Pending
-            # fires pass trigger-shaped levels (distances 0.3-1.6%) — never
-            # rejected; manual adds must obey the same shape as arm time.
-            _e = args.entry
-            if _e and _e > 0:
-                if args.target is not None:
-                    if args.side == "short" and args.target > _e * 0.999:
-                        parser.error(f"target {args.target} wrong-side: short "
-                                     f"needs ≥0.1% below entry {_e}")
-                    if args.side == "long" and args.target < _e * 1.001:
-                        parser.error(f"target {args.target} wrong-side: long "
-                                     f"needs ≥0.1% above entry {_e}")
-                if args.sl is not None:
-                    if args.side == "short" and args.sl < _e * 1.001:
-                        parser.error(f"sl {args.sl} wrong-side: short needs "
-                                     f"≥0.1% above entry {_e}")
-                    if args.side == "long" and args.sl > _e * 0.999:
-                        parser.error(f"sl {args.sl} wrong-side: long needs "
-                                     f"≥0.1% below entry {_e}")
+            # LEVEL-SIDE VALIDATION (bug_hunter F-1 2026-11-12; F-MED-1
+            # zero-sentinel exemption): wrong-side levels rejected pre-side-
+            # effect; 0/None passes (ATR-deferral sentinel — decider delayed
+            # entries rely on it). See brain.validate_levels.
+            try:
+                validate_levels(args.side, args.entry, args.sl, args.target)
+            except ValueError as _ve:
+                parser.error(str(_ve))
             trade_id = add_trade(
                 token=args.token,
                 side_type=args.side,  # long or short (positional)
