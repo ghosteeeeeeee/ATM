@@ -338,10 +338,16 @@ def tweak_structure_fixed(decision, open_positions):
          enough to trail profit during the move; one swing BEHIND, so a
          retest must exceed the previous swing to hit = real structure
          break only, interior noise can't — #16871). Structure unchanged
-         → stop untouched. New swing → bump to the PREVIOUS (now-old)
-         swing ±0.10 ATR, price-side clamped, ±5% stale cap, never
-         un-breaching a breached stop. Birth = SEED ONLY (the armed/ATR
-         stop the trade arrived with stands — never overridden).
+         → stop untouched. FAVORABLE new swing (short: LOWER high) →
+         bump to the PREVIOUS (now-old) swing ±0.10 ATR. ADVERSE new
+         swing (short: HIGHER high — #16882's 72224 bounce) → NEVER
+         chase the stop with it: keep it, or at most RAISE it to the
+         new structure so a crossing = a break at the real line (the
+         old chase dropped the stop 72327→71771 and exited 71789 while
+         72500 was never touched). Price-side clamped, ±5% stale cap,
+         never un-breaching a breached stop. Birth = SEED ONLY (the
+         armed/ATR stop the trade arrived with stands — never
+         overridden).
       TP: NEVER moved by the watchdog — the giant-candle backstop only.
          (The rule-10 TP snap is REMOVED: it fired take-profits mid-move
          — #16873/#16878 booked losses labeled manual_tp_hit, #16879
@@ -445,12 +451,41 @@ def tweak_structure_fixed(decision, open_positions):
             # F-5: side-specific — a SHORT bumps on swing-HIGH changes only
             changed = (cur_sh != prev['sh']) if side == 'SHORT' \
                 else (cur_sl != prev['sl'])
-            if changed:
-                # NEW structure formed → bump to the now-old structure
-                if abs(stop - want) <= 1 or _apply_stop(want, stop, pid):
-                    _smap[key] = {'sh': cur_sh, 'sl': cur_sl, 'ts': time.time()}
-                    _st_dirty[0] = True
-            # structure unchanged → the stop is NOT touched (the whole rule)
+            if not changed:
+                # structure unchanged → the stop is NOT touched (the rule)
+                return
+            favorable = (cur_sh < prev['sh']) if side == 'SHORT' \
+                else (cur_sl > prev['sl'])
+            if favorable:
+                # structure broke LOWER (short) / HIGHER (long) → trail:
+                # bump to the now-old structure (one swing behind)
+                target = want
+            else:
+                # ADVERSE structure change (short: a HIGHER swing high —
+                # #16882's bounce to 72224; long: a LOWER swing low) →
+                # NEVER chase the stop with it. At most RAISE the stop to
+                # the new structure (short: cur_sh+buf, long: cur_sl−buf)
+                # so a crossing still = a break at the real line. (CEO
+                # 2026-11-12: "even on a 1m chart we haven't crossed 72500"
+                # — the old chase dropped the stop 72327 → 71771 under the
+                # bounce and exited 71789 on interior noise.)
+                if side == 'SHORT':
+                    t2 = cur_sh + 0.10 * cur_atr
+                    t2 = min(max(t2, price * 1.001), price * 1.05)
+                else:
+                    t2 = cur_sl - 0.10 * cur_atr
+                    t2 = max(min(t2, price * 0.999), price * 0.95)
+                target = t2 if t2 > stop + 1 else None   # only ever raise
+            if target is None:
+                # adverse & already at/above the new structure → keep the
+                # stop; still record the new structure for next compare
+                _smap[key] = {'sh': cur_sh, 'sl': cur_sl, 'ts': time.time()}
+                _st_dirty[0] = True
+            elif abs(stop - target) <= 1 or _apply_stop(target, stop, pid):
+                _smap[key] = {'sh': cur_sh, 'sl': cur_sl, 'ts': time.time()}
+                _st_dirty[0] = True
+            # (F-6: a CAS miss on a favorable bump records nothing → the
+            # structure change retries next cycle instead of vanishing)
 
         for pos in open_positions or []:
             # Gate CHANGED 2026-11-10: no longer dynamic_sl-false only —

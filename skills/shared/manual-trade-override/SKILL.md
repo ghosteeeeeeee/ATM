@@ -320,9 +320,15 @@ duplicate real trade #16832).
     then ran +691 without us; structure IS the risk bound). Since
     2026-11-12 the watchdog's **STRUCTURE-LAG trailing** is the stop
     authority on managed trades: state remembers the last **15m** swing
-    — structure unchanged → stop untouched; new swing → bump to the
-    now-OLD swing ±0.10 ATR (one behind, so only a REAL structure break
-    hits — interior retests can't, #16871); birth = SEED ONLY (the
+    — structure unchanged → stop untouched; a FAVORABLE new swing
+    (short: lower high) → bump to the now-OLD swing ±0.10 ATR (one
+    behind, so only a REAL structure break hits — interior retests
+    can't, #16871); an ADVERSE new swing (short: HIGHER high) → NEVER
+    chase the stop with it — keep it, or at most RAISE it to the new
+    structure so a crossing = a break at the real line (#16882: the
+    72224 bounce made the old code drop the stop 72327 → 71771 under
+    price and exit 71789 while the CEO's 72500 line was never
+    touched); birth = SEED ONLY (the
     armed stop stands, never overridden — a birth-align once loosened
     #16879's 73010 → 73669 needlessly). The stop therefore TRAILS DOWN
     on shorts as 15m LHs print (proven: 73112 → 72919 across two
