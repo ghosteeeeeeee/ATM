@@ -381,6 +381,56 @@ def tweak_structure_fixed(decision, open_positions):
                 return True
             return False
 
+        # ── STRUCTURE-LAG TRAILING (CEO 2026-11-12): "stops should only
+        # move when new structure is formed — we bump the stop to the now
+        # OLD structure, so if that is broken we get taken out."
+        # The stop NEVER moves on interior noise (the #16871 lesson: stop
+        # sat at the CURRENT structure, a 74121 bounce tagged it, +0.99%
+        # taken, direction kept going to 73584). It steps ONLY when the
+        # 1h zigzag confirms a new swing, and it steps to the PREVIOUS
+        # (now-old) swing — one full structure behind the newest.
+        # State: data/tweak_struct_state.json (72h prune on save).
+        import os as _os, json as _json
+        from paths import HERMES_DATA as _HD
+        _st_path = _os.path.join(_HD, 'tweak_struct_state.json')
+        try:
+            with open(_st_path) as _f:
+                _smap = _json.load(_f)
+        except Exception:
+            _smap = {}
+        _st_dirty = [False]           # nonlocal-ish for nested helper
+
+        def _lag_stop(pid, side, cur_sh, cur_sl, cur_atr, price, stop):
+            key = str(pid)
+            prev = _smap.get(key)
+            if side == 'SHORT':
+                if not (cur_sh and cur_atr):
+                    return
+                # birth → current structure; after that → the now-old one
+                base = cur_sh if prev is None else float(prev['sh'])
+                want = base + 0.10 * cur_atr
+                want = max(want, price * 1.001)     # never at/below price
+            else:
+                if not (cur_sl and cur_atr):
+                    return
+                base = cur_sl if prev is None else float(prev['sl'])
+                want = base - 0.10 * cur_atr
+                if want >= price:
+                    want = price * 0.999           # never at/above price
+            if prev is None:
+                if abs(stop - want) > 1:
+                    _apply_stop(want, stop, pid)
+                _smap[key] = {'sh': cur_sh, 'sl': cur_sl, 'ts': time.time()}
+                _st_dirty[0] = True
+                return
+            if cur_sh != prev['sh'] or cur_sl != prev['sl']:
+                # NEW structure formed → bump to the now-old structure
+                if abs(stop - want) > 1:
+                    _apply_stop(want, stop, pid)
+                _smap[key] = {'sh': cur_sh, 'sl': cur_sl, 'ts': time.time()}
+                _st_dirty[0] = True
+            # structure unchanged → the stop is NOT touched (the whole rule)
+
         for pos in open_positions or []:
             # Gate CHANGED 2026-11-10: no longer dynamic_sl-false only —
             # trail (2-min mxm, fluid profile) and this structure-follow
@@ -397,21 +447,12 @@ def tweak_structure_fixed(decision, open_positions):
                 continue
             d = str(pos.get('direction') or '').upper()
             if d == 'SHORT':
-                # FLUID STRUCTURE-FOLLOW (CEO 2026-11-10 synthesis):
-                # risk-side (stop ≥ entry) → ALIGN to MAJOR (1h) structure
-                # either direction — survival IS the pattern boundary
-                # (#16834 fix; ±0.5% cap removed; 15m→1h 2026-11-10 because
-                # flag interior swings get stop-hunted: #16851/52's 74114
-                # died at 74285, real drop followed). Profit-side (stop <
-                # entry) → only DEEPEN the lock, never relax.
-                if sh_h and atr_h:
-                    want = sh_h + 0.10 * atr_h
-                    want = max(want, price * 1.001)   # never at/below price
-                    if stop >= entry:
-                        if abs(stop - want) > 1:
-                            _apply_stop(want, stop, pos['id'])
-                    elif stop > want:
-                        _apply_stop(want, stop, pos['id'])
+                # STRUCTURE-LAG trailing (CEO 2026-11-12): the stop moves
+                # ONLY when the 1h zigzag forms a new swing, and then only
+                # to the now-OLD swing — interior bounces never touch it
+                # (#16871: current-structure stop tagged by a 74121 bounce,
+                # +0.99% taken while direction ran to 73584).
+                _lag_stop(pos['id'], 'SHORT', sh_h, sl_h, atr_h, price, stop)
                 # F3 (bug_hunter MED): TP must stay BELOW live price for a
                 # short — a structure snap already crossed = instant exit.
                 if target < (sl - atr) and (sl + 0.05 * atr) < price * 0.999:
@@ -426,21 +467,9 @@ def tweak_structure_fixed(decision, open_positions):
                         tweaks.append(t)
                         DB.log_event('INFO', f"tweak {t}")
             elif d == 'LONG':
-                # FLUID STRUCTURE-FOLLOW mirror (1h MAJOR structure, CEO
-                # 2026-11-10): risk-side (stop ≤ entry) → align to pattern
-                # boundary; profit-side → only deepen, never relax.
-                # Clamp ONLY when structure sits at/above the live price
-                # (instant self-close) — never over-tighten valid structure
-                # (test-caught: min() dragged a valid stop150pts closer).
-                if sl_h and atr_h:
-                    want = sl_h - 0.10 * atr_h
-                    if want >= price:
-                        want = price * 0.999
-                    if stop <= entry:
-                        if abs(stop - want) > 1:
-                            _apply_stop(want, stop, pos['id'])
-                    elif stop < want:
-                        _apply_stop(want, stop, pos['id'])
+                # STRUCTURE-LAG mirror (CEO 2026-11-12): same rule —
+                # move only on new 1h structure, bump to the now-old swing.
+                _lag_stop(pos['id'], 'LONG', sh_h, sl_h, atr_h, price, stop)
                 # F3 mirror: TP must stay ABOVE live price for a long
                 if target > (sh + atr) and (sh - 0.05 * atr) > price * 1.001:
                     new_tp = round(sh - 0.05 * atr, 8)
@@ -453,6 +482,15 @@ def tweak_structure_fixed(decision, open_positions):
                              'old': target, 'new': new_tp, 'rule': 'R2'}
                         tweaks.append(t)
                         DB.log_event('INFO', f"tweak {t}")
+        # persist structure-lag state (72h prune, atomic — mirrors mxm)
+        if _st_dirty[0]:
+            _now = time.time()
+            _smap = {k: v for k, v in _smap.items()
+                     if float((v or {}).get('ts') or _now) > _now - 72 * 3600}
+            _tmp = _st_path + '.tmp'
+            with open(_tmp, 'w') as _f:
+                _json.dump(_smap, _f)
+            _os.replace(_tmp, _st_path)
         cur.close()
     finally:
         conn.close()
