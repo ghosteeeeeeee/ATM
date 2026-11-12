@@ -324,22 +324,22 @@ def _arm_real_leg(order_id, leg, o, size, cfg, atr_1h):
 
 
 def tweak_structure_fixed(decision, open_positions):
-    """Fluid structure-follow stop tuning (CEO 2026-11-10: "the stop is
-    trailing so we book profits... fluid enough to allow the chop and
-    survive unless structure is broken... the watchdog is adjusting the
-    stops as the trade progresses").
+    """Structure-lag stop tuning (CEO 2026-11-12: "our stops should only
+    move when new structure is formed — we bump the stop to the now OLD
+    structure, so if that is broken we get taken out").
 
-    Runs on EVERY managed open trade (ai-trader-*) — the mxm trail books
-    profits on 2-min pipeline cycles with the fluid profile (skip-BE /
-    wide giveback / min-lock), THIS tweak follows structure every 30-min
-    watchdog cycle. The two coexist without fighting:
-      R1 structure-follow — risk-side stop (short: stop ≥ entry, long:
-         stop ≤ entry) ALIGNS to structure either direction (survival IS
-         structure — the #16834 fix: stop pinned 130pts above structure
-         in the noise, move ran +691; ±0.5% entry cap removed 2026-11-09).
-         Profit-side stop: only DEEPENS (never relaxes a lock) — so the
-         watchdog can't undo what the trail booked, and the trail's
-         ratchet can't undo an alignment. Never onto the live price side.
+    Runs on EVERY managed open trade (ai-trader-*) on each 30-min watchdog
+    cycle. For ladder/structural orders the mxm giveback-trail stands down
+    (`dynamic_sl: false`), so THIS is their sole stop authority:
+      R1 structure-lag (_lag_stop) — per-trade state remembers the last 1h
+         zigzag swing. Structure unchanged → the stop is NOT touched
+         (interior bounces never move it — the #16871 lesson: a 74121
+         bounce tagged a current-structure stop for +0.99% while the run
+         went to 73583). New swing confirmed → the stop bumps to the
+         PREVIOUS (now-old) swing ±0.10 ATR, price-side clamped (never at
+         the live price), capped at ±5% (stale-structure guard), never
+         un-breaching an already-breached stop (the hit-check owns that
+         exit). Birth aligns to the current structure once.
       R2 rule-10 TP — a TP overshooting the FIRST opposing structure by
          more than 1 ATR snaps into it (short: 15m SL + 0.05 ATR;
          long: 15m SH − 0.05 ATR), price-side guarded (F3).
@@ -403,6 +403,19 @@ def tweak_structure_fixed(decision, open_positions):
         def _lag_stop(pid, side, cur_sh, cur_sl, cur_atr, price, stop):
             key = str(pid)
             prev = _smap.get(key)
+            # F-1: malformed entry (sh=None / non-dict) → treat as birth so
+            # one bad row can't abort every cycle forever (bug_hunter 2026-11-12)
+            if not (isinstance(prev, dict)
+                    and isinstance(prev.get('sh'), (int, float))
+                    and isinstance(prev.get('sl'), (int, float))):
+                prev = None
+            # F-3: stop already breached → the hit-check owns the exit; never
+            # write a rescue stop that un-breaches it ("if that is broken we
+            # get taken out" — the watchdog must not walk it back)
+            if side == 'SHORT' and stop <= price:
+                return
+            if side == 'LONG' and stop >= price:
+                return
             if side == 'SHORT':
                 if not (cur_sh and cur_atr):
                     return
@@ -410,6 +423,7 @@ def tweak_structure_fixed(decision, open_positions):
                 base = cur_sh if prev is None else float(prev['sh'])
                 want = base + 0.10 * cur_atr
                 want = max(want, price * 1.001)     # never at/below price
+                want = min(want, price * 1.05)      # F-4: absurd-stale cap
             else:
                 if not (cur_sl and cur_atr):
                     return
@@ -417,18 +431,23 @@ def tweak_structure_fixed(decision, open_positions):
                 want = base - 0.10 * cur_atr
                 if want >= price:
                     want = price * 0.999           # never at/above price
+                want = max(want, price * 0.95)      # F-4 cap
             if prev is None:
-                if abs(stop - want) > 1:
-                    _apply_stop(want, stop, pid)
-                _smap[key] = {'sh': cur_sh, 'sl': cur_sl, 'ts': time.time()}
-                _st_dirty[0] = True
+                # F-6: record state only when the bump landed (or was a
+                # no-op) — a CAS miss retries next cycle instead of
+                # consuming the structure change
+                if abs(stop - want) <= 1 or _apply_stop(want, stop, pid):
+                    _smap[key] = {'sh': cur_sh, 'sl': cur_sl, 'ts': time.time()}
+                    _st_dirty[0] = True
                 return
-            if cur_sh != prev['sh'] or cur_sl != prev['sl']:
+            # F-5: side-specific — a SHORT bumps on swing-HIGH changes only
+            changed = (cur_sh != prev['sh']) if side == 'SHORT' \
+                else (cur_sl != prev['sl'])
+            if changed:
                 # NEW structure formed → bump to the now-old structure
-                if abs(stop - want) > 1:
-                    _apply_stop(want, stop, pid)
-                _smap[key] = {'sh': cur_sh, 'sl': cur_sl, 'ts': time.time()}
-                _st_dirty[0] = True
+                if abs(stop - want) <= 1 or _apply_stop(want, stop, pid):
+                    _smap[key] = {'sh': cur_sh, 'sl': cur_sl, 'ts': time.time()}
+                    _st_dirty[0] = True
             # structure unchanged → the stop is NOT touched (the whole rule)
 
         for pos in open_positions or []:
