@@ -405,6 +405,8 @@ def tweak_structure_fixed(decision, open_positions):
                 _smap = _json.load(_f)
         except Exception:
             _smap = {}
+        if not isinstance(_smap, dict):   # F-6: top-level list/str must not
+            _smap = {}                    # raise at .get and abort the cycle
         _st_dirty = [False]           # nonlocal-ish for nested helper
 
         def _lag_stop(pid, side, cur_sh, cur_sl, cur_atr, price, stop):

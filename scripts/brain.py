@@ -1567,6 +1567,28 @@ if __name__ == "__main__":
         args = parser.parse_args(sys.argv[2:])
         
         if args.subcommand == "add":
+            # LEVEL-SIDE VALIDATION (bug_hunter F-1 2026-11-12): a wrong-side
+            # target/SL births a loss-labeling "TP hit" (#16873/#16878 class).
+            # Shape vs the add price with a 0.1% margin (round-trip fees
+            # ~0.09%); validated BEFORE any order/DB side effect. Pending
+            # fires pass trigger-shaped levels (distances 0.3-1.6%) — never
+            # rejected; manual adds must obey the same shape as arm time.
+            _e = args.entry
+            if _e and _e > 0:
+                if args.target is not None:
+                    if args.side == "short" and args.target > _e * 0.999:
+                        parser.error(f"target {args.target} wrong-side: short "
+                                     f"needs ≥0.1% below entry {_e}")
+                    if args.side == "long" and args.target < _e * 1.001:
+                        parser.error(f"target {args.target} wrong-side: long "
+                                     f"needs ≥0.1% above entry {_e}")
+                if args.sl is not None:
+                    if args.side == "short" and args.sl < _e * 1.001:
+                        parser.error(f"sl {args.sl} wrong-side: short needs "
+                                     f"≥0.1% above entry {_e}")
+                    if args.side == "long" and args.sl > _e * 0.999:
+                        parser.error(f"sl {args.sl} wrong-side: long needs "
+                                     f"≥0.1% below entry {_e}")
             trade_id = add_trade(
                 token=args.token,
                 side_type=args.side,  # long or short (positional)

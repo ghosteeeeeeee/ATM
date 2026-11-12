@@ -573,7 +573,19 @@ def check_atr_tp_sl_hits(open_positions: List[Dict]) -> List[Dict]:
             import manual_exit_manager as _mxm2
             if _mxm2.is_managed_signal(pos.get('signal', '')):
                 if hit == 'atr_tp_hit':
-                    hit = 'manual_tp_hit'
+                    # F-3 relabel guard (bug_hunter 2026-11-12): a "TP" whose
+                    # level sits on the loss side of entry books a loss —
+                    # label the loss family honestly instead (wrong-side-TP
+                    # class; #16873 closed −0.22% labeled manual_tp_hit).
+                    try:
+                        _mep = float(pos.get('entry_price') or 0)
+                        _mtx = float(pos.get('target') or 0)
+                    except (TypeError, ValueError):
+                        _mep, _mtx = 0.0, 0.0
+                    _tp_loss = _mep > 0 and _mtx > 0 and (
+                        (direction == 'LONG' and _mtx <= _mep) or
+                        (direction == 'SHORT' and _mtx >= _mep))
+                    hit = 'manual_sl_hit' if _tp_loss else 'manual_tp_hit'
                 else:
                     try:
                         _mep = float(pos.get('entry_price') or 0)
@@ -2449,6 +2461,22 @@ def _persist_atr_levels(updates: List[Dict]) -> None:
                             f"BLOCKED tight SL={new_sl:.6f} entry={_entry_chk:.6f} dist={_dist:.3f}% "
                             f"(old_sl={u.get('old_sl')}) trade_id={trade_id}")
                         continue  # Skip this write — SL too tight, likely ATR bug
+            # ENTRY-SIDE TP GUARD (bug_hunter F-7 2026-11-12): a first-set or
+            # tightened TP on the loss side of entry would birth a
+            # loss-labeling "TP hit" (#16873 class) — skip this cycle (the SL
+            # write rides along; next cycle recomputes once price is back
+            # onside). Managed trio never reaches here (loop gate :2152).
+            try:
+                _tp_wrong = ((_dir_chk == 'LONG' and new_tp is not None
+                              and new_tp < _entry_chk * 1.001) or
+                             (_dir_chk == 'SHORT' and new_tp is not None
+                              and new_tp > _entry_chk * 0.999))
+            except Exception:
+                _tp_wrong = False
+            if _tp_wrong:
+                log(f"  [TP-GUARD] trade_id={trade_id}: TP {new_tp} wrong-side of "
+                    f"entry {_entry_chk} — write skipped this cycle")
+                continue
             cur.execute(
                 "UPDATE trades SET stop_loss = %s, target = %s, atr_managed = TRUE WHERE id = %s AND status = 'open'",
                 (round(new_sl, 8), round(new_tp, 8), trade_id)
@@ -2743,6 +2771,31 @@ def refresh_current_prices(server: str = SERVER_NAME):
                             if _seed_new:
                                 _set_cols += ", " + _seed_pk + " = %s"
                                 _set_args.append(_seed_new)
+                            # F-1b gap fix (bug_hunter 2026-11-12): entry is
+                            # being rewritten to the REAL fill — if the fill
+                            # gapped past the target, the TP now sits on the
+                            # loss side of entry and would book a "TP hit"
+                            # loss (#16873 class). Reposition preserving the
+                            # planned distance (old entry → target) from the
+                            # real fill, atomically with the entry rewrite.
+                            try:
+                                _tgt = float(pos.get('target') or 0)
+                            except (TypeError, ValueError):
+                                _tgt = 0.0
+                            if _tgt > 0 and entry and _ep and _ep > 0:
+                                _tp_wrong = ((direction == 'LONG' and _tgt <= _ep * 1.001) or
+                                             (direction == 'SHORT' and _tgt >= _ep * 0.999))
+                                if _tp_wrong:
+                                    _dist = abs(_tgt - entry) or (_ep * 0.01)
+                                    _new_tgt = round(_ep + _dist, 8) if direction == 'LONG' \
+                                        else round(_ep - _dist, 8)
+                                    _set_cols += ", target = %s"
+                                    _set_args.append(_new_tgt)
+                                    pos['target'] = _new_tgt
+                                    log(f"  [TP-GAP-FIX] {token} {direction} trade={trade_id}: "
+                                        f"fill {_ep} gapped past target {_tgt} — target "
+                                        f"repositioned to {_new_tgt} (planned distance "
+                                        f"{_dist:.6f} kept from the real fill)")
                             db_cur.execute(
                                 "UPDATE trades SET " + _set_cols + ", updated_at = NOW() "
                                 "WHERE id = %s AND status = 'open'", _set_args + [trade_id])
