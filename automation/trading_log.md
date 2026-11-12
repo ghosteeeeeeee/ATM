@@ -25506,3 +25506,30 @@ BY: auto_1hr
 - Storm streak 1/3 with deadline today — unlikely to reach 3 positive storms in remaining hours
 - Unarmed cohort 50% of closes, WR 28.6% vs armed 100% — chop entries; stall stack owns fix
 BY: auto_1hr
+
+## [2026-11-12 17:23] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** $-0.02 (WR: 0.0%) | 24h 15T 60.0% +$0.02 GREEN | 7d 91T 47.3% -$2.35 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. Boost: signal_compactor.py atr-trend- source weight 1.0 -> 1.25 — pre-registered criterion met (24h 5T 80% WR +$0.11 across 5 tokens SAGA/BIGTIME/CRV/BLUR/CFX; 14d 16T 75% +$0.22; trading_log 23788 "revisit boost if 24h n reaches 5"). signal_versions.json atr-trend- v1 logged.
+
+**No Change Needed:**
+- Last hour: BTC ai-trader-pending SHORT manual_sl_hit -$0.02 (-1.06%); 1 open (ETC atr-trend- SHORT +0.35%)
+- Arm rate: unarmed 8/15 = 53.3% of 24h closes (<70%), WR 25.0% (-$0.27) vs armed 7/7 100% (+$0.29) — below threshold, stall stack owns fix, no new gate
+- Kill check: max 1 close/hr any signal -> no trigger; no 0% WR signal with 3+ closes
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/15 = 6.7% of 24h closes (<40%); tpsl_utils deployed -> no alert
+- Boost: atr-trend- taken (see Changes); others ineligible (jup_yolo_mirrored 4T 75% net -$0.03; ai-trader-pending 5T 40% WR<55%)
+- Neg streak: 16:00 -$0.10 = 1 consecutive negative hour (14:00 +$0.16 breaks) -> no size cut
+- Frequency: 1 close/hr — well under 20
+- 24h turned GREEN: 60.0% WR +$0.02 (was 64.3% -$0.03 last hour)
+- No storm (window-min -0.45% / at-run -0.20%) -> gate not fired; storm streak 1/3 deadline today
+- Winners exit dist 0.348% vs losers 0.433% — exits still drive losses, nothing to fix
+
+**Open Questions:**
+- 7d 47.3% -$2.35 still RED despite 24h green
+- Storm streak 1/3 with deadline today — cannot reach 3
+- Unarmed cohort 53% WR 25% vs armed 100% — chop entries; stall stack owns fix
+BY: auto_1hr
