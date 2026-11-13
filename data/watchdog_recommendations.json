@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-13T20:20:07.054192+00:00",
+  "timestamp": "2026-11-13T23:20:08.177482+00:00",
   "steers": [
     {
       "severity": "warning",
@@ -12,18 +12,22 @@
   ],
   "portfolio_health": "good",
   "regime": {
-    "btc_15m": "LONG_BIAS",
+    "btc_15m": "SHORT_BIAS",
     "btc_4h": "LONG_BIAS",
-    "continuum": "ABOVE",
-    "volatility": "LOW",
-    "zscore_tier": "POS",
+    "continuum": "BELOW",
+    "volatility": "NORMAL",
+    "zscore_tier": "STRONG_NEG",
     "velocity_state": "SLOW",
     "acceleration_state": "POSITIVE",
-    "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
+    "volume_regime": "NORMAL",
+    "linreg_alignment": 1.0,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "DECLINING",
-    "trend_quality": "STRONG_UP"
+    "market_phase": "RECOVERY",
+    "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 0
+  "open_count": 1,
+  "deep_analysis": "1 open trade: BTC SHORT 16902 (entry 68002 @23:05, +0.20%, meta_rsi 19.59). Regime alignment: CORRECT \u2014 continuum 1m BELOW EMA300 (price 67843 vs EMA300 68564, below for 276 min), trend_quality STRONG_DOWN, 15m aggregate SHORT_BIAS. We are on the right side of the higher-timeframe tape. Two caveats on entry quality: (1) entry RSI 19.59 is deeply oversold \u2014 in the last 24h BTC shorts entered below meta_rsi 30 split 2W-2L (16888 +0.19 won, 16886 +0.15 won, 16891 -0.10 lost, 16889 -0.10 lost), so oversold shorts are coin-flips even inside a down-trend; (2) z-score -2.89 STRONG_NEG with acceleration POSITIVE and volume_ratio 3.26 \u2014 the tape is stretched below EMA300 and a bounce is the live risk to this short. Auto-trader R1 widened the stop 68361 -> 68551 (risk 0.81% of entry, R:R 4.4 to target 65594); the stop sits above the 68466/68390 rejection highs from the last 6h, so the placement is structural, not arbitrary.\n\nEXIT-CONDITION STEER (re-test next cycle, do not restate without re-reading candles): exit BTC SHORT 16902 if 1m closes reclaim EMA300 (~68564) and hold 15-30m, OR if z-score reverts above -1.0 \u2014 either condition means the extended down-spike is reversing and the short's thesis (trend-following below EMA300) is void. As long as price stays below EMA300, HOLD \u2014 the trend is our friend and we are on its side.\n\nWrong-side audit of last 24h closes (8 losers, meta_rsi truth source): 6 of 8 never reached +0.40% MFE \u2014 entered mid-chop and died there. BTC LONG 16894 entered at meta_rsi 88.0 in a STRONG_DOWN tape and lost -4.11% \u2014 the winning side was plainly SHORT; we bought an overbought spike against the trend. JUP (35.3), INJ (55.5), IOTA (37.5) LONGs all lost into continued dumps \u2014 winning side was SHORT or no-trade. MNT SHORT 16890 at meta_rsi 74.0 lost -5.31% \u2014 winning side was LONG (the only genuine wrong-side short: shorted strength while the bounce ran). The two armed BTC shorts (16896 mfe 0.78, 16889 mfe 0.87) both reached trail-activation and round-tripped \u2014 the winning side there was the bounce LONG after +0.40%.\n\nPortfolio: 1 position, short, aligned with SHORT_BIAS aggregate \u2014 no correlation cluster, no stale holds, no trade at 2%+ (no BE-stop action due) and none at 5%+ (no trail action due), none open 8h+. Exposure is thin and correctly sided; the problem tonight is not the open book, it is what we keep entering with.",
+  "regime_context": "Sources disagree \u2014 quote both: 15m regime scanner (regime_5m.json) aggregate = SHORT_BIAS (49 short / 2 long / 78 neutral) while regimes.BTC = NEUTRAL; btc_4h = LONG_BIAS; continuum (1m) = BELOW EMA300, z -2.89 STRONG_NEG, trend_quality STRONG_DOWN, market_phase RECOVERY, acceleration POSITIVE, velocity SLOW. Flip rate is NORMAL, not anomalous: aggregate 20 flips/24h, BTC 24 flips/24h (baseline p50 19 / p95 26) \u2014 so no direction-flavored steer can lean on regime stability; every directional statement above is keyed to the condition (1m below EMA300 / z<-1.0) and must be re-tested next cycle. BTC -4.9% in 24h (71333 -> 67843): this is a down-tape, SHORTs are the aligned side, LONGs are counter-trend. Auto-trader independently reads CHOP (long score -30, short +10, MANAGE_ONLY).",
+  "pattern_alerts": "CHOP-BLEED KPI BREACH (dollar-share measure, sum_loss(mfe<0.40)/sum_all_loss): 7d 93.5% (41 of 47 losers never armed, NULL-mfe losers=0), 14d 94.9% (129/140), 30d 92.0% (275/321) \u2014 ALL windows >=92 vs 2026-10-25 baseline 84.1/85.6/80.6. Same-day arm rate 62.5% (16 closes). 7d LONG arm rate 43.6% \u2014 the <50 tripwire is FIRED. NULL count = 0 so this is not a backfill artifact. Meaning: nearly every dollar of loss comes from trades that never reached +0.40% MFE \u2014 we are entering in chop, at entry, not mismanaging exits. Ownership: entry-quality filters (brain-auditor territory), NOT trail/exit tweaks.\n\nTrail family still carries the wins: 7d profit-monster-trail +1.56 (30T) vs atr_sl_hit -1.95 (17T) and hard_max_loss -1.30 (13T). Trend-following exits pay; chop entries pay nothing.\n\nSIGNAL FLAGS (dead-signal checked): ai-trader-pending 7d 23T 30.4% WR -$0.37 \u2014 LIVE traffic (armed pending orders, last close 17:42), not a dead flag; steer-001's 4-loss streak stands. pump-chain+ shows 6T 0W -$0.54 in watchdog's window but 0 trades in 7d \u2014 STALE WINDOW, already killed, NO action, do not re-propose. warrior-sr-confirm+ (ENABLED=True, live, last close 23:03) 7d 4T 25% -$0.18 and bb-squeeze+ 7d 5T 40% -$0.26 \u2014 both live but n=4-5, below significance; watch, do not act. HL_COPY_TRADING_ENABLED=False remains disabled-by-design with HL_COPY_SIGNAL_* as the live path (answered 2026-10-25, not re-flagged).",
+  "agent_timestamp": "2026-11-13T23:26:40.125474+00:00"
 }
