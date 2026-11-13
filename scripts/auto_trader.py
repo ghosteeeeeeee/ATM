@@ -372,6 +372,13 @@ def tweak_structure_fixed(decision, open_positions):
     sd_h = (decision.get('structure_detail') or {}).get('1h') or {}
     sh_h, sl_h, atr_h = sd_h.get('sh'), sd_h.get('sl'), sd_h.get('atr')
     if not (sh and sl and atr) or not (sh_h and sl_h and atr_h):
+        if open_positions:
+            # F-3 (bug_hunter): never freeze silently — a missing snapshot
+            # with live trades = stops frozen at armed levels, unlogged.
+            DB.log_event('WARN', f"tweak: incomplete structure detail "
+                                 f"(15m={bool(sh and sl and atr)}, "
+                                 f"1h={bool(sh_h and sl_h and atr_h)}) — "
+                                 f"lag frozen at armed stops this cycle")
         return tweaks
     try:
         import psycopg2
@@ -455,12 +462,54 @@ def tweak_structure_fixed(decision, open_positions):
             if not (s15[2] and s1h[2]) or not (cur_sh and cur_atr):
                 return
             if prev is None:
-                # SEED ONLY — the armed stop stands (CEO 'plan better')
-                _smap[key] = {'sh15': s15[0], 'sl15': s15[1],
-                              'sh1h': s1h[0], 'sl1h': s1h[1],
-                              'ts': time.time()}
-                _st_dirty[0] = True
-                return
+                # BIRTH: record state AND re-anchor an INTERIOR stop to the
+                # MAJOR (1h) line (bug_hunter F-1 for #16896: the armed
+                # 68950 was interior to the box — the fixed lag still died
+                # at 69027 because seed-only held it until the first 1h
+                # step 33min too late. The stop must only ever exit on a
+                # MAJOR-structure break: 'we should have still been in').
+                # A stop already at/behind the line is NEVER touched
+                # (supersedes the old seed-only 'needless loosening' note:
+                # #16879's armed 73010 would also have re-anchored to the
+                # then-line ~73674 — harmless, price never returned there).
+                _rec = {'sh15': s15[0], 'sl15': s15[1],
+                        'sh1h': s1h[0], 'sl1h': s1h[1], 'ts': time.time()}
+                if side == 'SHORT':
+                    if not (s1h[0] and s1h[1]):
+                        _smap[key] = _rec; _st_dirty[0] = True; return
+                    # Only MID-BOX interior stops re-anchor: the stop sits
+                    # ABOVE the major-floor-reclaim zone (sl1h+0.6·ATR15 =
+                    # what a floor-break thesis stop uses — the keeper's own
+                    # formula, and your dictated rungs like 67940/SL68300)
+                    # but BELOW the ceiling line (sh1h+0.1·ATR1h). A floor-
+                    # zone stop IS major structure (keep) — #16896's
+                    # wiggle-anchored 68950 was in the gap → raise.
+                    floor_top = s1h[1] + 0.60 * s15[2]
+                    line = s1h[0] + 0.10 * s1h[2]
+                    line = max(line, price * 1.001)   # never at/below price
+                    line = min(line, price * 1.05)    # F-4 stale cap
+                    if floor_top < stop < line - 1:
+                        if _apply_stop(line, stop, pid):   # CAS; miss →
+                            _smap[key] = _rec; _st_dirty[0] = True   # retry
+                        return
+                    _smap[key] = _rec; _st_dirty[0] = True; return
+                else:
+                    if not s1h[0]:
+                        _smap[key] = _rec; _st_dirty[0] = True; return
+                    # LONG thesis line = ceiling-reclaim (sh1h−0.6·ATR15,
+                    # the keeper's own long formula): align the stop to it
+                    # (too-tight wiggle stops give room back; too-loose
+                    # stops exit at the structure break, not past it).
+                    # Skipped when the line is not meaningfully below price
+                    # (hand-armed runs with structure near entry keep their
+                    # dictated stop — e.g. a line above entry is invalid).
+                    line = s1h[0] - 0.60 * s15[2]
+                    line = max(line, price * 0.95)    # F-4 floor
+                    if line < price * 0.999 and abs(stop - line) > 1:
+                        if _apply_stop(line, stop, pid):
+                            _smap[key] = _rec; _st_dirty[0] = True
+                        return
+                    _smap[key] = _rec; _st_dirty[0] = True; return
             prev_val = prev[f'{fld}{sfx}']
             cur_val = cur_sh if side == 'SHORT' else cur_sl
             if cur_val == prev_val:
@@ -575,13 +624,14 @@ def _ladder_keeper(decision, summary):
     Every watchdog cycle, independently per side (BTC only — a foreign
     coin's rung must never suppress either side, bug_hunter F-1):
       SHORT: no unfired BTC rung WITHIN REACH (≤3·ATR1h) below price →
-        derive at the 15m swing floor (trigger sl−60, reclaim SL
-        sl+0.6·ATR15, TP trigger−3·ATR1h disaster depth AT ARM TIME —
+        derive at the 1h MAJOR floor (trigger sl1h−60, reclaim SL
+        sl1h+0.6·ATR15, TP trigger−3·ATR1h disaster depth AT ARM TIME —
         loop-safe: derived must itself be within reach).
       LONG: no unfired BTC rung within reach (≤3·ATR1h above price —
         the stacked 72k+ rungs do NOT count for a snap from 68k) →
-        derive at the 15m ceiling reclaim (sh+60, SL sh−0.6·ATR15, TP
-        trigger+3·ATR1h AT ARM TIME), ITM + reach guarded.
+        derive at the 1h-major-ceiling reclaim (sh1h+60, SL
+        sh1h−0.6·ATR15, TP trigger+3·ATR1h AT ARM TIME), ITM + reach
+        guarded.
     Both: serial:true + dynamic_sl:false — exits are STRUCTURE-BREAK ONLY
     (the Nov-11 19:00 → Nov-13 counterfactual: one ride = +37.3% margin
     to the cited low / +39.5% to the span low 68,608; 7 fragmented
@@ -648,8 +698,9 @@ def _ladder_keeper(decision, summary):
             and reach_lo <= float(o.get('trigger_price') or 0) < price
             for o in orders)
         if not short_ready:
-            # F-6 mirror: derive at the 15m SWING FLOOR (executing
-            # structure — always near price) instead of the 24h low
+            # F-6 mirror: derive at the 1h MAJOR floor (the pattern's
+            # own floor — 15m wiggle floors sit mid-box and get rungs
+            # shaken out, the #16896 class; CEO 2026-11-13) instead of
             # (can sit thousands away after a bounce = the same reach
             # gap the long side bounds). F-7 bonus: no candle-table
             # mixing — price and structure both come from decision.
@@ -677,7 +728,7 @@ def _ladder_keeper(decision, summary):
                              f"DISASTER depth AT ARM TIME (structure-break-only exits — TP is a "
                              f"circuit breaker, never a take-profit, never moved). serial + "
                              f"dynamic_sl:false.")})
-                appended.append(('ladder_keeper', oid, f"short @ {trig} (15m sl {sl15:.0f}, SL {sl}, TP {tp})"))
+                appended.append(('ladder_keeper', oid, f"short @ {trig} (1h major floor {sl1h:.0f}, SL {sl}, TP {tp})"))
 
         # ── LONG side: an unfired BTC rung within reach (≤3·ATR1h) = ready.
         # The rubberband rule (CEO): stacked 72k+ rungs are the FURTHER
@@ -713,7 +764,7 @@ def _ladder_keeper(decision, summary):
                              f"3·ATR1h DISASTER depth AT ARM TIME (structure-break-only exits — TP "
                              f"never moved). serial + "
                              f"dynamic_sl:false. Trend-is-your-friend ride leg.")})
-                appended.append(('ladder_keeper_long', oid, f"long @ {trig} (15m sh {sh15:.0f}, SL {sl}, TP {tp})"))
+                appended.append(('ladder_keeper_long', oid, f"long @ {trig} (1h major ceiling {sh1h:.0f}, SL {sl}, TP {tp})"))
 
         if appended:
             pcfg['orders'] = orders
