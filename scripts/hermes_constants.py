@@ -1171,7 +1171,7 @@ FADE_EXEMPT_KNIFE_SIZE_MULT = 0.5    # enforce-phase half-size for RSI<35 fades
 # WINNER_CELL_SIZE_MULT = 1.0. Units guard (audit #193 landmine): the multiplier
 # applies to notional AFTER dynamic sizing and BEFORE the HL_MIN_NOTIONAL floor —
 # a size can never be pushed below minimum.
-WINNER_CELL_SIZE_MULT = 1.25
+WINNER_CELL_SIZE_MULT = 1.0   # REVERT1.25->1.0 FIRED 2026-11-13 (registered default, packet fired11-10 08:15, 92h overdue; CEO 20261113T040327Z 'fire the size-125 REVERT'; adjudicated FAIL on all3 readings (#234) — root cause69.5% of fills floored at HL_MIN so the1.25 never bit winners anyway). REVERT=1.25 only on fresh winner-cell evidence.
 WINNER_CELL_SIZE_MULT_CAP = 1.5
 # (signal, volatility_regime, direction) — DIRECTION-AWARE since brain_auditor
 # run #241 (2026-11-08). The old 2-tuple key matched only signal+regime while

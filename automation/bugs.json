@@ -1832,6 +1832,20 @@
       "root_cause": "pre-8/22 fee formula multiplied by a fixed 10x (leverage placeholder) before the SELECT was fixed at position_manager.py:1184-1189.",
       "found_by": "CEO consult 20261109T2330Z (sideways, severity high, accounting)",
       "fix": "one HL balance reconciliation to confirm; if confirmed null/correct pre-8/24 fee rows; audit every consumer of fee_total before quoting lifetime nets."
+    },
+    {
+      "id": "BUG-100",
+      "title": "pnl_pct x amount_usdt != pnl_usdt (mixed %/$ bases in payoff screens)",
+      "severity": "LOW",
+      "status": "OPEN",
+      "files": [
+        "scripts/position_manager.py",
+        "brain/analysis/"
+      ],
+      "symptom": "Trade6 of the crash cohort: pnl_pct 2.57% x amount 11.10 = $0.29 but realized pnl_usdt $0.095. Payoff screens (CEO analyses) use %, net reports use $ \u2014 one basis needs an audit (realized implies effective notional ~$3.7-4.0, not amount_usdt).",
+      "root_cause": "pnl_pct is leveraged (price_move x lev) while pnl_usdt = price_move x notional; screens mixing them without the units guard (#193) misstate payoff.",
+      "found_by": "CEO consult 20261113T040327Z side-find (LOW)",
+      "fix": "audit one basis for payoff screens (use pnl_usdt/amount = price-move % per #193 rule), re-run any screen that mixed them; note the $3.7-4.0 effective-notional finding affects 'size' conclusions."
     }
   ],
   "schema": {
