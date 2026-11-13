@@ -916,7 +916,7 @@ def _build_control_tower(entries, now_iso, problems, entry_errors,
 
     lines = [
         '# CONTROL TOWER — shadows, trials, decision calendar',
-        f'generated {now_iso} by scripts/shadow_disposition.py (daily 08:15) — '
+        f'generated {now_iso} by scripts/shadow_disposition.py (daily 08:15 + on any registry change via hermes-shadow-disposition.path) — '
         f'REGENERATED FILE, do not hand-edit (edit data/shadow_disposition.json)',
     ]
     if stale:
