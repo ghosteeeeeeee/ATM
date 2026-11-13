@@ -26127,3 +26127,29 @@ BY: auto_1hr
 - 7d still 47.8% RED -$1.70
 - Unarmed WR 33.3% vs armed 100% — chop entries; stall stack owns fix
 BY: auto_1hr
+
+## [2026-11-13 18:21] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** -$0.19 (WR: 0.0%) | 24h 15T 46.7% -$0.03 RED | 7d 92T 46.7% -$1.89 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 2 closes (INJ btc-pump-rider+ LONG hard_max_loss -$0.13 -5.84%; BTC ai-trader-pending SHORT manual_sl_hit -$0.06 -2.67%); 0 open
+- Arm rate: unarmed 11/15 = 73.3% (>70% — chop entries dominating; stall stack owns fix, no new gate) WR 27.3% (-$0.45) vs armed 4/4 100% (+$0.42)
+- Kill check: 2 closes/hr; no signal with 0% WR and 3+ closes this hour (btc-pump-rider+ 1T, n=1)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/15 = 13.3% of 24h closes (<40%); tpsl_utils.py deployed -> no alert; hard_max_loss 4/15 = 27% avg -$0.113 — expected at leverage
+- Boost: none eligible (pending 6T 33.3% not >55%, jup_yolo 2T n<5, atr-trend+ 2T n<5)
+- Neg streak: 14 -0.09, 15 -0.09, 16 no-trade (break), 17 -0.02, 18 -0.13 → 2 consecutive negative <3 -> no size cut
+- Frequency: 2 closes/hr — well under 20
+- No storm (window-min -0.19% / at-run +0.54%) -> gate not fired
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h slipped to -$0.03 RED (46.7% WR)
+- Unarmed cohort 73.3% of 24h closes (>70%) — chop entries; stall stack owns fix
+- 7d still 46.7% RED -$1.89
+BY: auto_1hr
