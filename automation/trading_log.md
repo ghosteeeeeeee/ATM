@@ -25712,3 +25712,28 @@ BY: auto_1hr
 - 7d still 46.7% -$2.47 RED
 - Unarmed cohort 60% of closes, WR 22% vs armed 100% — chop entries; stall stack owns fix
 BY: auto_1hr
+
+## [2026-11-13 02:22] Hourly Analysis
+
+**Trades:** 2 closed (2 wins, 0 losses)
+**PnL:** $0.17 (WR: 100.0%) | 24h 16T 62.5% +$0.18 GREEN | 7d 94T 47.9% -$2.30 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 2 closes, both wins (BTC ai-trader-pending SHORT manual_tp_hit +$0.15/+6.45%; HYPE jup_yolo_mirrored SHORT mfe_exit +$0.02/+1.03%); 0 open trades
+- Arm rate: unarmed 10/16 = 62.5% of 24h closes (<70%), WR 40.0% (-$0.06) vs armed 6/6 100% (+$0.24) — below threshold, stall stack owns fix, no new gate
+- Kill check: 2 closes/hr, both wins -> no 0% WR signal with 3+ closes (hl_copy_trader 1T only)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/16 = 6.3% of 24h closes (<40%); tpsl_utils deployed -> no alert
+- Boost: none eligible (jup_yolo_mirrored 3T 100% +$0.09 n<5; atr-trend- 7T 71.4% net +$0.02 <$0.05 + boosted 1.0->1.25 at 17:23 on 11-12 stability rule; ai-trader-pending 5T 40% WR)
+- Neg streak: 02:00 +$0.17 breaks; last negative hour 21:00 -$0.11 -> no size cut
+- Frequency: 2 closes/hr — well under 20
+- No storm (window-min -0.62% / at-run -0.45%) -> gate not fired, storm streak 0/3
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h flipped GREEN +$0.18 (was -$0.14); 7d still RED 47.9% -$2.30
+- Unarmed cohort 62.5% of closes, WR 40% vs armed 100% — chop entries; stall stack owns fix
+BY: auto_1hr
