@@ -26074,3 +26074,31 @@ BY: auto_1hr
 - 7d still 48.4% RED -$1.49
 - Unarmed cohort 71.4% of 24h closes (>70%), WR 30.0% vs armed 100% — chop entries; stall stack owns fix
 BY: auto_1hr
+
+## [2026-11-13 16:26] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** -$0.09 (WR: 0.0%) | 24h 14T 50.0% +$0.12 GREEN | 7d 90T 46.7% -$1.81 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 1 close (IOTA pump-chain LONG atr_sl_hit -$0.09 -2.41%); 1 open (BTC ai-trader-pending SHORT, stop 0.73% away)
+- Arm rate: unarmed 10/14 = 71.4% of 24h closes (>70% — chop entries dominating; stall stack owns fix, no new gate), WR 30.0% (-$0.28) vs armed 4/4 100% (+$0.40)
+- Kill check: 1 close/hr; pump-chain 24h 1T 0% (n=1, no trigger — needs 3+ in last hour)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/14 = 14.3% of 24h closes (<40%); tpsl_utils.py deployed (exists, 69KB) -> no alert; hard_max_loss 3/14 = 21% avg -$0.107 — expected at leverage
+- Boost: none eligible (jup_yolo_mirrored 2T 100% n<5; ai-trader-pending 6T 33.3% not >55%; atr-trend- 3T 33.3% net -$0.21)
+- Neg streak: 13 +$0.29, 14 -$0.09, 15 -$0.09 — 2 consecutive negative <3 -> no size cut
+- Frequency: 1 close/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**STORM GATE FIRED (window-min -1.57% <= -1.5)** — packet emitted (steps 1-4 complete):
+🌩️ [STORM-READINESS] window-min -1.57% / at-run -0.31% | blocked 154 (combo_key-stale 52, compaction_stale_10min 34, rr-engine-hard-block 18, expired-hotset 13, long-*-gates 10, short-rsi-hard-floor 10, pump-chain-long-high 5, pump-chain-short-high 4, confluence single-type 3, pump-chain-other 3, short-regime-gate 2) | true-starvation 33 RSI>=35 | counterfactual $-1.31 (touch 28/33) | waiver: SHADOW=True ENFORCE=False — storm packet, counterfactual NEGATIVE -> **streak stays 0/3** (bar needs >=3 consecutive positive, deadline EXTENDED 2026-11-19); split: blocked SHORTs +$1.60 (9) = gates suppressed some dump winners, blocked LONGs -$2.91 (24) = gates correctly kept dump losers out
+
+**Open Questions:**
+- 7d still 46.7% RED -$1.81
+- Unarmed cohort 71.4% of 24h closes (>70%) — chop entries; stall stack owns fix
+- Counterfactual NEGATIVE again (11-10 −, 11-12 +1/3, 11-13 04:25 −, now −) — waiver enforce bar stays 0/3
+BY: auto_1hr
