@@ -1688,7 +1688,36 @@
       "default_action": "NO CHANGE — if block is a quality filter (not plumbing), report and close",
       "risk": "low",
       "requires": "CEO label + T sign-off before any gate change"
+    },
+    {
+      "id": "amplify-warrior-sr-normal-long",
+      "stream": "warrior-sr-confirm+ NORMAL LONG validated-cell candidate — 30d 6T +0.28 WR 66.7% arm 66.7% (early label n<10)",
+      "kind": "amplify",
+      "proposal_type": "(c) clone-hunt: mine blocked setups vs warrior NORMAL LONG profile; early-signal cell (n>=5 rule)",
+      "status": "open",
+      "created": "2026-11-13T12:45:00Z",
+      "deadline": "2026-11-20T00:00:00Z",
+      "owner": "brain_auditor weekly AMPLIFY run #256",
+      "evidence": "30d cell signal=warrior-sr-confirm+ regime=NORMAL direction=LONG n=6 pnl=+0.28 wr=66.7% arm=66.7% (PG fresh 2026-11-13). EARLY LABEL n=6<10. Not covered by amplify-bbsqueeze-warrior-uninert (that item measures combo-weight share, not this cell). No other open amplify id covers warrior-alone.",
+      "threshold": "SHIP only if: (i) cell reaches n>=10/30d with net>0 same-sign at 7d+14d; OR blocked-matchable n>=15 token-day deduped with would-win >=70%; (ii) 30d 1m-candle walk net >= +$0.50 pnl_usdt UNITS GUARD (never pnl_pct #193); (iii) fk <20%. Default NO SHIP if n stays <10.",
+      "default_action": "NO SHIP — close as early-cell noise if n<10 at deadline",
+      "risk": "low",
+      "requires": "CEO label + T sign-off before any gate/size change"
+    },
+    {
+      "id": "watch-pc-flip-demote-55",
+      "stream": "pump-chain- contrarian flip-WR decay toward pre-registered demote bar <55%",
+      "kind": "watch",
+      "status": "open",
+      "created": "2026-11-13T12:45:00Z",
+      "deadline": "2026-11-17T00:00:00Z",
+      "owner": "brain_auditor #256 (extends #255 creative demote threshold)",
+      "evidence": "contrarian_outcome_join re-ran 2026-11-13T12:30Z: pump-chain- flip 198W/152L=56.6% n=350 (was 60.6% #255, 63.7% prior, 64.6% Oct-27). Monotone decay ~3-4pts/read. btc-pump-rider+ 40.0% do-not-flip stands. overall flip 43.2% n=1778.",
+      "threshold": "At next weekly join read (or any read): flip-WR <55% -> DEMOTE the Oct-27 CONTRARIAN_LIVE pc- PROMOTE to shadow-only; revert flag already registered in flip-contrarian-pc. If 55-57% -> HOLD + flag CEO. If >=58% -> stand down watch.",
+      "default_action": "HOLD current live fade until read; demote only below 55%",
+      "risk": "low",
+      "requires": "CEO/T for actual demote execution"
     }
   ],
-  "updated_at": "2026-11-13T08:50:00Z"
+  "updated_at": "2026-11-13T12:45:00Z"
 }

@@ -1,20 +1,20 @@
 {
-  "timestamp": "2026-11-13T08:50:01.682135+00:00",
+  "timestamp": "2026-11-13T12:50:03.834887+00:00",
   "steers": [],
   "portfolio_health": "good",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "BELOW",
+    "continuum": "ABOVE",
     "volatility": "LOW",
     "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "POSITIVE",
+    "acceleration_state": "NEGATIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
-    "wyckoff_phase": "DISTRIBUTION",
+    "linreg_alignment": 0.0,
+    "wyckoff_phase": "UNKNOWN",
     "market_phase": "CALM",
-    "trend_quality": "STRONG_UP"
+    "trend_quality": "STRONG_DOWN"
   },
   "open_count": 1
 }

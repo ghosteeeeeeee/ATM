@@ -11181,5 +11181,37 @@
     "category": "amplify-clone-hunt",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-13T12:45:00Z",
+    "idea": "pc- flip hard demote at <55%: pre-registered watch-pc-flip-demote-55 (join read cadence)",
+    "rationale": "flip-WR 64.6% (Oct-27) -> 63.7% -> 60.6% (#255) -> 56.6% n=350 (#256, fresh join 12:30Z) = monotone decay ~3-4pts/read, only 1.6pp above the #255 demote bar. Trajectory matters more than level — riding a dying flip edge into negative EV is the failure mode.",
+    "expected_impact": "prevents live fade from flipping positive-EV to negative-EV without notice",
+    "category": "monitor-threshold",
+    "status": "suggested",
+    "risk": "low",
+    "citations": [
+      [
+        "contrarian_outcome_join",
+        "2026-11-13",
+        "pump-chain- 198W/152L flip 56.6% n=350"
+      ]
+    ]
+  },
+  {
+    "date": "2026-11-13T12:45:00Z",
+    "idea": "mult-150 pre-adjudication: predict FAIL (2/4 cells net14>0, need >=3) + drop-pcplus will NOT fire (30d now +0.18 > 0)",
+    "rationale": "Fresh PG: bb-squeeze NORMAL LONG 14d +0.06, vb- HIGH SHORT 14d +0.21, r2v2-long3 14d n=0 (not >0), pc+ EXTREME LONG 14d -0.48 -> only 2 of 4 pass net14>0. Threshold requires >=3 of 4. Separately drop-pcplus pre-reg is 30d<=0 (was -0.04 at registration); cell is now +0.18 so DROP will not fire. Pre-computing tomorrow's read prevents outcome-selected surprise.",
+    "expected_impact": "clean 11-14 adjudication: mult-150 stays 1.0, pc+ stays in winner set, no accidental membership churn",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "low",
+    "citations": [
+      [
+        "WINNER_CELLS_VALIDATED",
+        "2026-11-13",
+        "4-cell window query fresh PG 12:40Z"
+      ]
+    ]
   }
 ]

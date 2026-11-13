@@ -1,243 +1,204 @@
 {
-  "timestamp": "2026-11-13T08:50:00Z",
-  "run": 255,
+  "timestamp": "2026-11-13T12:45:00Z",
+  "run": 256,
   "session_brain_stats": {
-    "sessions_total": 284,
-    "chunks_total": 448808,
-    "last_ingest": "2026-11-13T08:00:38Z",
-    "note": "queries return results but title/date often null on user chunks — rebuild still owed (11th+ run)"
+    "queries": 12,
+    "hits_total": 50,
+    "quality": "DEGRADED — title/date null on user chunks (known, rebuild owed 11+ runs), many excerpts empty; OpenMemory partial substitute",
+    "note": "run-derived questions only; no generic queries"
   },
   "questions_asked": [
     {
-      "question": "stop tighten jup atr_sl_hit loser reduction",
-      "results_found": 3,
-      "cited": true,
-      "citation": [
-        "calwndar",
-        "STOP-ASYMMETRY STUDY",
-        "SHIP-TO-SHADOW @ 1.0% price on jup_yolo — inverted R:R is stop-side"
-      ]
-    },
-    {
-      "question": "winner cell size multiplier 1.25 revert",
-      "results_found": 3,
-      "cited": true,
-      "citation": [
-        "calwndar",
-        "winner-cell plumbing",
-        "mult fired in log but amount_usdt stayed 11.10 not 13.75 — plumbing break traced"
-      ]
-    },
-    {
-      "question": "prearm breakeven lock unarmed",
-      "results_found": 3,
-      "cited": true,
-      "citation": [
-        "mfe exit",
-        "mfe exit",
-        "saved +$0.69 but preempted winners ≈ -$0.79 — winner pass-through is the fk risk"
-      ]
-    },
-    {
-      "question": "jup_yolo atr_sl_hit losses pattern",
+      "question": "what did we say about arm-rate LONG tripwire",
       "results_found": 5,
-      "cited": true,
-      "citation": [
-        "OpenMemory #110",
-        "2026-10-24",
-        "reached-arm leak: 41T/14d atr_sl_hit ALL trailing_activated=False"
-      ]
+      "cited": true
     },
     {
-      "question": "exit asymmetry loss bigger than win",
+      "question": "have we tried atr_sl_hit stop too tight widening",
       "results_found": 5,
-      "cited": true,
-      "citation": [
-        "OpenMemory CEO Review",
-        "2026-08-10",
-        "atr_sl_hit 36T -$1.62 dominant cost driver — recurring 3mo"
-      ]
+      "cited": true
     },
     {
-      "question": "have we tried volume-buildup- HIGH SHORT amplify",
+      "question": "what did we say about pump-chain- flip decay demote",
       "results_found": 5,
-      "cited": false,
-      "note": "no direct prior art on vb- underdeployment; cell already in WINNER_CELLS_VALIDATED (bug_hunter 2026-10-29)"
+      "cited": true
+    },
+    {
+      "question": "atr-trend boost post-ship performance",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "exit stack day mfe-cut prearm interaction",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "pc- flip decay demote threshold 55%",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "atr_sl_hit 20 trades stop too tight fix",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "LONG arm-rate below 50 percent chop entries",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "exit stack day 13 items disposition plan",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "have we tried demoting pump-chain contrarian flip when decays",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "block LONG when btc below ema300 tape filter",
+      "results_found": 2,
+      "cited": true
+    },
+    {
+      "question": "LONG trades not reaching trail arm entry quality",
+      "results_found": 5,
+      "cited": true
     }
   ],
   "trade_summary_24h": {
-    "trades": 19,
-    "wr": 57.9,
-    "pnl": 0.15,
+    "trades": 14,
+    "wr": 57.1,
+    "pnl": 0.09,
     "status": "GREEN",
+    "losers": 6,
+    "winners": 8,
     "by_signal": {
-      "ai-trader-pending SHORT": "7T 42.9% +0.25",
-      "jup_yolo_mirrored SHORT": "3T 100% +0.09",
-      "atr-trend- SHORT": "8T 62.5% -0.10",
-      "hl_copy_trader LONG": "1T 0% -0.09"
+      "atr-trend-_SHORT": "5T -0.20 40% (3 of 6 losers)",
+      "ai-trader-pending_SHORT": "6T +0.16 50% (CEO domain)",
+      "jup_yolo_mirrored_SHORT": "2T +0.05 100%",
+      "atr-trend+_LONG": "1T +0.08"
     },
-    "open": "BTC #16891 SHORT ai-trader-pending @68558 SL68880 TP66637 opened 07:59Z flat — meta_rsi 21.18 (oversold knife zone, ai-trader CEO domain, bracketed)",
     "windows": {
-      "7d": "95T 46.3% -2.39",
-      "14d": "344T 52.3% -4.23",
-      "30d": "689T 49.3% -7.42"
+      "7d": "94T 46.8% -2.13",
+      "14d": "334T 51.8% -4.44",
+      "30d": "684T 49.3% -7.48"
     },
-    "armed_14d": "170T 92.9% +9.62 vs unarmed 174T 12.6% -13.85 — mandate intact",
-    "rr_asymmetry": "14d avg_win +0.062 avg_loss -0.102 (1:1.65); break-even avg_loss at 52.3% WR = -0.068; exitstack KPI bar -0.070 correctly placed"
+    "armed_14d": "165T 90.9% +9.09 vs unarmed 169T 13.6% -13.53",
+    "trail_vs_chop_14d": "trail 155T 93.5% +8.51 vs chop_exits 124T 0.8% -14.06",
+    "exits_7d": "atr_sl_hit 20T 0% -2.31 (dominant, avg mfe 0.198=never armed) | hard_max 11T 0% -1.07 | profit-monster-trail 30T 96.7% +1.18",
+    "arm_rate_7d": "LONG 42.5% (<50!) vs SHORT 51.9% — full tripwire NOT met (SHORT not >55%)",
+    "rr_asymmetry_14d": "avg win +0.062 vs avg loss -0.103 (1:1.66)"
   },
   "shadow_analysis": {
-    "contrarian": "join re-ran 08:30Z (mandate) n=1759 overall flip 44.6%; pc- flip 60.6% (212/350, was 63.7% #254) PROMOTE stands with decay watch; rider 40.5% do-NOT-flip",
-    "floor": "join 04:30Z fisher_p 0.0442 (was 0.0321) drifting UP toward 0.05; floor 48.8% n=1691 vs always 42.5% n=325; same-sign due 11-15 — do NOT ship early",
-    "oscillator": "FROZEN/archived — none",
-    "wyckoff": "RETIRED — none",
-    "rr_shadow": "ORPHANED — none",
-    "shadow_trader": "95,446 signals; gates justified (CONFLUENCE-EXPIRY 16,767 @47% avg -0.13); exit A/B pm_trail +14,318 vs hard_max -16,919 = trail-or-nothing",
-    "overall": "3/5 answerable (contrarian, floor, shadow_trader); oscillator/wyckoff/rr dead"
+    "contrarian": "join RE-RAN 12:30Z mandate — overall flip 43.2% n=1778; pc- 56.6% n=350 DECAY (was 60.6%) -> watch-pc-flip-demote-55 registered; rider 40.0% do-not-flip",
+    "floor_admit": "join 04:30Z — p=0.0442, floor 48.8% n=1691 vs always 42.5% n=325; n bar PASS, 30d same-sign due 11-15 (may FAIL, do not ship early)",
+    "oscillator": "FROZEN+archived — none",
+    "wyckoff": "RETIRED 10-31 — none",
+    "rr_shadow": "ORPHANED mtime stale — none",
+    "shadow_trader": "96,055 signals — trail-or-nothing confirmed (exit A/B pm_trail +14,440 vs hard_max -17,157); gates justified (CONFLUENCE-EXPIRY 16,788 @47% avg -0.13)",
+    "overall": "2/5 usable (contrarian+floor) + shadow_trader; joins re-ran this run"
   },
   "drift_findings": [
     {
-      "item": "WINNER_CELL_SIZE_MULT 1.25→1.0 CEO revert",
-      "status": "RESOLVED",
-      "detail": "REVERT FIRED 2026-11-13 per constants comment (CEO 04:03Z directive); verified live value=1.0; root cause: 69.5% fills floored at HL_MIN so 1.25 never bit winners (#234)"
+      "item": "pc- flip decay 60.6->56.6% in one read",
+      "severity": "HIGH",
+      "action": "watch-pc-flip-demote-55 registered, demote at <55% next read"
     },
     {
-      "item": "session_brain title/date null on user chunks",
-      "status": "OPEN",
+      "item": "7d LONG arm-rate 42.5% <50%",
       "severity": "MED",
-      "detail": "11th+ run flagged; queries work (scores+text) but citations lack dates; rebuild owed"
+      "action": "full tripwire NOT met (SHORT 51.9 not >55); stall stack / 11-14 exit-stack owns fix; no new gate"
+    },
+    {
+      "item": "session_brain title/date null + empty excerpts",
+      "severity": "MED",
+      "action": "rebuild owed 11+ runs — still not done"
+    },
+    {
+      "item": "atr_sl_hit 7d 20T 0% -2.31 all never-armed (avg mfe 0.198)",
+      "severity": "MED",
+      "action": "owned by 11-14 stop-tighten eval + tat-neverarmed + mfe-cut — do not duplicate"
     }
   ],
   "recurring_problems": [
-    {
-      "pattern": "RR asymmetry avg_loss 1.65x avg_win",
-      "evidence": "14d +0.062/-0.102; exitstack-day-kpi-1114 (due 11-15) targets -0.070",
-      "status": "OWNED by 11-14 exit-stack day"
-    },
-    {
-      "pattern": "atr_sl_hit never-armed chop exits",
-      "evidence": "7d 22T 0% -2.62 dominant; OpenMemory #110 all trailing_activated=False; 3mo recurring",
-      "status": "OWNED by prearm-BE + stop-tighten + tat-neverarmed (all due 11-14)"
-    },
-    {
-      "pattern": "unarmed bleed concentration",
-      "evidence": "7d unarmed losses: jup -1.20, atr-trend- -0.68, ai-trader-pending -0.62, bb-squeeze+ -0.52",
-      "status": "each has open amplify/eval item"
-    }
+    "chop-bleed / never-armed unarmed cohort (14d unarmed -13.53) — trail-or-nothing",
+    "exit asymmetry: avg loss 1.66x avg win — KPI bar -0.070 correct",
+    "atr-trend- chop entries post-boost n=2 -0.23 — stability rule holds, monitor"
   ],
-  "missing_implementations": [
-    {
-      "idea": "vb- HIGH SHORT underdeployment clone-hunt",
-      "detail": "cell validated 30d 19T 78.9% +0.42 but 0 fires/7d — what blocks it? No open item found",
-      "status": "proposed as AMPLIFY this run"
-    }
-  ],
+  "missing_implementations": [],
   "creative_improvements": [
-    {
-      "date": "2026-11-13T08:50:00Z",
-      "idea": "pc- flip decay watch: demote PROMOTE if flip-WR <55% at next weekly read",
-      "rationale": "pc- flip 64.7%→63.7%→60.6% over ~3 runs — monotone decay ~3pts/read; still >50% but trajectory matters more than level",
-      "expected_impact": "prevents riding a dying flip edge into negative EV",
-      "category": "monitor-threshold",
-      "status": "suggested",
-      "risk": "low",
-      "citations": [
-        [
-          "contrarian_outcome_join",
-          "2026-11-13",
-          "pc- 212W/138L n=350 flip 60.6%"
-        ]
-      ]
-    },
-    {
-      "date": "2026-11-13T08:50:00Z",
-      "idea": "Coordinate 11-14 ships: stop-tighten-080 × prearm-BE interaction measurement in exitstack-day-kpi",
-      "rationale": "both attack the same never-armed loser pool from opposite sides (tighter adverse clamp vs entry-lock after peak); shipping both without interaction read risks double-counting or offsetting",
-      "expected_impact": "clean attribution of the -0.092→-0.070 avg-loss move to specific legs",
-      "category": "measurement",
-      "status": "suggested",
-      "risk": "low",
-      "citations": [
-        [
-          "mfe exit",
-          "session",
-          "winner pass-through fk is the shared risk of both legs"
-        ]
-      ]
-    }
+    "pc- flip hard demote watch <55% (registered watch-pc-flip-demote-55)",
+    "mult-150 pre-adjudication: predict FAIL 2/4 net14>0; drop-pcplus will NOT fire (30d +0.18)"
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
     {
-      "item": "#254 exitstack-day-kpi-1114 registered",
-      "verify": "open due 11-15 — PASS"
+      "item": "#255 exitstack-day-kpi-1114 registered",
+      "verify": "still open due 11-15 — PASS"
     },
     {
-      "item": "#254 both joins re-ran",
-      "verify": "contrarian re-ran 08:30Z this run — PASS"
+      "item": "#255 both joins re-ran",
+      "verify": "contrarian re-ran 12:30Z this run, floor 04:30Z — PASS"
     },
     {
-      "item": "#254 floor p=0.0442 watch",
+      "item": "#255 floor p=0.0442 watch",
       "verify": "still 0.0442, due 11-15 — PASS/maintain"
     },
     {
-      "item": "#254 atr-trend- boost n=1 monitor",
-      "verify": "post-boost n=2 -0.23, stability rule holds — MONITOR stands"
+      "item": "#255 atr-trend- boost n monitor",
+      "verify": "post-boost n=2 -0.23, 14d still 19T 68.4% +0.01 — MONITOR stands"
     },
     {
-      "item": "#254 warrior prior-art catch",
-      "verify": "not re-proposed — PASS"
+      "item": "#255 warrior prior-art catch",
+      "verify": "not re-proposed as same item; NEW early cell amplify-warrior-sr-normal-long is different (cell vs combo-share) — PASS"
     },
     {
       "item": "WINNER_CELL revert (CEO 04:03Z)",
-      "verify": "live value=1.0 confirmed — DONE"
+      "verify": "live value=1.0, constants EMPTY diff — DONE"
     }
   ],
   "amplify": {
-    "new_proposals": [
-      {
-        "id": "amplify-vb-high-short-underdeploy",
-        "kind": "amplify",
-        "proposal_type": "(c) clone-hunt",
-        "stream": "volume-buildup- HIGH SHORT underdeployment — validated cell (WINNER_CELLS_VALIDATED) fires 19/30d but 0/7d",
-        "deadline": "2026-11-20T00:00:00Z",
-        "threshold": "identify block source (confluence/ctx/regime/hotset) for vb- HIGH SHORT setup gap; counterfactual-walk 30d blocked setups; if recoverable net >= +$0.30/30d at n>=15 → propose gate exempt with fk<20%",
-        "default_action": "NO CHANGE if block is quality-filter (not plumbing)",
-        "owner": "brain_auditor weekly AMPLIFY run #255",
-        "risk": "low"
-      }
-    ],
-    "why_fewer": "queue already has 22 open amplify; only other n>=10 unowned cell is pc- NORMAL LONG (31T +0.15) — REJECTED: WR 38.7%, single +0.54 outlier = 36% of net, not robust at n=31",
-    "flip_kpi": "MET this week via winner-cell-size-125 (shipped live 11-10, reverted 11-13 after FAIL adjudication — conversion counted)"
+    "new_proposal": "amplify-warrior-sr-normal-long (EARLY n=6<10, clone-hunt, due 11-20)",
+    "why_not_more": "every n>=10 positive 30d cell already has open amplify/eval (bb-squeeze x3, vb- underdeploy, atr-trend cell-watch+clonehunt, pc+ drop/mult, jup flat, grind-breakout, ema300); Flip-KPI met earlier this week via winner-cell-size-125",
+    "in_flight_serviced": [
+      "amplify-vb-high-short-underdeploy",
+      "amplify-grind-breakout-underdeploy",
+      "amplify-atr-trend-short-cell-watch",
+      "13 items due 11-14"
+    ]
   },
-  "next_actions": [
-    "11-14 EXIT-STACK DAY: disposition 13 due items (mfe-cut, mult-150, jup-short-walk, atrtrail-clip, stop-tighten eval+probe, bbsqueeze x3, prearm-BE, drop-pcplus, slippage-column, tat-neverarmed) + new vb-underdeploy",
-    "11-14: coordinate stop-tighten × prearm-BE interaction read (see creative #2)",
-    "11-15 floor same-sign re-measure (p=0.0442 drifting toward 0.05 — may FAIL)",
-    "11-15 exitstack-day-kpi-1114: avg loss -0.092 → <=-0.070",
-    "11-16 atr-trend- cell watch; 11-17 jup batch; 11-18 contrarian fade + xmirror",
-    "MONITOR: pc- flip decay (60.6%, demote <55%); atr-trend- boost post-ship n=2 -0.23; arm-rate unarmed 68.4% near 70% tripwire",
-    "MED: session_brain title/date rebuild (11th+ run)",
-    "CEO: exit-stack pull-forward still open; winner-cell revert DONE 11-13"
-  ],
-  "autopsy_48h": {
+  "losing_trade_autopsy_48h": {
     "method": "recovery_replay adverse-first, selfcheck PASS",
     "n": 12,
     "never_adverse": 1,
-    "recovered": 9,
-    "never": 2,
-    "never_list": [
-      "ZORA SHORT atr-trend- cut-loser -0.12",
-      "CFX SHORT atr-trend- hard_max_loss -0.08"
-    ],
-    "verdict": "WRONG-SIDE REFUTED 83rd consecutive (#61 p=0.116, #84 t=-0.04)"
+    "recovered": 10,
+    "never": 1,
+    "never_detail": "CFX #16883 atr-trend- SHORT hard_max -0.08 (mfe -0.118, held 9min, rsi 72.7)",
+    "verdict": "WRONG-SIDE REFUTED 84th consecutive run (#61 p=0.116, #84 t=-0.04)",
+    "new_patterns": 0
   },
   "signal_deep_dive": {
-    "new_sub50_targets": 0,
-    "detail": "bb-bounce CEO-owned; doji 0 post-kill; ai-trader+ disabled; pc- PROMOTE-owned; pc+ NO-KILL; ai-trader-pending CEO domain; jup owned by 11-14/11-17 batch"
+    "new_sub50_targets_n15": 0,
+    "details": "ai-trader-pending 21T 33.3% CEO domain; pump-chain- 31T 38.7% +0.15 PROMOTE stands (positive net); atr-trend- post-boost n=2 monitor; hl_copy 9T n<15 collect"
   },
+  "next_actions": [
+    "11-14 EXIT-STACK DAY: disposition 13 due items + mult-150 pre-computed FAIL (2/4 net14>0) + drop-pcplus will NOT fire (30d +0.18)",
+    "11-14: coordinate stop-tighten × prearm-BE interaction read",
+    "11-15 floor same-sign re-measure (p=0.0442 may FAIL)",
+    "11-15 exitstack-day-kpi-1114: avg loss -0.092 -> <=-0.070",
+    "11-16 atr-trend cell watch; 11-17 pc- demote read (watch-pc-flip-demote-55); 11-17 jup batch; 11-18 contrarian fade + xmirror",
+    "MONITOR: pc- flip 56.6% (demote <55%); LONG arm 42.5% (tripwire needs SHORT>55 too); atr-trend- boost n=2 -0.23; floor p=0.0442",
+    "MED: session_brain title/date rebuild (12th+ run)",
+    "CEO: exit-stack pull-forward still open; mult-150 will FAIL tomorrow (pre-computed)"
+  ],
   "readiness": {
-    "open": "1x BTC SHORT #16891 bracketed (SL 68880), meta_rsi 21.18 knife-zone but ai-trader CEO domain",
-    "regime": "btc_15m LONG_BIAS vs btc_4h SHORT_BIAS split; continuum BELOW; trend_quality STRONG_DOWN; vol NORMAL",
-    "stance": "SHORTS align with 4h+structure; no fresh LONG entries; size 1.0x (size-reduce file absent); trail-family only"
+    "open": "SOL #16893 LONG jup_yolo_mirrored @12:23Z +0.16% SL80.06 TP82.35 bracketed (watchdog snapshot at 12:20 predates open)",
+    "regime": "15m LONG_BIAS vs 4h SHORT_BIAS split / continuum ABOVE / vol LOW / CALM / auto CHOP scores short+5 long-5 BRACKET",
+    "stance": "no added size while auto=CHOP; trail-family first; jup=CEO-domain mirror; size 1.0x (size-reduce absent)",
+    "steers": "0 from watchdog"
   }
 }
