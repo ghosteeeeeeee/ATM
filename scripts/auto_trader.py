@@ -352,9 +352,9 @@ def tweak_structure_fixed(decision, open_positions):
          new structure so a crossing = a break at the real line (the
          old chase dropped the stop 72327→71771 and exited 71789 while
          72500 was never touched). Price-side clamped, ±5% stale cap,
-         never un-breaching a breached stop. Birth = SEED ONLY (the
-         armed/ATR stop the trade arrived with stands — never
-         overridden).
+         never un-breaching a breached stop. Birth = RE-ANCHOR (F-1):
+         an interior stop moves to the major line; floor-zone/dictated
+         stops and stops already at/behind the line are kept.
       TP: NEVER moved by the watchdog — the giant-candle backstop only.
          (The rule-10 TP snap is REMOVED: it fired take-profits mid-move
          — #16873/#16878 booked losses labeled manual_tp_hit, #16879
@@ -443,7 +443,8 @@ def tweak_structure_fixed(decision, open_positions):
             """
             key = str(pid)
             prev = _smap.get(key)
-            # F-1 + format: old 2-key rows -> birth (re-seed, no stop move)
+            # F-1 + format: old 2-key rows -> birth (re-seed; the
+            # re-anchor rules apply on that path too)
             if not (isinstance(prev, dict)
                     and isinstance(prev.get('sh15'), (int, float))
                     and isinstance(prev.get('sl15'), (int, float))
@@ -463,15 +464,19 @@ def tweak_structure_fixed(decision, open_positions):
                 return
             if prev is None:
                 # BIRTH: record state AND re-anchor an INTERIOR stop to the
-                # MAJOR (1h) line (bug_hunter F-1 for #16896: the armed
-                # 68950 was interior to the box — the fixed lag still died
-                # at 69027 because seed-only held it until the first 1h
-                # step 33min too late. The stop must only ever exit on a
-                # MAJOR-structure break: 'we should have still been in').
-                # A stop already at/behind the line is NEVER touched
-                # (supersedes the old seed-only 'needless loosening' note:
-                # #16879's armed 73010 would also have re-anchored to the
-                # then-line ~73674 — harmless, price never returned there).
+                # MAJOR (1h) line (bug_hunter F-1 — the #16896 class).
+                # HONEST replay record (verdict b739a911, real birth-time
+                # data): the OLD system died #16896 at 69027 (interior
+                # stop, no re-anchor); the first fix round survived it
+                # only via the 16:20 1h-step (stop -> 70297, final 69653,
+                # STILL OPEN) — with real data its stop sat BELOW the
+                # floor-reclaim zone and KEPT; this branch catches the
+                # class ABOVE the reclaim zone at birth. The stop must
+                # only ever exit on a MAJOR-structure break ("we should
+                # have still been in"). A stop already at/behind the line
+                # is NEVER touched (supersedes the old seed-only note:
+                # #16879's armed 73010 would have re-anchored to the
+                # then-line ~73674 — harmless, price never returned).
                 _rec = {'sh15': s15[0], 'sl15': s15[1],
                         'sh1h': s1h[0], 'sl1h': s1h[1], 'ts': time.time()}
                 if side == 'SHORT':
@@ -482,8 +487,12 @@ def tweak_structure_fixed(decision, open_positions):
                     # what a floor-break thesis stop uses — the keeper's own
                     # formula, and your dictated rungs like 67940/SL68300)
                     # but BELOW the ceiling line (sh1h+0.1·ATR1h). A floor-
-                    # zone stop IS major structure (keep) — #16896's
-                    # wiggle-anchored 68950 was in the gap → raise.
+                    # zone stop IS major structure (keep — dictated rungs
+                    # and keeper floor-breaks). Class example: a wiggle-
+                    # anchored stop ABOVE the reclaim zone → raise (real
+                    # birth-time data put #16896's 68950 BELOW floor_top
+                    # → kept; its survival came from the later 1h-step —
+                    # verdict b739a911 F-a).
                     floor_top = s1h[1] + 0.60 * s15[2]
                     line = s1h[0] + 0.10 * s1h[2]
                     line = max(line, price * 1.001)   # never at/below price

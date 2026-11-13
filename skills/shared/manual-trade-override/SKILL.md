@@ -328,9 +328,12 @@ duplicate real trade #16832).
     structure so a crossing = a break at the real line (#16882: the
     72224 bounce made the old code drop the stop 72327 → 71771 under
     price and exit 71789 while the CEO's 72500 line was never
-    touched); birth = SEED ONLY (the
-    armed stop stands, never overridden — a birth-align once loosened
-    #16879's 73010 → 73669 needlessly). The stop therefore TRAILS DOWN
+    touched); birth = RE-ANCHOR (2026-11-13, supersedes the earlier
+    seed-only rule): an interior stop — above the major-floor-reclaim
+    zone (sl1h+0.6·ATR15) and below the ceiling line — moves to the
+    major line at birth; floor-zone/dictated stops and stops already
+    at/behind the line are kept (#16879-class note: its 73010 would
+    have re-anchored to ~73674 — harmless, price never returned). The stop therefore TRAILS DOWN
     on shorts as 15m LHs print (proven: 73112 → 72919 across two
     formations), locking profit with structure. **EXITS ARE STRUCTURE-
     BREAK ONLY — the standing doctrine, restated emphatically by the
