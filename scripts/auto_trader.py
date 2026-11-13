@@ -694,6 +694,21 @@ def _ladder_keeper(decision, summary):
             return (pstate.get(o.get('id')) or {}).get('status') \
                 not in ('fired', 'error')
 
+        def _side_mult(side):
+            """CEO 2026-11-13 position sizing: ADD ON WINNERS, REMOVE FROM
+            LOSERS — a derived rung doubles (2x base) when the side's last
+            5 closed BTC trades net positive (short side: +3.75% → 2x);
+            losers stay at base (the HL $11 min-notional floor makes
+            shrink-below-base impossible — 'remove from losers' = no
+            pyramid + serial cuts, not smaller notional)."""
+            try:
+                rows = DB.recent_attribution(5) or []
+                net = sum(float(r.get('pnl_pct') or 0) for r in rows
+                          if str(r.get('direction', '')).upper() == side)
+                return 2.0 if net > 0 else 1.0
+            except Exception:
+                return 1.0
+
         orders = pcfg.get('orders', [])
         appended = []
         reach_lo = price - 3.0 * atr1
@@ -727,7 +742,7 @@ def _ladder_keeper(decision, summary):
                 orders.append({
                     'id': oid, 'coin': 'BTC', 'direction': 'short',
                     'trigger': 'below', 'trigger_price': trig,
-                    'amount_usdt': 11.1, 'leverage': 5,
+                    'amount_usdt': round(11.1 * _side_mult('SHORT'), 2), 'leverage': 5,
                     'sl': sl, 'target': tp, 'confidence': 60,
                     'serial': True, 'dynamic_sl': False,
                     'note': (f"Rule-13 LADDER KEEPER auto-arm ({time.strftime('%Y-%m-%d %H:%M')} "
@@ -762,7 +777,7 @@ def _ladder_keeper(decision, summary):
                 orders.append({
                     'id': oid, 'coin': 'BTC', 'direction': 'long',
                     'trigger': 'above', 'trigger_price': trig,
-                    'amount_usdt': 11.1, 'leverage': 5,
+                    'amount_usdt': round(11.1 * _side_mult('LONG'), 2), 'leverage': 5,
                     'sl': sl, 'target': tp, 'confidence': 60,
                     'serial': True, 'dynamic_sl': False,
                     'note': (f"Rule-13 LADDER KEEPER auto-arm LONG ({time.strftime('%Y-%m-%d %H:%M')} "

@@ -358,17 +358,24 @@ duplicate real trade #16832).
     (2026-11-13, auto) — BOTH SIDES:** `auto_trader._ladder_keeper` runs
     every watchdog cycle: (a) no unfired **BTC** short rung WITHIN REACH
     (≤3·ATR1h below price — a far-below rung does NOT count) → derive at
-    the **15m swing floor** (trigger = sl15 − 60, reclaim SL = sl15 +
+    the **1h MAJOR floor** (trigger = sl1h − 60, reclaim SL = sl1h +
     0.6·ATR15, TP = trigger − 3·ATR1h disaster depth AT ARM TIME;
-    loop-safe: a derived trigger outside reach is skipped); (b) no
+    loop-safe: a derived trigger outside reach — including price already
+    at/below it — is skipped); (b) no
     unfired BTC long rung
     WITHIN REACH (≤3·ATR1h above price — stacked 72k+ rungs do NOT count,
     a rubberband snap from 68k would leave them behind) → derive at the
-    15m-ceiling reclaim (trigger = sh + 60, SL = sh − 0.6·ATR15, TP =
-    trigger + 3·ATR1h AT ARM TIME). All keeper legs `serial` + `dynamic_sl:false`, so
-    the ladder is never empty on either side after a fire/TP (CEO: "you
-    better be ready for the longs too, cuz they're coming — rubberband
-    snapping back"). Single-writer: only run_cycle. **Ride doctrine
+    **1h-major-ceiling reclaim** (trigger = sh1h + 60, SL = sh1h −
+    0.6·ATR15, TP = trigger + 3·ATR1h AT ARM TIME). All keeper legs
+    `serial` + `dynamic_sl:false`. **POSITION SIZING (CEO 2026-11-13:
+    "add on winners, remove from losers")** — derived rungs size at
+    **2× base ($22.20) when the side's last-5 closed BTC trades net
+    positive**, base ($11.10) otherwise; the HL $11 min-notional floor
+    means losers cannot shrink below base — "removing from losers" is
+    expressed as no pyramid + serial cuts, not smaller notional. The
+    ladder is never empty on either side after a fire/TP (CEO: "you
+    better be ready for the longs too — rubberband snapping back").
+    Single-writer: only run_cycle. **Ride doctrine
     (CEO: "we ride the trend till it is over — the trend is your friend,
     till it ends"):** the structure-lag trail IS the ride mechanism —
     entries are the rungs, exits are structure breaks, nothing else.
