@@ -26207,3 +26207,28 @@ BY: auto_1hr
 - 7d still 46.7% RED -$1.89
 - 0 trades closed + 0 open second hour running — check trade frequency pipeline if this persists
 BY: auto_1hr
+
+## [2026-11-13 21:21] Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** $0.12 (WR: 100%) | 24h 16T 50.0% +$0.09 GREEN | 7d 93T 47.3% -$1.77 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 1 close (SOL jup_yolo_mirrored SHORT profit-monster-trail +0.12 +3.03%), 0 open — winner, good exit
+- Arm rate: unarmed 11/16 = 68.75% (<70%) WR 27.3% (-0.45) vs armed 5/5 100% (+0.54) — no gate; stall stack owns fix
+- Kill check: 1 close/hr; no signal with 0% WR and 3+ closes this hour (atr-trend- 2T 0% 24h, n=2 <3)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/16 = 12.5% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 4/16 = 25% avg -0.113 — expected at leverage
+- Boost: none eligible (jup_yolo_mirrored 3T 100% n<5, atr-trend+ 2T n<5, pending 6T 33.3% not >55%)
+- Neg streak: 18:00 -0.13, 21:00 +0.12 — streak 0, not 3 -> no size cut
+- Frequency: 1 close/hr — well under 20
+- No storm (window-min -0.95% / at-run -0.95%) -> gate not fired
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still 47.3% RED -$1.77
+- Unarmed cohort 68.75% of 24h closes (just under 70%) with WR 27.3% — chop entries persist; stall stack owns fix
+BY: auto_1hr
