@@ -11122,5 +11122,23 @@
     "status": "suggested",
     "risk": "low",
     "run": "#253"
+  },
+  {
+    "date": "2026-11-13T04:42:42Z",
+    "idea": "EXIT-STACK DAY (11-14) pre-registered aggregate KPI: trailing-30 avg loss magnitude -0.092 -> <= -0.070 post-ships, else revert failing leg (harvest-ship pattern)",
+    "rationale": "14d WR 52.7% still net -4.10 because avg loss is 1.5x avg win; 6+ exit-stack items due 11-14 are the highest-leverage batch — without an aggregate KPI they ship unmeasured",
+    "expected_impact": "Same 186W/167L mix at -0.070 avg loss flips 14d-equivalent from -4.10 to approx -0.4",
+    "category": "exit quality",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-13T04:42:42Z",
+    "idea": "Prior-art CATCH: warrior-sr-confirm+ NORMAL LONG early cell (6T 66.7% +0.28) rejected — harvest-ship-2026-11-04 already shipped bb-squeeze+/warrior amplify; warrior 30d total flat 20T -0.03",
+    "rationale": "Mandatory prior-art query caught duplicate before queue entry; avoids re-proposing shipped work",
+    "expected_impact": "0 (queue noise avoided)",
+    "category": "process",
+    "status": "closed",
+    "risk": "none"
   }
 ]

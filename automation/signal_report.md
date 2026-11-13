@@ -1,9 +1,9 @@
 # Signal Performance Report
-**Generated:** 2026-11-12 21:23 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-13 03:23 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,776 | **WR:** 51.3% | **PnL:** -123.36%
-- **Date range:** 2026-07-29 → 2026-11-12
+- **Total trades (all time):** 3,780 | **WR:** 51.3% | **PnL:** -121.28%
+- **Date range:** 2026-07-29 → 2026-11-13
 
 ---
 
@@ -11,7 +11,7 @@
 
 | Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
 |--------|-----|------|-------|--------|-------|--------|---------|--------|
-| atr-trend- | SHORT | 2 | 50.0% | -0.50 | 6 | 83.3% | +1.47 | ❓ |
+| atr-trend- | SHORT | — | —% | — | 7 | 71.4% | +0.46 | ❓ |
 
 ---
 
@@ -25,7 +25,7 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| ai-trader-pending | SHORT | 5 | 40.0% | +0.26 | ❓ | Borderline |
+| ai-trader-pending | SHORT | 6 | 50.0% | +3.01 | ❓ | Borderline |
 
 ---
 
@@ -43,7 +43,7 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] ai-trader-pending SHORT** — WR=40.0%, PnL=+0.26% over 5 trades. Monitor next cycle.
+1. **[WATCH] ai-trader-pending SHORT** — WR=50.0%, PnL=+3.01% over 6 trades. Monitor next cycle.
 2. **[KEEP] 1 winning combos** — atr-trend-. LONG side dominant.
 
 ---
@@ -65,6 +65,5 @@ None found. Top performers are already enabled.
 | 2026-11-06 | 673b669 | bug-hunter: atr_trend_accel build fixes |
 | 2026-11-06 | e62ff98 | automation: hourly analysis 2026-11-06 14:30 — no config cha... |
 | 2026-11-06 | 8a229b1 | scripts: 2 LOG-ONLY counterfactual shadows — BTC-chop standa... |
-| 2026-11-06 | 03bde6d | signals: linreg_fade round 2 — cross-sectional trigger + mak... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

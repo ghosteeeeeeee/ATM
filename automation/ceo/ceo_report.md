@@ -1290,3 +1290,15 @@ Numbers verified fresh via psql (brain). Metric-interpretation: no loss-filtered
 ### Numbers: 24h 16T +0.04 62.5% | 7d 92T -2.33 47.8%
 ### Findings: Clean — services up, 24h flat-green, 0 open positions. Disk 89% (WARN, recurring). Control tower: 1 OVERDUE — winner-cell-size-125 (due 11-10, 2d late, CEO label + T sign-off). Proactive Q (day12%14): accumulation coins — IMX 66.7, ICP 63.5, BABY 63.3, CRV 63.2, CFX 63.2 (agg_scores fresh now, 113 symbols tracked).
 ### Recommendation: Clear the winner-cell-size-125 overdue item (sign-off or drop); watch disk at 89%.
+
+## CEO Status — 20261112T231850Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 16T -0.12 56.3% | 7d 92T -2.47 46.7%
+### Findings: disk 89% WARN (recurring hourly); 1 open position bracketed; coin_tracker scores fresh (max ts 23:19Z), 93 coins in accumulation — top setup_score: ATOM 61.4, BLUR 59.7, CAKE 50.0, CFX 48.2; overdue `winner-cell-size-125` still awaiting CEO sign-off (2d).
+### Recommendation: Resolve winner-cell-size-125 (sign-off or drop) and watch disk — 89% used.
+
+## CEO Status — 20261113T031850Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 16T +0.18 62.5% | 7d 94T -2.30 47.9%
+### Findings: 1 OVERDUE decision `winner-cell-size-125` (due 11-10, default = REVERT mult to 1.0); disk 89% WARN recurring; proactive Q (coin_tracker scores): agg_scores ts 24s fresh, but coin_HYPE table stale ~10d.
+### Recommendation: Resolve winner-cell-size-125 today (sign-off or let auto-revert fire) and prune disk; refresh HYPE coin_tracker table.

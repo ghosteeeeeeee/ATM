@@ -1,228 +1,236 @@
 {
-  "timestamp": "2026-11-13T00:48:43Z",
-  "run": "brain_auditor #253",
+  "timestamp": "2026-11-13T04:42:27Z",
+  "run": 254,
+  "session_lock": "absent",
+  "config_changes": 0,
   "session_brain_stats": {
     "queries_run": 8,
-    "hits_total": 33,
+    "hits_total": 40,
     "excerpts_available": false,
-    "caveat": "session_brain rebuild owed 8+ runs — titles/dates/excerpts empty; OpenMemory partial substitute. Citations carry title only."
+    "note": "session_brain returns titles only (excerpt/date empty) — rebuild now owed 10+ runs; OpenMemory partial substitute"
   },
   "questions_asked": [
     {
-      "question": "oversold short RSI entry filter tried before",
-      "results_found": 3,
-      "cited": true,
-      "titles": [
-        "trend align",
-        "risk-budget decision"
-      ]
-    },
-    {
-      "question": "arm rate chop entries stall stack escalation",
+      "question": "what did we say about atr_sl_hit stops too tight",
       "results_found": 5,
       "cited": true,
-      "titles": [
-        "mfe exit",
-        "yolo dash"
+      "cites": [
+        "calwndar [date n/a, excerpt empty]",
+        "ugb_pt exit [date n/a, excerpt empty]"
       ]
     },
     {
-      "question": "what did we say about jup_yolo losses",
+      "question": "have we tried widening ATR stop distance",
       "results_found": 5,
       "cited": true,
-      "titles": [
-        "yolo dash",
-        "copy_trader yolo"
+      "cites": [
+        "wider exits [date n/a, excerpt empty]",
+        "profit-monster-trail (1) [date n/a, excerpt empty]",
+        "constants ATR_SL_MAX comment: 4.0 trial REVERTED 2026-10-31 (HML guard fired)"
       ]
     },
     {
-      "question": "have we tried shorting midband RSI strength filter",
-      "results_found": 4,
-      "cited": true,
-      "titles": [
-        "mtf macd",
-        "risk-budget decision"
-      ]
-    },
-    {
-      "question": "giveback hard_max_loss trail failed ETH",
+      "question": "volume-buildup short signal performance",
       "results_found": 5,
       "cited": true,
-      "titles": [
-        "calwndar",
-        "yolo dash"
+      "cites": [
+        "exit asymmetry [date n/a, excerpt empty]"
       ]
     },
     {
-      "question": "linreg fade vol gate not suited REGIME_SIGNALS admitted",
+      "question": "exit stack pull forward mfe cut",
       "results_found": 5,
       "cited": true,
-      "titles": [
-        "Build New Linear Regression Signal"
+      "cites": [
+        "yolo dash [date n/a, excerpt empty]"
       ]
     },
     {
-      "question": "signal blocked at execution vol gate allowlist added",
-      "results_found": 4,
+      "question": "winner cell size multiplier 1.25 revert",
+      "results_found": 5,
       "cited": true,
-      "titles": [
-        "ceo (2)",
-        "signal to trades (1)"
+      "cites": [
+        "calwndar [date n/a, excerpt empty]"
       ]
     },
     {
-      "question": "oversold short RSI floor band rejected noise",
-      "results_found": 2,
+      "question": "warrior-sr-confirm signal quality normal long",
+      "results_found": 5,
       "cited": true,
-      "titles": [
-        "wider exits",
-        "risk-budget decision"
+      "cites": [
+        "signal to trades (2) [date n/a, excerpt empty]"
+      ]
+    },
+    {
+      "question": "have we tried amplifying warrior sr confirm",
+      "results_found": 5,
+      "cited": true,
+      "prior_art": "FOUND via shadow_disposition harvest-ship-2026-11-04 (CEO package already shipped bb-squeeze+/warrior amplify 2026-11-04) — did NOT re-propose",
+      "cites": [
+        "harvest-ship-2026-11-04, 2026-11-04, 'bb-squeeze+/warrior amplify' in CEO SHIP-LIVE package"
+      ]
+    },
+    {
+      "question": "average loss bigger than average win exit stack",
+      "results_found": 5,
+      "cited": true,
+      "cites": [
+        "exit asymmetry [date n/a, excerpt empty]",
+        "risk-budget decision [date n/a, excerpt empty]"
       ]
     }
   ],
   "trade_summary_24h": {
-    "trades": 15,
-    "pnl_usdt": -0.14,
-    "wr": 53.3,
+    "trades": 17,
+    "wins": 11,
+    "wr": 64.7,
+    "pnl": 0.37,
+    "status": "GREEN",
     "by_signal": [
       [
-        "hl_copy_trader LONG",
-        -0.09
+        "ai-trader-pending SHORT",
+        6,
+        0.35,
+        50.0
       ],
       [
         "jup_yolo_mirrored SHORT",
-        -0.08
-      ],
-      [
-        "ai-trader-pending SHORT",
-        0.01
+        3,
+        0.09,
+        100.0
       ],
       [
         "atr-trend- SHORT",
-        0.02
+        7,
+        0.02,
+        71.4
+      ],
+      [
+        "hl_copy_trader LONG",
+        1,
+        -0.09,
+        0.0
       ]
     ],
-    "losers": 6,
-    "winners": 8,
-    "flat": 1,
-    "7d": {
-      "trades": 92,
-      "pnl": -2.47,
-      "wr": 46.7,
-      "LONG": "41T 39.0% -1.48",
-      "SHORT": "51T 52.9% -0.99"
+    "windows": {
+      "7d": "95T 48.4% -2.11",
+      "14d": "353T 52.7% -4.10",
+      "30d": "696T 49.1% -7.43"
     },
-    "7d_arm": {
-      "armed": "44T 86.4% +1.61",
-      "unarmed": "48T 10.4% -4.08"
-    },
-    "7d_regime": {
-      "HIGH": "27T -0.95",
-      "NORMAL": "51T -0.87",
-      "EXTREME": "10T -0.43",
-      "FLAT": "4T -0.22"
-    }
+    "open_trades": 0,
+    "regime": "btc_15m SHORT_BIAS, btc_4h SHORT_BIAS, continuum BELOW, vol LOW, market CALM, wyckoff UNKNOWN/ACCUMULATION, trend_quality UP",
+    "watchdog_steers": 0,
+    "storm": "fired 04:26Z window-min -2.10% streak 0/3, counterfactual SHORT +1.67/LONG -2.46, packet kanban, no action"
+  },
+  "chop_mandate": {
+    "armed_7d": "47T 87.2% +1.97",
+    "unarmed_7d": "48T 10.4% -4.08",
+    "armed_14d": "179T 91.1% +9.71",
+    "unarmed_14d": "174T 13.2% -13.81",
+    "exit_family_7d": "atr_sl_hit 22T 0% -2.62 (dominant bleed) vs profit-monster-trail 31T 96.8% +1.16",
+    "rr_asymmetry": "14d avg win +0.061 vs avg loss -0.092 (1:1.5) — WR 52.7% still net negative; exit quality is the lever, not direction",
+    "verdict": "MANDATE INTACT — trail family wins, unarmed chop bleeds"
   },
   "shadow_analysis": {
-    "contrarian": "join re-ran 00:30Z (mandate): overall flip 44.9% n=1761; pump-chain- 64.9% n=350 LIVE-stable; btc-pump-rider+ 39.9% n=1410 do-NOT. chi2 rider heterogeneous (p~1e-33) — per-signal only.",
-    "floor_admit": "join re-ran 00:30Z: Q1 fisher p=0.0321 (floor 48.6% n=1681 vs always 42.0% n=322) — significant limb HOLDING; 30d same-sign not reachable until 2026-11-15. Verdict COLLECT, do NOT ship early.",
-    "oscillator": "FROZEN/ARCHIVED — no reads.",
-    "wyckoff": "RETIRED — no reads.",
-    "rr_shadow": "ORPHANED — no reads.",
-    "gate_shadow": "used as input for clone-hunt/exempt dispositions (vb- HIGH n=78 57.7%; bb-sq LONG-NEUTRAL-CHOP n=58 77.6%) — both threshold-forbidden as primary frame.",
-    "exit_ab": "shadow_trader --report: pm_trail n=38057 total +14116 vs hard_max n=17167 -16603 = trail-or-nothing confirmed again.",
-    "overall": "3/5 usable (contrarian, floor, gate_shadow-as-input). Both mandated joins fresh this run."
+    "contrarian": "join re-ran 04:30Z (mandate) — overall flip 45.0% n=1759; pc- flip 63.7% (223/350) STABLE, PROMOTE stands; btc-pump-rider+ 40.3% do-NOT-flip; per-signal never blanket",
+    "floor_admit": "join re-ran 04:30Z — floor_only 48.8% n=1691 vs always_admit 42.5% n=325, fisher p=0.0442 (drifted from 0.0321, still <0.05); 30d same-sign due 11-15 — do NOT ship early; blocked cohort n=0",
+    "oscillator": "FROZEN (OSCILLATOR_MULT_ENABLED since Oct 1, archived fossil) — not answerable",
+    "wyckoff": "RETIRED per #253 — not answerable",
+    "rr_shadow": "ORPHANED (no producer, 24d+ stale) — not answerable",
+    "shadow_trader": "94,556 signals — gates justified (CONFLUENCE-EXPIRY 16,728 @47% avg -0.13; COMBO-STALE 5,121 @45% -0.15); exit A/B pm_trail +14,203 vs hard_max -16,735 = trail-or-nothing confirmed at scale",
+    "overall": "3/5 answerable (contrarian, floor, shadow_trader) — both mandate joins fresh this run"
   },
-  "drift_findings": [
-    {
-      "finding": "linreg-fade wiring drift: LINREG_FADE_MINUS_ENABLED=True + STANDALONE_BYPASS live, but volatility_gate_v2.REGIME_SIGNALS has NO linreg-fade entry in any regime",
-      "evidence": "63/63 30d EXEC lines paired with VOL-GATE-v2 'not suited' SKIP (dedup 26); 0 PG fills all-time",
-      "status": "measured, counterfactual ~breakeven → NO CHANGE this run; escalate as amplify-linregfade-volgate-admit (bar pre-registered, 11-27)",
-      "prior_art": "session brain 'Build New Linear Regression Signal' (0.80) — build sessions only, no prior allowlist admission"
-    },
-    {
-      "finding": "Watchdog pattern #2 (oversold-short reversal, 24h n=6) does NOT survive 14d: rsi_exec<40 SHORT = 16T 62.5% +0.36",
-      "evidence": "14d SHORT bands rsi_exec: <40 +0.36 / 40-55 -0.23 / 55-70 -0.52 / >=70 +0.37",
-      "status": "REFUTED — do NOT ship an oversold-short RSI floor beyond existing OVERSOLD_SHORT_RSI_MAX=35 knife",
-      "prior_art": "'oversold short RSI floor band rejected noise' (2 hits)"
-    },
-    {
-      "finding": "LONG side is 60% of 7d bleed (-1.48 of -2.47) while continuum BELOW EMA300 52h+; all 14d LONG rsi bands negative",
-      "evidence": "7d direction split; jup_yolo_mirrored LONG 14d 106T -1.20 (unarmed 52T -4.84 vs armed 61T +3.67)",
-      "status": "same never-armed chop class — stall-stack escalation #251 already with CEO; no new gate (LONG gates dense: LONG-NEUTRAL-CHOP/RSI-CEILING/CONTINUUM-BULL all firing)"
-    }
-  ],
+  "losing_trade_autopsy": {
+    "method": "recovery_replay adverse-first (selfcheck PASS), 48h",
+    "n": 11,
+    "never_adverse": 1,
+    "recovered_after_adverse": 7,
+    "never_recovered": 3,
+    "never_list": [
+      "ZORA atr-trend- SHORT cut-loser-CL-T1 -0.12",
+      "AR atr-trend+ LONG atr_sl_hit -0.11",
+      "CFX atr-trend- SHORT hard_max_loss -0.08"
+    ],
+    "wrong_side": "REFUTED 82nd consecutive run (#61 p=0.116, #84 t=-0.04); 3 NEVER all immaterial <=0.12",
+    "new_patterns": "none — 24h losers 5 (SUSHI/CFX atr-trend-, ETH hl_copy, BTC pending x2) all within known families"
+  },
+  "signal_deep_dive": {
+    "sub50_n15_targets_new": 0,
+    "sub50_existing": [
+      "ai-trader-pending 19T 36.8% -0.01 — CEO/autopilot domain, do not touch",
+      "pump-chain- 31T 38.7% +0.15 — net positive, PROMOTE owns (flip 63.7%)"
+    ],
+    "biggest_bleed_family": "jup_yolo_mirrored atr_sl_hit 14d 26T 0% WR -3.47 (MFE 0.01-0.44 never armed) — owned by amplify-jup-short-walk (due 11-14) + jup-atrsl-shadow-parity / jup-trail-shadow-1xatr (due 11-17) + jup evals",
+    "atr_trend_boost_verify": "post-boost (since 11-12 17:23) n=1 -0.11 — MONITOR stands, auto_1hr stability rule blocks second boost"
+  },
+  "drift_findings": [],
   "recurring_problems": [
-    {
-      "problem": "never-armed chop entries own the bleed",
-      "runs": "7d dollar share 93.8% / 14d 94.5% (both >92% breach); unarmed 48T 10.4% -4.08 vs armed 44T 86.4% +1.61",
-      "owner": "exit-stack day 11-14 + stall stack; escalation #251 awaiting CEO"
-    },
-    {
-      "problem": "session_brain empty excerpts",
-      "runs": "8+ runs owed rebuild",
-      "owner": "housekeeping"
-    }
+    "unarmed chop bleed: 14d unarmed -13.81 (93%+ of gross loss) — same mandate every run, fix owned by 11-14 exit-stack batch",
+    "session_brain excerpt/date empty — rebuild owed 10+ runs (MED housekeeping)"
   ],
   "missing_implementations": [
-    {
-      "item": "REGIME_SIGNALS admission for linreg-fade- (vol-gate last mile)",
-      "status": "counterfactual run, bar pre-registered 11-27, default NO SHIP"
-    },
-    {
-      "item": "source column on LONG-NEUTRAL-CHOP block lines (86% of blocks unattributable in log frame)",
-      "status": "data-quality side-find, not built"
-    }
+    "linreg-fade REGIME_SIGNALS volgate admit — escalated #253, due 11-27, pre-registered bar (under bar this run: p~0.08 n=21)"
   ],
   "creative_improvements": [
     {
-      "date": "2026-11-13T00:48:43Z",
-      "idea": "Significance pre-check on watchdog pattern_alerts: before surfacing a pattern, auto-run it at 14d/30d and attach n + one-sided p; label '24h exploratory' if n<20",
-      "rationale": "This run: watchdog pattern #2 (oversold-short, 6W/6L) is REFUTED at 14d (rsi_exec<40 SHORT +0.36). Surfacing n=6 24h patterns as verified alerts steers the auditor toward shipping noise.",
-      "expected_impact": "prevents repeat of 2026-10-08 four-failed-analysis pattern at the alert layer",
-      "category": "meta/guardrail",
+      "date": "2026-11-13T04:42:27Z",
+      "idea": "EXIT-STACK DAY (11-14) pre-registered KPI: trailing-30 avg loss magnitude must fall from -0.092 to <= -0.070 post-ships, else flag failing ship for revert (harvest-ship pattern)",
+      "rationale": "14d WR 52.7% but PnL -4.10 — avg loss 1.5x avg win. The 6 amplify/eval items due 11-14 (mfe-cut, prearm-BE, stop-tighten x3, jup-short-walk, tat-neverarmed, mult-150, drop-pcplus) are the highest-leverage batch in the queue; without a KPI they ship and nobody measures the aggregate.",
+      "expected_impact": "If avg loss -> -0.070: 14d-equivalent net flips from -4.10 to approx -0.4 (arithmetic on same 186W/167L mix); if not, revert the failing leg",
+      "category": "exit quality",
       "status": "suggested",
-      "risk": "low"
+      "risk": "low",
+      "registered_as": "shadow_disposition eval entry exitstack-day-kpi-1114 due 2026-11-15"
     },
     {
-      "date": "2026-11-13T00:48:43Z",
-      "idea": "linreg-fade REGIME_SIGNALS admit (NORMAL) — registered as amplify-linregfade-volgate-admit",
-      "rationale": "63/63 EXECs killed by allowlist absence; counterfactual +8h 61.9% WR avg +0.195% (n=21, p≈0.08) — positive but under bar",
-      "expected_impact": "~+$0.56/30d if bar clears at n>=40",
-      "category": "fill-funnel",
-      "status": "suggested (pre-registered bar)",
-      "risk": "low"
+      "date": "2026-11-13T04:42:27Z",
+      "idea": "Prior-art CATCH (negative creative result): warrior-sr-confirm+ NORMAL LONG early cell (30d 6T 66.7% +0.28) looked like a fresh amplify candidate — shadow_disposition harvest-ship-2026-11-04 shows CEO already shipped 'bb-squeeze+/warrior amplify' on 2026-11-04. NOT proposed.",
+      "rationale": "Mandatory prior-art query + disposition file check caught a duplicate before it entered the queue; warrior 30d total is 20T 55% -0.03 (flat) so the 6T cell would not have cleared an honest bar anyway",
+      "expected_impact": "0 — avoided queue noise",
+      "category": "process",
+      "status": "closed",
+      "risk": "none"
     }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
     {
-      "change": "control-tower undated render fix (11-12 12:58)",
-      "verified": "control_tower.md mtime 11-12 12:54 render OK; 0 undated opens; no render regressions in changes log",
-      "outcome": "WORKED"
+      "item": "#253 linreg-fade volgate escalation",
+      "verify": "amplify-linregfade-volgate-admit OPEN due 11-27 — PASS"
     },
     {
-      "change": "deadline=11-18 on amplify-jup-long-flat-cell + amplify-grind-breakout-underdeploy",
-      "verified": "both entries show due 2026-11-18 in registry",
-      "outcome": "WORKED"
+      "item": "#253 pc+ weight monitor",
+      "verify": "pc-plus-weight-monitor OPEN due 11-27 — PASS"
     },
     {
-      "change": "arm-rate KPI added to auto_1hr prompt (11-12 00:45)",
-      "verified": "30 'arm-rate:' lines in recent_changes.log through 00:21Z today",
-      "outcome": "WORKED"
+      "item": "#253 oversold-short refutation (knife 35 stays)",
+      "verify": "OVERSOLD_SHORT_RSI_MAX=35 intact, constants EMPTY diff — PASS"
     },
     {
-      "change": "atr-trend- source weight 1.0->1.25 (auto_1hr 11-12 17:23)",
-      "verified": "post-boost closes n=1 (SUSHI -0.11); 24h atr-trend- SHORT 7T +0.02 71.4% — too early to judge",
-      "outcome": "MONITOR"
+      "item": "#253 both joins re-ran",
+      "verify": "re-ran 04:30Z this run (mandate) — PASS"
+    },
+    {
+      "item": "#253 atr-trend- boost n=1 monitor",
+      "verify": "post-boost n=1 -0.11, stability rule holds — MONITOR stands"
+    },
+    {
+      "item": "#176 volume-spike inversion HOLD",
+      "verify": "not re-proposed (pc+-ONLY refuted, p=0.21) — PASS"
     }
   ],
+  "amplify_weekly": {
+    "flip_kpi": "SATISFIED — winner-cell-size-125 shipped/done 2026-11-10 (shadow->live winner-cell notional 1.25); mult-150 escalation due 11-14",
+    "new_proposal": null,
+    "why_no_new_proposal": "22 open amplify entries incl. 6 due 11-14 EXIT-STACK DAY; all 30d n>=10 winner cells owned (bb-squeeze NORMAL LONG->mult-150 11-14, vb- HIGH SHORT->clone-hunt done today NO-SHIP, pc+ EXTREME LONG->weight monitor 11-27, atr-trend- NORMAL SHORT->cell watch 11-16 + boost live); early n<10 cells either owned (jup FLAT, atr-trend HIGH) or prior-art-refuted (warrior -> harvest-ship-2026-11-04). Piling a 23rd entry while 6 due items await disposition would be queue noise — dispositioning the due batch IS this week's offense work."
+  },
   "next_actions": [
-    "CEO: exit-stack pull-forward call (#251 escalation still open) + winner-cell revert 1.25->1.0 (6th+ resurface, ~120h overdue) + mult-150 folds into revert",
-    "11-14 EXIT-STACK DAY: mfe-cut, prearm-BE, stop-tighten x3, jup-short-walk, tat-neverarmed, mult-150/drop-pcplus, slippage",
-    "11-15: floor same-sign 30d read (Q1 p=0.0321 holding, do NOT ship early)",
-    "11-17: jup batch + atrsl · 11-18: contrarian fade + xmirror-giveback + deadlines set · 11-19: jup HIGH OOS",
-    "11-27: pc-plus-weight-monitor re-read + linreg-fade volgate-admit bar re-measure",
-    "session_brain rebuild (owed 8+ runs)"
-  ]
+    "11-14 EXIT-STACK DAY: disposition 6 due amplify/eval items (mfe-cut-arm-be, mult-150, jup-short-walk, atrtrail-clip-12, stop-tighten-enforce-eval, stop-tighten-probe-080, prearm-breakeven-lock, winner-cell-drop-pcplus, tat-neverarmed-age-widen, bbsqueeze x3) + exitstack-day-kpi-1114 opens",
+    "11-15 floor same-sign re-measure (fisher p now 0.0442, drifting — watch)",
+    "11-16 atr-trend- cell watch; 11-17 jup batch + atrsl; 11-18 contrarian fade + xmirror + jup-long-flat + grind-underdeploy",
+    "11-27 pc-plus-weight-monitor + linreg-fade volgate-admit bar",
+    "MED: session_brain duplicate rebuild (10th+ run flagged)",
+    "CEO: exit-stack pull-forward + winner-cell revert 1.25->1.0 (overdue) — unchanged from #253"
+  ],
+  "session_brain_citations_note": "All brain hits this run returned empty excerpt/date fields (rebuild owed); citations use titles + shadow_disposition/PG primary sources. No recommendation rests on an uncited brain hit alone."
 }

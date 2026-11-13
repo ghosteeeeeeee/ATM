@@ -25763,3 +25763,35 @@ BY: auto_1hr
 - Unarmed cohort 62.5% of closes, WR 40% vs armed 100% — chop entries; stall stack owns fix
 - Storm margin thin (-1.36 vs -1.5 gate) — next run may fire
 BY: auto_1hr
+
+## [2026-11-13 04:25] Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** $0.19 (WR: 100.0%) | 24h 17T 64.7% +$0.37 GREEN | 7d 95T 48.4% -$2.11 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**Storm-Readiness (gate FIRED):**
+- window-min -2.10% / at-run -0.40% (dump recovered at run time; window-peak rule caught it)
+- blocked 141 (combo_key-stale 45, compaction_stale_10min 27, short-rsi-hard-floor 24, pump-chain-* 18, confluence single-type 9, expired-hotset 5, other 18)
+- true-starvation 38 RSI>=35 | counterfactual $-0.79 (touch 28/38) | split: SHORTs +$1.67 (23), LONGs -$2.46 (15)
+- waiver SHADOW=True ENFORCE=False | storm-confl-waiver streak **0/3** (negative CF; deadline extended 2026-11-19)
+
+**No Change Needed:**
+- Last hour: 1 close, 1 win (BTC ai-trader-pending SHORT manual_tp_hit +$0.19/+8.26%); 0 open
+- Entry quality: winners MAE avg 0.253%, 10/11 <0.5% — good entries
+- Arm rate: unarmed 11/17 = 64.7% of 24h closes (<70%), WR 45.5% (+$0.13) vs armed 6/6 100% (+$0.24) — below threshold, stall stack owns fix, no new gate
+- Kill check: 1 close/hr -> no 0% WR signal with 3+ closes
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/17 = 5.9% of 24h closes (<40%); tpsl_utils deployed -> no alert
+- Boost: none eligible (atr-trend- 7T 71.4% net +$0.02 <$0.05 + boosted 1.0->1.25 at 17:23 on 11-12 stability rule; jup_yolo_mirrored 3T 100% n<5; ai-trader-pending 6T 50% WR)
+- Neg streak: 03:00 +$0.19 continues 02:00 +$0.17 -> 0 consecutive negative hours, no size cut
+- Frequency: 1 close/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h GREEN +$0.37 (best in days), 7d still RED 48.4% -$2.11
+- Storm CF negative ($-0.79): gates blocked +$1.67 of SHORT dump winners but correctly kept -$2.46 of LONG dump losers out — net negative, streak stays 0/3
+- Unarmed cohort 64.7% of closes, WR 45.5% vs armed 100% — chop entries; stall stack owns fix
+BY: auto_1hr
