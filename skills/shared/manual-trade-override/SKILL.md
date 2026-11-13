@@ -351,13 +351,20 @@ duplicate real trade #16832).
 13. **ALWAYS arm the short ladder — readiness is the default**
     (CEO 2026-11-10: "there is always a short we want to be ready for...
     it is about probabilities, anything can happen"). **LADDER KEEPER
-    (2026-11-13, auto):** `auto_trader._ladder_keeper` runs every
-    watchdog cycle — when NO unfired short rung sits below the current
-    price it derives one under the 24h low (trigger = low − 60,
-    reclaim SL = low + 0.6·ATR15, TP = trigger − 3·ATR1h disaster
-    depth, `serial` + `dynamic_sl:false`) and arms it, so the ladder
-    is never empty after a fire/TP (the CEO's "why was the next short
-    not already ready to fire"). Single-writer: only run_cycle.
+    (2026-11-13, auto) — BOTH SIDES:** `auto_trader._ladder_keeper` runs
+    every watchdog cycle: (a) no unfired short rung below price → derive
+    under the 24h low (trigger = low − 60, reclaim SL = low + 0.6·ATR15,
+    TP = trigger − 3·ATR1h disaster depth); (b) no unfired long rung
+    WITHIN REACH (≤3·ATR1h above price — stacked 72k+ rungs do NOT count,
+    a rubberband snap from 68k would leave them behind) → derive at the
+    15m-ceiling reclaim (trigger = sh + 60, SL = sh − 0.6·ATR15, TP =
+    trigger + 3·ATR1h). All keeper legs `serial` + `dynamic_sl:false`, so
+    the ladder is never empty on either side after a fire/TP (CEO: "you
+    better be ready for the longs too, cuz they're coming — rubberband
+    snapping back"). Single-writer: only run_cycle. **Ride doctrine
+    (CEO: "we ride the trend till it is over — the trend is your friend,
+    till it ends"):** the structure-lag trail IS the ride mechanism —
+    entries are the rungs, exits are structure breaks, nothing else.
     Never report "no
     short armed" or ask the CEO for short levels — derive the ladder
     from the chart yourself and arm it: **rung 1** = local-low break

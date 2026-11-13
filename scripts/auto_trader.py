@@ -543,25 +543,32 @@ def tweak_structure_fixed(decision, open_positions):
 
 
 def _ladder_keeper(decision, summary):
-    """Rule-13 AUTO-REPLENISH (CEO 2026-11-13: "figure out why the next
-    short was not already ready to fire — we need to be adding in situations
-    like this").
+    """Rule-13 AUTO-REPLENISH — BOTH SIDES (CEO 2026-11-13: "figure out why
+    the next short was not already ready to fire... you better be ready for
+    the longs too, cuz they're coming — might even rebound like a rubberband
+    snapping back... we want both sides and we ride the trend till it is
+    over. The trend is your friend, till it ends").
 
-    When NO unfired 'below' short rung sits under the current price, derive
-    one under the 24h low and arm it: continuation trigger (low − 60),
-    reclaim stop (low + 0.6·ATR15), DISASTER-depth TP (trigger − 3·ATR1h —
-    exits are STRUCTURE-BREAK ONLY per the standing doctrine; the Nov-11
-    19:00 → Nov-13 counterfactual: one ride = +36.4% margin, our 7
-    fragmented trades = +16.0%). serial:true + dynamic_sl:false.
-    Single-writer: only run_cycle (systemd-serialized) calls this.
-    Reads/writes the pending config directly (no trade_watchdog import —
-    would be circular).
+    Every watchdog cycle, independently per side:
+      SHORT: no unfired 'below' short rung under price → derive under the
+        24h low (trigger low−60, reclaim SL low+0.6·ATR15, TP
+        trigger−3·ATR1h disaster depth).
+      LONG: no unfired 'above' long rung WITHIN REACH (≤3·ATR1h above
+        price — the stacked 72k+ rungs do NOT count as ready for a snap
+        from 68k) → derive at the reclaim of the 15m ceiling (sh+60, SL
+        sh−0.6·ATR15, TP trigger+3·ATR1h disaster depth).
+    Both: serial:true + dynamic_sl:false — exits are STRUCTURE-BREAK ONLY
+    (the Nov-11 19:00 → Nov-13 counterfactual: one ride = +39.4% margin,
+    7 fragmented trades = +16.0%). Single-writer: only run_cycle
+    (systemd-serialized) calls this. Reads/writes the pending config
+    directly (no trade_watchdog import — would be circular).
     """
     try:
         import os, sqlite3
         from paths import HERMES_DATA
         price = float(decision.get('price') or 0)
         sd = decision.get('structure_detail') or {}
+        sh15 = float((sd.get('15m') or {}).get('sh') or 0)
         atr15 = float((sd.get('15m') or {}).get('atr') or 0)
         atr1 = float((sd.get('1h') or {}).get('atr') or 0)
         if not (price and atr15 and atr1):
@@ -575,47 +582,88 @@ def _ladder_keeper(decision, summary):
                 pstate = json.load(f)
         except Exception:
             pstate = {}
-        for o in pcfg.get('orders', []):
-            if o.get('direction') == 'short' and o.get('trigger') == 'below':
-                st = (pstate.get(o.get('id')) or {}).get('status')
-                if st not in ('fired', 'error') and \
-                        float(o.get('trigger_price') or 0) < price:
-                    return   # a short rung is already waiting below price
-        # derive under the 24h low
-        con = sqlite3.connect(f'file:{HERMES_DATA}/candles.db?mode=ro',
-                              uri=True)
-        cur = con.cursor()
-        cur.execute("SELECT MIN(low) FROM candles_15m WHERE token='BTC' "
-                    "AND ts > strftime('%s','now','-1 day')")
-        row = cur.fetchone()
-        cur.close()
-        con.close()
-        low = float(row[0]) if row and row[0] else 0.0
-        if not low or not (low < price):
-            return
-        trig = round(low - 60)
-        sl = round(low + 0.60 * atr15)
-        tp = round(trig - 3.0 * atr1)
-        oid = f"btc-auto-ladder-{int(time.time())}"
-        pcfg.setdefault('orders', []).append({
-            'id': oid, 'coin': 'BTC', 'direction': 'short',
-            'trigger': 'below', 'trigger_price': trig,
-            'amount_usdt': 11.1, 'leverage': 5,
-            'sl': sl, 'target': tp, 'confidence': 60,
-            'serial': True, 'dynamic_sl': False,
-            'note': (f"Rule-13 LADDER KEEPER auto-arm ({time.strftime('%Y-%m-%d %H:%M')} "
-                     f"UTC): no unfired short rung below price {price:.0f}. Under-24h-low "
-                     f"{low:.0f} continuation: trigger {trig} (low−60), SL {sl} "
-                     f"(low+0.6·ATR15 reclaim = break failed), TP {tp} = 3·ATR1h "
-                     f"DISASTER depth (structure-break-only exits — TP is a circuit "
-                     f"breaker, not a take-profit). serial + dynamic_sl:false.")})
-        tmp = p_path + '.tmp'
-        with open(tmp, 'w') as f:
-            json.dump(pcfg, f, indent=1)
-        os.replace(tmp, p_path)
-        summary['ladder_keeper'] = oid
-        DB.log_event('INFO', f"ladder_keeper: armed {oid} short @ {trig} "
-                             f"(low {low:.0f}, SL {sl}, TP {tp} disaster-depth)")
+
+        def _unfired(o):
+            return (pstate.get(o.get('id')) or {}).get('status') \
+                not in ('fired', 'error')
+
+        orders = pcfg.get('orders', [])
+        appended = []
+
+        # ── SHORT side: an unfired rung below price = ready
+        short_ready = any(
+            o.get('direction') == 'short' and o.get('trigger') == 'below'
+            and _unfired(o) and float(o.get('trigger_price') or 0) < price
+            for o in orders)
+        if not short_ready:
+            con = sqlite3.connect(f'file:{HERMES_DATA}/candles.db?mode=ro',
+                                  uri=True)
+            cur = con.cursor()
+            cur.execute("SELECT MIN(low) FROM candles_15m WHERE token='BTC' "
+                        "AND ts > strftime('%s','now','-1 day')")
+            row = cur.fetchone()
+            cur.close()
+            con.close()
+            low = float(row[0]) if row and row[0] else 0.0
+            if low and low < price:
+                trig = round(low - 60)
+                sl = round(low + 0.60 * atr15)
+                tp = round(trig - 3.0 * atr1)
+                oid = f"btc-auto-ladder-{int(time.time())}"
+                orders.append({
+                    'id': oid, 'coin': 'BTC', 'direction': 'short',
+                    'trigger': 'below', 'trigger_price': trig,
+                    'amount_usdt': 11.1, 'leverage': 5,
+                    'sl': sl, 'target': tp, 'confidence': 60,
+                    'serial': True, 'dynamic_sl': False,
+                    'note': (f"Rule-13 LADDER KEEPER auto-arm ({time.strftime('%Y-%m-%d %H:%M')} "
+                             f"UTC): no unfired short rung below price {price:.0f}. Under-24h-low "
+                             f"{low:.0f} continuation: trigger {trig} (low−60), SL {sl} "
+                             f"(low+0.6·ATR15 reclaim = break failed), TP {tp} = 3·ATR1h "
+                             f"DISASTER depth (structure-break-only exits — TP is a circuit "
+                             f"breaker, not a take-profit). serial + dynamic_sl:false.")})
+                appended.append(('ladder_keeper', oid, f"short @ {trig} (low {low:.0f}, SL {sl}, TP {tp})"))
+
+        # ── LONG side: an unfired rung within reach (≤3·ATR1h) = ready.
+        # The rubberband rule (CEO): stacked 72k+ rungs are the FURTHER
+        # rungs — a snap from 68k would leave them all behind; the near
+        # reclaim rung must exist.
+        reach = price + 3.0 * atr1
+        long_ready = any(
+            o.get('direction') == 'long' and o.get('trigger') == 'above'
+            and _unfired(o)
+            and price <= float(o.get('trigger_price') or 0) <= reach
+            for o in orders)
+        if not long_ready and sh15:
+            trig = round(sh15 + 60)
+            if trig > price:            # ceiling still above price (ITM guard)
+                sl = round(sh15 - 0.60 * atr15)
+                tp = round(trig + 3.0 * atr1)
+                oid = f"btc-auto-ladder-long-{int(time.time())}"
+                orders.append({
+                    'id': oid, 'coin': 'BTC', 'direction': 'long',
+                    'trigger': 'above', 'trigger_price': trig,
+                    'amount_usdt': 11.1, 'leverage': 5,
+                    'sl': sl, 'target': tp, 'confidence': 60,
+                    'serial': True, 'dynamic_sl': False,
+                    'note': (f"Rule-13 LADDER KEEPER auto-arm LONG ({time.strftime('%Y-%m-%d %H:%M')} "
+                             f"UTC): no long rung within reach (≤3·ATR1h) above price {price:.0f} — "
+                             f"rubberband-snap readiness (CEO: 'ready for the longs too, they're "
+                             f"coming'). Reclaim of the 15m ceiling {sh15:.0f}: trigger {trig} "
+                             f"(sh+60), SL {sl} (sh−0.6·ATR15 = reclaim failed = exit), TP {tp} = "
+                             f"3·ATR1h DISASTER depth (structure-break-only exits). serial + "
+                             f"dynamic_sl:false. Trend-is-your-friend ride leg.")})
+                appended.append(('ladder_keeper_long', oid, f"long @ {trig} (15m sh {sh15:.0f}, SL {sl}, TP {tp})"))
+
+        if appended:
+            pcfg['orders'] = orders
+            tmp = p_path + '.tmp'
+            with open(tmp, 'w') as f:
+                json.dump(pcfg, f, indent=1)
+            os.replace(tmp, p_path)
+            for key, oid, detail in appended:
+                summary[key] = oid
+                DB.log_event('INFO', f"{key}: armed {oid} {detail}")
     except Exception as e:
         try:
             DB.log_event('WARN', f"ladder_keeper: {e}")
