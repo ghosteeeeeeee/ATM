@@ -11102,5 +11102,25 @@
     "category": "exit",
     "status": "monitor",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-13T00:48:54Z",
+    "idea": "Significance pre-check on watchdog pattern_alerts (auto14d/30d re-run + n/p label before surfacing)",
+    "rationale": "watchdog oversold-short pattern n=6 24h REFUTED at 14d (rsi_exec<40 SHORT +0.36)",
+    "expected_impact": "blocks noise patterns at the alert layer",
+    "category": "meta/guardrail",
+    "status": "suggested",
+    "risk": "low",
+    "run": "#253"
+  },
+  {
+    "date": "2026-11-13T00:48:54Z",
+    "idea": "linreg-fade REGIME_SIGNALS NORMAL admit — pre-registered amplify-linregfade-volgate-admit",
+    "rationale": "63/63 EXECs allowlist-killed; counterfactual +8h 61.9% +0.195% n=21 p~0.08 under bar",
+    "expected_impact": "~+$0.56/30d if bar clears",
+    "category": "fill-funnel",
+    "status": "suggested",
+    "risk": "low",
+    "run": "#253"
   }
 ]

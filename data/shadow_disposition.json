@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-11T00:45:00Z",
+  "updated": "2026-11-13T00:47:24Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -709,14 +709,15 @@
       "id": "pump-chain-plus-weight-kill-review",
       "stream": "pump-chain+ LONG auto_1hr weight = 1.4 (held at ceiling for weeks); 14d red in BOTH regimes with 40T+ n — standard kill bar applies at next 14d checkpoint",
       "kind": "amplify",
-      "disposition": "KILL-REVIEW",
-      "status": "open",
+      "disposition": "KILL-REVIEW 2026-11-13 (run #253): INSUFFICIENT — do NOT default-KILL. Fresh PG 14d pump-chain+ LONG = n=12 (EXTREME only, -0.34, 33.3% WR); second regime has ZERO trades so BOTH-regimes-negative AND n>=40 bar is unsatisfiable, exactly as pre-corrected 2026-11-05 #224. Cell-scoped read: 30d EXTREME n=49 +0.18 (40.8% WR) still POSITIVE, HIGH n=8 -0.43. Fill rate collapsed (31T→12T/14d) — the 1.4 weight is not starving but the signal dried up. Per pre-registered rule: n<40 = INSUFFICIENT -> monitor. Re-measure at 2026-11-27 14d checkpoint; kill only if BOTH regimes negative with n>=40 at that read. Units: pnl_usdt.",
+      "status": "done",
       "started": "2026-10-31",
-      "deadline": "2026-11-13T00:00:00Z",
+      "deadline": "2026-11-27T00:00:00Z",
       "evidence": "Capstone verdict Q3-5: not a CEO_PROTECTED flag — standard kill bar applies (the 1.4 ceiling held via auto_1hr for weeks without passing its own checkpoint). | 2026-11-05 #224 premise correction: 14d pump-chain+ LONG = EXTREME ONLY n=31 '-0.13' (no second regime has trades; n<40). 30d EXTREME cell n=75 '+1.32' POSITIVE, HIGH 11T '-0.59', NORMAL 3T '-0.10'. Kill condition (BOTH-regimes-negative AND n>=40) NOT satisfiable as written — at 11-13 checkpoint: n<40 = INSUFFICIENT -> monitor, do NOT default-KILL on sample-size rule (n<40); evaluate cell-scoped (EXTREME vs rest) instead.",
       "threshold": "At the next 14d checkpoint: if still net-negative both regimes with n>=40 -> kill/decay the 1.4 boost under standard bars; if flipped positive -> KEEP with documented rationale.",
       "default_action": "KILL the 1.4 weight if bar fails at checkpoint",
-      "owner": "auto_1hr weekly / AMPLIFY cadence"
+      "owner": "auto_1hr weekly / AMPLIFY cadence",
+      "status_note": "closed at 11-13 checkpoint INSUFFICIENT; follow-up monitor pc-plus-weight-monitor"
     },
     {
       "id": "trial-wider-sl",
@@ -1212,7 +1213,7 @@
       "id": "amplify-vb-high-short-clonehunt",
       "stream": "volume-buildup- HIGH SHORT winner-cell (WINNER_CELLS_VALIDATED) — clone-hunt blocked setups matching the profile",
       "kind": "amplify",
-      "status": "open",
+      "status": "done",
       "created": "2026-11-05T04:45:00Z",
       "deadline": "2026-11-13T00:00:00Z",
       "owner": "brain_auditor weekly AMPLIFY run #223",
@@ -1220,7 +1221,8 @@
       "evidence": "Audit #223 weekly screen. WINNER_CELLS_VALIDATED member ('volume-buildup-','HIGH'): live 30d 19T 78.9% WR net +0.42 (PG fresh). Family overall is a net bleeder 14d 58T 60.3% -0.89 (R:R class, unarmed half owns it) — the HIGH SHORT cell is the validated bright spot and has NO amplify proposal yet (stop-tighten 11-14 is exit-side; conf-filter-parity is not cell-scoped). Clone-hunt = find MORE of what that cell does well: setups blocked by CONFLUENCE-EXPIRY / CTX-GATE / regime that match the HIGH SHORT entry profile (vb- source, SHORT, volatility_regime=HIGH), then counterfactual-walk 1m candles. Depends on gate-shadow coverage fix (gate-shadow-capture-coverage-fix due 11-06).",
       "threshold": "SHIP only if blocked-matchable n>=15 AND would-win >=70% (live cell 78.9%) AND counterfactual candle-walk net >= +$0.50/30d (pnl_usdt basis, units guard) AND 30d same-sign on live cell. Default NO SHIP.",
       "measurement": "gate_shadow + signals runtime join filtered to vb- HIGH SHORT profile; candle replay via existing counterfactual walkers; report at deadline.",
-      "default_action": "NO SHIP"
+      "default_action": "NO SHIP",
+      "disposition": "NO SHIP 2026-11-13 (run #253). Measured: gate_shadow outcome_signal=volume-buildup- SHORT blocked 30d n=1013; regime-joined to shadow_trades context vol_regime (2h window) matched 424; HIGH cohort n=78 would-win 45/78=57.7% — FAILS the >=70% bar. Per-gate HIGH: PUMP-CHAIN-SHORT-HIGH 12T 83.3% (n<15), SHORT-CONTINUUM 8T 75% (n<15), OVERSOLD-SHORT 7T 71.4% (n<15), SHORT-RSI-HARD-FLOOR 21T 57.1% (n>=15 but far below bar), CONTINUUM-BULL 5T 0%. NO gate clears n>=15 AND would-win>=70% simultaneously — candle-walk leg not reached (default NO SHIP). Live cell itself unchanged: 30d 19T 78.9% +0.42 (validated, keep). Re-open only if a new gate cohort reaches n>=15 at >=70%."
     },
     {
       "id": "amplify-jup-short-high-cell",
@@ -1255,14 +1257,15 @@
       "id": "amplify-bbsqueeze-chop-exempt",
       "stream": "bb-squeeze+ LONG × LONG-NEUTRAL-CHOP gate exempt (validated cell bb-squeeze+ NORMAL LONG 30d 43T 65.1% +0.73)",
       "kind": "amplify",
-      "status": "open",
+      "status": "done",
       "started": "2026-11-06",
       "deadline": "2026-11-13T00:00:00Z",
       "threshold": "log-reparse (NOT gate_shadow.db — capture 15-30%) deduped token-events n>=15 ∧ would-win>=70% ∧ 30d 1m-candle walk on exempted events net>=$0.50 pnl_usdt-units (UNITS GUARD: derive from entry/exit × amount_usdt, never mix with pnl_pct) ∧ fk of would-be-loser share among exempted <20%; default NO SHIP",
       "default_action": "NO SHIP — gate stays global; chop-bleed KPI owns the entry-quality story",
       "owner": "brain_auditor next weekly / signal-lab",
       "evidence": "gate_shadow 30d: bb-squeeze+ LONG blocked by LONG-NEUTRAL-CHOP n=58 would-win 48/58=82.8% avg +0.031; LONG-NEUTRAL n=51 70.6% +0.040. Validated cell already in WINNER_CELLS_VALIDATED. Capture caveat mandatory (gate-shadow-capture-coverage-fix still open 15-30%).",
-      "notes": "AMPLIFY #227 type (a). Chop-bleed 7d 94.8% says most bleed is never-armed — exempting a chop gate for ONE validated trend signal must prove the exempted cohort actually arms/trails, else it re-opens chop. Pair with arm-rate measurement on exempted events."
+      "notes": "AMPLIFY #227 type (a). Chop-bleed 7d 94.8% says most bleed is never-armed — exempting a chop gate for ONE validated trend signal must prove the exempted cohort actually arms/trails, else it re-opens chop. Pair with arm-rate measurement on exempted events.",
+      "disposition": "NO SHIP 2026-11-13 (run #253). Required frame = log-reparse (threshold explicitly excludes gate_shadow.db). Fresh 30d pipeline.log reparse: LONG-NEUTRAL-CHOP blocks 5723; source-attributed via CONFLUENCE-DEBUG/HOTSET-FINAL-ADD within 15min: only 131 deduped events total (86% unattributable — block tokens rarely have a source line in window); bb-squeeze+ LONG = n=2 deduped — FAILS n>=15 by a wide margin. gate_shadow.db frame (n=58, 77.6% would-win, fwd_4h +0.30) is the frame the threshold FORBIDS (non-random 15-30% capture). would-win/candle-walk/fk legs not reached. Data-quality side-find: log source-attribution covers only ~13% of LONG-NEUTRAL-CHOP blocks — future exempt claims in this frame need a source column on the block line itself. Gate stays global; chop-bleed KPI owns entry quality."
     },
     {
       "id": "jup-cluster-gate",
@@ -1336,14 +1339,15 @@
       "id": "linreg-fade-fill-funnel",
       "stream": "linreg-fade- SHORT — STANDALONE_BYPASS shipped 2026-11-05 (bug_hunter CRITICAL: 0/57 approved); signal_type linreg_fade_short, source 'linreg-fade-'",
       "kind": "eval",
-      "status": "open",
+      "status": "done",
       "started": "2026-11-06",
-      "deadline": "2026-11-13T00:00:00Z",
+      "deadline": "2026-11-27T00:00:00Z",
       "owner": "brain_auditor",
       "evidence": "2026-11-06 #228 funnel read (first 9h of collection, first signal row 2026-11-05 19:36Z): 78 signals ALL decision=EXPIRED, 0 APPROVED, 0 PG trades all-time. Death split: compaction_stale_10min 43 (no gate reason written = top-10 hotset never entered) + blocked@approval confluence 27 (all BEFORE the 11-05 bypass deploy) + short-rsi-hard-floor 4 / rr-engine 3 / oversold-knife 1. Post-bypass the confluence block is GONE (0 on 11-06) and the path works end-to-end at least once: 23:45:02 CONFLUENCE-GATE-PASS (backtested standalone) -> HOTSET-FINAL-BYPASS -> PENDING-APPROVE-BYPASS -> [DECIDER-LOOP] AVAX SHORT -> 'EXEC: AVAX SHORT @ $8.149 [linreg-fade-]' -> killed by CTX-GATE/VOL-GATE-v2 storm (ATR 1.6874% > 1.5%). Other exec-reaching tokens: SAND (20:41-20:48), AERO (21:46-21:50, conf=107.6). Shadow replay ranks linreg_fade_short #1 of 14d n>=20 sources by avg net_pnl_pct (+0.626, 56/91) vs grind_breakout_short +0.397 — but fwd_4h is NULL on all rows (no forward join) and shadow net is LEVERAGED % (units guard: sign only, never sum against pnl_usdt).",
       "threshold": "FILL bar: >=5 live PG fills by 2026-11-13 (i.e. ~1 per 30h) AND armed-rate >=50% on those fills. If fills <5: the bypass alone does not unlock the sample — escalate ONE lever only (hotset/top-10 competition vs VOL-GATE storm at exec) with a shadow counterfactual, default NO CHANGE. If fills >=5: let the pre-registered 2-week sample run to 2026-11-19 before any verdict.",
       "default_action": "NO CHANGE — signal stays as configured (LINREG_FADE_MINUS_ENABLED=True, bypass live); report why-not if fill bar missed",
-      "notes": "Do NOT widen bypass or relax VOL-GATE for this signal: zero live history, and the 10-min staleness (STALE-WARN 10.1min > 5min max at the one exec) means entries arrive late. Collection is the point."
+      "notes": "Do NOT widen bypass or relax VOL-GATE for this signal: zero live history, and the 10-min staleness (STALE-WARN 10.1min > 5min max at the one exec) means entries arrive late. Collection is the point.",
+      "disposition": "FAIL 2026-11-13 (run #253) — fill bar 0 PG fills < 5 required. ROOT CAUSE FOUND (one lever escalated per threshold): VOL-GATE-v2 REGIME_SIGNALS has NO linreg-fade entry in ANY regime, so every EXEC is allowlist-killed. 30d log: 63 EXEC: [linreg-fade-] lines, 63/63 paired with '[VOL-GATE-v2] <tok>: SKIP — linreg-fade- not suited for NORMAL/HIGH' within the same second (deduped 26 token-events; top: LIT 13, NEAR 7, ATOM 5). STANDALONE_BYPASS shipped 11-05 unlocked confluence/hotset/approve but never touched the vol-gate allowlist — last mile still wired shut. SHADOW COUNTERFACTUAL (this run, 1m candle walk, pnl-free price-move units): 21/26 walkable — +30m 47.6% WR avg -0.085%, +2h 52.4% +0.048%, +8h 61.9% avg +0.195% med +0.520%; crude arm(+0.40)/stop(-1%) sim = 15 arm / 6 stop ≈ 0.00% net. At $11 notional ≈ +$0.02/trade → ~+$0.56/30d — POSITIVE but NOT significant (n=21, +8h binomial p≈0.08 vs 50%) and below +$1.00/30d-class bars. DEFAULT = NO CHANGE (do not add to REGIME_SIGNALS yet). Escalation delivered: wiring-flip candidate registered as amplify-linregfade-volgate-admit with pre-registered bar; re-measure 2026-11-27 when killed-EXEC cohort ~doubles. Secondary blocker noted (not the escalated lever): BTC-CRASH gate also killed approved IOTA SHORT 11-12 18:47. Prior art: session brain hit 'Build New Linear Regression Signal' (score 0.80) — signal-build sessions, no prior REGIME_SIGNALS admission attempt found."
     },
     {
       "id": "amplify-bbsqueeze-warrior-uninert",
@@ -1613,7 +1617,33 @@
       "measurement": "gate_shadow.db WHERE outcome_signal LIKE 'grind-breakout%' AND blocked_at>=30d; join signals runtime; live PG count for signal LIKE 'grind-breakout%'",
       "notes": "brain_auditor #249 AMPLIFY weekly type (c) clone-hunt/underdeploy. Not a duplicate of ema300-underdeploy (different signal). | DEADLINE SET 2026-11-12 (brain_auditor #252): was None — paired with amplify-jup-long-flat-cell same registration batch #249; 11-18 aligns with contrarian/clone-hunt reads.",
       "deadline": "2026-11-18T00:00:00Z"
+    },
+    {
+      "id": "pc-plus-weight-monitor",
+      "stream": "pump-chain+ LONG 1.4 weight — INSUFFICIENT at 11-13 kill-review (n=12<40); cell-scoped re-read",
+      "kind": "eval",
+      "status": "open",
+      "started": "2026-11-13",
+      "deadline": "2026-11-27T00:00:00Z",
+      "owner": "brain_auditor",
+      "threshold": "14d BOTH-regimes-negative with n>=40 -> kill 1.4 weight; else KEEP with rationale. Cell-scoped: 30d EXTREME net<=0 twice consecutively -> decay boost.",
+      "default_action": "KEEP weight (INSUFFICIENT sample)",
+      "evidence": "run #253: 14d n=12 -0.34 EXTREME-only; 30d EXTREME +0.18; fill rate 31T/14d -> 12T/14d."
+    },
+    {
+      "id": "amplify-linregfade-volgate-admit",
+      "stream": "linreg-fade- SHORT: add to volatility_gate_v2 REGIME_SIGNALS (NORMAL first) — 100% exec-killed today",
+      "kind": "amplify",
+      "status": "open",
+      "started": "2026-11-13",
+      "deadline": "2026-11-27T00:00:00Z",
+      "owner": "brain_auditor weekly AMPLIFY run #253",
+      "proposal_type": "(c) clone-hunt/type-a: admit a validated signal whose ENTIRE exec path is blocked",
+      "evidence": "LINREG_FADE_MINUS_ENABLED=True ('validated 1m Oct-Nov 53.9%') + STANDALONE_BYPASS live 11-05, yet 0 PG fills ever: 63/63 30d EXECs killed by VOL-GATE-v2 allowlist absence (dedup 26; LIT/NEAR/ATOM top). Counterfactual candle-walk run #253: 21/26 walkable, +8h 61.9% WR avg +0.195% med +0.520%, arm/stop sim ≈0.00% net ≈ +$0.56/30d at $11 — positive, n=21, p≈0.08 NOT significant. Session prior art: 'Build New Linear Regression Signal' (0.80) build sessions only; no prior REGIME_SIGNALS admission.",
+      "threshold": "ENFORCE admit 'linreg-fade-','linreg_fade_short' to REGIME_SIGNALS['NORMAL'] ONLY IF at read time: (i) killed-EXEC 30d cohort n>=40 AND (ii) +8h counterfactual net >= +$1.00/30d pnl_usdt-basis (derive price-move x amount_usdt, never pnl_pct) AND (iii) 2/3 positive weeks AND (iv) first 5 live fills armed-rate >=50%. Units guard: price-move% x $11 notional, no leverage mixing. Any read below bar -> stay out.",
+      "default_action": "NO SHIP — current read fails (i) n=26<40 and (ii) ~+$0.56<$1.00",
+      "notes": "One lever only (fill-funnel disposition). HIGH/EXTREME/FLAT admissions are SEPARATE later questions (EXTREME = storm band, needs its own ATR read). Knife/RSI floors unchanged. Revert: delete the allowlist entries."
     }
   ],
-  "updated_at": "2026-11-12T00:45:00Z"
+  "updated_at": "2026-11-13T00:47:24Z"
 }

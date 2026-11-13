@@ -4155,5 +4155,16 @@
     "after": "generated 2026-11-12T12:53Z FRESH with undated section + both entries",
     "rationale": "daily timer failed to write tower on 11-12",
     "impact": "CEO tower view current"
+  },
+  {
+    "timestamp": "2026-11-13T00:48:54Z",
+    "agent": "brain_auditor",
+    "change": "Run #253 dispositions: closed 4 due-11-13 entries (pc+ kill-review INSUFFICIENT/monitor, vb- clone-hunt NO SHIP 57.7%<70%, bbsqueeze chop-exempt NO SHIP log-reparse n=2<15, linreg-fade funnel FAIL 0 fills w/ root cause REGIME_SIGNALS); added amplify-linregfade-volgate-admit + pc-plus-weight-monitor (both due 11-27)",
+    "type": "ops",
+    "file": "data/shadow_disposition.json",
+    "before": "4 entries open past deadline",
+    "after": "4 done with measured verdicts + 2 new pre-registered entries",
+    "rationale": "daily disposition cadence; due-today bars measured fresh",
+    "impact": "registry clean; no trading behavior change"
   }
 ]
