@@ -549,39 +549,59 @@ def _ladder_keeper(decision, summary):
     snapping back... we want both sides and we ride the trend till it is
     over. The trend is your friend, till it ends").
 
-    Every watchdog cycle, independently per side:
-      SHORT: no unfired 'below' short rung under price → derive under the
-        24h low (trigger low−60, reclaim SL low+0.6·ATR15, TP
-        trigger−3·ATR1h disaster depth).
-      LONG: no unfired 'above' long rung WITHIN REACH (≤3·ATR1h above
-        price — the stacked 72k+ rungs do NOT count as ready for a snap
-        from 68k) → derive at the reclaim of the 15m ceiling (sh+60, SL
-        sh−0.6·ATR15, TP trigger+3·ATR1h disaster depth).
+    Every watchdog cycle, independently per side (BTC only — a foreign
+    coin's rung must never suppress either side, bug_hunter F-1):
+      SHORT: no unfired BTC rung WITHIN REACH (≤3·ATR1h) below price →
+        derive at the 15m swing floor (trigger sl−60, reclaim SL
+        sl+0.6·ATR15, TP trigger−3·ATR1h disaster depth AT ARM TIME —
+        loop-safe: derived must itself be within reach).
+      LONG: no unfired BTC rung within reach (≤3·ATR1h above price —
+        the stacked 72k+ rungs do NOT count for a snap from 68k) →
+        derive at the 15m ceiling reclaim (sh+60, SL sh−0.6·ATR15, TP
+        trigger+3·ATR1h AT ARM TIME), ITM + reach guarded.
     Both: serial:true + dynamic_sl:false — exits are STRUCTURE-BREAK ONLY
-    (the Nov-11 19:00 → Nov-13 counterfactual: one ride = +39.4% margin,
-    7 fragmented trades = +16.0%). Single-writer: only run_cycle
-    (systemd-serialized) calls this. Reads/writes the pending config
-    directly (no trade_watchdog import — would be circular).
+    (the Nov-11 19:00 → Nov-13 counterfactual: one ride = +37.3% margin
+    to the cited low / +39.5% to the span low 68,608; 7 fragmented
+    trades = +16.0%). TP depth is SET AT ARM TIME and never moved (F-2:
+    ATR drift narrows the multiple, never the distance — see the
+    ponytail ceiling). Single-writer: only run_cycle (systemd-serialized);
+    config read-modify-write held under flock (F-4). Reads/writes the
+    pending config directly (no trade_watchdog import — would be
+    circular).
     """
     try:
-        import os, sqlite3
+        import os, fcntl
         from paths import HERMES_DATA
         price = float(decision.get('price') or 0)
         sd = decision.get('structure_detail') or {}
         sh15 = float((sd.get('15m') or {}).get('sh') or 0)
+        sl15 = float((sd.get('15m') or {}).get('sl') or 0)
         atr15 = float((sd.get('15m') or {}).get('atr') or 0)
         atr1 = float((sd.get('1h') or {}).get('atr') or 0)
         if not (price and atr15 and atr1):
             return
         p_path = os.path.join(HERMES_DATA, 'pending_orders.json')
         s_path = os.path.join(HERMES_DATA, 'pending_orders_state.json')
+        # F-4: config read-modify-write under EX flock — a manual
+        # `python3 auto_trader.py` interleaving with the timer cycle must
+        # not silently lose an arm (lock released by file close at
+        # function exit; prune scripts are outside this lock — a lost
+        # arm self-heals on the next cycle's idempotent derivation).
+        _lk = open(p_path + '.lock', 'w')
+        fcntl.flock(_lk, fcntl.LOCK_EX)
         with open(p_path) as f:
             pcfg = json.load(f)
         try:
             with open(s_path) as f:
                 pstate = json.load(f)
-        except Exception:
+        except Exception as _se:
+            # F-5: loud, and fail-READY (empty = everything looks
+            # unfired = readiness still true → no spurious arm while
+            # existing rungs satisfy it, consistent with _arm_real_leg's
+            # fail-closed WARN style)
             pstate = {}
+            DB.log_event('WARN', f"ladder_keeper: state unreadable ({_se}) "
+                                 f"— treating as empty (fail-ready)")
 
         def _unfired(o):
             return (pstate.get(o.get('id')) or {}).get('status') \
@@ -589,25 +609,31 @@ def _ladder_keeper(decision, summary):
 
         orders = pcfg.get('orders', [])
         appended = []
+        reach_lo = price - 3.0 * atr1
+        reach_hi = price + 3.0 * atr1
 
-        # ── SHORT side: an unfired rung below price = ready
+        # ── SHORT side: an unfired BTC rung within reach below price = ready
         short_ready = any(
-            o.get('direction') == 'short' and o.get('trigger') == 'below'
-            and _unfired(o) and float(o.get('trigger_price') or 0) < price
+            o.get('coin') == 'BTC' and o.get('direction') == 'short'
+            and o.get('trigger') == 'below'
+            and _unfired(o)
+            and reach_lo <= float(o.get('trigger_price') or 0) < price
             for o in orders)
         if not short_ready:
-            con = sqlite3.connect(f'file:{HERMES_DATA}/candles.db?mode=ro',
-                                  uri=True)
-            cur = con.cursor()
-            cur.execute("SELECT MIN(low) FROM candles_15m WHERE token='BTC' "
-                        "AND ts > strftime('%s','now','-1 day')")
-            row = cur.fetchone()
-            cur.close()
-            con.close()
-            low = float(row[0]) if row and row[0] else 0.0
-            if low and low < price:
-                trig = round(low - 60)
-                sl = round(low + 0.60 * atr15)
+            # F-6 mirror: derive at the 15m SWING FLOOR (executing
+            # structure — always near price) instead of the 24h low
+            # (can sit thousands away after a bounce = the same reach
+            # gap the long side bounds). F-7 bonus: no candle-table
+            # mixing — price and structure both come from decision.
+            # Loop-safe: only derive if the derived trigger lands
+            # within reach, else next cycle would duplicate it.
+            trig = round(sl15 - 60) if sl15 else 0
+            if trig and reach_lo <= trig < price:
+                sl = round(sl15 + 0.60 * atr15)
+                # ponytail: TP gap fixed at arm time (3·ATR1h THEN, never
+                # moved — F-2 restated doctrine) — if ATR1h later grows
+                # past ~3.5× the gap the disaster floor erodes; top up by
+                # hand (upgrade path: keeper TP-refresh when gap < 2·ATR1h)
                 tp = round(trig - 3.0 * atr1)
                 oid = f"btc-auto-ladder-{int(time.time())}"
                 orders.append({
@@ -617,27 +643,32 @@ def _ladder_keeper(decision, summary):
                     'sl': sl, 'target': tp, 'confidence': 60,
                     'serial': True, 'dynamic_sl': False,
                     'note': (f"Rule-13 LADDER KEEPER auto-arm ({time.strftime('%Y-%m-%d %H:%M')} "
-                             f"UTC): no unfired short rung below price {price:.0f}. Under-24h-low "
-                             f"{low:.0f} continuation: trigger {trig} (low−60), SL {sl} "
-                             f"(low+0.6·ATR15 reclaim = break failed), TP {tp} = 3·ATR1h "
-                             f"DISASTER depth (structure-break-only exits — TP is a circuit "
-                             f"breaker, not a take-profit). serial + dynamic_sl:false.")})
-                appended.append(('ladder_keeper', oid, f"short @ {trig} (low {low:.0f}, SL {sl}, TP {tp})"))
+                             f"UTC): no unfired BTC short rung within reach (≤3·ATR1h) below price "
+                             f"{price:.0f}. 15m-swing-floor break: trigger {trig} (sl15 {sl15:.0f}−60), "
+                             f"SL {sl} (sl15+0.6·ATR15 reclaim = break failed), TP {tp} = 3·ATR1h "
+                             f"DISASTER depth AT ARM TIME (structure-break-only exits — TP is a "
+                             f"circuit breaker, never a take-profit, never moved). serial + "
+                             f"dynamic_sl:false.")})
+                appended.append(('ladder_keeper', oid, f"short @ {trig} (15m sl {sl15:.0f}, SL {sl}, TP {tp})"))
 
-        # ── LONG side: an unfired rung within reach (≤3·ATR1h) = ready.
+        # ── LONG side: an unfired BTC rung within reach (≤3·ATR1h) = ready.
         # The rubberband rule (CEO): stacked 72k+ rungs are the FURTHER
         # rungs — a snap from 68k would leave them all behind; the near
         # reclaim rung must exist.
-        reach = price + 3.0 * atr1
         long_ready = any(
-            o.get('direction') == 'long' and o.get('trigger') == 'above'
+            o.get('coin') == 'BTC' and o.get('direction') == 'long'
+            and o.get('trigger') == 'above'
             and _unfired(o)
-            and price <= float(o.get('trigger_price') or 0) <= reach
+            and price <= float(o.get('trigger_price') or 0) <= reach_hi
             for o in orders)
         if not long_ready and sh15:
             trig = round(sh15 + 60)
-            if trig > price:            # ceiling still above price (ITM guard)
+            # ITM guard + F-6 reach guard: the derived rung must itself
+            # be within reach (else every cycle would duplicate it)
+            if price < trig <= reach_hi:
                 sl = round(sh15 - 0.60 * atr15)
+                # ponytail: TP gap fixed at arm time (3·ATR1h then, never
+                # moved — F-2): top up by hand if ATR1h outgrows ~3.5×
                 tp = round(trig + 3.0 * atr1)
                 oid = f"btc-auto-ladder-long-{int(time.time())}"
                 orders.append({

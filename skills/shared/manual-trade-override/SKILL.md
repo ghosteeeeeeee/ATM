@@ -341,9 +341,10 @@ duplicate real trade #16832).
     snap removed earlier for booking loss-"TPs"; 2026-11-13: TP caps
     during directional travel cost the difference between **7
     fragmented trades Nov-11 19:00 → Nov-13 = +16.0% margin** and
-    **ONE structure-held ride from the same timestamp = +36.4%** —
-    every cap during a straight-down move is that ~20pt-of-margin
-    gap). Guardian/max-hold still apply.
+    **ONE structure-held ride from the same timestamp = +37.3% to the
+    cited low (+39.5% to the span low 68,608)** —
+    every cap during a straight-down move is that ≈23pt-of-margin
+    gap ≈59% of the ride itself). Guardian/max-hold still apply.
     (Counterfactual noted honestly:
     on #16827 itself the trail's exit beat the structure stop by
     ~1.7pts-of-margin — the fake-out resolved UP; the rule is for when
