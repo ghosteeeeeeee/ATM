@@ -1673,7 +1673,22 @@
       "owner": "brain_auditor",
       "created_by": "brain_auditor #254",
       "created_at": "2026-11-13T04:42:42Z"
+    },
+    {
+      "id": "amplify-vb-high-short-underdeploy",
+      "stream": "volume-buildup- HIGH SHORT underdeployment — validated cell (WINNER_CELLS_VALIDATED) fires 19/30d but 0/7d — clone-hunt block source",
+      "kind": "amplify",
+      "proposal_type": "(c) clone-hunt: mine blocked setups against winner profile, counterfactual-walk candles",
+      "status": "open",
+      "created": "2026-11-13T08:50:00Z",
+      "deadline": "2026-11-20T00:00:00Z",
+      "owner": "brain_auditor weekly AMPLIFY run #255",
+      "evidence": "30d cell: signal=volume-buildup- regime=HIGH direction=SHORT n=19 pnl=+0.42 wr=78.9% (PG fresh 2026-11-13). 7d: n=0. In WINNER_CELLS_VALIDATED since bug_hunter 2026-10-29. No open amplify item covers vb- underdeployment (checked 22 open amplify ids).",
+      "threshold": "identify block source (confluence/ctx/regime/hotset/exec) for the 30d setup gap; counterfactual-walk 30d blocked setups in pnl_usdt units (never pnl_pct — #193 landmine); if recoverable net >= +$0.30/30d at n>=15 AND fk <20% → propose gate exempt for CEO/T; else NO CHANGE",
+      "default_action": "NO CHANGE — if block is a quality filter (not plumbing), report and close",
+      "risk": "low",
+      "requires": "CEO label + T sign-off before any gate change"
     }
   ],
-  "updated_at": "2026-11-13T00:47:24Z"
+  "updated_at": "2026-11-13T08:50:00Z"
 }

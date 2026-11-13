@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-13T04:42:42.864708+00:00
-registry: 108 entries (open=48)
+# Shadow disposition report — 2026-11-13T08:50:28.050915+00:00
+registry: 109 entries (open=49)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -86,7 +86,7 @@ registry: 108 entries (open=48)
 - OPEN btc-standalone-deny-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - OPEN setup-recall-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
 - DONE linreg-fade-fill-funnel: FAIL 2026-11-13 (run #253) — fill bar 0 PG fills < 5 required. ROOT CAUSE FOUND (one lever escalated per threshold): VOL-GATE-v2 REGIME_SIGNALS has NO linreg-fade entry in ANY regime, so every EXEC is allowlist-killed. 30d log: 63 EXEC: [linreg-fade-] lines, 63/63 paired with '[VOL-GATE-v2] <tok>: SKIP — linreg-fade- not suited for NORMAL/HIGH' within the same second (deduped 26 token-events; top: LIT 13, NEAR 7, ATOM 5). STANDALONE_BYPASS shipped 11-05 unlocked confluence/hotset/approve but never touched the vol-gate allowlist — last mile still wired shut. SHADOW COUNTERFACTUAL (this run, 1m candle walk, pnl-free price-move units): 21/26 walkable — +30m 47.6% WR avg -0.085%, +2h 52.4% +0.048%, +8h 61.9% avg +0.195% med +0.520%; crude arm(+0.40)/stop(-1%) sim = 15 arm / 6 stop ≈ 0.00% net. At $11 notional ≈ +$0.02/trade → ~+$0.56/30d — POSITIVE but NOT significant (n=21, +8h binomial p≈0.08 vs 50%) and below +$1.00/30d-class bars. DEFAULT = NO CHANGE (do not add to REGIME_SIGNALS yet). Escalation delivered: wiring-flip candidate registered as amplify-linregfade-volgate-admit with pre-registered bar; re-measure 2026-11-27 when killed-EXEC cohort ~doubles. Secondary blocker noted (not the escalated lever): BTC-CRASH gate also killed approved IOTA SHORT 11-12 18:47. Prior art: session brain hit 'Build New Linear Regression Signal' (score 0.80) — signal-build sessions, no prior REGIME_SIGNALS admission attempt found. (?)
-- OPEN amplify-bbsqueeze-warrior-uninert: deadline=2026-11-14T00:00:00Z | data/combo_weights.json: 67 rows, 0.9d
+- OPEN amplify-bbsqueeze-warrior-uninert: deadline=2026-11-14T00:00:00Z | data/combo_weights.json: 67 rows, 0.1d
 - OPEN amplify-bbsqueeze-neutral-exempt: deadline=2026-11-14T00:00:00Z | (no parseable source)
 - OPEN atr-trend-accel-shadow: deadline=2026-12-06T00:00:00Z | (no parseable source)
 - OPEN amplify-prearm-breakeven-lock: deadline=2026-11-14T00:00:00Z | (no parseable source)
@@ -109,3 +109,4 @@ registry: 108 entries (open=48)
 - OPEN amplify-linregfade-volgate-admit: deadline=2026-11-27T00:00:00Z | (no parseable source)
 - OPEN compaction-stale-trend-band-eval: deadline=2026-11-20T00:00:00Z | (no parseable source)
 - OPEN exitstack-day-kpi-1114: deadline=2026-11-15T00:00:00Z | (no parseable source)
+- OPEN amplify-vb-high-short-underdeploy: deadline=2026-11-20T00:00:00Z | (no parseable source)

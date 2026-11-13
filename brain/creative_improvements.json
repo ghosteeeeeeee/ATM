@@ -11140,5 +11140,46 @@
     "category": "process",
     "status": "closed",
     "risk": "none"
+  },
+  {
+    "date": "2026-11-13T08:50:00Z",
+    "idea": "pc- flip decay watch: demote PROMOTE if flip-WR <55% at next weekly read",
+    "rationale": "pc- flip 64.7%→63.7%→60.6% over ~3 runs — monotone decay ~3pts/read; still >50% but trajectory matters more than level",
+    "expected_impact": "prevents riding a dying flip edge into negative EV",
+    "category": "monitor-threshold",
+    "status": "suggested",
+    "risk": "low",
+    "citations": [
+      [
+        "contrarian_outcome_join",
+        "2026-11-13",
+        "pc- 212W/138L n=350 flip 60.6%"
+      ]
+    ]
+  },
+  {
+    "date": "2026-11-13T08:50:00Z",
+    "idea": "Coordinate 11-14 ships: stop-tighten-080 × prearm-BE interaction measurement in exitstack-day-kpi",
+    "rationale": "both attack the same never-armed loser pool from opposite sides (tighter adverse clamp vs entry-lock after peak); shipping both without interaction read risks double-counting or offsetting",
+    "expected_impact": "clean attribution of the -0.092→-0.070 avg-loss move to specific legs",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "low",
+    "citations": [
+      [
+        "mfe exit",
+        "session",
+        "winner pass-through fk is the shared risk of both legs"
+      ]
+    ]
+  },
+  {
+    "date": "2026-11-13T08:50:00Z",
+    "idea": "vb- HIGH SHORT underdeployment clone-hunt (amplify-vb-high-short-underdeploy)",
+    "rationale": "validated winner cell 19T/30d +0.42 78.9% WR but 0 fires/7d — silent underdeployment, no open item",
+    "expected_impact": "recover blocked setups if gate is plumbing not quality",
+    "category": "amplify-clone-hunt",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

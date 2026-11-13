@@ -3956,3 +3956,16 @@
 
 ## Error Alerts — 2026-11-13 06:35 UTC
 - **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-13 07:20 UTC
+- **REPEATED** (10x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-13 07:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-13 08:20 UTC
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+NEUTRAL+TOK, allowing despite TOK filter`
+- **REPEATED** (23x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+TOK+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-13 08:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
