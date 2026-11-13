@@ -25795,3 +25795,29 @@ BY: auto_1hr
 - Storm CF negative ($-0.79): gates blocked +$1.67 of SHORT dump winners but correctly kept -$2.46 of LONG dump losers out — net negative, streak stays 0/3
 - Unarmed cohort 64.7% of closes, WR 45.5% vs armed 100% — chop entries; stall stack owns fix
 BY: auto_1hr
+
+## [2026-11-13 05:21] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a) | 24h 17T 64.7% +$0.37 GREEN | 7d 95T 48.4% -$2.11 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes; 1 open (BTC ai-trader-pending SHORT -0.31%)
+- Entry quality: winners MAE avg 0.253%, 10/11 <0.5% — good entries
+- Arm rate: unarmed 11/17 = 64.7% of 24h closes (<70%), WR 45.5% (+$0.13) vs armed 6/6 100% (+$0.24) — below threshold, stall stack owns fix, no new gate
+- Kill check: 0 closes/hr -> no trigger; no 0% WR signal with 3+ closes
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/17 = 5.9% of 24h closes (<40%); tpsl_utils deployed -> no alert
+- Boost: none eligible (jup_yolo_mirrored 3T 100% +$0.09 n<5; atr-trend- 7T 71.4% net +$0.02 < $0.05 + boosted 1.0->1.25 at 17:23 on 11-12 stability rule; ai-trader-pending 6T 50% WR)
+- Neg streak: last close 03:00 +$0.19 = 0 consecutive negative hours; no size cut
+- Frequency: 0 closes/hr — well under 20
+- No storm (window-min -0.91% / at-run -0.44%) -> gate not fired
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still 48.4% RED -$2.11
+- Unarmed cohort 64.7% of closes, WR 45.5% vs armed 100% — chop entries; stall stack owns fix
+BY: auto_1hr
