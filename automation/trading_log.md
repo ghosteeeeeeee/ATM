@@ -25999,3 +25999,53 @@ BY: auto_1hr
 - 7d still 46.8% RED -$2.13
 - Unarmed cohort 73.3% of 24h closes (>70% again), WR 36.4% vs armed 100% — chop entries; stall stack owns fix
 BY: auto_1hr
+
+## [2026-11-13 13:21] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: N/A) | 24h 14T 57.1% +$0.09 GREEN | 7d 93T 46.2% -$2.15 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes, 1 open
+- Arm rate: unarmed 10/14 = 71.4% of 24h closes (>70% — chop entries dominating; stall stack owns fix, no new gate), WR 40.0% (-$0.13) vs armed 4/4 100% (+$0.22)
+- Kill check: 0 closes/hr -> no trigger; no 0% WR signal with 3+ closes
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/14 = 7.1% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 3/14 = 21% avg -$0.100 — expected at leverage, not a bug
+- Boost: none eligible (pending 6T 50.0% not >55%; atr-trend- 5T 40.0% net -$0.20; jup_yolo n<5; atr-trend+ 1T)
+- Neg streak: 06 -$0.10, 07 -$0.12, 10 -$0.10, 11 +$0.08 — not 3 consecutive negative hours -> no size cut
+- Frequency: 0 closes/hr — well under 20
+- No storm (window-min -0.37% / at-run -0.18%) -> gate not fired
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still 46.2% RED -$2.15
+- Unarmed cohort 71.4% of 24h closes (>70%), WR 40.0% vs armed 100% — chop entries; stall stack owns fix
+BY: auto_1hr
+
+## [2026-11-13 14:21] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** $0.29 (WR: 100%) | 24h 14T 57.1% +$0.34 GREEN | 7d 92T 47.8% -$1.63 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 1 close (SOL jup_yolo_mirrored LONG profit-monster-trail +$0.29 +7.28%), 2 open (ARB +0.30%, BTC -0.78%)
+- Arm rate: unarmed 9/14 = 64.3% of 24h closes (<70%), WR 33.3% (-$0.17) vs armed 5/5 100% (+$0.51) — no gate
+- Kill check: 1 close/hr -> no 0% WR signal with 3+ closes
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/14 = 7.1% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 3/14 = 21% avg -$0.100 — expected at leverage
+- Boost: none eligible (jup_yolo_mirrored 3T 100% but n<5; ai-trader-pending 5T 40% net +0.12 not >55%; atr-trend- 5T 40% net -$0.20)
+- Neg streak: 06 -$0.10, 07 -$0.12, 10 -$0.10, 11 +$0.08, 13 +$0.29 — not 3 consecutive negative -> no size cut
+- Frequency: 1 close/hr — well under 20
+- No storm (window-min -0.18% / at-run +0.04%) -> gate not fired
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still 47.8% RED -$1.63
+- jup_yolo_mirrored 3/3 100% +$0.34 in 24h — watch for boost eligibility (needs 5+ trades)
+BY: auto_1hr
