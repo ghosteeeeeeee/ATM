@@ -332,19 +332,33 @@ duplicate real trade #16832).
     armed stop stands, never overridden — a birth-align once loosened
     #16879's 73010 → 73669 needlessly). The stop therefore TRAILS DOWN
     on shorts as 15m LHs print (proven: 73112 → 72919 across two
-    formations), locking profit with structure. **TP is NEVER moved by
-    the watchdog — giant-candle backstop only**: the rule-10 TP snap is
-    REMOVED (it fired take-profits mid-move, booked losses labeled
-    manual_tp_hit on #16873/#16878, and cut #16879's winner at 72270
-    while the void ran on — CEO: "TP should only kick in if there's a
-    giant candle between SL updates"). Guardian/max-hold still apply.
+    formations), locking profit with structure. **EXITS ARE STRUCTURE-
+    BREAK ONLY — the standing doctrine, restated emphatically by the
+    CEO (2026-11-13): "unless structure is broken we don't exit — how
+    can structure be broken if something is going straight down?"**:
+    the watchdog NEVER moves a TP, and a TP is NEVER a take-profit —
+    it is a DISASTER circuit breaker set at ≥3·ATR1h depth (rule-10
+    snap removed earlier for booking loss-"TPs"; 2026-11-13: TP caps
+    during directional travel cost the difference between **7
+    fragmented trades Nov-11 19:00 → Nov-13 = +16.0% margin** and
+    **ONE structure-held ride from the same timestamp = +36.4%** —
+    every cap during a straight-down move is that ~20pt-of-margin
+    gap). Guardian/max-hold still apply.
     (Counterfactual noted honestly:
     on #16827 itself the trail's exit beat the structure stop by
     ~1.7pts-of-margin — the fake-out resolved UP; the rule is for when
     the retest precedes the REAL leg.)
 13. **ALWAYS arm the short ladder — readiness is the default**
     (CEO 2026-11-10: "there is always a short we want to be ready for...
-    it is about probabilities, anything can happen"). Never report "no
+    it is about probabilities, anything can happen"). **LADDER KEEPER
+    (2026-11-13, auto):** `auto_trader._ladder_keeper` runs every
+    watchdog cycle — when NO unfired short rung sits below the current
+    price it derives one under the 24h low (trigger = low − 60,
+    reclaim SL = low + 0.6·ATR15, TP = trigger − 3·ATR1h disaster
+    depth, `serial` + `dynamic_sl:false`) and arms it, so the ladder
+    is never empty after a fire/TP (the CEO's "why was the next short
+    not already ready to fire"). Single-writer: only run_cycle.
+    Never report "no
     short armed" or ask the CEO for short levels — derive the ladder
     from the chart yourself and arm it: **rung 1** = local-low break
     (quick-move, own tight TP/SL, local structure OK per §13 quick-leg),

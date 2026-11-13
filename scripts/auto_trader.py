@@ -542,6 +542,87 @@ def tweak_structure_fixed(decision, open_positions):
     return tweaks
 
 
+def _ladder_keeper(decision, summary):
+    """Rule-13 AUTO-REPLENISH (CEO 2026-11-13: "figure out why the next
+    short was not already ready to fire — we need to be adding in situations
+    like this").
+
+    When NO unfired 'below' short rung sits under the current price, derive
+    one under the 24h low and arm it: continuation trigger (low − 60),
+    reclaim stop (low + 0.6·ATR15), DISASTER-depth TP (trigger − 3·ATR1h —
+    exits are STRUCTURE-BREAK ONLY per the standing doctrine; the Nov-11
+    19:00 → Nov-13 counterfactual: one ride = +36.4% margin, our 7
+    fragmented trades = +16.0%). serial:true + dynamic_sl:false.
+    Single-writer: only run_cycle (systemd-serialized) calls this.
+    Reads/writes the pending config directly (no trade_watchdog import —
+    would be circular).
+    """
+    try:
+        import os, sqlite3
+        from paths import HERMES_DATA
+        price = float(decision.get('price') or 0)
+        sd = decision.get('structure_detail') or {}
+        atr15 = float((sd.get('15m') or {}).get('atr') or 0)
+        atr1 = float((sd.get('1h') or {}).get('atr') or 0)
+        if not (price and atr15 and atr1):
+            return
+        p_path = os.path.join(HERMES_DATA, 'pending_orders.json')
+        s_path = os.path.join(HERMES_DATA, 'pending_orders_state.json')
+        with open(p_path) as f:
+            pcfg = json.load(f)
+        try:
+            with open(s_path) as f:
+                pstate = json.load(f)
+        except Exception:
+            pstate = {}
+        for o in pcfg.get('orders', []):
+            if o.get('direction') == 'short' and o.get('trigger') == 'below':
+                st = (pstate.get(o.get('id')) or {}).get('status')
+                if st not in ('fired', 'error') and \
+                        float(o.get('trigger_price') or 0) < price:
+                    return   # a short rung is already waiting below price
+        # derive under the 24h low
+        con = sqlite3.connect(f'file:{HERMES_DATA}/candles.db?mode=ro',
+                              uri=True)
+        cur = con.cursor()
+        cur.execute("SELECT MIN(low) FROM candles_15m WHERE token='BTC' "
+                    "AND ts > strftime('%s','now','-1 day')")
+        row = cur.fetchone()
+        cur.close()
+        con.close()
+        low = float(row[0]) if row and row[0] else 0.0
+        if not low or not (low < price):
+            return
+        trig = round(low - 60)
+        sl = round(low + 0.60 * atr15)
+        tp = round(trig - 3.0 * atr1)
+        oid = f"btc-auto-ladder-{int(time.time())}"
+        pcfg.setdefault('orders', []).append({
+            'id': oid, 'coin': 'BTC', 'direction': 'short',
+            'trigger': 'below', 'trigger_price': trig,
+            'amount_usdt': 11.1, 'leverage': 5,
+            'sl': sl, 'target': tp, 'confidence': 60,
+            'serial': True, 'dynamic_sl': False,
+            'note': (f"Rule-13 LADDER KEEPER auto-arm ({time.strftime('%Y-%m-%d %H:%M')} "
+                     f"UTC): no unfired short rung below price {price:.0f}. Under-24h-low "
+                     f"{low:.0f} continuation: trigger {trig} (low−60), SL {sl} "
+                     f"(low+0.6·ATR15 reclaim = break failed), TP {tp} = 3·ATR1h "
+                     f"DISASTER depth (structure-break-only exits — TP is a circuit "
+                     f"breaker, not a take-profit). serial + dynamic_sl:false.")})
+        tmp = p_path + '.tmp'
+        with open(tmp, 'w') as f:
+            json.dump(pcfg, f, indent=1)
+        os.replace(tmp, p_path)
+        summary['ladder_keeper'] = oid
+        DB.log_event('INFO', f"ladder_keeper: armed {oid} short @ {trig} "
+                             f"(low {low:.0f}, SL {sl}, TP {tp} disaster-depth)")
+    except Exception as e:
+        try:
+            DB.log_event('WARN', f"ladder_keeper: {e}")
+        except Exception:
+            pass
+
+
 def run_cycle():
     """Main entry. Returns a summary dict for the watchdog output/dashboard."""
     cfg = load_config()
@@ -725,6 +806,10 @@ def run_cycle():
             if summary['shadow_armed']:
                 DB.log_event('INFO', f"cycle {cycle_id}: shadow-armed "
                                      f"{summary['shadow_armed']} @ {price_now}")
+
+    # 4b LADDER KEEPER — the ladder must never be empty on the short side
+    # (CEO 2026-11-13: "why was the next short not already ready to fire").
+    _ladder_keeper(decision, summary)
 
     # 5 LEARN: live attribution + bounded self-tune
     live_attribution(cfg)
