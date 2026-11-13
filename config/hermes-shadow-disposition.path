@@ -1,0 +1,16 @@
+[Unit]
+Description=Hermes Shadow Disposition trigger — re-render control tower the moment the registry changes
+# ROOT-CAUSE FIX 2026-11-13: the calendar (control_tower.md) only re-rendered on the
+# daily 08:15 timer, so registry writes from other actors (brain_auditor adjudications,
+# e.g. run #253 at 00:47) left the calendar showing already-closed items as DUE, and
+# the tower's own freshness footer could not see the drift (it stamps registry mtime
+# captured at render time). Any registry write now re-runs the runner immediately.
+# No loop risk: scripts/shadow_disposition.py only READS the registry (writes state,
+# report, tower, kanban — dedupe makes re-runs packet-quiet).
+[Path]
+PathChanged=/root/.hermes/data/shadow_disposition.json
+PathModified=/root/.hermes/data/shadow_disposition.json
+Unit=hermes-shadow-disposition.service
+
+[Install]
+WantedBy=multi-user.target
