@@ -240,6 +240,13 @@ def _arm_real_leg(order_id, leg, o, size, cfg, atr_1h):
     (stacking twins from both callers). Returns 'armed'|'covered'|'error'.
     """
     path = os.path.join(HERMES_DATA, 'pending_orders.json')
+    # F-9 (bug_hunter 2026-11-13): config RMW under the same EX flock as
+    # _ladder_keeper — a manual run_cycle overlapping the timer cycle could
+    # lose a bracket arm (keeper-vs-keeper was already fixed; this was the
+    # second config writer). Held to function exit (refcount), same file.
+    import fcntl as _fcntl
+    _lk = open(path + '.lock', 'w')
+    _fcntl.flock(_lk, _fcntl.LOCK_EX)
     try:
         with open(path) as f:
             pcfg = json.load(f)
@@ -682,7 +689,8 @@ def _ladder_keeper(decision, summary):
                              f"rubberband-snap readiness (CEO: 'ready for the longs too, they're "
                              f"coming'). Reclaim of the 15m ceiling {sh15:.0f}: trigger {trig} "
                              f"(sh+60), SL {sl} (sh−0.6·ATR15 = reclaim failed = exit), TP {tp} = "
-                             f"3·ATR1h DISASTER depth (structure-break-only exits). serial + "
+                             f"3·ATR1h DISASTER depth AT ARM TIME (structure-break-only exits — TP "
+                             f"never moved). serial + "
                              f"dynamic_sl:false. Trend-is-your-friend ride leg.")})
                 appended.append(('ladder_keeper_long', oid, f"long @ {trig} (15m sh {sh15:.0f}, SL {sl}, TP {tp})"))
 

@@ -353,13 +353,16 @@ duplicate real trade #16832).
     (CEO 2026-11-10: "there is always a short we want to be ready for...
     it is about probabilities, anything can happen"). **LADDER KEEPER
     (2026-11-13, auto) — BOTH SIDES:** `auto_trader._ladder_keeper` runs
-    every watchdog cycle: (a) no unfired short rung below price → derive
-    under the 24h low (trigger = low − 60, reclaim SL = low + 0.6·ATR15,
-    TP = trigger − 3·ATR1h disaster depth); (b) no unfired long rung
+    every watchdog cycle: (a) no unfired **BTC** short rung WITHIN REACH
+    (≤3·ATR1h below price — a far-below rung does NOT count) → derive at
+    the **15m swing floor** (trigger = sl15 − 60, reclaim SL = sl15 +
+    0.6·ATR15, TP = trigger − 3·ATR1h disaster depth AT ARM TIME;
+    loop-safe: a derived trigger outside reach is skipped); (b) no
+    unfired BTC long rung
     WITHIN REACH (≤3·ATR1h above price — stacked 72k+ rungs do NOT count,
     a rubberband snap from 68k would leave them behind) → derive at the
     15m-ceiling reclaim (trigger = sh + 60, SL = sh − 0.6·ATR15, TP =
-    trigger + 3·ATR1h). All keeper legs `serial` + `dynamic_sl:false`, so
+    trigger + 3·ATR1h AT ARM TIME). All keeper legs `serial` + `dynamic_sl:false`, so
     the ladder is never empty on either side after a fire/TP (CEO: "you
     better be ready for the longs too, cuz they're coming — rubberband
     snapping back"). Single-writer: only run_cycle. **Ride doctrine
