@@ -367,7 +367,11 @@ def tweak_structure_fixed(decision, open_positions):
     # step during #16879's move: zero trailing, TP did all the exiting).
     sd = (decision.get('structure_detail') or {}).get('15m') or {}
     sh, sl, atr = sd.get('sh'), sd.get('sl'), sd.get('atr')
-    if not (sh and sl and atr):
+    # 1h structure for the lag's MAJOR targets (adverse raises always,
+    # favorable steps when regime=CHOP) — CEO 2026-11-13 shakeout fix.
+    sd_h = (decision.get('structure_detail') or {}).get('1h') or {}
+    sh_h, sl_h, atr_h = sd_h.get('sh'), sd_h.get('sl'), sd_h.get('atr')
+    if not (sh and sl and atr) or not (sh_h and sl_h and atr_h):
         return tweaks
     try:
         import psycopg2
@@ -416,85 +420,91 @@ def tweak_structure_fixed(decision, open_positions):
             _smap = {}                    # raise at .get and abort the cycle
         _st_dirty = [False]           # nonlocal-ish for nested helper
 
-        def _lag_stop(pid, side, cur_sh, cur_sl, cur_atr, price, stop):
+        def _lag_stop(pid, side, s15, s1h, regime, price, stop):
+            """Structure-lag with REGIME/MAJOR split (CEO 2026-11-13: "your
+            SL is still not being placed right... we should have still been
+            in the previous trade, not shaken out on small move like that"):
+              - FAVORABLE steps (trail with the trend): source = 15m in
+                TREND (responsive — books rides, #16886 proven) but **1h in
+                CHOP** (box interiors get shaken — #16891's raise to the
+                15m interior 69106 and #16896's armed 68950 both died
+                inside the base box).
+              - ADVERSE raises (never chase; raise to the invalidation
+                line): ALWAYS 1h — the major ceiling/floor, never interior.
+            State records BOTH TFs (sh15/sl15/sh1h/sl1h/ts); old-format rows
+            (sh/sl only) re-seed WITHOUT moving the stop.
+            """
             key = str(pid)
             prev = _smap.get(key)
-            # F-1: malformed entry (sh=None / non-dict) → treat as birth so
-            # one bad row can't abort every cycle forever (bug_hunter 2026-11-12)
+            # F-1 + format: old 2-key rows -> birth (re-seed, no stop move)
             if not (isinstance(prev, dict)
-                    and isinstance(prev.get('sh'), (int, float))
-                    and isinstance(prev.get('sl'), (int, float))):
+                    and isinstance(prev.get('sh15'), (int, float))
+                    and isinstance(prev.get('sl15'), (int, float))
+                    and isinstance(prev.get('sh1h'), (int, float))
+                    and isinstance(prev.get('sl1h'), (int, float))):
                 prev = None
-            # F-3: stop already breached → the hit-check owns the exit; never
-            # write a rescue stop that un-breaches it ("if that is broken we
-            # get taken out" — the watchdog must not walk it back)
+            # F-3 breach guard — the hit-check owns that exit
             if side == 'SHORT' and stop <= price:
                 return
             if side == 'LONG' and stop >= price:
                 return
-            if side == 'SHORT':
-                if not (cur_sh and cur_atr):
-                    return
-                # birth → current structure; after that → the now-old one
-                base = cur_sh if prev is None else float(prev['sh'])
-                want = base + 0.10 * cur_atr
-                want = max(want, price * 1.001)     # never at/below price
-                want = min(want, price * 1.05)      # F-4: absurd-stale cap
-            else:
-                if not (cur_sl and cur_atr):
-                    return
-                base = cur_sl if prev is None else float(prev['sl'])
-                want = base - 0.10 * cur_atr
-                if want >= price:
-                    want = price * 0.999           # never at/above price
-                want = max(want, price * 0.95)      # F-4 cap
+            src_1h = str(regime or '').upper() == 'CHOP'
+            sfx = '1h' if src_1h else '15'   # state keys: sh15/sl15/sh1h/sl1h
+            cur_sh, cur_sl, cur_atr = (s1h if src_1h else s15)
+            fld = 'sh' if side == 'SHORT' else 'sl'
+            if not (s15[2] and s1h[2]) or not (cur_sh and cur_atr):
+                return
             if prev is None:
-                # SEED ONLY — never move the stop at birth. The armed/ATR
-                # structure stop the trade ARRIVED with stands (birth-align
-                # once loosened #16879's armed 73010 → 73669 = +659pts of
-                # needless risk; CEO 2026-11-12: "plan better"). The first
-                # formation after this steps it to the now-old structure.
-                _smap[key] = {'sh': cur_sh, 'sl': cur_sl, 'ts': time.time()}
+                # SEED ONLY — the armed stop stands (CEO 'plan better')
+                _smap[key] = {'sh15': s15[0], 'sl15': s15[1],
+                              'sh1h': s1h[0], 'sl1h': s1h[1],
+                              'ts': time.time()}
                 _st_dirty[0] = True
                 return
-            # F-5: side-specific — a SHORT bumps on swing-HIGH changes only
-            changed = (cur_sh != prev['sh']) if side == 'SHORT' \
-                else (cur_sl != prev['sl'])
-            if not changed:
-                # structure unchanged → the stop is NOT touched (the rule)
+            prev_val = prev[f'{fld}{sfx}']
+            cur_val = cur_sh if side == 'SHORT' else cur_sl
+            if cur_val == prev_val:
+                # structure unchanged -> stop untouched (the whole rule)
                 return
-            favorable = (cur_sh < prev['sh']) if side == 'SHORT' \
-                else (cur_sl > prev['sl'])
+            def _record():
+                _smap[key] = {'sh15': s15[0], 'sl15': s15[1],
+                              'sh1h': s1h[0], 'sl1h': s1h[1],
+                              'ts': time.time()}
+                _st_dirty[0] = True
+            favorable = (cur_val < prev_val) if side == 'SHORT' \
+                else (cur_val > prev_val)
             if favorable:
-                # structure broke LOWER (short) / HIGHER (long) → trail:
-                # bump to the now-old structure (one swing behind)
-                target = want
-            else:
-                # ADVERSE structure change (short: a HIGHER swing high —
-                # #16882's bounce to 72224; long: a LOWER swing low) →
-                # NEVER chase the stop with it. At most RAISE the stop to
-                # the new structure (short: cur_sh+buf, long: cur_sl−buf)
-                # so a crossing still = a break at the real line. (CEO
-                # 2026-11-12: "even on a 1m chart we haven't crossed 72500"
-                # — the old chase dropped the stop 72327 → 71771 under the
-                # bounce and exited 71789 on interior noise.)
+                # trail to the now-old structure (one swing behind, src-TF)
                 if side == 'SHORT':
-                    t2 = cur_sh + 0.10 * cur_atr
+                    target = prev_val + 0.10 * cur_atr
+                    target = max(target, price * 1.001)   # never <= price
+                    target = min(target, price * 1.05)    # F-4 stale cap
+                else:
+                    target = prev_val - 0.10 * cur_atr
+                    if target >= price:
+                        target = price * 0.999
+                    target = max(target, price * 0.95)    # F-4 cap
+            else:
+                # ADVERSE (short: higher swing / long: lower swing) ->
+                # NEVER chase interior; raise to the MAJOR (1h) invalidation
+                # line only (#16882 chase bug; #16891/#16896 = interior
+                # raises killed in the box — the 1h ceiling survives those).
+                if side == 'SHORT':
+                    if not s1h[0]:
+                        _record(); return
+                    t2 = s1h[0] + 0.10 * s1h[2]
                     t2 = min(max(t2, price * 1.001), price * 1.05)
                 else:
-                    t2 = cur_sl - 0.10 * cur_atr
+                    if not s1h[1]:
+                        _record(); return
+                    t2 = s1h[1] - 0.10 * s1h[2]
                     t2 = max(min(t2, price * 0.999), price * 0.95)
                 target = t2 if t2 > stop + 1 else None   # only ever raise
             if target is None:
-                # adverse & already at/above the new structure → keep the
-                # stop; still record the new structure for next compare
-                _smap[key] = {'sh': cur_sh, 'sl': cur_sl, 'ts': time.time()}
-                _st_dirty[0] = True
+                _record()   # already at/above the major line — keep stop
             elif abs(stop - target) <= 1 or _apply_stop(target, stop, pid):
-                _smap[key] = {'sh': cur_sh, 'sl': cur_sl, 'ts': time.time()}
-                _st_dirty[0] = True
-            # (F-6: a CAS miss on a favorable bump records nothing → the
-            # structure change retries next cycle instead of vanishing)
+                _record()
+            # (F-6: a CAS miss records nothing -> the change retries next cycle)
 
         for pos in open_positions or []:
             # Gate CHANGED 2026-11-10: no longer dynamic_sl-false only —
@@ -524,11 +534,17 @@ def tweak_structure_fixed(decision, open_positions):
                 # take-profits mid-move — #16879 exited at 72270 while
                 # the void ran on; "TP should only kick in if there's a
                 # giant candle between SL updates").
-                _lag_stop(pos['id'], 'SHORT', sh, sl, atr, price, stop)
+                _lag_stop(pos['id'], 'SHORT', (sh, sl, atr),
+                          (sh_h, sl_h, atr_h),
+                          decision.get('regime_state'),
+                          price, stop)
             elif d == 'LONG':
                 # STRUCTURE-LAG mirror on 15m, one swing behind; TP =
                 # giant-candle backstop only (R2 removed — see SHORT).
-                _lag_stop(pos['id'], 'LONG', sh, sl, atr, price, stop)
+                _lag_stop(pos['id'], 'LONG', (sh, sl, atr),
+                          (sh_h, sl_h, atr_h),
+                          decision.get('regime_state'),
+                          price, stop)
         # persist structure-lag state (72h prune, atomic — mirrors mxm)
         if _st_dirty[0]:
             _now = time.time()
@@ -583,6 +599,11 @@ def _ladder_keeper(decision, summary):
         sd = decision.get('structure_detail') or {}
         sh15 = float((sd.get('15m') or {}).get('sh') or 0)
         sl15 = float((sd.get('15m') or {}).get('sl') or 0)
+        # F-8/CEO 2026-11-13: anchors are the 1h MAJOR floor/ceiling —
+        # 15m wiggle floors sit mid-box and get the rung shaken out
+        # (#16896's 15m-anchored entry+stop died inside the base).
+        sh1h = float((sd.get('1h') or {}).get('sh') or 0)
+        sl1h = float((sd.get('1h') or {}).get('sl') or 0)
         atr15 = float((sd.get('15m') or {}).get('atr') or 0)
         atr1 = float((sd.get('1h') or {}).get('atr') or 0)
         if not (price and atr15 and atr1):
@@ -634,9 +655,9 @@ def _ladder_keeper(decision, summary):
             # mixing — price and structure both come from decision.
             # Loop-safe: only derive if the derived trigger lands
             # within reach, else next cycle would duplicate it.
-            trig = round(sl15 - 60) if sl15 else 0
+            trig = round(sl1h - 60) if sl1h else 0
             if trig and reach_lo <= trig < price:
-                sl = round(sl15 + 0.60 * atr15)
+                sl = round(sl1h + 0.60 * atr15)
                 # ponytail: TP gap fixed at arm time (3·ATR1h THEN, never
                 # moved — F-2 restated doctrine) — if ATR1h later grows
                 # past ~3.5× the gap the disaster floor erodes; top up by
@@ -651,8 +672,8 @@ def _ladder_keeper(decision, summary):
                     'serial': True, 'dynamic_sl': False,
                     'note': (f"Rule-13 LADDER KEEPER auto-arm ({time.strftime('%Y-%m-%d %H:%M')} "
                              f"UTC): no unfired BTC short rung within reach (≤3·ATR1h) below price "
-                             f"{price:.0f}. 15m-swing-floor break: trigger {trig} (sl15 {sl15:.0f}−60), "
-                             f"SL {sl} (sl15+0.6·ATR15 reclaim = break failed), TP {tp} = 3·ATR1h "
+                             f"{price:.0f}. 1h MAJOR-floor break: trigger {trig} (sl1h {sl1h:.0f}−60), "
+                             f"SL {sl} (sl1h+0.6·ATR15 reclaim = break failed), TP {tp} = 3·ATR1h "
                              f"DISASTER depth AT ARM TIME (structure-break-only exits — TP is a "
                              f"circuit breaker, never a take-profit, never moved). serial + "
                              f"dynamic_sl:false.")})
@@ -668,12 +689,12 @@ def _ladder_keeper(decision, summary):
             and _unfired(o)
             and price <= float(o.get('trigger_price') or 0) <= reach_hi
             for o in orders)
-        if not long_ready and sh15:
-            trig = round(sh15 + 60)
+        if not long_ready and sh1h:
+            trig = round(sh1h + 60)
             # ITM guard + F-6 reach guard: the derived rung must itself
             # be within reach (else every cycle would duplicate it)
             if price < trig <= reach_hi:
-                sl = round(sh15 - 0.60 * atr15)
+                sl = round(sh1h - 0.60 * atr15)
                 # ponytail: TP gap fixed at arm time (3·ATR1h then, never
                 # moved — F-2): top up by hand if ATR1h outgrows ~3.5×
                 tp = round(trig + 3.0 * atr1)
@@ -687,7 +708,7 @@ def _ladder_keeper(decision, summary):
                     'note': (f"Rule-13 LADDER KEEPER auto-arm LONG ({time.strftime('%Y-%m-%d %H:%M')} "
                              f"UTC): no long rung within reach (≤3·ATR1h) above price {price:.0f} — "
                              f"rubberband-snap readiness (CEO: 'ready for the longs too, they're "
-                             f"coming'). Reclaim of the 15m ceiling {sh15:.0f}: trigger {trig} "
+                             f"coming'). Reclaim of the 1h major ceiling {sh1h:.0f}: trigger {trig} "
                              f"(sh+60), SL {sl} (sh−0.6·ATR15 = reclaim failed = exit), TP {tp} = "
                              f"3·ATR1h DISASTER depth AT ARM TIME (structure-break-only exits — TP "
                              f"never moved). serial + "

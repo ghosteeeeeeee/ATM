@@ -184,6 +184,39 @@ CUT_LOSER_PNL = CUT_LOSER_PNL_HERMES  # from hermes_constants.py (was hardcoded 
 ATR_UPDATE_THRESHOLD_PCT = ATR_UPDATE_THRESHOLD  # only push SL/TP update to HL if delta > 0.15%
 MAX_LEVERAGE = 5
 
+
+def hml_threshold(hard_pct, signal, entry, stop, direction, lev, floor_acct=None):
+    """CEO 2026-11-13: managed STRUCTURAL trades exit at STRUCTURE, not the
+    account cap ("we should have still been in the previous trade, not
+    gotten shaken out on small move like that").
+
+    #16896: the -4.00% account cap = -0.80% price @lev5 would have cut at
+    ~69,210 while the box ceiling (real structure) sat ~69,600-70,300 —
+    and its own stop was the 15m interior 68,950. Widens the HML price
+    threshold to the structure-stop distance when that is WIDER, floored
+    at floor_acct/lev (HML_STRUCT_FLOOR_ACCT = -8% account = catastrophic
+    backstop, never exceeded). Non-managed trades, wrong-side/absent
+    stops, and tighter structures: threshold unchanged (never tightens
+    below the caller's account cap). Pure function — unit-tested.
+    """
+    try:
+        if floor_acct is None:
+            from hermes_constants import HML_STRUCT_FLOOR_ACCT as floor_acct
+        if not signal or not entry or not stop:
+            return hard_pct
+        import manual_exit_manager as _mxm
+        if not _mxm.is_managed_signal(signal):
+            return hard_pct
+        d = str(direction or '').upper()
+        if not ((d == 'SHORT' and stop > entry) or
+                (d == 'LONG' and stop < entry)):
+            return hard_pct
+        struct_pct = abs(stop - entry) / entry * 100.0
+        wide = max(-struct_pct, float(floor_acct) / max(float(lev or 1), 1.0))
+        return min(hard_pct, wide)
+    except Exception:
+        return hard_pct
+
 # ─── ATR Internal Close System ─────────────────────────────────────────────────
 # Kill switch: disables pushing SL/TP orders to Hyperliquid.
 # When False, _execute_atr_bulk_updates() is NOT called from the main loop.
@@ -4151,6 +4184,15 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 # logged, never swallowed — same rule as the JUP shadows
                 log(f"  [JUP-SHADOW-ATRSL] error for {token}: {type(_asl_e).__name__}: {_asl_e}")
 
+        # CEO 2026-11-13: managed structural trades hold to STRUCTURE —
+        # widen the HML threshold to the structure-stop distance (floored
+        # at HML_STRUCT_FLOOR_ACCT/lev); non-managed unchanged. See
+        # position_manager.hml_threshold (pure, unit-tested).
+        HARD_MAX_LOSS_PCT = hml_threshold(
+            HARD_MAX_LOSS_PCT, _pos_signal,
+            float(pos.get('entry_price') or 0),
+            float(pos.get('stop_loss') or 0),
+            pos.get('direction'), _hml_lev)
         if live_pnl <= HARD_MAX_LOSS_PCT:
             # P0: canonical label 'hard_max_loss' — pnl detail moved to exit_detail.
             # (Old f-string produced ~25 fragmented per-trade labels like
