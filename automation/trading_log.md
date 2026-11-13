@@ -25948,3 +25948,29 @@ BY: auto_1hr
 - 7d still 46.3% RED -$2.34
 - Unarmed cohort now 70.6% of 24h closes (crossed 70%), WR 33.3% vs armed 100% — chop entries; stall stack owns fix
 BY: auto_1hr
+
+## [2026-11-13 11:21] Hourly Analysis
+
+**Trades:** 1 closed (1 win, 0 losses)
+**PnL:** $0.08 (WR: 100%) | 24h 18T 55.6% +$0.09 GREEN | 7d 95T 46.3% -$2.29 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 1 close (MERL atr-trend+ LONG profit-monster-trail +$0.08 / +2.09%, MAE 0.33% < 0.5%); 0 open
+- Entry quality: 24h winners MAE avg 0.283%, max 0.673%, 90% < 0.5% — good
+- Arm rate: unarmed 12/18 = 66.7% of 24h closes (<70%), WR 33.3% (-$0.22) vs armed 6/6 100% (+$0.31) — below threshold, stall stack owns fix, no new gate
+- Kill check: 1 close/hr -> no trigger; no 0% WR signal with 3+ closes
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/18 = 5.6% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 4/18 = 22% avg -$0.098 — expected at leverage, not a bug
+- Boost: none eligible (atr-trend- 7T 57.1% but net -$0.11; ai-trader-pending 7T 42.9% not >55%; jup_yolo 2T n<5; atr-trend+ 1T)
+- Neg streak: 06:00 -$0.10, 07:00 -$0.12, 10:00 -$0.10, 11:00 +$0.08 — not 3 consecutive negative hours -> no size cut
+- Frequency: 1 close/hr — well under 20
+- No storm (window-min -0.12% / at-run +0.22%) -> gate not fired
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still 46.3% RED -$2.29
+- Unarmed cohort 66.7% (was 70.6% last hour), WR 33.3% vs armed 100% — chop entries; stall stack owns fix
+BY: auto_1hr
