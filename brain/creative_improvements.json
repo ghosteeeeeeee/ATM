@@ -11213,5 +11213,29 @@
         "4-cell window query fresh PG 12:40Z"
       ]
     ]
+  },
+  {
+    "idea": "Contrarian join SETTLE-TIME guard: only classify entries whose 30x5m window closed >=60min before read",
+    "rationale": "reads reclassified 13 WINNER->LOSER in 4h at fixed n=350; unsettled windows make demote/promote bars whipsaw",
+    "category": "measurement integrity",
+    "status": "suggested",
+    "risk": "low",
+    "date": "2026-11-13T16:46:33+00:00"
+  },
+  {
+    "idea": "ema300-breakthrough underdeploy hunt (registered amplify-ema300-breakthrough-underdeploy)",
+    "rationale": "ENABLED signal, 0/30d fills, 10/10 detections expired, shadow avg +0.24 n=14",
+    "category": "clone-hunt",
+    "status": "registered",
+    "risk": "low",
+    "date": "2026-11-13T16:46:33+00:00"
+  },
+  {
+    "idea": "Post-demotion pc- SHORT cohort watch: original direction 103T 34% WR +0.12/30d — if demoted cohort bleeds >0.50/14d, kill-review (NO-KILL standing requires fresh data)",
+    "rationale": "demote returns to weak-but-positive baseline; verify it stays positive",
+    "category": "kill-review",
+    "status": "suggested",
+    "risk": "low",
+    "date": "2026-11-13T16:46:33+00:00"
   }
 ]

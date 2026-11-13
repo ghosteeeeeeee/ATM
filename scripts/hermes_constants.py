@@ -4115,8 +4115,11 @@ SIGNAL_INVERSION_MAP = {
 # (43.2% WR, −$0.57/111T). Applied inside decider_run._apply_inversion step 0 (same
 # call sites + downstream gate validation as the live dynamic-inversion path).
 # DO NOT add 'btc-pump-rider+' — its flip cohort measured 28.6% (flipped-WORSE), stays shadow.
-# Revert: set CONTRARIAN_LIVE_ENABLED = False (registered: data/shadow_disposition.json).
-CONTRARIAN_LIVE_ENABLED = True
+# DEMOTED 2026-11-13 brain_auditor #257: pre-reg watch-pc-flip-demote-55 bar breached —
+# join reads 12:30Z 56.6% / 16:30Z 52.9% / 16:38Z 53.1% (reproduced) all <55% at n=350,
+# monotone decay 64.6%→52.9% since 10-27; live fade cohort 38T 39.5% WR net 0.00.
+# Shadow-only again. Re-promote requires flip-WR >=58% + CEO/T sign-off.
+CONTRARIAN_LIVE_ENABLED = False
 CONTRARIAN_LIVE_PREFIXES = {'pump-chain-'}
 
 # ── Dynamic Signal Inversion (WR-based auto-invert) ────────────────────────────

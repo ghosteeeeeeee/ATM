@@ -5,7 +5,23 @@
     "Runner: scripts/shadow_disposition.py (daily hermes-shadow-disposition.timer, 08:15 UTC (was weekly — day-scale deadlines, #190 2026-10-27)).",
     "Rules: deadline reached -> default_action fires via kanban packet with 24h CEO clock (silence = default).",
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
-    "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
+    "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope.",
+    {
+      "id": "amplify-ema300-breakthrough-underdeploy",
+      "stream": "ema300-breakthrough: ENABLED signal with 0 live fills in 30d while shadow shows +0.24 avg (n=14)",
+      "kind": "amplify",
+      "proposal_type": "(c) clone-hunt / underdeploy audit",
+      "status": "open",
+      "created": "2026-11-13T16:45:00Z",
+      "deadline": "2026-11-20T00:00:00Z",
+      "owner": "brain_auditor #257",
+      "evidence": "EMA300_BREAKTHROUGH_ENABLED=True (hermes_constants:2890, list :2249) but PG live fills 30d=0; signals_hermes_runtime 30d detections=10 ALL EXPIRED (compaction_stale_10min x majority, 1x rr-engine-hard-block); shadow_trader signal-quality n=14 WR 42.9% avg +0.24 (fat-tail profile). Enabled-but-zero-conversion = same class as grind-breakout-underdeploy.",
+      "threshold": "Diagnose conversion leak (detection->approval latency vs named-gate blocks) with dedup guard (#239: dedup source+token+created_at). Ship bar: deduped blocked/expired set n>=15 AND counterfactual candle-walk net positive (pnl_usdt basis, units guard) AND split-half same-sign AND fk<20%. If detections are simply too rare (<15/30d sustained), close as TRICKLE-NO-DEPLOY.",
+      "measurement": "runtime signals DB decision breakdown + gate_shadow join for ema300-breakthrough-; report at 11-20 run",
+      "default_action": "NO SHIP — measurement only",
+      "risk": "low",
+      "notes": "Do NOT cite raw shadow n without dedup (#239 pseudo-replication). Signal uses atr exit management (:2357)."
+    }
   ],
   "updated": "2026-11-13T04:40:00Z",
   "entries": [
@@ -1708,7 +1724,7 @@
       "id": "watch-pc-flip-demote-55",
       "stream": "pump-chain- contrarian flip-WR decay toward pre-registered demote bar <55%",
       "kind": "watch",
-      "status": "open",
+      "status": "done",
       "created": "2026-11-13T12:45:00Z",
       "deadline": "2026-11-17T00:00:00Z",
       "owner": "brain_auditor #256 (extends #255 creative demote threshold)",
@@ -1716,7 +1732,9 @@
       "threshold": "At next weekly join read (or any read): flip-WR <55% -> DEMOTE the Oct-27 CONTRARIAN_LIVE pc- PROMOTE to shadow-only; revert flag already registered in flip-contrarian-pc. If 55-57% -> HOLD + flag CEO. If >=58% -> stand down watch.",
       "default_action": "HOLD current live fade until read; demote only below 55%",
       "risk": "low",
-      "requires": "CEO/T for actual demote execution"
+      "requires": "CEO/T for actual demote execution",
+      "done_at": "2026-11-13T16:40:00Z",
+      "disposition": "DEMOTE EXECUTED 2026-11-13 #257 — CONTRARIAN_LIVE_ENABLED True->False in hermes_constants.py. Bar breached on any-read basis: 12:30Z 56.6% / 16:30Z 52.9% / 16:38Z 53.1% (reproduced) n=350, monotone decay 64.6%->52.9% since 10-27. Corroborating: live fade cohort 38T 39.5% WR net 0.00 (armed 10T 100% +1.06 vs unarmed 28T 17.9% -1.06); this week 3T 0% -0.22. Shadow-only again. Re-promote bar: flip-WR >=58% + CEO/T sign-off. Flagged to CEO in kanban for veto."
     }
   ],
   "updated_at": "2026-11-13T12:45:00Z"

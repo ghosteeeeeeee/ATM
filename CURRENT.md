@@ -1,50 +1,47 @@
-# Current State — brain_auditor #256 2026-11-13 12:45 UTC
-**Last Updated: 2026-11-13 12:45 UTC**
-**Updated by: brain_auditor #256. Prior: #255 2026-11-13 08:50 UTC (preserved in git history).**
+# Current State — brain_auditor #257 2026-11-13 16:45 UTC
+**Last Updated: 2026-11-13 16:45 UTC**
+**Updated by: brain_auditor #257. Prior: #256 2026-11-13 12:45 UTC (preserved in git history).**
 
-## HEADLINE — 0 CONFIG CHANGES; pc- FLIP DECAY 56.6% (1.6pp FROM DEMOTE); MULT-150 FAILS TOMORROW
+## HEADLINE — PC- FADE DEMOTED (pre-reg bar breached same day as registration)
 
-1. **0 trading-constant changes** — session lock ABSENT, hermes_constants.py EMPTY git diff, CEO_PROTECTED intact, size-reduce absent = 1.0x, nothing passed bars.
-2. **pc- flip 64.6→56.6%** (fresh join 12:30Z, n=350) — registered `watch-pc-flip-demote-55` due 11-17: <55% → DEMOTE live fade.
-3. **mult-150 pre-computed FAIL** for 11-14: only 2/4 cells net14>0 (need >=3); drop-pcplus will NOT fire (30d +0.18).
-4. **11-14 EXIT-STACK DAY** — 13 items due tomorrow + warrior early amplify added.
-5. **Autopsy 48h**: n=12 = 1/10/1 NEVER → wrong-side refuted 84th consecutive.
-6. **AMPLIFY: 1 new** — amplify-warrior-sr-normal-long (EARLY n=6<10, due 11-20).
+1. **CONTRARIAN_LIVE_ENABLED True->False** — watch-pc-flip-demote-55 bar <55% breached: join 16:30Z **52.9%** / 16:38Z **53.1%** (reproduced) n=350; monotone decay 64.6%→52.9% since 10-27; live fade 38T 39.5% WR **net 0.00** (armed 10T +1.06 vs unarmed 28T -1.06). Shadow-only again; one-line revert registered; **CEO veto flagged** (re-promote bar >=58% + CEO/T).
+2. **1 config change, CEO_PROTECTED 13/13, session lock absent, size-reduce absent = 1.0x.**
+3. **Autopsy 48h**: n=11 = 1/9/1 NEVER → wrong-side refuted **85th** consecutive.
+4. **AMPLIFY new**: amplify-ema300-breakthrough-underdeploy (ENABLED signal 0/30d fills, 10/10 expired, shadow +0.24 n=14, due 11-20).
+5. **Chop-bleed 7d 88.9% = below 92% bar (first non-breach recent runs).**
 
 ### 1. FINDINGS THIS RUN
 | Item | Result |
 |---|---|
-| 24h | 14T 57.1% +0.09 GREEN, 6L/8W, 0 steers |
-| 7d/14d/30d | 94T 46.8% -2.13 / 334T 51.8% -4.44 / 684T 49.3% -7.48 |
-| pc- flip | **56.6% n=350** (was 60.6%) — demote bar <55%, watch registered |
-| mult-150 | **FAIL predicted**: 2/4 net14>0; drop-pcplus NO (30d +0.18) |
-| 7d LONG arm | 42.5% <50 but SHORT 51.9 not >55 = tripwire NOT met |
-| atr_sl_hit 7d | 20T 0% -2.31 all never-armed (mfe 0.198) — owned by 11-14 |
-| atr-trend- boost | post-ship n=2 -0.23 — MONITOR, stability rule holds |
-| floor fisher p | 0.0442 unchanged — due 11-15, do NOT ship early |
-| sub-50 new targets | 0 |
+| 24h | 14T 50.0% +0.12 GREEN, 0 steers |
+| 7d/14d/30d | 90T 46.7% -1.81 / 323T 51.4% -4.02 / 684T 49.3% -7.37 |
+| pc- flip | **52.9-53.1% n=350** (<55 bar) -> DEMOTE EXECUTED |
+| live fade | 38T 39.5% WR net 0.00; weekly +0.11/+0.11/-0.22 |
+| floor fisher | 0.0545 (up from 0.0442) — due 11-15, do NOT ship early |
+| arm tripwire | LONG 43.2% <50 but SHORT 50.9 not >55 = NOT met |
+| chop-bleed 7d | 88.9% dollar (4.02/4.25) — below 92% push bar |
+| sub-50 new targets | 0 (ai-trader CEO / pc- NO-KILL) |
+| jup HIGH SHORT | 30d 21T net -0.04 (was +0.15) — 11-19 likely FAIL |
 
-### 2. NUMBERS (fresh PG 12:40Z)
-- 24h **14T 57.1% +0.09 GREEN** | 7d **94T 46.8% -2.13** | 14d **334T 51.8% -4.44** | 30d **684T 49.3% -7.48**
-- armed 14d 165T 90.9% +9.09 vs unarmed 169T 13.6% -13.53
-- trail 14d 155T 93.5% +8.51 vs chop_exits 124T 0.8% -14.06
-- 7d exits: atr_sl_hit 20T 0% -2.31 vs profit-monster-trail 30T 96.7% +1.18
-- contrarian 12:30Z: pc- **56.6% n=350** · rider 40.0% · overall 43.2% n=1778
-- floor 04:30Z: **p=0.0442** · floor 48.8% n=1691 vs always 42.5% n=325 · same-sign due 11-15
+### 2. NUMBERS (fresh PG 16:30Z)
+- 24h **14T 50.0% +0.12 GREEN** | 7d **90T 46.7% -1.81** | 14d **323T 51.4% -4.02** | 30d **684T 49.3% -7.37**
+- armed 14d 157T 91.1% +8.74 vs unarmed 166T 13.9% -12.76
+- trail 14d 177T 86.4% +8.34 vs atr_sl_hit 56T 0% -6.16 + hard_max 49T 0% -5.90
+- contrarian 16:38Z: pc- **53.1% n=350** · overall 43.6% n=1811 · rider ~40% do-NOT
+- floor 16:38Z: **p=0.0545** · floor 48.9% n=1690 vs always 43.1% n=332
 
-### 3. SHADOW (2/5 usable + shadow_trader)
-- contrarian + floor joins fresh (mandate ✓)
-- shadow_trader 96,055: pm_trail +14,440 vs hard_max -17,157 = trail-or-nothing
+### 3. SHADOW (4/6 answerable)
+- contrarian + floor joins re-ran (mandate ✓); shadow_trader 96k pm_trail +14,522 vs hard_max -17,291
 - oscillator FROZEN · wyckoff RETIRED · rr ORPHANED
 
 ### 4. AUTOPSY + CREATIVE + AMPLIFY
-- **48h recovery_replay (adverse-first): n=12 = 1/10/1 NEVER → wrong-side refuted 84th** (#61 p=0.116, #84 t=-0.04).
-- **Creative x2:** pc- demote watch <55% · mult-150 pre-computed FAIL + drop-pcplus no-fire.
-- **AMPLIFY new:** amplify-warrior-sr-normal-long (EARLY, due 11-20).
+- **48h recovery_replay (adverse-first): n=11 = 1/9/1 NEVER → wrong-side refuted 85th** (#61 p=0.116, #84 t=-0.04).
+- **Creative x3:** join settle-time guard · ema300 underdeploy · post-demotion pc- cohort watch.
+- **AMPLIFY new:** amplify-ema300-breakthrough-underdeploy (due 11-20, NO-SHIP default).
 
-### 5. READINESS (2026-11-13 12:45 UTC)
-**1 open: SOL #16893 LONG jup_yolo_mirrored opened 12:23Z +0.16% SL80.06 TP82.35** (watchdog 12:20 snapshot predates open). Regime: 15m LONG_BIAS vs 4h SHORT_BIAS split / continuum ABOVE / vol LOW / CALM / auto=CHOP short+5 long-5 BRACKET → **no added size; trail-family first; jup=CEO-domain mirror; size 1.0x.**
+### 5. READINESS (2026-11-13 16:45 UTC)
+**1 open: BTC #16896 SHORT ai-trader-pending @68661, SL 69161 (R1 ratchet), TP 66514, +0.29%, 0.9h, meta_rsi 46.21, HIGH regime.** Regime: 15m+4h SHORT_BIAS agreed / continuum BELOW / STRONG_DOWN / vol LOW / auto=CHOP short+15 -> **SHORT aligned with tape: HOLD bracketed; no fresh LONGs; trail-family first; ai-trader=CEO domain; size 1.0x.**
 
-**Queue:** **11-14 EXIT-STACK DAY (13 due + mult-150 FAIL read)** → 11-15 floor same-sign + exitstack-day-kpi-1114 → 11-16 atr-trend cell → **11-17 pc- demote read** → 11-17 jup batch → 11-18 contrarian fade + xmirror → 11-20 vb-underdeploy + warrior early → 11-27 pc-plus-weight + linreg-fade.
-**CEO owed:** exit-stack pull-forward (#251). **mult-150 will FAIL tomorrow (pre-computed).**
-**Housekeeping:** session_brain rebuild owed 12+ runs (title/date null + empty excerpts; OpenMemory partial substitute).
+**Queue:** **11-14 EXIT-STACK DAY (13 due)** → 11-15 floor same-sign + exitstack-kpi → 11-16 atr-trend cell → 11-17 jup batch (pc- watch closed early) → 11-18 grind-breakout + contrarian re-promote bar >=58% → 11-19 jup HIGH OOS (net -0.04, likely FAIL) → 11-20 ema300 hunt + warrior + vb underdeploy.
+**CEO owed:** pc- demote veto window (one-line revert). **mult-150 FAIL tomorrow (pre-computed).**
+**Housekeeping:** session_brain rebuild owed 13+ runs (null dates/excerpts; OpenMemory partial substitute).

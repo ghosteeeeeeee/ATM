@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-13 09:23 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-13 15:23 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,782 | **WR:** 51.3% | **PnL:** -123.17%
+- **Total trades (all time):** 3,787 | **WR:** 51.3% | **PnL:** -122.59%
 - **Date range:** 2026-07-29 → 2026-11-13
 
 ---
@@ -23,7 +23,7 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| ai-trader-pending | SHORT | 6 | 50.0% | +2.22 | ❓ | Borderline |
+| ai-trader-pending | SHORT | 5 | 40.0% | +0.94 | ❓ | Borderline |
 
 ---
 
@@ -41,7 +41,7 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] ai-trader-pending SHORT** — WR=50.0%, PnL=+2.22% over 6 trades. Monitor next cycle.
+1. **[WATCH] ai-trader-pending SHORT** — WR=40.0%, PnL=+0.94% over 5 trades. Monitor next cycle.
 
 ---
 
@@ -61,6 +61,5 @@ None found. Top performers are already enabled.
 | 2026-11-08 | 6740b6f | scripts: payoff-fix CHANGE-NOW — stop-tighten scope-widen 2-... |
 | 2026-11-08 | 704c73c | signals: atr_trend_accel CONF_BASE 70->78 (CEO: hotset compe... |
 | 2026-11-06 | 673b669 | bug-hunter: atr_trend_accel build fixes |
-| 2026-11-06 | e62ff98 | automation: hourly analysis 2026-11-06 14:30 — no config cha... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

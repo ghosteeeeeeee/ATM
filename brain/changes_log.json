@@ -4166,5 +4166,16 @@
     "after": "4 done with measured verdicts + 2 new pre-registered entries",
     "rationale": "daily disposition cadence; due-today bars measured fresh",
     "impact": "registry clean; no trading behavior change"
+  },
+  {
+    "timestamp": "2026-11-13T16:45:00Z",
+    "agent": "brain_auditor",
+    "change": "DEMOTE CONTRARIAN_LIVE pc- fade per pre-reg watch-pc-flip-demote-55 (bar <55% breached: 52.9%/53.1% n=350, reproduced; live fade 38T 39.5% WR net 0.00)",
+    "type": "config",
+    "file": "scripts/hermes_constants.py",
+    "before": "CONTRARIAN_LIVE_ENABLED = True",
+    "after": "CONTRARIAN_LIVE_ENABLED = False",
+    "rationale": "Pre-registered demote bar breached on any-read basis; monotone flip-WR decay 64.6%->52.9% since 10-27; live cohort no edge; STRONG_DOWN tape means fade LONGs fight trend. Re-promote bar >=58% + CEO/T.",
+    "impact": "pc- signals fire original SHORT direction again; removes wrong-side fade LONGs. Revertible one line."
   }
 ]

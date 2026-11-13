@@ -4006,3 +4006,9 @@
 ## Error Alerts — 2026-11-13 15:20 UTC
 - **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
 - **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: CONTAGION,TOK | vol=N.4x eth_div=+N.N%`
+
+## Error Alerts — 2026-11-13 15:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
+
+## Error Alerts — 2026-11-13 16:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)

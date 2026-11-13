@@ -1,6 +1,6 @@
 # CONTROL TOWER — shadows, trials, decision calendar
-generated 2026-11-13T12:48:29.957717+00:00 by scripts/shadow_disposition.py (daily 08:15 + on any registry change via hermes-shadow-disposition.path) — REGENERATED FILE, do not hand-edit (edit data/shadow_disposition.json)
-51 open / 60 done / 111 registry entries
+generated 2026-11-13T16:45:16.456819+00:00 by scripts/shadow_disposition.py (daily 08:15 + on any registry change via hermes-shadow-disposition.path) — REGENERATED FILE, do not hand-edit (edit data/shadow_disposition.json)
+50 open / 61 done / 111 registry entries
 
 ## 🟠 DUE ≤24h (13)
 - 2026-11-14 [T-1] `mfe-cut-arm-be` (owner: CEO)
@@ -56,7 +56,7 @@ generated 2026-11-13T12:48:29.957717+00:00 by scripts/shadow_disposition.py (dai
   - progress: —
   - if silent: NO CHANGE (age stays as-is); measurement-only until bar met
 
-## 🟡 DUE ≤7d (30)
+## 🟡 DUE ≤7d (29)
 - 2026-11-15 [T-2] `win-side-capture-shadow` (owner: CEO)
   - bar: MFE_EXIT_GIVEBACK_PCT 0.30→0.20 and/or PM_TRAIL_DISTANCE_PCT 0.002→0.003 SHADOW: prove no ATR-SL race first — constan...
   - progress: —
@@ -121,13 +121,9 @@ generated 2026-11-13T12:48:29.957717+00:00 by scripts/shadow_disposition.py (dai
   - bar: token-day dedup join of [SETUP-RECALL-SHADOW] WOULD-ALLOW → outcome: re-consider MIN_N/SIMILAR_SETUP_HARD_BLOCK_WR on...
   - progress: —
   - if silent: keep the hard block (setup WR floor stays)
-- 2026-11-17 [T-4] `watch-pc-flip-demote-55` (owner: brain_auditor #256 (extends #255 creative demote threshold))
-  - bar: At next weekly join read (or any read): flip-WR <55% -> DEMOTE the Oct-27 CONTRARIAN_LIVE pc- PROMOTE to shadow-only;...
-  - progress: —
-  - if silent: HOLD current live fade until read; demote only below 55%
 - 2026-11-18 [T-5] `watch-contrarian-live` (owner: main-session)
   - bar: >= 1 REAL fade trade (pc- LONG open since started) + Z-FLIP conversion check at the 11-03 dispo
-  - progress: 37 vs >=1 real fade trades (pc- LONG opens since started) — OK
+  - progress: 38 vs >=1 real fade trades (pc- LONG opens since started) — OK
   - if silent: report-only: if still 0 real trades at deadline, either extend watch 7d with evidence or disable CONTRARIAN_LIVE_PREF...
 - 2026-11-18 [T-5] `amplify-xmirror-giveback` (owner: brain_auditor weekly AMPLIFY run #219)
   - bar: SHADOW ONLY first: log [XMIRROR-GIVEBACK-SHADOW] when peak MFE >= +1.50% price then gives back to <= +0.50% (i.e. loc...
@@ -214,19 +210,16 @@ generated 2026-11-13T12:48:29.957717+00:00 by scripts/shadow_disposition.py (dai
   - progress: —
   - if silent: NO SHIP — keep the 2026-10-31 bypass skip; monitor only
 
-## ⚗️ RUNNING TRIALS (2)
-- `watch-pc-flip-demote-55` — due 2026-11-17 | owner: brain_auditor #256 (extends #255 creative demote threshold)
-  - bar: At next weekly join read (or any read): flip-WR <55% -> DEMOTE the Oct-27 CONTRARIAN_LIVE pc- PROMOTE to shadow-only;...
-  - progress: —
+## ⚗️ RUNNING TRIALS (1)
 - `watch-contrarian-live` — due 2026-11-18 | owner: main-session
   - bar: >= 1 REAL fade trade (pc- LONG open since started) + Z-FLIP conversion check at the 11-03 dispo
-  - progress: 37 vs >=1 real fade trades (pc- LONG opens since started) — OK
+  - progress: 38 vs >=1 real fade trades (pc- LONG opens since started) — OK
 
 ## 📅 CALENDAR — every dated open item, date-ordered
 - 2026-11-14 [T-1]: mfe-cut-arm-be, amplify-winner-cell-mult-150, amplify-jup-short-walk, atrtrail-clip-12, stop-tighten-enforce-eval, amplify-stop-tighten-probe-080, amplify-bbsqueeze-warrior-uninert, amplify-bbsqueeze-neutral-exempt, amplify-prearm-breakeven-lock, amplify-bbsqueeze-module-rsi-reband, amplify-winner-cell-drop-pcplus, stop-tighten-slippage-column, amplify-tat-neverarmed-age-widen
 - 2026-11-15 [T-2]: win-side-capture-shadow, exitstack-day-kpi-1114
 - 2026-11-16 [T-3]: amplify-atr-trend-short-cell-watch
-- 2026-11-17 [T-4]: jup-trail-shadow-1xatr, jup-atrsl-shadow-parity, short-regime-exempt-shadow, flip1-bear-override-reshadow, bear-single-source-shadow, volgate-short-exempt-shadow, maxxed-short-exempt-shadow, long-bypass-regime-shadow, jup-cluster-gate, jup-anti-chase, jup-pro-selection, btc-standalone-deny-shadow, setup-recall-shadow, watch-pc-flip-demote-55
+- 2026-11-17 [T-4]: jup-trail-shadow-1xatr, jup-atrsl-shadow-parity, short-regime-exempt-shadow, flip1-bear-override-reshadow, bear-single-source-shadow, volgate-short-exempt-shadow, maxxed-short-exempt-shadow, long-bypass-regime-shadow, jup-cluster-gate, jup-anti-chase, jup-pro-selection, btc-standalone-deny-shadow, setup-recall-shadow
 - 2026-11-18 [T-5]: watch-contrarian-live, amplify-xmirror-giveback, hml-vol-atr-mult-shadow, amplify-atr-trend-short-clonehunt, amplify-ugb-bypass-armgap, amplify-jup-long-flat-cell, amplify-grind-breakout-underdeploy
 - 2026-11-19 [T-6]: storm-confl-waiver, amplify-jup-short-high-cell, amplify-ema300-underdeploy
 - 2026-11-20 [T-7]: compaction-stale-trend-band-eval, amplify-vb-high-short-underdeploy, amplify-warrior-sr-normal-long
@@ -236,8 +229,8 @@ generated 2026-11-13T12:48:29.957717+00:00 by scripts/shadow_disposition.py (dai
 - 2026-12-06 [T-23]: atr-trend-accel-shadow
 - 2026-12-15 [T-32]: amplify-ugb-bypass-hole
 
-## ✅ DONE / REVERTED (60)
-flip-contrarian-pc, trial-coupled-cutsloser-sl, eval-midband-long-4564, gate-shadow, shadow-trader-bypass, expiry-t5-shadow, relative-regime, rr-engine-shadow, chase-ratio, ichimoku-dampen-flooradmit, volmom-volbreak, tc-temporal-confluence, mom-filter-shadow, acceleration-threshold, wyckoff-shadow, ai-trader-extreme-shadow, oscillator-shadow, bb-tat-shadow, db-mirror-0byte, escalation-17, ugb-pt-045, disposition-cadence-revert, fade-ctx-exempt, winner-cell-size-125, bb-squeeze-hml-entry-profile, amplify-weekly-mandate, fade-volgate-split-analysis, fade-btc-crash-postflip, storm-readiness-packet, signal-zombie-purge, momentum-cache-regime-coverage, pump-detect-ceiling-mismatch, override-vs-ceiling-contradiction, ichimoku-short-solo-counterfactual, jup-yolo-regime-review, chase-move-shadow, conf-filter-parity-split, ichimoku-bypass-lowjoin-ticket, stop-asymmetry-highwr, short-relax-shadow-study, pump-chain-plus-weight-kill-review, trial-wider-sl, trial-extended-time, gate-shadow-capture-coverage-fix, candle-collector-coverage-audit, amplify-grind-breakout-deploy, amplify-pc-fade-cell-split, jup-hml-shadow-065-050, ichimoku-short-pause, rsi-ceiling-75-live, gate-shadow-dedup-convention, short-shadow-join-builder, timer-cadence-recheck, harvest-ship-2026-11-04, daily-fill-cap-brake, amplify-vb-high-short-clonehunt, amplify-bbsqueeze-chop-exempt, linreg-fade-fill-funnel, dailyfillcap-identity-verify, amplify-stoptighten-scope-widen
+## ✅ DONE / REVERTED (61)
+flip-contrarian-pc, trial-coupled-cutsloser-sl, eval-midband-long-4564, gate-shadow, shadow-trader-bypass, expiry-t5-shadow, relative-regime, rr-engine-shadow, chase-ratio, ichimoku-dampen-flooradmit, volmom-volbreak, tc-temporal-confluence, mom-filter-shadow, acceleration-threshold, wyckoff-shadow, ai-trader-extreme-shadow, oscillator-shadow, bb-tat-shadow, db-mirror-0byte, escalation-17, ugb-pt-045, disposition-cadence-revert, fade-ctx-exempt, winner-cell-size-125, bb-squeeze-hml-entry-profile, amplify-weekly-mandate, fade-volgate-split-analysis, fade-btc-crash-postflip, storm-readiness-packet, signal-zombie-purge, momentum-cache-regime-coverage, pump-detect-ceiling-mismatch, override-vs-ceiling-contradiction, ichimoku-short-solo-counterfactual, jup-yolo-regime-review, chase-move-shadow, conf-filter-parity-split, ichimoku-bypass-lowjoin-ticket, stop-asymmetry-highwr, short-relax-shadow-study, pump-chain-plus-weight-kill-review, trial-wider-sl, trial-extended-time, gate-shadow-capture-coverage-fix, candle-collector-coverage-audit, amplify-grind-breakout-deploy, amplify-pc-fade-cell-split, jup-hml-shadow-065-050, ichimoku-short-pause, rsi-ceiling-75-live, gate-shadow-dedup-convention, short-shadow-join-builder, timer-cadence-recheck, harvest-ship-2026-11-04, daily-fill-cap-brake, amplify-vb-high-short-clonehunt, amplify-bbsqueeze-chop-exempt, linreg-fade-fill-funnel, dailyfillcap-identity-verify, amplify-stoptighten-scope-widen, watch-pc-flip-demote-55
 
 ---
-freshness: FRESH | registry mtime: 2026-11-13T12:48:29+00:00 | prev tower render: 2026-11-13T08:50:28+00:00 | last run: 0 packet(s), 0 entry error(s)
+freshness: FRESH | registry mtime: 2026-11-13T16:45:16+00:00 | prev tower render: 2026-11-13T16:39:26+00:00 | last run: 0 packet(s), 0 entry error(s)

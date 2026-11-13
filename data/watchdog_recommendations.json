@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-13T15:20:04.872331+00:00",
+  "timestamp": "2026-11-13T16:20:05.297582+00:00",
   "steers": [],
   "portfolio_health": "good",
   "regime": {
@@ -9,16 +9,12 @@
     "volatility": "LOW",
     "zscore_tier": "NEG",
     "velocity_state": "SLOW",
-    "acceleration_state": "POSITIVE",
+    "acceleration_state": "NEGATIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 1.0,
+    "linreg_alignment": 0.5,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "CALM",
+    "market_phase": "RECOVERY",
     "trend_quality": "STRONG_DOWN"
   },
-  "open_count": 0,
-  "deep_analysis": "Portfolio is FLAT (0 open) \u2014 ARB long closed +$0.01 trail_arm_timeout at ~14:55, so no per-trade steers this cycle. 24h closed: 7W/7L net +$0.13. All 7 losers never armed trail (mfe<0.40): BTC LONG@meta_rsi88 (chased overbought \u2014 winning side was SHORT that pump), BTC SHORTs@21/27/37 (oversold shorts \u2014 winning side was LONG the bounce; same-window SOL LONG@38.9 won +7.3%), MNT SHORT@74 and CFX SHORT@92 (hard_max_loss, mfe<=0 \u2014 price kept pushing after entry), SUSHI SHORT@67 atr_sl_hit. The pattern is symmetric wrong-side entries at RSI extremes in both directions, all chop (never reached +0.40% MFE).\n\n7d meta_rsi x direction (PostgreSQL, n=93): LONG 55-70 = 7T 14.3%WR -$0.70 and LONG 70+ = 6T 16.7% -$0.32 are the bleed cells (longing strength); SHORT <40 = 20T 35%WR -$0.30 (shorting oversold). Profit cells: LONG 40-55 (11T 63.6%), SHORT 55-70 (15T 66.7%), SHORT 70+ (18T 61.1%). We keep losing on the extremes and winning in the mid-bands.\n\nExit-reason 7d: profit-monster-trail 29T 96.6%WR +$1.42 (the winner machine), hard_max_loss 12T 0%WR -$1.17, atr_sl_hit 18T 0%WR -$2.08 \u2014 chop entries killed by ATR/hard stops before trail could arm. ai-trader-pending 7d: 22T -$0.31 (31.8% WR) \u2014 still losing despite AI_TRADER_ENABLED=False because pending/conditional orders continue to fill; the pending-order path is the bleed, not the hourly pick.",
-  "agent_timestamp": "2026-11-13T14:57:46.896736+00:00",
-  "regime_context": "Bear structure tape: continuum BTC BELOW EMA300 (30+ min consecutive, price 68949 vs EMA 69263), linreg LEAN_BEAR, trend_quality STRONG_DOWN, btc_4h SHORT_BIAS, but btc_15m NEUTRAL and aggregate 15m NEUTRAL (6L/8S/115 neutral of 129 scanned). Regime flip-rate last 24h: aggregate 22 flips (p75=22, normal standing state), BTC 24 flips (just under p95=26 \u2014 elevated but not anomalous); last dump 14:45 aggregate=NEUTRAL, BTC=SHORT_BIAS. Volatility LOW, velocity SLOW, acceleration NEGATIVE, volume LOW \u2014 this is a slow drift-down chop tape, not a clean trend. Direction-flavored steers must state this source split: 15m aggregate says NEUTRAL, 4h says SHORT_BIAS, continuum says BELOW. Prefer SHORT-side entries into bounces (mid-band RSI 55-70), avoid LONG chase above RSI 55 while 1m holds below EMA300 \u2014 but note the measured-refuted midband steer stays advisory-only (blocked cell BELOW was the profitable one).",
-  "pattern_alerts": "VERIFIED (PostgreSQL, 2026-11-13):\n\n1. CHOP-BLEED SHARE (dollar measure): 7d 94.8% ($4.48 of $4.73 gross loss from mfe<0.40 losers; 41/46 loser count), 14d 94.3%, 30d 92.1%. NULL mfe_pct losers = 0 in all windows (self-healing working). Same-day arm rate 64.3% (9/14). 7d LONG arm rate 43.6% (17/39) \u2014 BELOW the 50 tripwire. All three windows >=92% = entry quality deteriorating: nearly all loss comes from trades that never reached trail activation. Route to entry-quality (brain auditor), not exit tweaks.\n\n2. RSI-EXTREME WRONG-SIDE (7d): LONG@55-70 7T 14.3%WR -$0.70; LONG@70+ 6T 16.7%WR -$0.32; SHORT@<40 20T 35%WR -$0.30. WINNING side for each: short the overbought pump (SHORT@70+ 18T 61.1% holds up), long the oversold dip (LONG@40-55 11T 63.6% / LONG<40 +$0.01). We were on the wrong side of both extremes. Why: entries fire on the extreme itself instead of the mid-band or the reversal confirmation.\n\n3. HARD_MAX_LOSS = CHOP ENTRIES (7d): 12T 0%WR -$1.17, all mfe<0.40 \u2014 52/56-class pattern continues. ATR stop and hard stop are doing the exits because trail never armed. Confirms trend-following entries are not being selected in this LOW-vol drift tape.\n\n4. AI-TRADER-PENDING bleed (7d): 22T 31.8%WR -$0.31 \u2014 pending/conditional order path still live while AI_TRADER_ENABLED=False. BTC pending trades specifically: LONG@88 lost, SHORT@21/27/37 lost, SHORT@12/25/26 won \u2014 the losers were extreme-RSI entries, winners were mid/low-RSI with TP hit.\n\nNOT flagged (dead-signal check): pump-chain+ 7d = 2T -$0.14 (V4/V5 long already killed, V5_SHORT is live emitter \u2014 no action); atr-trend- 7d = 19T +$0.01 68.4% WR (healthy, no action)."
+  "open_count": 1
 }
