@@ -104,7 +104,7 @@ cur.close(); conn.close()
 **Exit reason interpretation:**
 - `atr_trail_hit` — Trailing stop took profit (winner trailed out)
 - `atr_sl_hit` — ATR stop loss hit (loser)
-- `hard_max_loss` — Hard max loss cap hit (loser)
+- `hard_max_loss` — cap hit (loser). NOTE (2026-11-13): for managed STRUCTURAL trades the cap is widened to the structure-stop distance, floored at −8% account (`hml_threshold`) — a managed `hard_max_loss` now means the catastrophic floor, not the old fixed −4% account line.
 - `rr_engine_*` — RR engine managed exit (structural support/resistance)
 - `HL_CLOSED` — Closed on Hyperliquid directly
 - `trail_sl` — Trailing stop loss hit
@@ -382,7 +382,7 @@ trend is in its last act. Run it on every analysis:
 python3 /root/.hermes/scripts/adx_atr_analysis.py COIN   # local DB, closed bars only
 ```
 
-**The three lifecycle rules (CEO's, tape-derived):**
+**The lifecycle rules (CEO's, tape-derived — rules 1-4 from 2026-10-27/11-10, rule 5 from 2026-11-14):**
 
 1. **ADX back to ~0 → new trend starting.** ADX below `ADX_NEAR_ZERO`
    (5.0) means the previous trend has ENDED — flat, and a NEW trend is
@@ -408,6 +408,22 @@ python3 /root/.hermes/scripts/adx_atr_analysis.py COIN   # local DB, closed bars
    spent — same family as rule 3); **MACD and RSI both low** = oversold
    but NOT a floor — "could drop further", never a buy signal on its
    own: it needs rule-4 divergence + structure confirmation first.
+
+5. **ADX-trendline family (CEO's own indicator, tape-verified 2026-11-10→13)**
+   — draw the trendline on the ADX peaks/lows THEMSELVES, not on price:
+   - **Bounce off an ADX-trendline low → the thrust**: ascending ADX
+     lows (15.4 → 27.7, Nov-12) held, ADX then ran to a NEW PEAK
+     (48.5 → 55.3) and price thrust with it (70k → 68.6k leg). A new
+     ADX peak AFTER the bounce = the move extending, not ending.
+   - **A PEAK and a CROSS mean different things** (Nov-10 dissection):
+     the ADX PEAK (14:15, 33.5) preceded the big short (−2.5% to the
+     low); the line-CROSS (17:15) preceded the recovery (+0.86% / 6h).
+     Peak = the move; cross = its END. Never read them the same way.
+   - **Split-reads = coiled resolution**: 1m ADX sitting on its series
+     floor (16.9/15.0) while 15m ADX prints a new arc-high (59.8) =
+     micro-trend spent vs macro-trend strongest — POSITION BOTH SIDES
+     and let the pin resolve; do not predict (Nov-13 04:39 case: both
+     wings armed, verdict "undecided by design", resolved later).
 
 **How to read it in the verdict:** per-TF state (TRENDLESS / TREND
 RUNNING / ADX PEAKED / DUAL-PEAK CLIMAX / EXHAUSTION + flags), then one
@@ -648,6 +664,17 @@ and resistance.** The stop-limit process IS the backup strategy.
   with the CEO's chart levels; cushion both triggers (§11-1 style);
   SLs get 200pt+ wick room; TPs exit INTO the opposing level, never AT
   round numbers; both legs verified non-overlapping.
+  **CROSS-SIDE INVARIANT (2026-11-14):** every rung's SL must sit
+  beyond the OPPOSITE side's nearest unfired trigger — rally kills the
+  short before the long fires, drop kills the long before the short
+  fires (evidence: the 68,551/68,557 pair — 6pts, serial-safe; and the
+  three-way check that caught a 3pt overlap on 73,594-class rungs).
+  `serial:true` then guarantees no stacking on top of it.
+  **SIZING — add-on-winners (CEO 2026-11-13):** rungs size at **2× base
+  ($22.20) when the side's last-5 closed trades net positive**, base
+  ($11.10) otherwise (HL $11 floor = losers can't shrink; "remove from
+  losers" = no pyramid + serial cuts). The keeper enforces it
+  (`_side_mult`); apply the same table when deriving by hand.
 - Market entries in no-edge states are the #16283/#16291/#16317 pattern —
   paying the sweep tax for information the bracket gets for free by
   waiting. The bracket converts indecision into defined-risk optionality:
@@ -710,6 +737,38 @@ model:
   1min apart in one dump → 2× exposure stopped −3.80%×2 on one spike —
   auto orders now wait until flat (monitor stacking guard + scoped
   `--force`), CEO tranches keep the merge path.
+
+- **Regime split (evidence: 2026-11-13)** — in CHOP the stop must
+  reference MAJOR (1h) structure: the box interior is a SHAKEOUT zone
+  (#16891's interior raise to 69,106 and #16896's armed 68,950 both
+  died inside the base; 4 stops in 9h = −15.1% margin = the box tax).
+  In TREND the responsive 15m trail books (#16886: five structure
+  steps then the exit). The exit MECHANICS (birth re-anchor, regime-
+  split lag, adverse-raise-to-1h, guardian structure-widening) live in
+  manual-trade-override rules 12-13; this section owns the analysis
+  reads that FEED them.
+
+### 14. The pin/box state — no mid-range entries (evidence: 2026-11-13)
+
+A **PIN** = price welded to the EMA300 (the precheck quantifies it:
+"AT EMA300 Xm — mid-band entries have no edge — wait for resolution")
+with z ≈ 0, velocity/acceleration ≈ 0 and CHOP regime. A **BOX** = the
+same state framed as a range (1h/4h in-range % pinned at a band
+extreme). Rules:
+   (a) NO market entries mid-pin/mid-box — both sides get ARMED at the
+   edges instead (the rungs ARE the entries);
+   (b) the box has a price: the Nov-13 churn — 4 stops in 9h =
+   −15.1% margin from interior stops + re-entries inside a ~1,000pt
+   box — while the same discipline held FLAT through every pin cycle
+   for free;
+   (c) velocity/acceleration curling up from negative while z sits
+   deeply below = the pre-bounce configuration — it preceded every
+   bounce of this arc (3/3), but it is NOT a signal until the
+   reclaim: confirm with the structure line or the EMA300, never
+   front-run it;
+   (d) a pin verdict is DIRECTION "undecided BY DESIGN" + ENTRY "none"
+   + the armed-book listing (§12 completion) — a positioning answer,
+   not a prediction.
 
 ## Analysis Script
 
@@ -816,6 +875,15 @@ BANANA), vol floor, LOSERS list, RR gate.
 | 3/5 bearish | Mixed | SHORT with caution |
 | Mixed | Any | **NO TRADE** |
 
+**Ride-cost accounting (run whenever exits clustered inside a trend):**
+ride = (trend-start candle-open − span low) × leverage; fragments = Σ
+the trade pnls; captured% = fragments ÷ ride. Canonical (driven into
+the TP-doctrine): Nov-11 19:00 → Nov-13 — ride **+37.3%** (to the
+cited low) / **+39.5%** (span low 68,608) vs 7 fragmented trades
+**+16.0%** = **41% captured**; every TP cap or interior exit during
+directional travel is part of that ~23pt-of-margin gap. Cite the
+method + numbers whenever the verdict reviews a series of exits.
+
 ## Output Template
 
 ```
@@ -849,6 +917,7 @@ BANANA), vol floor, LOSERS list, RR gate.
   4h: ...
   [lifecycle sentence: where each TF sits in the cycle — rule 1/2/3 flags,
    which TFs are RUNNING vs EXHAUSTED, and what that dates about the move]
+  ADX-trendline (rule 5): [line touch? peak-vs-cross? split-read?]
 
 📈 2. CONTINUUM
   [continuum data]
@@ -896,4 +965,12 @@ brewing; ATR at previous peak = climax; MACD+RSI low = could drop further,
 never a floor alone. §13 added 2026-11-10: major-structure stop discipline
 (hold through the flag's interior whipsaw — stops reference 1h/round
 structure, not 15m interior swings; #16851/52 + #16846 + stacked-double
-lessons).
+lessons). **2026-11-14 upgrade** (conversation audit, evidence-based):
+rule 5 ADX-trendline family (peak=move / cross=end / split=coil — Nov-10
+dissection + Nov-12/13 thrust); §14 pin/box state (box-tax −15.1%/9h,
+pre-bounce velocity-curl 3/3, no mid-range entries); §12 cross-side SL
+INVARIANT + add-on-winners sizing table; §13 regime-split (CHOP→1h
+major vs TREND→15m responsive) with the mechanics pointer to
+manual-trade-override; Verdict Rules ride-cost accounting (41% captured
+canonical method); Step0 hard_max_loss = structure-widened cap note;
+lifecycle intro count fixed.
