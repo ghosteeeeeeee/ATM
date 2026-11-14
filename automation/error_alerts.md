@@ -4087,3 +4087,9 @@
 
 ## Error Alerts — 2026-11-14 06:35 UTC
 - **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
+
+## Error Alerts — 2026-11-14 07:20 UTC
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-11-14 07:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
