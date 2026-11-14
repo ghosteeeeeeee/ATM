@@ -26361,3 +26361,30 @@ BY: auto_1hr
 - Unarmed cohort WR 11.1% (-$0.62) vs armed 100% — chop entries persist; stall stack owns fix
 - ai-trader-pending 5T 20% (-$0.17) 24h — worst signal, but no last-hour closes for regime kill; watch next hour
 BY: auto_1hr
+
+## [2026-11-14 03:25] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a) | 24h 14T 42.9% -$0.08 RED | 7d 93T 46.2% -$1.92 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes, 1 open (BTC pending SHORT +0.11) — quiet hour
+- Arm rate: unarmed 9/14 = 64.3% (<70%) WR 11.1% (-$0.62) vs armed 5/5 100% (+$0.54) — no gate; stall stack owns fix
+- Kill check: 0 closes/hr; no signal with 0% WR and 3+ closes this hour
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/14 = 7.1% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 5/14 = 36% avg -$0.112 — expected at leverage
+- Boost: none eligible (jup_yolo_mirrored 2T 100% n<5, atr-trend+ 2T 100% n<5, ai-trader-pending 5T 20% not >55%)
+- Neg streak: 23:00 -0.11, then 00-02 no-trade — streak 1, not 3 -> no size cut
+- Frequency: 0 closes/hr — well under 20
+- **STORM GATE FIRED** (window-min -1.67% / at-run -0.50%) -> packet emitted: blocked 122, true-starvation 27 RSI>=35, counterfactual $+0.24 (touch 17/27) POSITIVE -> **streak 1/3** (needs >=3 consecutive positive, deadline EXTENDED 2026-11-19); split: blocked SHORTs $+0.81 (12), blocked LONGs -$0.56 (15)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still 46.2% RED -$1.92
+- Unarmed cohort WR 11.1% (-$0.62) vs armed 100% — chop entries persist; stall stack owns fix
+- ai-trader-pending 5T 20% (-$0.17) 24h — worst signal, no last-hour closes for regime kill; watch
+- Storm counterfactual flipped POSITIVE this storm (+$0.24) — first positive since 11-12; streak 1/3
+BY: auto_1hr
