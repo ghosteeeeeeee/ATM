@@ -26525,3 +26525,84 @@ BY: auto_1hr
 - Unarmed WR 12.5% (-$0.64) over 24h — chop entries persist; stall stack owns fix
 - Storm streak still 2/3 — next positive storm makes enforce bar eligible (CEO + T sign-off required)
 BY: auto_1hr
+
+## [2026-11-14 09:21] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a) | 24h 14T 50.0% -$0.09 RED | 7d 96T 46.9% -$1.96 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes, 1 open (BTC ai-trader-pending SHORT ~0.00)
+- Entry quality: 24h winners avg MAE 0.243% (<0.5% OK); losers 0.721%
+- Arm rate: unarmed 8/14 = 57.1% (<70%) WR 12.5% (-$0.64) vs armed 6/6 100% (+$0.55) — chop entries; stall stack owns fix, no new gate
+- Kill check: 0 closes/hr; no signal with 0% WR 3+ in last hour or 24h — no regime-kill eligibility
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/14 = 14.3% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 3/14 = 21% avg -$0.113 — expected at leverage
+- Boost: none eligible (jup_yolo_mirrored 3T 66.7% n<5, atr-trend+ 2T 100% n<5, ai-trader-pending 4T 25%)
+- Neg streak: 06:00 -0.15 then 07:00 +0.11 — streak 0 -> no size cut
+- Frequency: 0 closes/hr — well under 20
+- No storm (window-min -0.16% / at-run +0.00%) -> gate not fired
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still 46.9% RED -$1.96
+- Unarmed WR 12.5% (-$0.64) over 24h — chop entries persist; stall stack owns fix
+- Storm streak still 2/3 — next positive storm makes enforce bar eligible (CEO + T sign-off required)
+BY: auto_1hr
+
+## [2026-11-14 10:21] Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** $0.03 (WR: 100%) | 24h 14T 57.1% +$0.04 GREEN | 7d 97T 47.4% -$1.93 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 1 close (IO atr-trend- SHORT profit-monster-trail +$0.03 +0.87%), 1 open (BTC ai-trader-pending SHORT ~0.00)
+- Entry quality: winners trail-exit; 24h winners profit-monster-trail 6T +$0.57 dominates
+- Arm rate: unarmed 7/14 = 50.0% (<70%) WR 14.3% (-$0.54) vs armed 7/7 100% (+$0.58) — chop entries; stall stack owns fix, no new gate
+- Kill check: 1 close/hr; no signal with 0% WR 3+ last-hour closes — no regime-kill eligibility; ai-trader-pending 3T 33.3% (-$0.06) 24h watch
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/14 = 14.3% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 3/14 = 21% avg -$0.113 — expected at leverage
+- Boost: none eligible (jup_yolo_mirrored 3T 66.7% n<5, atr-trend+ 2T 100% n<5, atr-trend- 2T 100% n<5)
+- Neg streak: 06 -0.15 then 07 +0.11 then 10 +0.03 — streak 0 -> no size cut
+- Frequency: 1 close/hr — well under 20
+- No storm (window-min -0.30% / at-run +0.40%) -> gate not fired
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still 47.4% RED -$1.93
+- Unarmed WR 14.3% (-$0.54) over 24h — chop entries persist; stall stack owns fix
+- Storm streak still 2/3 — next positive storm makes enforce bar eligible (CEO + T sign-off required)
+BY: auto_1hr
+
+## [2026-11-14 11:21] Hourly Analysis
+
+**Trades:** 0 closed (n/a)
+**PnL:** $0.00 (WR: n/a) | 24h 13T 53.8% -$0.04 RED | 7d 97T 47.4% -$1.93 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes, 1 open (BTC ai-trader-pending SHORT +0.04)
+- Entry quality: 24h winners avg MAE 0.224% (<0.5% OK); losers 0.696%
+- Arm rate: unarmed 7/13 = 53.8% (<70%) WR 14.3% (-$0.54) vs armed 6/6 100% (+$0.50) — chop entries; stall stack owns fix, no new gate
+- Kill check: 0 closes/hr; no signal with 0% WR 3+ last-hour or 24h — no regime-kill eligibility
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/13 = 15.4% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 3/13 = 23% avg -$0.113 — expected at leverage
+- Boost: none eligible (jup_yolo_mirrored 3T 66.7% n<5, atr-trend- 2T n<5, ai-trader-pending 3T 33.3%)
+- Neg streak: 06 -0.15 then 07 +0.11 then 10 +0.03 — streak 0 -> no size cut
+- Frequency: 0 closes/hr — well under 20
+- No storm (window-min -0.28% / at-run +0.00%) -> gate not fired
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still 47.4% RED -$1.93
+- Unarmed WR 14.3% (-$0.54) over 24h — chop entries persist; stall stack owns fix
+- Storm streak still 2/3 — next positive storm makes enforce bar eligible (CEO + T sign-off required)
+BY: auto_1hr
