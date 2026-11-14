@@ -26309,3 +26309,29 @@ BY: auto_1hr
 - Unarmed cohort 68.75% of 24h closes with WR 27.3% — chop entries persist; stall stack owns fix
 - 0 trades closed — quiet stretch continues; check trade frequency pipeline if this persists
 BY: auto_1hr
+
+## [2026-11-14 01:2x] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a) | 24h 16T 50.0% +$0.09 GREEN | 7d 94T 46.8% -$1.88 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes, 1 open — quiet hour
+- Arm rate: unarmed 11/16 = 68.75% (<70%) WR 27.3% (-$0.45) vs armed 5/5 100% (+$0.54) — no gate; stall stack owns fix
+- Kill check: 0 closes/hr; no signal with 0% WR and 3+ closes this hour
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/16 = 6.25% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 5/16 = 31% avg -$0.112 — expected at leverage
+- Boost: none eligible (jup_yolo_mirrored 3T 100% n<5, atr-trend+ 2T n<5, ai-trader-pending 6T 33.3% not >55%)
+- Neg streak: 21:00 +0.12, 23:00 -0.11 — streak 1, not 3 -> no size cut
+- Frequency: 0 closes/hr — well under 20
+- No storm (window-min -0.24% / at-run -0.14%) -> gate not fired
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still 46.8% RED -$1.88
+- Unarmed cohort 68.75% of 24h closes with WR 27.3% — chop entries persist; stall stack owns fix
+- Quiet stretch: 0 closes in last hour, only 16 in 24h
+BY: auto_1hr
