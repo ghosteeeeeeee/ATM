@@ -4276,5 +4276,16 @@
     "after": "registered 4-leg threshold incl. same-sign-both-windows, tape-split, realized n>=15 net>0, 1m walk, units guard",
     "rationale": "weekly AMPLIFY >=1 proposal mandate; shadow says +0.3756% t=+3.33 post / +0.1110 t=+0.89 pre while realized 75-85 is -0.28/30d — the walk adjudicates the contradiction instead of shipping on one basis",
     "impact": "0 trading behavior; default NO-SHIP keeps the hard ceiling at 75"
+  },
+  {
+    "timestamp": "2026-11-14T20:52:38Z",
+    "agent": "brain_auditor",
+    "change": "session_brain query() returns documented keys date/excerpt/chunk_type/topic (aliases in single enrichment path) — root-cause fix for 16-run \"rebuild owed\" misdiagnosis",
+    "type": "bugfix",
+    "file": "scripts/session_brain.py",
+    "before": "query() returned {session_id, text, type, chunk_index, title, score} — callers reading excerpt/date got None",
+    "after": "+ date (sessions.created_at), excerpt (text alias), chunk_type (type alias), topic (chunks.topic)",
+    "rationale": "documented contract in brain_auditor_prompt.md was never implemented (git -S proves excerpt never existed); citation mandate unfulfillable",
+    "impact": "zero trading behavior; citations restored 0/12 -> 15/23; bug_hunter SHIP, selfcheck PASS"
   }
 ]

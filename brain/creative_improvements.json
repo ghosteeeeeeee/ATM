@@ -11372,5 +11372,32 @@
     "category": "entry sniper",
     "status": "rejected-with-data",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-11-14T20:52:38Z",
+    "idea": "session_brain documented-contract restore — query() returns date/excerpt/topic/chunk_type (never existed; 16-run 'rebuild owed' was key mismatch)",
+    "rationale": "citations mandate unfulfillable 16 runs; root cause in one enrichment path",
+    "expected_impact": "citations restored 0/12 -> 15/23 usable",
+    "category": "telemetry",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-14T20:52:38Z",
+    "idea": "pc- tape-conditioned re-promote check (BTC BELOW 62.0% n=213 vs AT 43.2%)",
+    "rationale": "overall flip swung 49.0->54.3->55.7 within 8h = tape-compositional; split must be inspected before any >=58 re-promote",
+    "expected_impact": "prevents tape-selected re-promote",
+    "category": "guard",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-14T20:52:38Z",
+    "idea": "ai-trader-pending tape-stamp coverage 0/27 — telemetry gap flag",
+    "rationale": "pending path bypasses decider _exec_meta; all other signals 100% stamped",
+    "expected_impact": "flag only, no gate reads keys",
+    "category": "telemetry",
+    "status": "side-find",
+    "risk": "low"
   }
 ]

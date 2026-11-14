@@ -804,7 +804,12 @@ class SessionBrain:
           topic       — only chunks classified with this topic
                         (chunks.topic, e.g. 'signal')
 
-        Returns list of {text, session_id, score, type, chunk_index}
+        Returns list of {title, date, chunk_type, topic, score, excerpt,
+        text, session_id, type, chunk_index} — the first six are the
+        documented contract (brain_auditor prompt callers read them);
+        `excerpt`/`chunk_type` alias `text`/`type`, `date` is
+        sessions.created_at (brain_auditor #263: they never existed, so
+        every caller saw None and misdiagnosed it as "index rebuild owed").
         """
         self._ensure_embedder()
         self._ensure_vector_store()
@@ -851,7 +856,8 @@ class SessionBrain:
                 continue
             row = self.db.execute(
                 "SELECT c.session_id, c.text, c.chunk_type, c.chunk_index, "
-                "s.title FROM chunks c JOIN sessions s ON c.session_id = s.id "
+                "s.title, s.created_at, c.topic FROM chunks c "
+                "JOIN sessions s ON c.session_id = s.id "
                 "WHERE c.id = ?",
                 (chunk_id,)
             ).fetchone()
@@ -869,7 +875,11 @@ class SessionBrain:
                     "type": row[2],
                     "chunk_index": row[3],
                     "title": row[4],
-                    "score": distance
+                    "score": distance,
+                    "date": row[5],
+                    "excerpt": row[1][:500],
+                    "chunk_type": row[2],
+                    "topic": row[6],
                 })
             if len(enriched) >= top_k:
                 break

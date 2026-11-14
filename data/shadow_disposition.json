@@ -785,7 +785,7 @@
       "default_action": "report-only: if still 0 real trades at deadline, either extend watch 7d with evidence or disable CONTRARIAN_LIVE_PREFIXES (CEO) — do NOT leave it drifting unwatched",
       "owner": "main-session",
       "evidence": "fresh 2026-11-04 (registry progress_eval SQL): n=32 real pc- LONG fills, gross +$0.130, fees $0.335, NET -$0.205, WR 45.2% (14W/17L/1fl) vs pre-fade baseline 13T 38.5% (+6.7pp directional). Conversion: 178 CONTRARIAN-LIVE approvals (33 tokens) -> 22/33 tokens filled = 66.7%; 0 Z-FLIP skips BUT that check is near-vacuous (96.6% of pc- signals carry z<0, LONG branch needs z>0 — see BUG-078). Promote gate (NET>=0) unmet: avg gross +$0.0041/trade < fee $0.0108/trade = structurally fee-negative at current size -> fade-size/fee review at 11-10/11-11. Kill gate (0 fills) not triggered. NOTE: prior evidence_20261103 (n=33/NET-0.37/baseline 27.3% n=22) did NOT reproduce — superseded by these numbers.",
-      "notes": "migrated from brain/trial_tracking_dashboard.md (archived 2026-10-31). Pairs with done entry flip-contrarian-pc (its notes carry the same 11-03 watch). | progress_eval 'contrarian_live' counts PG pc- LONG opens since 'started' (review HIGH-1: old log-grep path logs/decider*.log never existed; logs rotate, approved != executed). | 16:30Z refresh: fade cooled to +0.07 (22T) — still positive; 11-03 disposition judges (extend-to-11-10 rec stands). | 11-11 deadline adjudicated: EXTEND to 11-18 (brain_auditor #246).",
+      "notes": "migrated from brain/trial_tracking_dashboard.md (archived 2026-10-31). Pairs with done entry flip-contrarian-pc (its notes carry the same 11-03 watch). | progress_eval 'contrarian_live' counts PG pc- LONG opens since 'started' (review HIGH-1: old log-grep path logs/decider*.log never existed; logs rotate, approved != executed). | 16:30Z refresh: fade cooled to +0.07 (22T) — still positive; 11-03 disposition judges (extend-to-11-10 rec stands). | 11-11 deadline adjudicated: EXTEND to 11-18 (brain_auditor #246). | #263 2026-11-14T20:52:56Z: pc- overall flip 55.7% (196/352) still <58 re-promote bar; NEW tape-split pre-registered — pc-|BTC-BELOW 62.0% n=213 vs AT 43.2% n=111 vs ABOVE 57.1% n=28 (join by_regime); overall swing 49.0->54.3->55.7 in 8h = tape-compositional. Re-promote review MUST inspect the tape split (and per-token heterogeneity chi2 p=0.0032) alongside the overall >=58 bar. Token heterogeneity: per-token never blanket.",
       "evidence_20261101": {
         "pc_long_since_1027": "9T +0.31 WR 44.4% (cooled from 11T +0.45)",
         "shadow_join": "pc- flip-WR 64.6% n=350 (re-ran 04:30Z)",
@@ -1701,7 +1701,8 @@
       "default_action": "flag failing leg for CEO revert review in kanban",
       "owner": "brain_auditor",
       "created_by": "brain_auditor #254",
-      "created_at": "2026-11-13T04:42:42Z"
+      "created_at": "2026-11-13T04:42:42Z",
+      "notes": " | #263 early read 2026-11-14T20:52:56Z: trailing-30 avg loser -0.1069 (bar -0.070) still failing, BUT only n=10 closes post-ship (2 losers avg -0.185) — formal read NOT possible before 11-15 at n>=30. Walk A prearm lock thr=0.25 re-verified ALL BARS (net30 +6.51, fk 13.3%); walk B tat-age-widen FAIL (net30 -0.49) = no-change correct. Flag failing leg for CEO revert review as specified if bar still fails at formal read."
     },
     {
       "id": "amplify-vb-high-short-underdeploy",
