@@ -188,15 +188,18 @@ MAX_LEVERAGE = 5
 
 
 def structure_governed(signal, stop_loss):
-    """CEO 2026-11-14 doctrine: EXITS ARE STRUCTURE-BREAK ONLY — a managed
-    trade carrying an active structure stop is self-managing (the
-    structure-lag trail IS its exit manager), so the 8h UNIVERSAL_MAX_HOLD
-    clock must not cut it: it cut #16902's +4.27% winner mid-thesis
-    ('the previous close was a good one, max_hold, could have stayed in').
-    Safety retained: the trailing stop + guardian floor still bound the
-    loss, staleness checks still run. Non-managed signals and managed
-    trades WITHOUT a stop: unchanged (zombie protection intact).
-    Pure function — unit-tested; any import failure → False (old behavior).
+    """Gates BOTH non-structure exit clocks for MANAGED trades carrying an
+    active structure stop (CEO 2026-11-14 doctrine: EXITS ARE STRUCTURE-
+    BREAK ONLY):
+      - UNIVERSAL_MAX_HOLD (8h clock) — it cut #16902's +4.27% winner;
+      - stale_exit PnL-stall (loser -1.0%/8min, winner +0.6%/120min) —
+        it was #16909's second near-miss (verifier 0090d750 F-2).
+    Safety retained for this class: the structure stop itself + the
+    structure-lag trail + guardian's HL-side stop + price-FEED staleness
+    (age of prices.json) + serial one-at-a-time. What does NOT run: the
+    two PnL/time exit clocks above. Non-managed signals and managed
+    trades WITHOUT a stop: all clocks unchanged (zombie protection
+    intact). Pure function — unit-tested; import failure → False.
     """
     try:
         if not stop_loss or not signal:
@@ -3179,6 +3182,13 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # below (zone 0b, wave_turn, stale, soft-trail, MFE, engines, UGB-PT
         # via bypass list) sees the same definition. Dual-form match (bug_hunter
         # #9): source form 'linreg-fade' / signal_type form 'linreg_fade'.
+        # N-1 (verifier 39bce62e, HIGH): _pos_signal read at the stale gate
+        # BEFORE its :3954 first assignment -> UnboundLocalError killed the
+        # whole cycle (stops included) on the first stale position, or the
+        # previous iteration's signal leaked in (gate wrong both ways).
+        # Hoisted to the loop top beside is_linreg_fade_pos so every exit
+        # actor below sees THIS position's signal.
+        _pos_signal = str(pos.get('signal', '') or '')
         _sig_for_fade = str(pos.get('signal', '') or '')
         is_linreg_fade_pos = ('linreg-fade' in _sig_for_fade
                               or 'linreg_fade' in _sig_for_fade)
@@ -3931,11 +3941,12 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # linreg-fade exempt (bug_hunter #5): stale-loser cuts at -1.0% after
         # 8min — the same early loss-lock V9 measured as fatal (WR 53.6->38.3).
         # CEO 2026-11-14 structure-only doctrine (F-2, verifier 0090d750):
-        # stale_exit (loser -1% stalled / winner +1% stalled) is a PnL-stall
-        # exit, NOT a structure break — it was #16909's second near-miss
-        # (4min stall < the 8min clock). Managed trades carrying an active
-        # stop are structure-governed: this clock skips them. Non-managed /
-        # stop-less unchanged; linreg-fade exemption unchanged.
+        # stale_exit is a PnL-stall exit, NOT a structure break — loser
+        # -1.0%/8min, winner +0.6%/120min (hermes_constants:585-587) — and
+        # it was #16909's second near-miss (4min stall < 8min). Managed
+        # trades carrying an active stop are structure-governed: this clock
+        # skips them (both branches). Non-managed / stop-less unchanged;
+        # linreg-fade exemption unchanged.
         if stale_close and not is_linreg_fade_pos and not structure_governed(_pos_signal, pos.get('stop_loss')):
             # P0: canonical label; stalled_* detail moved to exit_detail.
             # (Old f"stale_exit_{stale_reason}" produced 55-char close_reasons that
