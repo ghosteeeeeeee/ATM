@@ -26886,3 +26886,31 @@ BY: auto_1hr
 - Storm streak 0/3 (deadline 2026-11-19)
 - 1 open trade at run time (BTC SHORT)
 BY: auto_1hr
+
+## [2026-11-14 22:23] Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** $0.19 (WR: 75.0% 24h) | 24h 12T 75.0% +$0.85 GREEN | 7d 100T 49.0% -$1.02 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**Storm Packet:** 🌩️ [STORM-READINESS] window-min -1.66% / at-run -1.23% | blocked 128 (combo_key-stale 52, long-*gates 20, short-rsi-hard-floor 15, vol-gate-override 9, pump-chain-* 9, expired-hotset 7, compaction_stale_10min 7, rr-engine-hard-block 4, short-regime-gate 4, oversold-knife 1) | true-starvation 32 RSI>=35 (87 raw rows RSI>=35, deduped first-fire-per-token 32; 1 null/zero price skipped, 32 walked) | counterfactual $-1.38 (touch 25/32) | waiver: SHADOW=True ENFORCE=False — counterfactual NEGATIVE -> **streak stays 0/3** (reset at 15:25 -$0.98; bar needs >=3 consecutive positive, deadline 2026-11-19); split: blocked SHORTs $+0.65 (8) = gates suppressed dump winners, blocked LONGs $-2.16 (24) = gates correctly kept dump LONG losers out
+
+**No Change Needed:**
+- Last hour: 1 close (BTC continuum-osc- SHORT atr_trail_hit +$0.19 +8.32%), 1 open (BTC ai-trader-pending SHORT opened 21:42, +$0.35 unrealized)
+- Entry quality: 24h winners avg MAE 0.183% (<0.5% OK); losers 0.805%
+- Arm rate: unarmed 7/12 = 58.3% (<70%) WR 57.1% (+$0.49) vs armed 5/5 100% (+$0.36) — under threshold, stall stack owns fix, no new gate
+- Kill check: 0 closes/hr signals all n<3; no 0% WR n>=3 — no regime-kill eligibility
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/12 = 8.3% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 2/12 = 16.7% avg -$0.165 — expected at leverage
+- Boost: none eligible (ai-trader-pending 4T 75% +$0.68 all-BTC single-token + manual; atr-trend- 3T 100% n<5; jup_yolo 3T n<5)
+- Neg streak: close-hours 16 +0.02, 17 +0.11, 21 +0.19 all positive — no size cut
+- Frequency: 1 close/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- Storm fired (window-min -1.66%) but counterfactual NEGATIVE $-1.38 — streak stays 0/3 (deadline 2026-11-19)
+- 7d still RED -$1.02 (49.0% WR); 24h GREEN +$0.85
+- 1 open trade at run time (BTC ai-trader-pending SHORT +0.35)
+BY: auto_1hr
