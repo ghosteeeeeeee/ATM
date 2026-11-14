@@ -1305,7 +1305,7 @@
       "id": "jup-anti-chase",
       "stream": "jup_yolo entry-extremity filter — block chasing entries (z>=1.5 or RSI>=55 at detect) (T: 'get the real tops and bottoms')",
       "kind": "eval",
-      "disposition": "EVAL",
+      "disposition": "MEASURED + INDEPENDENTLY REPLICATED 2026-11-14 (brain_auditor #261): rsi_14>=55 at detect, 30d window (15d of actual jup data, signal born 10-30): blocked n=50-54 net '-1.47..-1.35', kept net +0.28..+0.34 WR 64.15% >= baseline 61.54%, both time-halves blocked-negative ('-0.88'/'-0.47'), direction split BOTH negative (LONG -1.10 / SHORT -0.25). ALL FOUR PRE-REG NUMERIC BARS PASS + own-conclusions replication PASS (brain/verdicts/jup_antichase_replication_2026-11-14.md, independent SQL). BUT SHIP BLOCKED BY STANDING HOUSE RULES: Fisher p=0.379 / Welch p=0.122 BOTH > 0.05 (Step-5c 'p>0.05 = noise, do not ship') AND fk=29% (28/96 winners blocked) >> 20% bar AND blocked-cohort WR is still 56% (not a bad-setup cohort by WR) AND magnitudes tiny (+$1.35/15d = $0.09/day). Collision check: jup-SCOPING mandatory — same rule would annihilate atr-trend- (21/21 trades rsi>=55, net +0.05) and flip bb-squeeze+ halves. RE-OPEN: blocked-n>=100 OR any re-run p<0.05; ship legs must stay jup-scoped. NO CONFIG CHANGE #261.",
       "status": "open",
       "started": "2026-11-03",
       "deadline": "2026-11-17T00:00:00Z",
@@ -1313,7 +1313,9 @@
       "default_action": "NO CHANGE — report-only",
       "join_rate": "trades._signal_metadata->z_score, rsi_14 (full coverage)",
       "owner": "T question, CEO bar",
-      "evidence": "z<=-1.5 (bottom catch) 34T 75%WR +$0.18 vs z>=1.5 17T 47% -$0.92; RSI 35-45 40T 70% +$0.58 vs RSI 55-65 28T 57% -$0.74 — enter-on-weakness works, chasing does NOT (bottoms caught, tops chased)"
+      "evidence": "z<=-1.5 (bottom catch) 34T 75%WR +$0.18 vs z>=1.5 17T 47% -$0.92; RSI 35-45 40T 70% +$0.58 vs RSI 55-65 28T 57% -$0.74 — enter-on-weakness works, chasing does NOT (bottoms caught, tops chased)",
+      "last_measured_at": "2026-11-14T12:49:19Z",
+      "progress_note": "jup-anti-chase replication 2026-11-14: bars PASS, significance+fk FAIL -> no ship"
     },
     {
       "id": "jup-pro-selection",
@@ -1558,7 +1560,9 @@
       "measurement": "PG: signal='atr-trend-' AND volatility_regime='NORMAL' AND direction='SHORT', 30d window, n/WR/net + arm% (mfe>=0.40); units guard: pnl_usdt vs pnl_usdt",
       "evidence": "5T 100% WR +0.32, 100% arm, last close 2026-11-09 (fresh); signal live since 2026-11-06 (n<10 = early, labeled per AMPLIFY rule)",
       "not_a_duplicate_of": "atr-trend-accel-shadow (that is the shadow collector due 12-06; this is the winner-cell promote watch)",
-      "risk": "low"
+      "risk": "low",
+      "progress_note": "EARLY RE-MEASURE 2026-11-14 (#261): 30d cell now n=13 net '+0.06' WR 69.2% arm 69.2% (was 5T 100% '+0.32' at creation) — letter-of-bar met (n>=10 AND net>0) BUT decayed to noise: +0.005/trade, WR 100->69.2. Recommend close as NO-CELL at 11-16 deadline unless net >= '+0.25' by then. No notional action.",
+      "last_measured_at": "2026-11-14T12:49:19Z"
     },
     {
       "id": "amplify-structure-flip-early-exit",
@@ -1757,7 +1761,9 @@
       "default_action": "NO SHIP — keep SLOPE-FILTER global; report why-not if walk fails",
       "measurement": "gate_shadow.db WHERE gate='SLOPE-FILTER' AND outcome_signal LIKE 'jup%' AND blocked_at>=30d; join 1m candles from blocked_at; units guard",
       "notes": "AMPLIFY weekly emit #259. Not a duplicate of amplify-jup-short-walk (that walks first-fire-per-token live fills, not SLOPE-blocked counterfactual). Not amplify-jup-short-high-cell (HIGH regime cell watch).",
-      "basis_correction_20261114": "CORRECTED brain_auditor #260 — the cited numbers were read off the WRONG gate_shadow basis. (a) would_win/would_pnl is the follow-on LIVE trade's outcome (gate_shadow.py close_events joins the first same token+direction PG trade opening within 24h AFTER the block) — gate_shadow's own report() labels this SECONDARY: 'follow-on trades are LIVE trades already in the book — PnL below is NOT avoided/foregone money'. (b) n=23 was EVENT count: those 23 events resolve to 8 distinct trade_id / 9 token|UTC-day (30d closed-with-trade events 16,911 -> 618 distinct trades = ~27 events/trade, same #156 multi-count class). (c) outcome_signal is the FOLLOW-ON trade's signal, NOT the signal that was blocked (events table has no blocked-signal column) — so 'SLOPE-FILTER blocked jup_yolo_mirrored SHORT' reads as 'SLOPE-FILTER blocked a SHORT on tokens that later filled as jup'. PRIMARY basis = fwd_4h (direction-signed), denominator tok_n, CEO bar tok_n>=50: SLOPE-FILTER all-signals 30d 541 ev / 78 tok avg +0.334pp, 7d 118/43 avg +0.711pp (same-sign, strengthening); jup follow-on only 23 ev / 9 tok-days avg +0.099pp = far below bar. ALSO: the short-gate relax route was already adjudicated CLOSED by short-relax-shadow-study (2026-10-31, 0 of 25 SHORT gates cleared 5 bars, 'price of poor base rates' accepted). Net: threshold unchanged (1m walk, >=+$1.00/30d, fk<20%) but n must be counted as token-days AND the walk must start from block time on the blocked direction — do NOT quote the 91.3%/n=23 figure again."
+      "basis_correction_20261114": "CORRECTED brain_auditor #260 — the cited numbers were read off the WRONG gate_shadow basis. (a) would_win/would_pnl is the follow-on LIVE trade's outcome (gate_shadow.py close_events joins the first same token+direction PG trade opening within 24h AFTER the block) — gate_shadow's own report() labels this SECONDARY: 'follow-on trades are LIVE trades already in the book — PnL below is NOT avoided/foregone money'. (b) n=23 was EVENT count: those 23 events resolve to 8 distinct trade_id / 9 token|UTC-day (30d closed-with-trade events 16,911 -> 618 distinct trades = ~27 events/trade, same #156 multi-count class). (c) outcome_signal is the FOLLOW-ON trade's signal, NOT the signal that was blocked (events table has no blocked-signal column) — so 'SLOPE-FILTER blocked jup_yolo_mirrored SHORT' reads as 'SLOPE-FILTER blocked a SHORT on tokens that later filled as jup'. PRIMARY basis = fwd_4h (direction-signed), denominator tok_n, CEO bar tok_n>=50: SLOPE-FILTER all-signals 30d 541 ev / 78 tok avg +0.334pp, 7d 118/43 avg +0.711pp (same-sign, strengthening); jup follow-on only 23 ev / 9 tok-days avg +0.099pp = far below bar. ALSO: the short-gate relax route was already adjudicated CLOSED by short-relax-shadow-study (2026-10-31, 0 of 25 SHORT gates cleared 5 bars, 'price of poor base rates' accepted). Net: threshold unchanged (1m walk, >=+$1.00/30d, fk<20%) but n must be counted as token-days AND the walk must start from block time on the blocked direction — do NOT quote the 91.3%/n=23 figure again.",
+      "progress_note": "SHORT-RELAX weekly re-run 2026-11-14 (#261): token-day dedup fwd_4h weekly sign runs — SLOPE-FILTER W41..W45 all NEG, W46 (partial) POS = 0 consecutive positive weeks; SHORT-BB-DEAD-ZONE 1 positive week only (W44 NEG breaks). Named re-open gates FAIL the 3rd-consecutive-same-sign-week criterion -> short-relax stays CLOSED. Watch: SHORT-RSI-CEILING / EXEC-RSI-HARD-FLOOR / SHORT-REGIME-GATE each show 3 consecutive POS weeks W43-W45 (but those were never the named re-open gates; weekly n=3-24 = noisy).",
+      "last_measured_at": "2026-11-14T12:49:19Z"
     },
     {
       "id": "amplify-r2v2-long3-clonehunt",
@@ -1775,7 +1781,21 @@
       "measurement": "brain/gate_shadow.db PRIMARY basis (fwd_4h, tok_n) + PG r2v2-long3 NORMAL|LONG cell; dedupe gate|token|direction|UTC-day (short-relax-shadow-study convention)",
       "not_a_duplicate_of": "amplify-ema300-underdeploy (different signal) / amplify-grind-breakout-* (different signal) / winner-cell-size-125 (notional axis, adjudicated FAIL) / amplify-cell-conf-tilt-floorproof (confidence axis, 4 named cells not incl. r2v2)",
       "notes": "AMPLIFY weekly emit #260. Why-not stated up front: no OTHER cell cleared the bar — all other n>=10 positive cells are already in-flight (bb-squeeze+ x5, volume-buildup- x2, atr-trend- x3, jup x7, pc+ / pc- / warrior / tat / prearm / grind / ema300 / linregfade / xmirror / ugb / structure-flip) and every costliest short-side gate on the fwd basis (SHORT-BB-DEAD-ZONE +0.357, SLOPE-FILTER +0.334, SHORT-RSI-CEILING +0.292, EXEC-RSI-HARD-FLOOR +0.287, SHORT-REGIME-GATE +0.190; all 7d/30d same-sign, tok_n>=56) is already closed by short-relax-shadow-study (0/25 gates cleared 5 bars, 'price of poor base rates' accepted 10-31) or has an open exempt shadow. Flip-KPI: 0 shadow->live conversions this run (stated)."
+    },
+    {
+      "id": "amplify-pcv6-extreme-short-cell",
+      "stream": "pump-chain-,pump-chain-v6- EXTREME SHORT early winner cell (30d 8T net +0.35, arm 75%)",
+      "kind": "amplify",
+      "proposal_type": "(c) clone-hunt: mine gate_shadow blocked SHORT setups against this cell profile + 1m-candle walk (only if cell clears bar)",
+      "status": "open",
+      "created_at": "2026-11-14T12:49:19Z",
+      "deadline": "2026-11-21T00:00:00Z",
+      "owner": "brain_auditor #261 AMPLIFY (weekly emit)",
+      "early_label": "EARLY — n=8 <10 per AMPLIFY early-cell rule; emitted for offense coverage of the only UNCOVERED positive n>=5 30d cell",
+      "evidence": "PG fresh 2026-11-14 12:45Z 30d winner-cell rank: ('pump-chain-,pump-chain-v6-','EXTREME','SHORT') n=8 net +0.35 WR 37.5% arm 75.0% — trend-rider profile (low WR, high arm, positive net = few big trail winners). No open amplify entry covers this cell (watch-contrarian-live = pc- LONG fade; pc-plus-weight = pc+ LONG weight).",
+      "threshold": "Promote to clone-hunt ONLY IF: 30d n>=15 AND net >= +0.50 AND arm >= 60% AND 7d/14d same sign (units = pnl_usdt). Else close as no-cell at deadline. EARLY n=8, default NO CHANGE.",
+      "default_action": "no change — early cell, watch-only"
     }
   ],
-  "updated_at": "2026-11-14T08:44:51Z"
+  "updated_at": "2026-11-14T12:49:19Z"
 }

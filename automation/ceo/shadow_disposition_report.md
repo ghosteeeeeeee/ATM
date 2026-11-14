@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-14T08:15:00.110926+00:00
-registry: 112 entries (open=43)
+# Shadow disposition report — 2026-11-14T12:52:51.480067+00:00
+registry: 114 entries (open=45)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -114,3 +114,5 @@ registry: 112 entries (open=43)
 - OPEN amplify-warrior-sr-normal-long: deadline=2026-11-20T00:00:00Z | (no parseable source)
 - DONE watch-pc-flip-demote-55: DEMOTE EXECUTED 2026-11-13 #257 — CONTRARIAN_LIVE_ENABLED True->False in hermes_constants.py. Bar breached on any-read basis: 12:30Z 56.6% / 16:30Z 52.9% / 16:38Z 53.1% (reproduced) n=350, monotone decay 64.6%->52.9% since 10-27. Corroborating: live fade cohort 38T 39.5% WR net 0.00 (armed 10T 100% +1.06 vs unarmed 28T 17.9% -1.06); this week 3T 0% -0.22. Shadow-only again. Re-promote bar: flip-WR >=58% + CEO/T sign-off. Flagged to CEO in kanban for veto. (2026-11-13T16:40:00Z)
 - OPEN amplify-slope-jup-short-exempt: deadline=2026-11-21T00:00:00Z | (no parseable source)
+- OPEN amplify-r2v2-long3-clonehunt: deadline=2026-11-21T00:00:00Z | (no parseable source)
+- OPEN amplify-pcv6-extreme-short-cell: deadline=2026-11-21T00:00:00Z | (no parseable source)
