@@ -4139,3 +4139,28 @@
 
 ## Error Alerts — 2026-11-14 16:35 UTC
 - **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
+
+## Error Alerts — 2026-11-14 17:20 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK hard floor: N.N < N`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`
+
+## Error Alerts — 2026-11-14 17:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
+
+## Error Alerts — 2026-11-14 18:20 UTC
+- **REPEATED** (8x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   decider_run: TOK in N.3s (rc=N)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TOK decider_run: TOK (most recent call last):`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TOK decider_run: IndentationError: expected an indented block after function definition on line N`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   position_manager: TOK in N.1s (rc=N)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TOK position_manager: IndentationError: expected an indented block after function definition on line N`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS WARNING: N steps failed: decider_run, position_manager`
+
+## Error Alerts — 2026-11-14 18:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 91% used (>= 85%)
+
+## Error Alerts — 2026-11-14 19:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 91% used (>= 85%)
+
+## Error Alerts — 2026-11-14 20:20 UTC
+- **REPEATED** (7x): `Nov N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
