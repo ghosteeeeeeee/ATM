@@ -26335,3 +26335,29 @@ BY: auto_1hr
 - Unarmed cohort 68.75% of 24h closes with WR 27.3% — chop entries persist; stall stack owns fix
 - Quiet stretch: 0 closes in last hour, only 16 in 24h
 BY: auto_1hr
+
+## [2026-11-14 02:21] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: n/a) | 24h 14T 42.9% -$0.08 RED | 7d 94T 46.8% -$1.88 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none
+
+**No Change Needed:**
+- Last hour: 0 closes, 1 open (BTC pending SHORT) — quiet hour
+- Arm rate: unarmed 9/14 = 64.3% (<70%) WR 11.1% (-$0.62) vs armed 5/5 100% (+$0.54) — no gate; stall stack owns fix
+- Kill check: 0 closes/hr; no signal with 0% WR and 3+ closes this hour
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/14 = 7.1% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 5/14 = 36% avg -$0.112 — expected at leverage
+- Boost: none eligible (jup_yolo_mirrored 2T 100% n<5, atr-trend+ 2T n<5, ai-trader-pending 5T 20% not >55%)
+- Neg streak: 18:00 -0.13, 21:00 +0.12, 23:00 -0.11 — streak 1, not 3 -> no size cut
+- Frequency: 0 closes/hr — well under 20
+- No storm (window-min -0.43% / at-run -0.43%) -> gate not fired
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still 46.8% RED -$1.88
+- Unarmed cohort WR 11.1% (-$0.62) vs armed 100% — chop entries persist; stall stack owns fix
+- ai-trader-pending 5T 20% (-$0.17) 24h — worst signal, but no last-hour closes for regime kill; watch next hour
+BY: auto_1hr
