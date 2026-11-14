@@ -26441,3 +26441,33 @@ BY: auto_1hr
 - Unarmed WR 0% (-$0.81) over 24h — chop entries persist; stall stack owns fix
 - ai-trader-pending 4T 0% (-$0.36) 24h — worst signal, watch for regime kill eligibility
 BY: auto_1hr
+
+## [2026-11-14 06:25] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** $-0.15 (WR: 0.0%) | 24h 14T 35.7% -$0.42 RED | 7d 94T 45.7% -$2.07 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**Storm Packet (gate FIRED):**
+🌩️ [STORM-READINESS] window-min -1.67% / at-run +0.15% | blocked 113 (compaction_stale_10min 34, pump-chain-* 24, combo_key-stale 22, long-*gates 11, expired-hotset 8, short-regime-gate 6, rr-engine-hard-block 4, short-rsi-hard-floor 3, other 1) | true-starvation 40 RSI>=35 | counterfactual $+0.72 (touch 27/40) | waiver: SHADOW=True ENFORCE=False — counterfactual POSITIVE -> **streak 2/3** (03:25 +0.24, now +0.72; deadline EXTENDED 2026-11-19); split: blocked SHORTs $-0.95 (17), blocked LONGs +$1.67 (23). One more positive storm flips enforce bar (CEO label + T sign-off required to actually flip).
+
+**No Change Needed:**
+- Last hour: 1 close (SOL jup_yolo_mirrored SHORT atr_sl_hit -$0.15 -3.77%), 2 open (BTC pending SHORT +1.11%, MNT atr-trend- SHORT -0.42%)
+- Entry quality: 24h winners avg MAE 0.131% (<0.5% OK); losers 0.739%
+- Arm rate: unarmed 9/14 = 64.3% (<70%) WR 0.0% (-$0.96) vs armed 5/5 100% (+$0.54) — unarmed WR near 0 = chop entries; stall stack owns fix, no new gate
+- Kill check: 1 close/hr; jup_yolo_mirrored closed 1T this hour (100% 24h anyway); ai-trader-pending 4T 0% (-$0.36) 24h but 0 last-hour closes — no regime-kill eligibility
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/14 = 14.3% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 5/14 = 36% avg -$0.112 — expected at leverage
+- Boost: none eligible (jup_yolo_mirrored 3T 66.7% n<5, atr-trend+ 2T n<5, pending 4T 0%, rest 0%)
+- Neg streak: 23:00 -0.11, 00-05 no-trade, 06:00 -0.15 — no-trade hours broke streak, now 1, not 3 -> no size cut
+- Frequency: 1 close/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still 45.7% RED -$2.07
+- Unarmed WR 0% (-$0.96) over 24h — chop entries persist; stall stack owns fix
+- ai-trader-pending 4T 0% (-$0.36) 24h — worst signal, watch for regime kill eligibility
+- Storm streak 2/3 — next positive storm makes enforce bar eligible (CEO + T sign-off still required)
+BY: auto_1hr
