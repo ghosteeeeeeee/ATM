@@ -4164,3 +4164,6 @@
 
 ## Error Alerts — 2026-11-14 20:20 UTC
 - **REPEATED** (7x): `Nov N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-11-14 20:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 91% used (>= 85%)
