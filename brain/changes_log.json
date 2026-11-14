@@ -4232,5 +4232,49 @@
     "after": "basis_correction_20261114 added (PRIMARY=fwd_4h/tok_n, n counted as 8 trades/9 token-days); new open entry amplify-r2v2-long3-clonehunt (default NO SHIP, tok_n>=50 bar)",
     "rationale": "gate_shadow.py report() itself labels trade-join SECONDARY and \"NOT avoided/foregone money\"; event n inflated ~27x vs distinct trades (#156 class). Trading constants untouched.",
     "impact": "0 behavior change; prevents a mis-based count from ever reaching a ship decision"
+  },
+  {
+    "timestamp": "2026-11-14T16:57:00Z",
+    "agent": "brain_auditor",
+    "change": "SHIPPED brain/analysis/unclog_expiry_remeasure_2026-11-14.py — owed CEO unclog-waiver EXPIRY re-measure of the SHORT RSI [35,45) band (raw floor join, control-subtracted vs never-waived knife cohort)",
+    "type": "ops",
+    "file": "brain/analysis/unclog_expiry_remeasure_2026-11-14.py",
+    "before": "item owed since 2026-11-03, never measured",
+    "after": "measured: raw post-expiry +0.2226 t=+2.06 but control-subtracted +0.128 t=+1.01 = DOES NOT clear; sign flips vs pre-expiry (-0.166)",
+    "rationale": "distinguish tape-lifted short fwd from a real band edge; --selfcheck PASS (parser, band membership, gate_shadow-identical 10-min bucket, fwd_4h sign lock, cluster_t)",
+    "impact": "0 trading behavior; closes the owed re-measure on the RAW join and routes the decisive read to the FLIP1 shadow"
+  },
+  {
+    "timestamp": "2026-11-14T16:57:00Z",
+    "agent": "brain_auditor",
+    "change": "SHIPPED brain/analysis/flip1_bear_override_reshadow_2026-11-14.py — early read of disposition flip1-bear-override-reshadow (deadline 11-17)",
+    "type": "ops",
+    "file": "brain/analysis/flip1_bear_override_reshadow_2026-11-14.py",
+    "before": "shadow collecting since 11-03, never adjudicated",
+    "after": "BAR CLEARS 4/4: n=371 tok_n=70, net +$12.09 (bar +$1.00), LOO worst +$7.66, tape-split SAME-SIGN, cluster t=+2.13",
+    "rationale": "the pre-registered bar was written before the data; reading at n=371 keeps the CEO-required crash window inside the sample",
+    "impact": "0 trading behavior; produces a one-line CEO ratify decision (owner=CEO, not executed by brain_auditor)"
+  },
+  {
+    "timestamp": "2026-11-14T16:57:00Z",
+    "agent": "brain_auditor",
+    "change": "APPENDED early-read evidence to data/shadow_disposition.json id=flip1-bear-override-reshadow (+ early_read_at/early_read_result)",
+    "type": "ops",
+    "file": "data/shadow_disposition.json",
+    "before": "evidence = ship-time note only",
+    "after": "evidence += full 4/4 read with 5 stated caveats + reproduce command + GO recommendation",
+    "rationale": "the 11-17 judge must read current numbers, not the ship-time note",
+    "impact": "0 trading behavior"
+  },
+  {
+    "timestamp": "2026-11-14T16:57:00Z",
+    "agent": "brain_auditor",
+    "change": "EMITTED data/shadow_disposition.json id=amplify-short-rsi-hard-ceiling-85-walk (kind=amplify, deadline 2026-11-21, default NO-SHIP)",
+    "type": "ops",
+    "file": "data/shadow_disposition.json",
+    "before": "no open item covers SHORT_RSI_HARD_CEILING 75->85 (rsi-ceiling-75-live is done)",
+    "after": "registered 4-leg threshold incl. same-sign-both-windows, tape-split, realized n>=15 net>0, 1m walk, units guard",
+    "rationale": "weekly AMPLIFY >=1 proposal mandate; shadow says +0.3756% t=+3.33 post / +0.1110 t=+0.89 pre while realized 75-85 is -0.28/30d — the walk adjudicates the contradiction instead of shipping on one basis",
+    "impact": "0 trading behavior; default NO-SHIP keeps the hard ceiling at 75"
   }
 ]

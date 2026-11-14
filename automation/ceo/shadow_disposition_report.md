@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-14T12:52:51.480067+00:00
-registry: 114 entries (open=45)
+# Shadow disposition report — 2026-11-14T16:58:36.850883+00:00
+registry: 115 entries (open=46)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -116,3 +116,4 @@ registry: 114 entries (open=45)
 - OPEN amplify-slope-jup-short-exempt: deadline=2026-11-21T00:00:00Z | (no parseable source)
 - OPEN amplify-r2v2-long3-clonehunt: deadline=2026-11-21T00:00:00Z | (no parseable source)
 - OPEN amplify-pcv6-extreme-short-cell: deadline=2026-11-21T00:00:00Z | (no parseable source)
+- OPEN amplify-short-rsi-hard-ceiling-85-walk: deadline=2026-11-21T00:00:00Z | (no parseable source)

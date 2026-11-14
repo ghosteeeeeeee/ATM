@@ -26746,3 +26746,31 @@ BY: auto_1hr
 - 15:25 storm packet was missing from ceo_kanban.md — backfilled at 16:25 for bar countability
 - BTC pending trades now at 10x (leverage trial 41a79bde) — hard_max_loss -9.77% account is consistent with ~1% move at 10x; watching for oversized account hits
 BY: auto_1hr
+
+## [2026-11-14 17:20] Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** $0.02 (WR: 100.0%) | 24h 13T 61.5% +$0.48 GREEN | 7d 100T 48.0% -$1.35 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**Storm Packet:** no storm (window-min -0.82% / at-run -0.37%, both inside ±1.5% gate)
+
+**No Change Needed:**
+- Last hour: 1 close (XTEN atr-trend- SHORT profit-monster-trail +$0.02 +0.54%), 0 open
+- Entry quality: 24h winners avg MAE 0.204% (<0.5% OK); losers 0.739%
+- Arm rate: unarmed 9/13 = 69.2% (<70%) WR 44.4% (+$0.30) vs armed 4/4 100% (+$0.18) — under threshold, chop share stable; stall stack owns fix, no new gate
+- Kill check: 1 close/hr; no signal with 0% WR n>=3 (last-hour or 24h) — no regime-kill eligibility
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/13 = 7.7% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 3/13 = 23% avg -$0.153 — expected at leverage
+- Boost: none eligible (ai-trader-pending 5T 60% +$0.62 but all 5 on BTC single-token + manual CEO signal, fails multi-token consistency; atr-trend- 3T 100% n<5; jup_yolo_mirrored 3T 66.7% n<5)
+- Neg streak: 10 +0.03, 11 +0.07, 14 +0.46, 15 +0.12, 16 +0.02 — positive, no size cut
+- Frequency: 1 close/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still RED -$1.35 (48.0% WR); 24h GREEN +$0.48
+- Storm streak 0/3 (last two packets negative CF); deadline 2026-11-19
+- No open trades at run time — flat book
+BY: auto_1hr

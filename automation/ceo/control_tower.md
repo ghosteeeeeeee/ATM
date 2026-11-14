@@ -1,6 +1,6 @@
 # CONTROL TOWER — shadows, trials, decision calendar
-generated 2026-11-14T12:52:51.480067+00:00 by scripts/shadow_disposition.py (daily 08:15 + on any registry change via hermes-shadow-disposition.path) — REGENERATED FILE, do not hand-edit (edit data/shadow_disposition.json)
-45 open / 69 done / 114 registry entries
+generated 2026-11-14T16:58:36.850883+00:00 by scripts/shadow_disposition.py (daily 08:15 + on any registry change via hermes-shadow-disposition.path) — REGENERATED FILE, do not hand-edit (edit data/shadow_disposition.json)
+46 open / 69 done / 115 registry entries
 
 ## 🔴 OVERDUE — default packet issued; override needs decision + evidence within 24h (1)
 - 2026-11-14 [TODAY] `stop-tighten-slippage-column` (owner: main-session)
@@ -18,7 +18,7 @@ generated 2026-11-14T12:52:51.480067+00:00 by scripts/shadow_disposition.py (dai
   - progress: —
   - if silent: flag failing leg for CEO revert review in kanban
 
-## 🟡 DUE ≤7d (37)
+## 🟡 DUE ≤7d (38)
 - 2026-11-16 [T-2] `amplify-atr-trend-short-cell-watch` (owner: brain_auditor)
   - bar: atr-trend- NORMAL SHORT cell reaches n>=10 closed AND net>0 over trailing 30d -> promote to winner-cell notional-mult...
   - progress: —
@@ -167,6 +167,10 @@ generated 2026-11-14T12:52:51.480067+00:00 by scripts/shadow_disposition.py (dai
   - bar: Promote to clone-hunt ONLY IF: 30d n>=15 AND net >= +0.50 AND arm >= 60% AND 7d/14d same sign (units = pnl_usdt). Els...
   - progress: —
   - if silent: no change — early cell, watch-only
+- 2026-11-21 [T-7] `amplify-short-rsi-hard-ceiling-85-walk` (owner: brain_auditor)
+  - bar: SHIP only if ALL: (1) gate_shadow token-day-dedup fwd_4h for the PURE >75 hard-ceiling cohort (regex splits '(hard ce...
+  - progress: —
+  - if silent: NO-SHIP — hard ceiling stays 75 unless EVERY threshold below clears; 'oversold/bounce-risk even in bear' doctrine (bf...
 
 ## 📅 DUE 8–14d (2)
 - 2026-11-27 [T-13] `pc-plus-weight-monitor` (owner: brain_auditor)
@@ -205,7 +209,7 @@ generated 2026-11-14T12:52:51.480067+00:00 by scripts/shadow_disposition.py (dai
 - 2026-11-18 [T-4]: watch-contrarian-live, amplify-xmirror-giveback, hml-vol-atr-mult-shadow, amplify-atr-trend-short-clonehunt, amplify-ugb-bypass-armgap, amplify-jup-long-flat-cell, amplify-grind-breakout-underdeploy
 - 2026-11-19 [T-5]: storm-confl-waiver, amplify-jup-short-high-cell, amplify-ema300-underdeploy
 - 2026-11-20 [T-6]: compaction-stale-trend-band-eval, amplify-vb-high-short-underdeploy, amplify-warrior-sr-normal-long
-- 2026-11-21 [T-7]: amplify-jup-short-walk, atrtrail-clip-12, reentry-study, amplify-prearm-breakeven-lock, amplify-cell-conf-tilt-floorproof, amplify-bbsqueeze-module-rsi-reband, amplify-structure-flip-early-exit, amplify-slope-jup-short-exempt, amplify-r2v2-long3-clonehunt, amplify-pcv6-extreme-short-cell
+- 2026-11-21 [T-7]: amplify-jup-short-walk, atrtrail-clip-12, reentry-study, amplify-prearm-breakeven-lock, amplify-cell-conf-tilt-floorproof, amplify-bbsqueeze-module-rsi-reband, amplify-structure-flip-early-exit, amplify-slope-jup-short-exempt, amplify-r2v2-long3-clonehunt, amplify-pcv6-extreme-short-cell, amplify-short-rsi-hard-ceiling-85-walk
 - 2026-11-27 [T-13]: pc-plus-weight-monitor, amplify-linregfade-volgate-admit
 - 2026-12-01 [T-17]: linreg-fade-storm-admission-shadow
 - 2026-12-06 [T-22]: atr-trend-accel-shadow
@@ -215,4 +219,4 @@ generated 2026-11-14T12:52:51.480067+00:00 by scripts/shadow_disposition.py (dai
 flip-contrarian-pc, trial-coupled-cutsloser-sl, eval-midband-long-4564, gate-shadow, shadow-trader-bypass, expiry-t5-shadow, mfe-cut-arm-be, relative-regime, rr-engine-shadow, chase-ratio, ichimoku-dampen-flooradmit, volmom-volbreak, tc-temporal-confluence, mom-filter-shadow, acceleration-threshold, wyckoff-shadow, ai-trader-extreme-shadow, oscillator-shadow, bb-tat-shadow, db-mirror-0byte, escalation-17, ugb-pt-045, disposition-cadence-revert, fade-ctx-exempt, winner-cell-size-125, bb-squeeze-hml-entry-profile, amplify-weekly-mandate, fade-volgate-split-analysis, fade-btc-crash-postflip, storm-readiness-packet, signal-zombie-purge, momentum-cache-regime-coverage, pump-detect-ceiling-mismatch, override-vs-ceiling-contradiction, ichimoku-short-solo-counterfactual, jup-yolo-regime-review, amplify-winner-cell-mult-150, chase-move-shadow, conf-filter-parity-split, ichimoku-bypass-lowjoin-ticket, stop-asymmetry-highwr, short-relax-shadow-study, pump-chain-plus-weight-kill-review, trial-wider-sl, trial-extended-time, gate-shadow-capture-coverage-fix, candle-collector-coverage-audit, stop-tighten-enforce-eval, amplify-grind-breakout-deploy, amplify-pc-fade-cell-split, amplify-stop-tighten-probe-080, jup-hml-shadow-065-050, ichimoku-short-pause, rsi-ceiling-75-live, gate-shadow-dedup-convention, short-shadow-join-builder, timer-cadence-recheck, harvest-ship-2026-11-04, daily-fill-cap-brake, amplify-vb-high-short-clonehunt, amplify-bbsqueeze-chop-exempt, linreg-fade-fill-funnel, amplify-bbsqueeze-warrior-uninert, amplify-bbsqueeze-neutral-exempt, dailyfillcap-identity-verify, amplify-stoptighten-scope-widen, amplify-winner-cell-drop-pcplus, amplify-tat-neverarmed-age-widen, watch-pc-flip-demote-55
 
 ---
-freshness: FRESH | registry mtime: 2026-11-14T12:52:51+00:00 | prev tower render: 2026-11-14T12:49:19+00:00 | last run: 0 packet(s), 0 entry error(s)
+freshness: FRESH | registry mtime: 2026-11-14T16:58:36+00:00 | prev tower render: 2026-11-14T12:52:51+00:00 | last run: 0 packet(s), 0 entry error(s)
