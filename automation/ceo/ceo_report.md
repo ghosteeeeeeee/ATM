@@ -1326,3 +1326,9 @@ Numbers verified fresh via psql (brain). Metric-interpretation: no loss-filtered
 ### Numbers: 24h 15T -0.03 46.7% | 7d 92T -1.89 46.7%
 ### Findings: Flat book, both windows ~breakeven-negative; disk 90% WARN recurring 4x today. Rotating Q (regime-specialists, 14d n>=8): jup_yolo_mirrored FLAT 12T 83.3% +0.26 (only clear specialist); bb-squeeze+ HIGH 14T 50% -0.53 weak vs NORMAL 13T 53.8% +0.06; pump-chain- NORMAL 31T 38.7% +0.15 (WR-low, PnL-positive).
 ### Recommendation: Free disk space before critical; no trade/signal action this run.
+
+## CEO Status — 20261113T231851Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 16T +0.09 50.0% | 7d 94T -1.88 46.8%
+### Findings: disk 90% (WARN threshold 85%) repeating every hour; 13 decision items due ≤24h (11-14 batch: mfe-cut-arm-be, mult-150, jup-short-walk, atrtrail-clip, stop-tighten-eval). Rotating Q (regime-specialists): no cell n>=5 net>0.50 in 7d — atr-trend- HIGH 6T +0.09/83.3% and jup HIGH 9T +0.02 are the only positive slices; jup NORMAL 10T 70% but -0.05 (RR drag), ai-trader-pending NORMAL 19T 36.8% worst. 7d regime totals all negative (HIGH -0.67, NORMAL -0.61, EXTREME -0.38, FLAT -0.22).
+### Recommendation: schedule disk cleanup before 85%→full; 11-14 CEO-owned items (mfe-cut, mult-150, stop-tighten) need labels by 00:00Z.

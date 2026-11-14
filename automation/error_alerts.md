@@ -4028,3 +4028,30 @@
 
 ## Error Alerts — 2026-11-13 20:20 UTC
 - **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-13 20:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
+
+## Error Alerts — 2026-11-13 21:20 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-11-13 21:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
+
+## Error Alerts — 2026-11-13 22:20 UTC
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-11-13 22:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
+
+## Error Alerts — 2026-11-13 23:20 UTC
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK knife floor: N.N < N`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK knife floor: N.N < N`
+
+## Error Alerts — 2026-11-13 23:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
+
+## Error Alerts — 2026-11-14 00:20 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+NEUTRAL+TOK, allowing despite TOK filter`

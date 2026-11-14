@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-13 15:23 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-13 21:23 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,787 | **WR:** 51.3% | **PnL:** -122.59%
+- **Total trades (all time):** 3,792 | **WR:** 51.3% | **PnL:** -124.29%
 - **Date range:** 2026-07-29 → 2026-11-13
 
 ---
@@ -23,7 +23,7 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| ai-trader-pending | SHORT | 5 | 40.0% | +0.94 | ❓ | Borderline |
+| ai-trader-pending | SHORT | 5 | 40.0% | +0.55 | ❓ | Borderline |
 
 ---
 
@@ -41,7 +41,7 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] ai-trader-pending SHORT** — WR=40.0%, PnL=+0.94% over 5 trades. Monitor next cycle.
+1. **[WATCH] ai-trader-pending SHORT** — WR=40.0%, PnL=+0.55% over 5 trades. Monitor next cycle.
 
 ---
 
@@ -53,6 +53,8 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-11-13 | 114711f | SL placement fix (CEO 2026-11-13): structure-widened guardia... |
+| 2026-11-13 | 919f4d5 | scripts: brain_auditor #257 — DEMOTE contrarian pc- fade (CO... |
 | 2026-11-13 | 6034708 | scripts: fire winner-cell size REVERT 1.25->1.0 (registered ... |
 | 2026-11-10 | b4b7322 | memory: hourly analysis 2026-11-10 17:22 — storm packet (win... |
 | 2026-11-09 | 1f5cf45 | logs: hourly analysis 2026-11-09 13:22 — no config change, 0... |
