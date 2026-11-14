@@ -11291,5 +11291,32 @@
     "category": "meta",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-14T08:45:11Z",
+    "idea": "Basis-stamped AMPLIFY feed: every gate_shadow-derived proposal must declare its basis (fwd_4h/tok_n PRIMARY vs trade-join SECONDARY) and count n as distinct token|direction|UTC-day, never events",
+    "rationale": "#260 measured 30d: 16,911 closed-with-trade events resolve to 618 distinct trades (~27 events/trade) and outcome_signal is the follow-on trade's signal, not the blocked one — my own #259 evidence read the wrong basis. The short-relax study already uses gate|token|direction|UTC-day dedup; the amplify path did not.",
+    "expected_impact": "kills the n-inflation class before it reaches a ship bar; makes cross-run amplify numbers comparable",
+    "category": "meta",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-14T08:45:11Z",
+    "idea": "Winner-cell offense-coverage invariant: every WINNER_CELLS_VALIDATED member must have >=1 open kind='amplify' entry (audit showed r2v2-long3|NORMAL|LONG had zero while bb-squeeze+ had five)",
+    "rationale": "defense has five owners, offense coverage was uneven — coverage drift is silent because nothing diffs the validated set against the disposition queue",
+    "expected_impact": "one missing-cell emit per coverage hole; prevents validated cells aging out with no offense attempt",
+    "category": "process",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-14T08:45:11Z",
+    "idea": "Chop-bleed origin/size split as a standing dual read (7d/14d/30d never-armed dollar share AND trailing-30 avg loser) so an exit-stack change that shrinks avg loss cannot hide a rising never-armed share",
+    "rationale": "fresh: bleed 93.7/94.6/92.0% (baselines 84.1/85.6/80.6, BREACH) while trailing-30 avg loser -0.1063 vs KPI bar -0.070 — both legs fail; exitstack-day-kpi-1114 tracks only the size leg",
+    "expected_impact": "prevents single-leg false-pass on the 11-15 exitstack read",
+    "category": "meta",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
