@@ -187,6 +187,26 @@ ATR_UPDATE_THRESHOLD_PCT = ATR_UPDATE_THRESHOLD  # only push SL/TP update to HL 
 MAX_LEVERAGE = 5
 
 
+def maxhold_exempt(signal, stop_loss):
+    """CEO 2026-11-14 doctrine: EXITS ARE STRUCTURE-BREAK ONLY — a managed
+    trade carrying an active structure stop is self-managing (the
+    structure-lag trail IS its exit manager), so the 8h UNIVERSAL_MAX_HOLD
+    clock must not cut it: it cut #16902's +4.27% winner mid-thesis
+    ('the previous close was a good one, max_hold, could have stayed in').
+    Safety retained: the trailing stop + guardian floor still bound the
+    loss, staleness checks still run. Non-managed signals and managed
+    trades WITHOUT a stop: unchanged (zombie protection intact).
+    Pure function — unit-tested; any import failure → False (old behavior).
+    """
+    try:
+        if not stop_loss or not signal:
+            return False
+        import manual_exit_manager as _mxm
+        return bool(_mxm.is_managed_signal(signal))
+    except Exception:
+        return False
+
+
 def hml_threshold(hard_pct, signal, entry, stop, direction, lev, floor_acct=None):
     """CEO 2026-11-13: managed STRUCTURAL trades exit at STRUCTURE, not the
     account cap ("we should have still been in the previous trade, not
@@ -3922,7 +3942,9 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             'volume-breakout', 'volume_breakout',
             'mover-',  # mover- maps to ride_it; mover+ was removed (own-conclusions 2026-10-06)
         )) and 'linreg-fade' not in _pos_signal and 'linreg_fade' not in _pos_signal  # linreg-fade always gets the 8h close (V8)
-        if UNIVERSAL_MAX_HOLD_MINUTES > 0 and open_time and not _is_ride_it:
+        _mh_exempt = maxhold_exempt(_pos_signal, pos.get('stop_loss'))
+        if UNIVERSAL_MAX_HOLD_MINUTES > 0 and open_time and not _is_ride_it \
+                and not _mh_exempt:
             try:
                 if isinstance(open_time, str):
                     _open_dt = datetime.fromisoformat(open_time.replace('Z', '+00:00'))
