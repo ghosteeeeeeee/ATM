@@ -128,6 +128,7 @@ from hermes_constants import (
     JUP_YOLO_ATRSL_SHADOW_ENABLED,
     PM_TRAIL_ACTIVATE_PCT,
     ARM_BE_SHADOW_ENABLED,
+    PREARM_LOCK_SHADOW_ENABLED, PREARM_LOCK_THR_PCT,
 )
 
 # Hyperliquid mirroring — non-blocking, failures don't stop paper trading
@@ -160,6 +161,7 @@ _hml_shadow_logged = set()     # trade_ids that have logged an HML-SHADOW line
 _arm_be_shadow_logged = set()  # trade_ids that have logged an ARM-BE would-fire (dedup per process; analysis joins by trade_id)
 _ugb_be_logged = set()         # trade_ids that have logged a UGB-BE would-fire (unarmed giveback)
 _ugb_pt_logged = set()         # trade_ids that have logged a UGB-PT would-fire (unarmed giveback)
+_prearm_lock_logged = set()    # trade_ids that have logged a PREARM-LOCK would-fire (dedup per process)
 
 # EXT #44 peak-trail distance (off the running peak). Lives here, not in
 # hermes_constants, so vacation rule no_constants_change keeps a zero git diff.
@@ -4401,6 +4403,34 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                             log(f"  [SHADOW] ARM-BE would-fire {token} {direction} live={live_pnl:+.2f}% fav={_abe_fav:+.2f}% [armed@{_abe_arm_pct:.2f}% then crossed entry] trade={trade_id} sig={_pos_signal}")
             except Exception as e:
                 log(f"  [SHADOW] ARM-BE error for {token}: {e}")
+
+        # ── 7b-shadow3b. PREARM-LOCK SHADOW — pre-arm BE lock (zero behavior) ──
+        # brain_auditor #258 (2026-11-14). Walk exit_stack_walk_2026_11_14.py:
+        # thr 0.25 30d net +$6.69 / fk 13.9% / 14d +$3.17 / halves same sign =
+        # ALL BARS MET (SHIP CANDIDATE, enforce needs CEO GO + independent verify).
+        # highest_price is monotonic, so fav in [thr, arm) proves the peak was
+        # reached BEFORE now and the trade never hit the 0.40 arm (armed-live and
+        # UGB-domain trades both keep fav >= arm and are excluded here).
+        # live_pnl <= 0 = price back at/below entry. Brief sub-entry dips that
+        # recover between polls are missed (poll ~1-2m) — logged counts are a
+        # lower bound. Per-process dedup; consumers join by trade_id.
+        if PREARM_LOCK_SHADOW_ENABLED and trade_id not in _prearm_lock_logged:
+            try:
+                _pl_en = float(pos.get('entry_price') or 0) or 0
+                _pl_hi = float(pos.get('highest_price') or 0) or 0
+                _pl_lo = float(pos.get('lowest_price') or 0) or 0
+                _pl_arm = PM_TRAIL_ACTIVATE_PCT * 100
+                if _pl_en > 0 and _pl_hi > 0 and _pl_lo > 0:
+                    if direction == 'LONG':
+                        _pl_fav = (_pl_hi / _pl_en - 1.0) * 100
+                    else:
+                        _pl_fav = (1.0 - _pl_lo / _pl_en) * 100
+                    if (PREARM_LOCK_THR_PCT <= _pl_fav < _pl_arm
+                            and live_pnl <= 0):
+                        _prearm_lock_logged.add(trade_id)
+                        log(f"  [SHADOW] PREARM-LOCK would-fire {token} {direction} live={live_pnl:+.2f}% peak={_pl_fav:+.2f}% [thr {PREARM_LOCK_THR_PCT:.2f}% peak then back to entry, never armed {_pl_arm:.2f}%] trade={trade_id} sig={_pos_signal}")
+            except Exception as e:
+                log(f"  [SHADOW] PREARM-LOCK error for {token}: {e}")
 
         # ── 7b-shadow4. UGB — UNARMED-GIVEBACK (PT live since run #130) ─────────
         # brain_auditor 2026-10-22. Delivers the candle OOS EXT #44 was waiting on,

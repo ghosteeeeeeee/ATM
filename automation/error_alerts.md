@@ -4055,3 +4055,6 @@
 
 ## Error Alerts — 2026-11-14 00:20 UTC
 - **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+NEUTRAL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-14 00:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)

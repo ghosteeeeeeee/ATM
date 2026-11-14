@@ -1052,12 +1052,12 @@ def _is_signal_disabled(signal_type):
 # SIGNAL_SOURCE_WEIGHTS, so a learner recalc silently reverts SHIP-LIVE static boosts
 # (measured 2026-11-06: bb-squeeze+ effective 1.1 vs 1.3, warrior-sr-confirm+ 1.04 vs
 # 1.6 — ship metric bb+warrior next-100 share stuck at 17% vs 25% target).
-# REVERT: delete entries here AND restore combo_weights.json values.
-PINNED_COMBO_WEIGHTS = {
-    'bb-squeeze+': 1.3,
-    'warrior-sr-confirm+': 1.6,
-    'warrior-sr-confirm-': 1.6,
-}
+# REVERT EXECUTED 2026-11-14 (brain_auditor #258, amplify-bbsqueeze-warrior-uninert
+# pre-registered default FIRED): next-100 share collapsed to 11% (7+4 of 100, bar
+# >=25%) AND bb-squeeze+ 7d net -0.26 < 0 — both legs failed; combo_weights.json
+# restored to bb-squeeze+ 1.1 / warrior-sr-confirm+ 1.04 / warrior-sr-confirm- removed
+# (absent pre-pin). Auto-tuning resumes; re-pin needs fresh CEO evidence.
+PINNED_COMBO_WEIGHTS = {}
 
 
 def analyze_combo_weights():

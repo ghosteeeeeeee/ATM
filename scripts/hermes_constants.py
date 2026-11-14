@@ -2155,6 +2155,20 @@ MFE_EXIT_SIGNALS = ('jup_yolo',)  # substring scope — mirror book first
 # (expensive FKs: COMP +8.42% end, SUPER +2.83%). Zero behavior — logs
 # would-fires only. Flip live only with CEO GO + v6 exit-stack integration.
 ARM_BE_SHADOW_ENABLED = True  # Revert: set False.
+# PRE-ARM BREAKEVEN LOCK SHADOW (brain_auditor #258, 2026-11-14) — zero behavior.
+# Gap-fill BELOW the arm: for never-armed trades (peak never reaches
+# PM_TRAIL_ACTIVATE_PCT), lock at entry once peak fav >= PREARM_LOCK_THR_PCT
+# and price later returns to <= entry. Distinct from UGB-PT/ARM-BE (both own
+# the >=0.40 domain) — this covers the [0.25, 0.40) never-armed stall class
+# that pays the chop-bleed (7d never-armed losers = the whole gross-loss side).
+# Walk brain/analysis/exit_stack_walk_2026_11_14.py --selfcheck (PASS):
+#   thr 0.25, 30d unarmed n=369, locked 81, net +$6.69, fk 11/79=13.9%,
+#   net14 +$3.17, halves +3.19/+3.50 (same sign) = ALL BARS MET.
+# Prior art: #82 unarmed-giveback at thr=0.40 FAILED fk 39.7% (that class is
+# UGB-PT's domain now); this is the lower-peak class, not previously tested.
+# Enforce path = CEO GO + independent verify (money-path change). Revert: False.
+PREARM_LOCK_SHADOW_ENABLED = True
+PREARM_LOCK_THR_PCT = 0.25
 # AI-TRADER+ EXTREME LONG conf-demote SHADOW (brain_auditor 2026-10-18).
 # RETIRED 2026-10-19 brain_auditor: signal_reporter hard block b0a2467d (09:41,
 # 30d 15T 26.7%WR -$0.71) supersedes — 0 EXTREME trades since, shadow starved.
