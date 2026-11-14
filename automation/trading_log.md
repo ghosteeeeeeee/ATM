@@ -26858,3 +26858,31 @@ BY: auto_1hr
 - Storm streak 0/3; deadline 2026-11-19
 - 1 open trade at run time (BTC SHORT)
 BY: auto_1hr
+
+## [2026-11-14 21:23] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 (WR: 72.7% 24h) | 24h 11T 72.7% +$0.66 GREEN | 7d 99T 48.0% -$1.21 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**Storm Packet:** no storm (window-min -1.44% / at-run -1.44%, both inside ±1.5% gate)
+
+**No Change Needed:**
+- Last hour: 0 closes, 1 open (BTC continuum-osc- SHORT opened 18:37, flat +$0.00)
+- Entry quality: 24h winners avg MAE 0.203% (<0.5% OK); losers 0.805%
+- Arm rate: unarmed 7/11 = 63.6% (<70%) WR 57.1% (+$0.49) vs armed 4/4 100% (+$0.17) — under threshold, stall stack owns fix, no new gate
+- Kill check: 0 closes/hr; no signal with 0% WR n>=3 (warrior-sr-confirm+ 0% but n=1) — no regime-kill eligibility
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/11 = 9.1% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 2/11 = 18.2% avg -$0.165 — expected at leverage
+- Boost: none eligible (ai-trader-pending 4T 75% +$0.68 all-BTC single-token + manual; jup_yolo 3T 66.7% n<5; atr-trend- 3T 100% n<5)
+- Neg streak: last 4 close-hours all positive (+0.46, +0.12, +0.02, +0.11) — no size cut
+- Frequency: 0 closes/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still RED -$1.21 (48.0% WR); 24h GREEN +$0.66
+- Storm streak 0/3 (deadline 2026-11-19)
+- 1 open trade at run time (BTC SHORT)
+BY: auto_1hr
