@@ -222,8 +222,6 @@ def hml_threshold(hard_pct, signal, entry, stop, direction, lev, floor_acct=None
     below the caller's account cap). Pure function — unit-tested.
     """
     try:
-        if floor_acct is None:
-            from hermes_constants import HML_STRUCT_FLOOR_ACCT as floor_acct
         if not signal or not entry or not stop:
             return hard_pct
         import manual_exit_manager as _mxm
@@ -234,8 +232,19 @@ def hml_threshold(hard_pct, signal, entry, stop, direction, lev, floor_acct=None
                 (d == 'LONG' and stop < entry)):
             return hard_pct
         struct_pct = abs(stop - entry) / entry * 100.0
-        wide = max(-struct_pct, float(floor_acct) / max(float(lev or 1), 1.0))
-        return min(hard_pct, wide)
+        # FLOOR RETIRED for managed structural trades (CEO 2026-11-14,
+        # incident #16909): the -8% ACCOUNT floor at 10x = -0.80% price
+        # pre-empted the structure stop (1.58% away) and cut a position
+        # whose structure was never broken — 'the trend is still down...
+        # we could have stayed in'. Doctrine: EXITS ARE STRUCTURE-BREAK
+        # ONLY — for a managed trade carrying a valid stop, THE STOP IS
+        # THE BOUND (its distance is the threshold; HML becomes its
+        # twin, never earlier). Base -4% account cap still applies when
+        # it is WIDER than the stop distance; non-managed and stop-less
+        # managed trades are unchanged. Worst case for a managed
+        # structural trade = the stop's own distance (arm-time
+        # validated, lag-clamped +-5% price, serial one-at-a-time).
+        return min(hard_pct, -struct_pct)
     except Exception:
         return hard_pct
 
