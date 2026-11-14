@@ -26716,3 +26716,33 @@ BY: auto_1hr
 - Storm streak RESET 0/3 — next positive storm starts a new run (deadline 2026-11-19)
 - Unarmed WR improved to 37.5% (+$0.09) — chop cohort less toxic than prior 25%/-0.47, still watch
 BY: auto_1hr
+
+## [2026-11-14 16:25] Hourly Analysis
+
+**Trades:** 2 closed (1 wins, 1 losses)
+**PnL:** $0.12 (WR: 50.0%) | 24h 13T 61.5% +$0.50 GREEN | 7d 99T 47.5% -$1.37 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**Storm Packet (gate FIRED):**
+🌩️ [STORM-READINESS] window-min -1.63% / at-run +0.05% | blocked 161 (combo_key-stale 47, expired-hotset 31, pump-chain-* 29, long-*gates 16, short-rsi-hard-floor 12, compaction_stale_10min 11, short-regime-gate 5, vol-gate-override 4, rep-low-reputation 2, rr-engine-hard-block 2, oversold-knife 1, confluence single-type 1) | true-starvation 38 RSI>=35 (108 raw rows RSI>=35, deduped first-fire-per-token 38; 1 LIT no candle data, 1 null signal price skipped (36 walked)) | counterfactual $-1.11 (touch 35/38) | waiver: SHADOW=True ENFORCE=False — storm packet, counterfactual NEGATIVE -> **streak stays 0/3** (was reset at 15:25 -$0.98; bar needs >=3 consecutive positive, deadline 2026-11-19); split: blocked SHORTs $+2.12 (12) = gates suppressed dump winners, blocked LONGs $-3.24 (24) = gates correctly kept dump LONG losers out
+
+**No Change Needed:**
+- Last hour: 2 closes (BTC ai-trader-pending SHORT manual_tp_hit +$0.34 +7.55% opened 14:27 closed 15:30; BTC ai-trader-pending SHORT hard_max_loss -$0.22 -9.77% opened 15:32 closed 15:44 at 10x leverage trial, ~1% price move = expected at leverage), 1 open (XTEN atr-trend- SHORT 16:13)
+- Entry quality: 24h winners avg MAE 0.200% (<0.5% OK); losers 0.739%
+- Arm rate: unarmed 9/13 = 69.2% (<70%) WR 44.4% (+$0.30) vs armed 4/4 100% (+$0.20) — just under threshold, chop cohort improving; stall stack owns fix, no new gate
+- Kill check: 2 closes/hr; no signal with 0% WR 3+ (last-hour or 24h n>=3) — no regime-kill eligibility (n>=3 24h: ai-trader-pending 5T 60% +0.62, jup_yolo_mirrored 3T 66.7% +0.04 — both positive)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/13 = 7.7% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 3/13 = 23% avg -$0.153 — expected at leverage
+- Boost: none eligible (ai-trader-pending meets WR/n/PnL but all 5 trades on BTC — single token fails multi-token consistency, and it is a manual CEO signal; jup_yolo_mirrored 3T n<5; rest n<5)
+- Neg streak: 10 +0.03, 11 +0.07, 14 +0.46, 15 +0.12 — positive, no size cut
+- Frequency: 2 closes/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still RED -$1.37 (47.5% WR); 24h GREEN +$0.50
+- Storm streak stays 0/3 after negative counterfactual -$1.11 — next positive storm starts a new run (deadline 2026-11-19)
+- 15:25 storm packet was missing from ceo_kanban.md — backfilled at 16:25 for bar countability
+- BTC pending trades now at 10x (leverage trial 41a79bde) — hard_max_loss -9.77% account is consistent with ~1% move at 10x; watching for oversized account hits
+BY: auto_1hr
