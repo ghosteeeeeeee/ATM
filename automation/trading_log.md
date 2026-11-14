@@ -26687,3 +26687,32 @@ BY: auto_1hr
 - Unarmed WR 25.0% (-$0.47) over 24h — chop entries persist; stall stack owns fix
 - Storm streak still 2/3 — next positive storm makes enforce bar eligible (CEO + T sign-off required)
 BY: auto_1hr
+
+## [2026-11-14 15:25] Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** $0.46 (WR: 100.0%) | 24h 12T 58.3% +$0.29 GREEN | 7d 99T 48.5% -$1.40 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**Storm Packet (gate FIRED):**
+🌩️ [STORM-READINESS] window-min -1.65% / at-run -1.65% | blocked 125 (combo_key-stale 46, short-rsi-hard-floor 19, compaction_stale_10min 15, pump-chain-* 14, long-*gates 10, vol-gate-override 6, expired-hotset 4, rr-engine-hard-block 4, short-regime-gate 2, confluence single-type 2, other 3) | true-starvation 35 RSI>=35 | counterfactual $-0.98 (touch 28/35) | waiver: SHADOW=True ENFORCE=False — storm packet, counterfactual NEGATIVE -> **streak RESET 0/3** (was 2/3 after 03:25 +0.24 / 06:xx +0.72; bar needs >=3 consecutive positive, deadline EXTENDED 2026-11-19); split: blocked SHORTs $+1.56 (16), blocked LONGs $-2.54 (19) = gates correctly kept dump LONG losers out, but also suppressed some dump SHORT winners
+
+**No Change Needed:**
+- Last hour: 1 close (BTC ai-trader-pending SHORT manual_tp_hit +$0.46 +9.96%, opened 07:07 closed 14:25, MAE 0.07%), 1 open (BTC pending SHORT +0.26)
+- Entry quality: 24h winners avg MAE 0.208% (<0.5% OK); losers 0.678%
+- Arm rate: unarmed 8/12 = 66.7% (<70%) WR 37.5% (+$0.09) vs armed 4/4 100% (+$0.20) — unarmed share under 70%, WR improved; stall stack owns fix, no new gate
+- Kill check: 1 close/hr; no signal with 0% WR 3+ (last-hour or 24h) — no regime-kill eligibility
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/12 = 16.7% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 2/12 = 17% avg -$0.120 — expected at leverage
+- Boost: none eligible (ai-trader-pending 3T 66.7% +$0.50 n<5; jup_yolo_mirrored 3T 66.7% n<5; atr-trend- 2T 100% n<5)
+- Neg streak: 06 -0.15, 07 +0.11, 10 +0.03, 11 +0.07, 14 +0.46 — streak 0 -> no size cut
+- Frequency: 1 close/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d still 48.5% RED -$1.40 (improved from -$1.86)
+- Storm streak RESET 0/3 — next positive storm starts a new run (deadline 2026-11-19)
+- Unarmed WR improved to 37.5% (+$0.09) — chop cohort less toxic than prior 25%/-0.47, still watch
+BY: auto_1hr

@@ -126,3 +126,6 @@
 
 ## TEAM UPDATES
 - [2026-10-28 11:32 UTC] auto_1hr: BOOST bb-squeeze+ weight 0.9→1.0 (signal_compactor.py:627, signal_versions v2) — 24h 7T 71.4% +$0.29 multi-token (STABLE×2, ICP, PENGU, MINA), 7d 15T 66.7% +$0.45; held >65% post-0.9 boost as pre-registered at 09:35 run. 1T last hour (MINA trail win +$0.04). 24h 24T 50% −$0.54 RED, 7d 136T −$0.68. Size-reduce 1.0x (file absent). Kill: none (volume-buildup- 14d positive in NORMAL/HIGH). atr_sl_hit 20.8%. Inversion 0. 1 open BTC pending LONG.
+
+## TEAM UPDATES
+- [2026-11-14 15:25 UTC] auto_1hr: NO CONFIG CHANGE — 1T last hour (BTC ai-trader-pending SHORT manual_tp_hit '+0.46' '+9.96%'), 1 open | 24h 12T 58.3% '+0.29' GREEN | 7d 99T 48.5% '-1.40' RED — size-reduce 1.0x (file absent = truth) | kill: none (no 0% WR n>=3) | atr_sl_hit 2/12=16.7% <40% tpsl deployed | inversion 0 | boost none eligible (all n<5) | arm-rate: unarmed 8/12=66.7% (<70%) WR 37.5% '+0.09' vs armed 100% '+0.20' — no gate; stall stack owns fix | neg streak 0 (14 +0.46) -> no size cut | frequency 1 close/hr | STORM FIRED window-min -1.65% / at-run -1.65% — packet emitted, counterfactual $-0.98 NEGATIVE -> **streak RESET 0/3** (deadline 11-19) | No constants change -> no signal_versions entry
