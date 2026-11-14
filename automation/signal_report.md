@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-13 21:23 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-14 03:23 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,792 | **WR:** 51.3% | **PnL:** -124.29%
+- **Total trades (all time):** 3,793 | **WR:** 51.3% | **PnL:** -125.24%
 - **Date range:** 2026-07-29 → 2026-11-13
 
 ---
@@ -21,9 +21,7 @@ None found.
 
 ## MARGINAL (30-50% WR)
 
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| ai-trader-pending | SHORT | 5 | 40.0% | +0.55 | ❓ | Borderline |
+None found.
 
 ---
 
@@ -41,7 +39,6 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] ai-trader-pending SHORT** — WR=40.0%, PnL=+0.55% over 5 trades. Monitor next cycle.
 
 ---
 
@@ -53,6 +50,7 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-11-14 | b5a7c92 | watchdog: cycle 2026-11-14 00:55 — reclaim-exit steer age=3,... |
 | 2026-11-13 | 114711f | SL placement fix (CEO 2026-11-13): structure-widened guardia... |
 | 2026-11-13 | 919f4d5 | scripts: brain_auditor #257 — DEMOTE contrarian pc- fade (CO... |
 | 2026-11-13 | 6034708 | scripts: fire winner-cell size REVERT 1.25->1.0 (registered ... |
@@ -62,6 +60,5 @@ None found. Top performers are already enabled.
 | 2026-11-08 | e91eea0 | skills: full-analysis gains MTF ADX/ATR lifecycle (CEO rules... |
 | 2026-11-08 | 6740b6f | scripts: payoff-fix CHANGE-NOW — stop-tighten scope-widen 2-... |
 | 2026-11-08 | 704c73c | signals: atr_trend_accel CONF_BASE 70->78 (CEO: hotset compe... |
-| 2026-11-06 | 673b669 | bug-hunter: atr_trend_accel build fixes |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

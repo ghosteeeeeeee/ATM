@@ -11237,5 +11237,59 @@
     "status": "suggested",
     "risk": "low",
     "date": "2026-11-13T16:46:33+00:00"
+  },
+  {
+    "date": "2026-11-14T01:09:08+00:00",
+    "idea": "PRE-ARM BE LOCK thr=0.25 SHIP CANDIDATE — walk all bars met (+$6.69/30d, fk 13.9%, halves same sign); zero-behavior shadow probe shipped this run; enforce = independent verify + 7d soak + CEO GO",
+    "rationale": "the [0.25,0.40) never-armed giveback class is the chop-bleed paying cohort and was never tested (#82 tested >=0.40 = UGB's domain, fk 39.7% fail); composition is exactly atr_sl/hard_max never-armed exits",
+    "expected_impact": "cut ~$6-7/30d of never-armed giveback losses without touching armed trades or winners above 0.40",
+    "category": "exit sniper",
+    "status": "candidate-shadow-collecting",
+    "risk": "medium (money path — needs independent verify + CEO GO)"
+  },
+  {
+    "date": "2026-11-14T01:09:08+00:00",
+    "idea": "Producer-pinned flip readings — any contrarian re-promote/go-NO-go must name join-vs-monitor and reproduce twice within 1 run",
+    "rationale": "53.1% vs 47.9% drift on a near-fixed cohort this run; the re-promote bar (>=58%) is close enough that an ambiguous producer could flip the decision",
+    "expected_impact": "eliminates a whole class of silent-decision drift",
+    "category": "governance",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-14T01:09:08+00:00",
+    "idea": "Peak-band lock map — the thr sweep shows 0.10/0.15/0.20 fail fk (46.8/32.9/22.8%), 0.25 passes all bars, 0.30+ nets less: the profitable lock lives in a NARROW peak band; publish the curve with the walk so future threshold changes walk the curve, not single points",
+    "rationale": "single-threshold tuning re-derives the same curve every time; the curve IS the artifact",
+    "expected_impact": "faster future adjudication, no re-burn",
+    "category": "meta",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-14T04:50:48Z",
+    "idea": "SLOPE-FILTER blocked-set leaderboard — gate_shadow already ranks gates by would-win; surface top signal×gate cells n>=15 ww>=70% as standing AMPLIFY feed (first entry: jup SHORT x SLOPE 91% n=23)",
+    "rationale": "clone-hunt currently ad-hoc; the data is already in gate_shadow.db and was under-read for weeks",
+    "expected_impact": "systematic under-deployment detection, +1 amplify candidate class per week",
+    "category": "offense pipeline",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-14T04:50:48Z",
+    "idea": "PREARM-LOCK first-fire watch — SOL #16903 already printed would-fire (peak +0.35% then back to entry, never armed); track 7d soak: fires that later arm vs never-arm outcomes before enforce GO",
+    "rationale": "shadow probe landed 01:09; first real candidate appeared same hour — need outcome book before CEO enforce",
+    "expected_impact": "independent verify input for 11-21 prearm adjudication",
+    "category": "exit stack",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-14T04:50:48Z",
+    "idea": "Chop-bleed dollar-share vs trailing-30 avg-loss dual KPI — bleed 93.5% (entry quality) while trailing-30 avg loss worsened -0.092→-0.105; exitstack-day KPI (bar -0.070) may be measuring loss SIZE while bleed measures loss ORIGIN — report both so a leg can't pass one while failing the other",
+    "rationale": "exitstack-day-kpi-1114 only tracks avg loss magnitude; never-armed share is the independent root cause metric",
+    "expected_impact": "prevents false-pass on exitstack read",
+    "category": "meta",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

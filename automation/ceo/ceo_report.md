@@ -1332,3 +1332,9 @@ Numbers verified fresh via psql (brain). Metric-interpretation: no loss-filtered
 ### Numbers: 24h 16T +0.09 50.0% | 7d 94T -1.88 46.8%
 ### Findings: disk 90% (WARN threshold 85%) repeating every hour; 13 decision items due ≤24h (11-14 batch: mfe-cut-arm-be, mult-150, jup-short-walk, atrtrail-clip, stop-tighten-eval). Rotating Q (regime-specialists): no cell n>=5 net>0.50 in 7d — atr-trend- HIGH 6T +0.09/83.3% and jup HIGH 9T +0.02 are the only positive slices; jup NORMAL 10T 70% but -0.05 (RR drag), ai-trader-pending NORMAL 19T 36.8% worst. 7d regime totals all negative (HIGH -0.67, NORMAL -0.61, EXTREME -0.38, FLAT -0.22).
 ### Recommendation: schedule disk cleanup before 85%→full; 11-14 CEO-owned items (mfe-cut, mult-150, stop-tighten) need labels by 00:00Z.
+
+## CEO Status — 20261114T031852Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 14T -0.08 42.9% | 7d 93T -1.92 46.2%
+### Findings: PnL negative — 7d bleed is exit-side (atr_sl_hit -1.95 + hard_max_loss -1.30, 0% WR by construction, cutting bleed as designed) vs profit-monster-trail +1.56/30T 96.7%; loss engines own the gap, not entries. Disk 90% (repeated WARN). 1 control-tower OVERDUE today: stop-tighten-slippage-column (clamp CFs stay 'stated-not-realized' until shipped).
+### Recommendation: Ship the stop-tighten slippage column today (overdue) and rotate disk cleanup; no param/flag changes needed.

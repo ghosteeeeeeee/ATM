@@ -1178,9 +1178,10 @@ WINNER_CELL_SIZE_MULT_CAP = 1.5
 # run #241 (2026-11-08). The old 2-tuple key matched only signal+regime while
 # decider_run._get_winner_cell_size_mult already received `direction` and never
 # used it, so a cell would size up BOTH legs. Harmless while every cell was
-# direction-pure (bb-squeeze+ NORMAL / r2v2-long3 NORMAL / pump-chain+ EXTREME
-# are LONG-only, volume-buildup- HIGH is SHORT-only in the 30d validation
-# window) — but the pending amplify-jup-short-high-cell proposal to add
+# direction-pure (bb-squeeze+ NORMAL / r2v2-long3 NORMAL are LONG-only,
+# volume-buildup- HIGH is SHORT-only in the 30d validation window;
+# pump-chain+ EXTREME dropped 2026-11-14 #259) — but the pending
+# amplify-jup-short-high-cell proposal to add
 # ('jup_yolo_mirrored','HIGH') would have 1.25x'd jup HIGH LONG 34T/41T
 # '-0.75' alongside the winning SHORT leg 15T 73.3% '+0.40'.
 # Cells were VALIDATED on one direction's trades, so sizing must match it.
@@ -1189,7 +1190,8 @@ WINNER_CELLS_VALIDATED = {
     ('bb-squeeze+', 'NORMAL', 'LONG'),
     ('volume-buildup-', 'HIGH', 'SHORT'),   # bug_hunter 2026-10-29: was 'volume-buildout-' (transcription typo — 0 rows ever; real signal + exact cell stats 14T/71.4%/+$0.21 confirmed on 'volume-buildup-')
     ('r2v2-long3', 'NORMAL', 'LONG'),
-    ('pump-chain+', 'EXTREME', 'LONG'),
+    # ('pump-chain+', 'EXTREME', 'LONG') DROPPED 2026-11-14 #259 — bar met: 30d 49T net -0.18 WR 40.8% <= 0
+    # (pre-reg amplify-winner-cell-drop-pcplus; inert while mult=1.0). RE-ADD: 30d >= +0.50 AND 2 consecutive positive weeks AND n>=40.
 }
 assert all(len(c) == 3 and c[2] in ('LONG', 'SHORT') for c in WINNER_CELLS_VALIDATED), \
     'WINNER_CELLS_VALIDATED must be (signal, regime, direction) 3-tuples'
@@ -2110,7 +2112,7 @@ VB_TRAIL_ARM_TIMEOUT_MIN = 45         # vb- armed winners avg hold 34m; catches 
 # proven mechanism — universal time+unrealized-pnl cut does not work on crypto paths.
 # Shadow stays zero-behavior (logs would-fires only) for data collection.
 # DO NOT flip live. Redesign required: signal-family-scoped timeouts, not universal cut.
-MFE_CUT_SHADOW_ENABLED = True  # Revert: set False.
+MFE_CUT_SHADOW_ENABLED = False  # KILLED 2026-11-14 brain_auditor #259 (default fired #258): candle OOS net-cost ~$9.90/30d, UGB-PT enforced live, no remaining consumer. Revert: set True.
 MFE_CUT_SHADOW_MIN = 45        # minutes hold before stall check
 MFE_CUT_SHADOW_MFE_MAX = 0.20  # live_pnl % below this at T => would-fire
 # ── MFE-GIVEBACK EXIT (T 2026-10-31) ─────────────────────────────────────────
@@ -2168,7 +2170,7 @@ ARM_BE_SHADOW_ENABLED = True  # Revert: set False.
 # UGB-PT's domain now); this is the lower-peak class, not previously tested.
 # Enforce path = CEO GO + independent verify (money-path change). Revert: False.
 PREARM_LOCK_SHADOW_ENABLED = True
-PREARM_LOCK_THR_PCT = 0.25
+PREARM_LOCK_THR_PCT = 0.25  # PERCENT (not fraction — PM_TRAIL_ACTIVATE_PCT is fraction)
 # AI-TRADER+ EXTREME LONG conf-demote SHADOW (brain_auditor 2026-10-18).
 # RETIRED 2026-10-19 brain_auditor: signal_reporter hard block b0a2467d (09:41,
 # 30d 15T 26.7%WR -$0.71) supersedes — 0 EXTREME trades since, shadow starved.

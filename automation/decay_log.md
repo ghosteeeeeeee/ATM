@@ -2303,3 +2303,5 @@
 [2026-11-13 21:23 UTC]   🟢 OK: ai-trader-pending: 6 trades, 33.3% WR, PnL=-0.27
 [2026-11-13 21:23 UTC] Done. Rapid-disabled 0 signals.
 [2026-11-13 21:23 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-11-14 03:23 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-11-14 03:23 UTC] No signals with sufficient trades in 24h window

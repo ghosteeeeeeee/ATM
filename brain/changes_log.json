@@ -4177,5 +4177,49 @@
     "after": "CONTRARIAN_LIVE_ENABLED = False",
     "rationale": "Pre-registered demote bar breached on any-read basis; monotone flip-WR decay 64.6%->52.9% since 10-27; live cohort no edge; STRONG_DOWN tape means fade LONGs fight trend. Re-promote bar >=58% + CEO/T.",
     "impact": "pc- signals fire original SHORT direction again; removes wrong-side fade LONGs. Revertible one line."
+  },
+  {
+    "timestamp": "2026-11-14T01:09:08+00:00",
+    "agent": "brain_auditor",
+    "change": "PREARM-LOCK shadow probe shipped (zero-behavior): PREARM_LOCK_SHADOW_ENABLED=True + PREARM_LOCK_THR_PCT=0.25 + position_manager 7b-shadow3b log-only block; bug-hunter SHIP-WITH-FIXES both MED fixes applied",
+    "type": "config",
+    "file": "scripts/hermes_constants.py + scripts/position_manager.py",
+    "before": "no prearm lock collector existed",
+    "after": "log-only would-fire when peak in [0.25%,0.40%) and price back at entry, never armed",
+    "rationale": "amplify-prearm-breakeven-lock bars all met (30d net +$6.69, fk 13.9%, 14d +$3.17 same-sign) — start live counterfactual; enforce needs independent verify + CEO GO",
+    "impact": "zero live behavior change; 7d shadow soak then adjudicate 11-21"
+  },
+  {
+    "timestamp": "2026-11-14T01:09:08+00:00",
+    "agent": "brain_auditor",
+    "change": "COMBO-WEIGHT PIN REVERT (pre-registered default fired): PINNED_COMBO_WEIGHTS {} + combo_weights.json bb-squeeze+ 1.3->1.1, warrior-sr-confirm+ 1.6->1.04, warrior-sr-confirm- deleted",
+    "type": "config",
+    "file": "scripts/self_learner.py + data/combo_weights.json",
+    "before": "pinned bb-squeeze+ 1.3 / warrior+ 1.6 / warrior- 1.6",
+    "after": "no pins; auto weights 1.1 / 1.04 (warrior- falls to static 1.6)",
+    "rationale": "amplify-bbsqueeze-warrior-uninert bars failed both legs: next-100 share 11% < 25% (was 23% at #241) and bb-squeeze+ 7d net -0.26 < 0",
+    "impact": "score-only weights change (affects confluence ranking); auto-tuning resumes at daily recalc; CEO may re-pin with fresh evidence"
+  },
+  {
+    "timestamp": "2026-11-14T04:50:48Z",
+    "agent": "brain_auditor",
+    "change": "MFE_CUT_SHADOW_ENABLED True->False (pre-registered default KILL from #258: candle OOS net-cost ~$9.90/30d, UGB-PT enforced live, no consumer)",
+    "type": "config",
+    "file": "scripts/hermes_constants.py",
+    "before": "MFE_CUT_SHADOW_ENABLED = True",
+    "after": "MFE_CUT_SHADOW_ENABLED = False",
+    "rationale": "#258 disposition default fired; queued for next run; log-only collector killed to stop noise",
+    "impact": "zero live behavior change (was log-only); removes would-fire log noise"
+  },
+  {
+    "timestamp": "2026-11-14T04:50:48Z",
+    "agent": "brain_auditor",
+    "change": "DROP ('pump-chain+','EXTREME','LONG') from WINNER_CELLS_VALIDATED (pre-reg amplify-winner-cell-drop-pcplus bar met: 30d 49T net -0.18 WR 40.8% <=0)",
+    "type": "config",
+    "file": "scripts/hermes_constants.py",
+    "before": "WINNER_CELLS_VALIDATED contained ('pump-chain+','EXTREME','LONG')",
+    "after": "cell removed (commented with RE-ADD bar)",
+    "rationale": "Pre-registered drop at 11-14 mult-150 adjudication; #258 deferred on 2-change cap; inert while WINNER_CELL_SIZE_MULT=1.0",
+    "impact": "stops any future sizing-UP of a 40.8% WR cell; RE-ADD needs 30d>=+0.50 + 2 positive weeks + n>=40"
   }
 ]

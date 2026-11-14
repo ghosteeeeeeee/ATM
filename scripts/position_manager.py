@@ -4404,13 +4404,15 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             except Exception as e:
                 log(f"  [SHADOW] ARM-BE error for {token}: {e}")
 
-        # ── 7b-shadow3b. PREARM-LOCK SHADOW — pre-arm BE lock (zero behavior) ──
+        # 7b-shadow3b. PREARM-LOCK SHADOW — pre-arm BE lock (zero behavior) ──
         # brain_auditor #258 (2026-11-14). Walk exit_stack_walk_2026_11_14.py:
         # thr 0.25 30d net +$6.69 / fk 13.9% / 14d +$3.17 / halves same sign =
         # ALL BARS MET (SHIP CANDIDATE, enforce needs CEO GO + independent verify).
-        # highest_price is monotonic, so fav in [thr, arm) proves the peak was
-        # reached BEFORE now and the trade never hit the 0.40 arm (armed-live and
-        # UGB-domain trades both keep fav >= arm and are excluded here).
+        # highest_price is monotonic EXCEPT guardian orphan-reconcile resets, so
+        # fav in [thr, arm) usually proves the peak preceded now and the trade
+        # never hit the 0.40 arm — but PMonster arms on its OWN sampled price
+        # (bug-hunter #258 finding #1), so the DB peak can lag a live arm:
+        # double-check profit_monster trail state and skip armed trades.
         # live_pnl <= 0 = price back at/below entry. Brief sub-entry dips that
         # recover between polls are missed (poll ~1-2m) — logged counts are a
         # lower bound. Per-process dedup; consumers join by trade_id.
@@ -4420,15 +4422,21 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 _pl_hi = float(pos.get('highest_price') or 0) or 0
                 _pl_lo = float(pos.get('lowest_price') or 0) or 0
                 _pl_arm = PM_TRAIL_ACTIVATE_PCT * 100
+                _pl_armed_live = False
                 if _pl_en > 0 and _pl_hi > 0 and _pl_lo > 0:
                     if direction == 'LONG':
                         _pl_fav = (_pl_hi / _pl_en - 1.0) * 100
                     else:
                         _pl_fav = (1.0 - _pl_lo / _pl_en) * 100
-                    if (PREARM_LOCK_THR_PCT <= _pl_fav < _pl_arm
-                            and live_pnl <= 0):
-                        _prearm_lock_logged.add(trade_id)
-                        log(f"  [SHADOW] PREARM-LOCK would-fire {token} {direction} live={live_pnl:+.2f}% peak={_pl_fav:+.2f}% [thr {PREARM_LOCK_THR_PCT:.2f}% peak then back to entry, never armed {_pl_arm:.2f}%] trade={trade_id} sig={_pos_signal}")
+                    if PREARM_LOCK_THR_PCT <= _pl_fav < _pl_arm and live_pnl <= 0:
+                        try:
+                            from profit_monster import _load_trail_state
+                            _pl_armed_live = str(trade_id) in _load_trail_state()
+                        except Exception:
+                            _pl_armed_live = False  # fail-open to logging; analysis joins pm_armed_at
+                        if not _pl_armed_live:
+                            _prearm_lock_logged.add(trade_id)
+                            log(f"  [SHADOW] PREARM-LOCK would-fire {token} {direction} live={live_pnl:+.2f}% peak={_pl_fav:+.2f}% [thr {PREARM_LOCK_THR_PCT:.2f}% peak then back to entry, never armed {_pl_arm:.2f}%] trade={trade_id} sig={_pos_signal}")
             except Exception as e:
                 log(f"  [SHADOW] PREARM-LOCK error for {token}: {e}")
 

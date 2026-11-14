@@ -1,177 +1,161 @@
 {
-  "timestamp": "2026-11-13T16:46:33+00:00",
-  "run": 257,
+  "timestamp": "2026-11-14T04:52:38Z",
+  "run": 259,
   "session_brain_stats": {
-    "queries": 5,
-    "hits_returned": true,
-    "usable_citations": 0,
-    "note": "session_brain still returns null dates/empty excerpts + reasoning-type noise despite chunk_types filter — known drift, rebuild owed 12+ runs (carried). Prior-art for demote sourced from data/shadow_disposition.json instead."
+    "queries_run": 7,
+    "quality": "weak — titles/dates often null (known session_brain rebuild drift, 14+ runs)",
+    "notes": "prior-art queries returned low-signal hits; relied on shadow_disposition + changes_log as primary prior art"
   },
   "questions_asked": [
     {
-      "question": "what did we say about contrarian fade decay demote",
+      "question": "what did we say about ai-trader-pending losses",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "prearm breakeven lock shadow",
       "results_found": 5,
       "cited": false,
-      "note": "hits had null title/date — unusable"
+      "note": "hits irrelevant (score>1.0)"
     },
     {
-      "question": "have we tried reverting contrarian live enable before",
+      "question": "chop bleed entry quality arm rate",
       "results_found": 5,
       "cited": false,
-      "note": "prior art found in shadow_disposition (flip-contrarian-pc revert flag), not session brain"
+      "note": "hits irrelevant"
     },
     {
-      "question": "pump-chain fade live performance",
+      "question": "stop tighten enforce slippage",
       "results_found": 5,
-      "cited": false
+      "cited": true,
+      "note": "ugb_pt exit hit relevant"
     },
     {
-      "question": "exit stack day 11-14 items mfe-cut stop-tighten",
+      "question": "have we tried MFE_CUT shadow kill before",
       "results_found": 5,
       "cited": false,
-      "note": "hit 'mfe exit' title present, date null"
+      "note": "primary art = #258 disposition"
     },
     {
-      "question": "contrarian fade demote revert",
+      "question": "pump-chain EXTREME winner cell drop",
       "results_found": 3,
       "cited": true,
-      "citation": [
-        "calwndar",
-        "date=null (drift)",
-        "contrarian-live would fire only when -0.5 < cur_z (mild dump/bounce) — Z-FLIP interaction known prior art"
-      ]
-    }
-  ],
-  "config_changes_applied": [
+      "note": "ceo thread"
+    },
     {
-      "file": "scripts/hermes_constants.py",
-      "change": "CONTRARIAN_LIVE_ENABLED True->False",
-      "bar": "watch-pc-flip-demote-55 pre-reg <55% breached",
-      "evidence": "join 16:30Z 52.9% / 16:38Z 53.1% reproduced n=350; live fade 38T 39.5% WR net 0.00; decay 64.6%->52.9% since 10-27",
-      "ceo_flag": "REVERTIBLE one line; flagged in kanban for CEO veto"
+      "question": "SLOPE-FILTER gate jup short blocked",
+      "results_found": 2,
+      "cited": true,
+      "note": "regime adaptation + redundant filter threads"
     }
   ],
   "trade_summary_24h": {
-    "trades": 14,
-    "wr": 50.0,
-    "pnl": 0.12,
-    "window": "closed last 24h",
-    "7d": "90T 46.7% -1.81",
-    "14d": "323T 51.4% -4.02",
-    "30d": "684T 49.3% -7.37",
-    "armed_14d": "157T 91.1% +8.74",
-    "unarmed_14d": "166T 13.9% -12.76",
-    "trail_14d": "177T 86.4% +8.34",
-    "atr_sl_hit_14d": "56T 0% -6.16",
-    "hard_max_14d": "49T 0% -5.90",
-    "chop_bleed_7d": "88.9% dollar (4.02/4.25, 40/45 losers never-armed) — BELOW 92% push bar first time in recent runs",
-    "arm_rate_7d": "LONG 43.2% / SHORT 50.9% — tripwire NOT met (SHORT not >55)"
+    "closed": "13T 38.5% -0.27 RED",
+    "by_signal_worst": "ai-trader-pending SHORT 3T 0% -0.26 (watchdog steer-001 stands)",
+    "windows": {
+      "7d": "93T 46.2% -1.92",
+      "14d": "301T 50.8% -3.89",
+      "30d": "677T 49.6% -7.29"
+    },
+    "armed_7d": "45T 84.4% +2.09 vs never 48T 10.4% -4.01",
+    "armed_14d": "143T 91.6% +8.32 vs never 158T 13.9% -12.21",
+    "chop_bleed_7d_dollar": "93.5% (41/47 losers never armed, -4.19 of -4.48) = >=92% breach",
+    "exits_7d": "profit-monster-trail 30T 96.7% +1.56 || atr_sl_hit 17T 0% -1.95, hard_max 13T 0% -1.30, manual_sl 8T 0% -0.62",
+    "arm_rate_7d_by_dir": "LONG 42.1% (16/38) <50 tripwire leg | SHORT 52.7% (29/55) not >55 = full tripwire NOT met",
+    "open": "2: BTC #16902 ai-trader-pending SHORT @68002 +1.81% (watchdog trail-step/BE steers); SOL #16903 jup SHORT @75.47 opened 04:27 +0.28% (PREARM-LOCK would-fire printed)"
   },
   "shadow_analysis": {
-    "contrarian": "JOIN RE-RAN 16:30Z + 16:38Z (mandate). pc- flip 52.9%->53.1% n=350 = DEMOTE BAR BREACHED (<55%) -> CONTRARIAN_LIVE_ENABLED=False executed. overall flip 43.5% n=1811. rider 40% do-NOT stands.",
-    "floor_admit": "JOIN RE-RAN 16:38Z: floor 48.9% n=1690 vs always 43.1% n=332, fisher p=0.0545 (drifting UP from 0.0442) — 30d same-sign bar due 11-15, do NOT ship early. COLLECT.",
-    "oscillator": "FROZEN/archived — not used",
-    "wyckoff": "RETIRED 10-31 — not used",
-    "rr_shadow": "ORPHANED (24d stale producer) — not used",
-    "shadow_trader": "96k+: exit A/B pm_trail +14,522 vs hard_max -17,291 = trail-or-nothing. Top source grind-breakout- 93.8% n=32 (underdeploy entry open 11-18). CONFLUENCE-EXPIRY gates justified @48%.",
-    "overall": "4/6 answerable (contrarian, floor, shadow_trader, live metadata). Contrarian join drove this run's config change."
+    "contrarian": "join RE-RAN 04:31Z (mandate): overall flip 42.6% n=1848; pump-chain- orig_wr 44.4% (156W/195L) — CONTRARIAN_LIVE stays False (#257 demote holds); rider do-NOT",
+    "floor_admit": "join RE-RAN: n=1752 PASS n-bar; 30d same-sign NOT reachable until ~12-16; COLLECT due 11-15 do-NOT-ship-early",
+    "wyckoff": "RETIRED (not pending)",
+    "oscillator": "FROZEN/archived",
+    "rr_shadow": "ORPHANED",
+    "shadow_trader": "96k+ signals; exit A/B pm_trail +14834 vs hard_max -17861 = trail-or-nothing; top source grind-breakout- 93.8% n=32 (in-flight amplify)",
+    "prearm_lock": "SHADOW LIVE 01:09; first would-fire SOL #16903 04:38 (peak +0.35% never armed)",
+    "overall": "3/6 answerable (contrarian, floor, shadow_trader); prearm now live collector"
+  },
+  "losing_trade_autopsy": {
+    "method": "recovery_replay adverse-first, selfcheck PASS exit=0",
+    "48h": "n=13 = 1 never-adverse / 11 recovered / 1 NEVER (CFX atr-trend- SHORT -0.08) → WRONG-SIDE REFUTED 86th consecutive (#61 p=0.116, #84 t=-0.04)",
+    "winning_side_note": "6/8 standing losers were structure-aligned shorts beating counter-trend longs; 2 were shorts that bounced — no exit-management failures"
   },
   "drift_findings": [
-    {
-      "item": "session_brain null title/date + reasoning noise despite native filters",
-      "severity": "MED",
-      "status": "rebuild owed 12+ runs, carried"
-    },
-    {
-      "item": "contrarian join outcomes reclassify between reads (198W->185W n fixed) — unsettled 5m candle windows/backfill",
-      "severity": "MED",
-      "status": "creative #1 settle-time guard proposed"
-    }
+    "session_brain null dates/excerpts — rebuild owed 14+ runs (MED, carried)",
+    "stop-tighten-slippage-column DEFAULT FIRED 01:06 — owner main-session BUILD #1 overdue since 11-14 00:00; brain_auditor cannot ship (not owner); CFs stay labeled stated-not-realized",
+    "watchdog pnl_usdt=0.00 on open BTC short while pnl_pct=1.81 — unrealized USDT not stamped on opens (LOW, trade_watchdog owner)"
   ],
   "recurring_problems": [
-    "chop-bleed / never-armed bleed: 88.9% 7d (below 92% bar this read) — owned by 11-14 exit-stack, no new gate",
-    "arm-rate LONG <50% for multiple runs (43.2% now) but SHORT not >55 = tripwire structurally unmet — monitor"
+    "chop-bleed >=92% dollar share resumed (93.5% 7d) — entry quality / never-armed class; exitstack-day owns structural fix",
+    "ai-trader-pending 23T 30.4% -0.37 = 8/8 manual_sl_hit and 7/7 manual_tp_hit in 7d — CEO domain, steer-001 stands",
+    "LONG arm-rate 42.1% <50 but SHORT not >55 = tripwire incomplete (2nd leg needed)"
   ],
   "missing_implementations": [
-    "join settle-time guard (classify only fully-closed 30-candle windows + settle lag) — not built",
-    "ema300-breakthrough conversion diagnosis — registered this run as amplify entry"
+    "slippage column (CEO BUILD #1, main-session) — DEFAULT fired, still owed",
+    "SLOPE-FILTER blocked-set leaderboard (new creative, fed by amplify-slope-jup-short-exempt)"
   ],
   "creative_improvements": [
+    "SLOPE-FILTER blocked-set leaderboard as standing AMPLIFY feed",
+    "PREARM-LOCK first-fire outcome book for 11-21 enforce GO",
+    "dual KPI: chop-bleed dollar-share + trailing-30 avg-loss so exitstack can't false-pass"
+  ],
+  "config_changes_applied": [
     {
-      "idea": "Contrarian join SETTLE-TIME guard: only classify entries whose 30x5m window closed >=60min before read",
-      "rationale": "reads reclassified 13 WINNER->LOSER in 4h at fixed n=350; unsettled windows make demote/promote bars whipsaw",
-      "category": "measurement integrity",
-      "status": "suggested",
-      "risk": "low"
+      "type": "config (log-only collector kill)",
+      "file": "scripts/hermes_constants.py",
+      "change": "MFE_CUT_SHADOW_ENABLED True->False",
+      "rationale": "#258 default KILL fired: candle OOS net-cost ~$9.90/30d, UGB-PT enforced, no consumer; queued for next run",
+      "review": "py_compile PASS; pre-adjudicated #258; zero live behavior (was log-only)"
     },
     {
-      "idea": "ema300-breakthrough underdeploy hunt (registered amplify-ema300-breakthrough-underdeploy)",
-      "rationale": "ENABLED signal, 0/30d fills, 10/10 detections expired, shadow avg +0.24 n=14",
-      "category": "clone-hunt",
-      "status": "registered",
-      "risk": "low"
-    },
-    {
-      "idea": "Post-demotion pc- SHORT cohort watch: original direction 103T 34% WR +0.12/30d — if demoted cohort bleeds >0.50/14d, kill-review (NO-KILL standing requires fresh data)",
-      "rationale": "demote returns to weak-but-positive baseline; verify it stays positive",
-      "category": "kill-review",
-      "status": "suggested",
-      "risk": "low"
+      "type": "config (winner-cell membership)",
+      "file": "scripts/hermes_constants.py",
+      "change": "DROP ('pump-chain+','EXTREME','LONG') from WINNER_CELLS_VALIDATED",
+      "rationale": "pre-reg amplify-winner-cell-drop-pcplus bar met: 30d 49T net -0.18 WR 40.8% <=0; #258 deferred on 2-change cap; inert while mult=1.0",
+      "review": "py_compile PASS; assert still validates remaining 3-tuples; RE-ADD bar commented in-file"
     }
   ],
   "changes_from_last_run": [
     {
-      "change": "#256 watch-pc-flip-demote-55 registered",
-      "worked": "YES — surfaced and breached same day; dispositioned DEMOTE EXECUTED this run"
+      "change": "#258 PREARM-LOCK shadow",
+      "worked": "VERIFIED LIVE — flag True, first would-fire SOL #16903 04:38Z, py_compile PASS"
     },
     {
-      "change": "#256 mult-150 pre-computed FAIL (due 11-14)",
-      "worked": "entry still open, disposition already records THRESHOLD NO LONGER MET — ready for 11-14"
+      "change": "#258 combo pin revert",
+      "worked": "VERIFIED — PINNED_COMBO_WEIGHTS absent, combo_weights bb-squeeze+ 1.1 / warrior- deleted"
     },
     {
-      "change": "#256 amplify-warrior-sr-normal-long registered",
-      "worked": "YES — open, due 11-20"
+      "change": "#257 pc- demote",
+      "worked": "VERIFIED — CONTRARIAN_LIVE still False; join overall flip 42.6% remains below re-promote >=58%"
     },
     {
-      "change": "#256 floor do-NOT-ship-early",
-      "worked": "YES — p drifted 0.0442->0.0545, still COLLECT, due 11-15"
+      "change": "#258 exit-stack 13/13 dispositions",
+      "worked": "VERIFIED — all 11-14 entries done/re-registered; exitstack-day-kpi due 11-15 open"
     }
   ],
-  "autopsy_48h": {
-    "method": "recovery_replay adverse-first (selfcheck PASS)",
-    "n": 11,
-    "never_adverse": 1,
-    "recovered": 9,
-    "never": 1,
-    "never_detail": "CFX SHORT atr-trend- -0.08 immaterial",
-    "verdict": "WRONG-SIDE REFUTED 85th consecutive run (#61 p=0.116, #84 t=-0.04)"
-  },
-  "signal_deep_dive": {
-    "new_sub50_targets_n15": 0,
-    "owned": [
-      "ai-trader-pending 22T 31.8% -0.31 CEO-domain",
-      "pump-chain- 31T 38.7% +0.15 NO-KILL standing (faded LONG cells now moot post-demotion)"
-    ]
-  },
-  "amplify": {
-    "new_proposal": "amplify-ema300-breakthrough-underdeploy (type c, due 11-20, NO-SHIP default)",
-    "why_not_cells": "all 5 n>=10 net>0 30d cells in-flight: bb-squeeze NORMAL (x4 11-14), vb- HIGH (11-20), pc+ EXTREME (drop-pcplus 11-14), pc- NORMAL LONG (fade demoted today — cell moot), atr-trend- NORMAL (11-16); sig x dir n>=8 net>0.50 = EMPTY (thin book)",
-    "flip_kpi": "0 NEW conversions this run; last met #239 week — stated per rule 3",
-    "jup_high_short_decay": "30d 21T net -0.04 (was +0.15 at 17T 11-10) — 11-19 read likely FAIL, noted"
+  "amplify_step": {
+    "proposal_this_run": "amplify-slope-jup-short-exempt (type a/c, due 11-21, NO-SHIP default): gate_shadow 30d SLOPE-FILTER blocked jup SHORT n=23 ww 91.3% net +1.41 — walk bars required",
+    "flip_kpi": "0 new shadow->live conversions this run — stated per rule 3 (last: stop-tighten ENFORCE 11-04 week)",
+    "cells_screened": "30d n>=10 net>0: bb-squeeze NORMAL LONG +0.69 (in-set), vb- HIGH SHORT +0.42 (in-set), pc- NORMAL LONG +0.15 WR 38.7% noise, jup HIGH SHORT +0.08 (in-flight 11-19), atr-trend- NORMAL SHORT +0.05 (in-flight 11-16); drop-pcplus EXECUTED this run",
+    "why_not_more": "all healthy n>=10 cells already in WINNER_CELLS or have open amplify entries; no new cell cleared the bar"
   },
   "next_actions": [
-    "11-14 EXIT-STACK DAY: 13 items due (mfe-cut-arm-be, prearm-BE, stop-tighten x3, jup-short-walk, tat-neverarmed, mult-150, drop-pcplus, bbsqueeze x3, atrtrail-clip, slippage-column)",
-    "11-15 floor same-sign + exitstack-day-kpi",
-    "11-16 atr-trend cell watch",
-    "11-17 pc- demote watch DONE early (closed this run) + jup batch",
-    "11-18 contrarian fade read (now: re-promote bar >=58% if ever) + xmirror + grind-breakout",
-    "11-19 jup HIGH SHORT OOS (net>0 bar — currently -0.04)",
-    "CEO: demote veto window (one-line revert CONTRARIAN_LIVE_ENABLED=True if disputed)"
+    "11-15: floor same-sign bar (do NOT ship early); exitstack-day-kpi read (dual KPI: avg-loss + bleed share); confirm MFE_CUT kill + pc+ drop live",
+    "11-16: atr-trend cell watch; 11-17: jup batch; 11-18: grind-breakout + contrarian re-promote bar >=58%",
+    "11-19: jup HIGH OOS (likely FAIL); 11-19/20: ema300-underdeploy; 11-21: prearm shadow first read + slope-jup walk + jup-walk + atrtrail",
+    "CEO owed: prearm-lock enforce GO path (after 7d soak + independent verify) · pc- demote veto window · slippage-column BUILD #1 (main-session, DEFAULT fired) · ai-trader-pending steer-001",
+    "Watch: BTC #16902 8h stale ~07:05Z; trail-step/BE steers on open short; SOL #16903 PREARM candidate"
   ],
-  "readiness": {
-    "open": "BTC #16896 SHORT ai-trader-pending entry 68661 SL 69161 (R1) TP 66514, +0.29%, 0.9h, meta_rsi 46.21, HIGH regime",
-    "regime": "15m SHORT_BIAS + 4h SHORT_BIAS agreed / continuum BELOW / trend STRONG_DOWN / vol LOW / auto CHOP short+15",
-    "steers": "0",
-    "stance": "SHORT aligned with tape -> HOLD bracketed; trail-family first; no fresh LONGs against STRONG_DOWN; size 1.0x; ai-trader = CEO domain"
+  "verify_258": {
+    "prearm_shadow": "PASS",
+    "combo_revert": "PASS",
+    "contrarian_demote": "PASS",
+    "exitstack_dispositions": "PASS 13/13",
+    "recovery_selfcheck": "PASS exit=0",
+    "exit_stack_walk_selfcheck": "PASS",
+    "protected_flags": "critical present (PM_TRAIL_*, LIVE_TRADING, BB_BOUNCE, CONFLUENCE)",
+    "size_reduce": "absent = 1.0x",
+    "session_lock": "absent",
+    "tracebacks_today": 0,
+    "timers": "live (watchdog/compactor/1m etc)"
   }
 }
