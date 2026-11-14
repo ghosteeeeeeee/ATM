@@ -372,7 +372,14 @@ duplicate real trade #16832).
     **2× base ($22.20) when the side's last-5 closed BTC trades net
     positive**, base ($11.10) otherwise; the HL $11 min-notional floor
     means losers cannot shrink below base — "removing from losers" is
-    expressed as no pyramid + serial cuts, not smaller notional. The
+    expressed as no pyramid + serial cuts, not smaller notional.
+    **LEVERAGE: CEO trial 10x on the next few orders (2026-11-14)** —
+    next-to-fire rungs + keeper derivations at 10x; the deep structural
+    stack (72,560+) stays 5x; revert on the CEO's word. Watchdog bound
+    is `1 <= lev <= 10` (exactly 10 = the max). Account-denominated
+    caps unchanged (base −4%, structure floor −8% = same account risk
+    per trade; at 10x a price-stop hits the floor at HALF the price
+    distance). The
     ladder is never empty on either side after a fire/TP (CEO: "you
     better be ready for the longs too — rubberband snapping back").
     Single-writer: only run_cycle. **Ride doctrine

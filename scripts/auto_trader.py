@@ -742,7 +742,7 @@ def _ladder_keeper(decision, summary):
                 orders.append({
                     'id': oid, 'coin': 'BTC', 'direction': 'short',
                     'trigger': 'below', 'trigger_price': trig,
-                    'amount_usdt': round(11.1 * _side_mult('SHORT'), 2), 'leverage': 5,
+                    'amount_usdt': round(11.1 * _side_mult('SHORT'), 2), 'leverage': 10,   # CEO trial 2026-11-14: next orders at 10x (revert when called)
                     'sl': sl, 'target': tp, 'confidence': 60,
                     'serial': True, 'dynamic_sl': False,
                     'note': (f"Rule-13 LADDER KEEPER auto-arm ({time.strftime('%Y-%m-%d %H:%M')} "
@@ -777,7 +777,7 @@ def _ladder_keeper(decision, summary):
                 orders.append({
                     'id': oid, 'coin': 'BTC', 'direction': 'long',
                     'trigger': 'above', 'trigger_price': trig,
-                    'amount_usdt': round(11.1 * _side_mult('LONG'), 2), 'leverage': 5,
+                    'amount_usdt': round(11.1 * _side_mult('LONG'), 2), 'leverage': 10,   # CEO trial 2026-11-14: next orders at 10x (revert when called)
                     'sl': sl, 'target': tp, 'confidence': 60,
                     'serial': True, 'dynamic_sl': False,
                     'note': (f"Rule-13 LADDER KEEPER auto-arm LONG ({time.strftime('%Y-%m-%d %H:%M')} "
