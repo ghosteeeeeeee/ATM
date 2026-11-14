@@ -104,7 +104,7 @@ cur.close(); conn.close()
 **Exit reason interpretation:**
 - `atr_trail_hit` — Trailing stop took profit (winner trailed out)
 - `atr_sl_hit` — ATR stop loss hit (loser)
-- `hard_max_loss` — cap hit (loser). NOTE (2026-11-13): for managed STRUCTURAL trades the cap is widened to the structure-stop distance, floored at −8% account (`hml_threshold`) — a managed `hard_max_loss` now means the catastrophic floor, not the old fixed −4% account line.
+- `hard_max_loss` — cap hit (loser). NOTE (2026-11-14): for managed STRUCTURAL trades the threshold IS the structure-stop distance (`hml_threshold` — the account-floor clamp was retired after #16909 pre-empted an unbroken structure at 10x) — a managed `hard_max_loss` now means the stop line itself; non-managed keeps the old −4% account line.
 - `rr_engine_*` — RR engine managed exit (structural support/resistance)
 - `HL_CLOSED` — Closed on Hyperliquid directly
 - `trail_sl` — Trailing stop loss hit

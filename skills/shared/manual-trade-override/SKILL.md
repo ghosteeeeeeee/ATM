@@ -376,10 +376,12 @@ duplicate real trade #16832).
     **LEVERAGE: CEO trial 10x on the next few orders (2026-11-14)** —
     next-to-fire rungs + keeper derivations at 10x; the deep structural
     stack (72,560+) stays 5x; revert on the CEO's word. Watchdog bound
-    is `1 <= lev <= 10` (exactly 10 = the max). Account-denominated
-    caps unchanged (base −4%, structure floor −8% = same account risk
-    per trade; at 10x a price-stop hits the floor at HALF the price
-    distance). The
+    is `1 <= lev <= 10` (exactly 10 = the max). Caps: managed
+    structural trades exit at THEIR STOP (the −8% account-floor clamp
+    was retired 2026-11-14 after it pre-empted #16909's unbroken
+    structure at 10x); non-managed keeps base −4% account. At 10x a
+    stop's distance = 10× in account terms (2.43% stop = −24.3% =
+    ~−$5.5 on $22.30) — the fill-sanity round owns that exposure. The
     ladder is never empty on either side after a fire/TP (CEO: "you
     better be ready for the longs too — rubberband snapping back").
     Single-writer: only run_cycle. **Ride doctrine

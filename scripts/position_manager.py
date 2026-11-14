@@ -187,7 +187,7 @@ ATR_UPDATE_THRESHOLD_PCT = ATR_UPDATE_THRESHOLD  # only push SL/TP update to HL 
 MAX_LEVERAGE = 5
 
 
-def maxhold_exempt(signal, stop_loss):
+def structure_governed(signal, stop_loss):
     """CEO 2026-11-14 doctrine: EXITS ARE STRUCTURE-BREAK ONLY — a managed
     trade carrying an active structure stop is self-managing (the
     structure-lag trail IS its exit manager), so the 8h UNIVERSAL_MAX_HOLD
@@ -207,19 +207,19 @@ def maxhold_exempt(signal, stop_loss):
         return False
 
 
-def hml_threshold(hard_pct, signal, entry, stop, direction, lev, floor_acct=None):
-    """CEO 2026-11-13: managed STRUCTURAL trades exit at STRUCTURE, not the
-    account cap ("we should have still been in the previous trade, not
-    gotten shaken out on small move like that").
+def hml_threshold(hard_pct, signal, entry, stop, direction, lev):
+    """Managed STRUCTURAL trades exit at STRUCTURE (CEO doctrine;
+    floor RETIRED 2026-11-14 — see below).
 
-    #16896: the -4.00% account cap = -0.80% price @lev5 would have cut at
-    ~69,210 while the box ceiling (real structure) sat ~69,600-70,300 —
-    and its own stop was the 15m interior 68,950. Widens the HML price
-    threshold to the structure-stop distance when that is WIDER, floored
-    at floor_acct/lev (HML_STRUCT_FLOOR_ACCT = -8% account = catastrophic
-    backstop, never exceeded). Non-managed trades, wrong-side/absent
-    stops, and tighter structures: threshold unchanged (never tightens
-    below the caller's account cap). Pure function — unit-tested.
+    History: #16896 showed the -4.00% account cap would have cut at
+    ~69,210 while structure sat ~69,600-70,300 (13th: floor added as
+    a -8% account backstop); #16909 showed that floor at 10x = -0.80%
+    price pre-empted the 2.43%-away stop and cut an unbroken-structure
+    trade — so the floor is GONE for managed trades with a valid stop:
+    threshold = min(base_cap, -struct_pct) = THE STOP'S OWN DISTANCE
+    (HML becomes the stop's twin, never earlier). Non-managed,
+    wrong-side/absent stops, tighter structures: threshold unchanged.
+    Pure function — unit-tested; any import failure -> old behavior.
     """
     try:
         if not signal or not entry or not stop:
@@ -234,7 +234,7 @@ def hml_threshold(hard_pct, signal, entry, stop, direction, lev, floor_acct=None
         struct_pct = abs(stop - entry) / entry * 100.0
         # FLOOR RETIRED for managed structural trades (CEO 2026-11-14,
         # incident #16909): the -8% ACCOUNT floor at 10x = -0.80% price
-        # pre-empted the structure stop (1.58% away) and cut a position
+        # pre-empted the structure stop (2.43% away from the fill) and cut a position
         # whose structure was never broken — 'the trend is still down...
         # we could have stayed in'. Doctrine: EXITS ARE STRUCTURE-BREAK
         # ONLY — for a managed trade carrying a valid stop, THE STOP IS
@@ -3930,7 +3930,13 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         stale_close, stale_reason = check_stale_position(token, live_pnl, direction)
         # linreg-fade exempt (bug_hunter #5): stale-loser cuts at -1.0% after
         # 8min — the same early loss-lock V9 measured as fatal (WR 53.6->38.3).
-        if stale_close and not is_linreg_fade_pos:
+        # CEO 2026-11-14 structure-only doctrine (F-2, verifier 0090d750):
+        # stale_exit (loser -1% stalled / winner +1% stalled) is a PnL-stall
+        # exit, NOT a structure break — it was #16909's second near-miss
+        # (4min stall < the 8min clock). Managed trades carrying an active
+        # stop are structure-governed: this clock skips them. Non-managed /
+        # stop-less unchanged; linreg-fade exemption unchanged.
+        if stale_close and not is_linreg_fade_pos and not structure_governed(_pos_signal, pos.get('stop_loss')):
             # P0: canonical label; stalled_* detail moved to exit_detail.
             # (Old f"stale_exit_{stale_reason}" produced 55-char close_reasons that
             # overflowed varchar(50) — likely why no stale_exit rows ever landed.)
@@ -3951,7 +3957,7 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             'volume-breakout', 'volume_breakout',
             'mover-',  # mover- maps to ride_it; mover+ was removed (own-conclusions 2026-10-06)
         )) and 'linreg-fade' not in _pos_signal and 'linreg_fade' not in _pos_signal  # linreg-fade always gets the 8h close (V8)
-        _mh_exempt = maxhold_exempt(_pos_signal, pos.get('stop_loss'))
+        _mh_exempt = structure_governed(_pos_signal, pos.get('stop_loss'))
         if UNIVERSAL_MAX_HOLD_MINUTES > 0 and open_time and not _is_ride_it \
                 and not _mh_exempt:
             try:
@@ -4217,10 +4223,10 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                 # logged, never swallowed — same rule as the JUP shadows
                 log(f"  [JUP-SHADOW-ATRSL] error for {token}: {type(_asl_e).__name__}: {_asl_e}")
 
-        # CEO 2026-11-13: managed structural trades hold to STRUCTURE —
-        # widen the HML threshold to the structure-stop distance (floored
-        # at HML_STRUCT_FLOOR_ACCT/lev); non-managed unchanged. See
-        # position_manager.hml_threshold (pure, unit-tested).
+        # Managed structural trades hold to STRUCTURE: the HML threshold
+        # becomes the structure-stop's own distance (account floor
+        # retired for this class, CEO 2026-11-14 / #16909); non-managed
+        # unchanged. See position_manager.hml_threshold (pure, tested).
         HARD_MAX_LOSS_PCT = hml_threshold(
             HARD_MAX_LOSS_PCT, _pos_signal,
             float(pos.get('entry_price') or 0),
