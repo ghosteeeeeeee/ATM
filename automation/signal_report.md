@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-14 15:23 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-14 21:23 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,799 | **WR:** 51.4% | **PnL:** -122.05%
+- **Total trades (all time):** 3,803 | **WR:** 51.4% | **PnL:** -120.96%
 - **Date range:** 2026-07-29 → 2026-11-14
 
 ---
@@ -50,6 +50,7 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-11-14 | 99cffce | verifier 0090d750 closures: stale_exit structure-gate (F-2) ... |
 | 2026-11-14 | b99cf4e | watchdog: trade-watchdog analysis 2026-11-14 04:56 — trail-s... |
 | 2026-11-14 | b5a7c92 | watchdog: cycle 2026-11-14 00:55 — reclaim-exit steer age=3,... |
 | 2026-11-13 | 114711f | SL placement fix (CEO 2026-11-13): structure-widened guardia... |
@@ -59,6 +60,5 @@ None found. Top performers are already enabled.
 | 2026-11-09 | 1f5cf45 | logs: hourly analysis 2026-11-09 13:22 — no config change, 0... |
 | 2026-11-09 | e9035a2 | logs: hourly analysis 2026-11-09 00:20 — no config change, 0... |
 | 2026-11-08 | e91eea0 | skills: full-analysis gains MTF ADX/ATR lifecycle (CEO rules... |
-| 2026-11-08 | 6740b6f | scripts: payoff-fix CHANGE-NOW — stop-tighten scope-widen 2-... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
