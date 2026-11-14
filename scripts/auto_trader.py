@@ -730,9 +730,24 @@ def _ladder_keeper(decision, summary):
             # mixing — price and structure both come from decision.
             # Loop-safe: only derive if the derived trigger lands
             # within reach, else next cycle would duplicate it.
-            trig = round(sl1h - 60) if sl1h else 0
+            trig1h = round(sl1h - 60) if sl1h else 0
+            trig = trig1h
+            # FALLBACK (CEO Q 2026-11-14 'if it drops further is there a
+            # short ready'): during a fast slide the 1h zigzag floor lags
+            # ABOVE price → the ITM guard blocks the arm and the short
+            # side goes DARK (the gap: trig 65742 > price 65637, zero
+            # shorts armed). Fallback to the FRESHER low: derive at
+            # sl15−60 ONLY when the 1h-derived trigger is not below
+            # price — arms at the fresh extreme's edge, fires on the next
+            # break. The 1h source stays primary (F-8: 15m mid-box
+            # wiggles were the #16896 class); each source carries its
+            # OWN reclaim-SL (slX + 0.6·ATR15) so the fallback's stop
+            # sits at the level it broke, not the stale one.
+            if not (trig and trig < price) and sl15 and atr15:
+                trig = round(sl15 - 60)
             if trig and reach_lo <= trig < price:
-                sl = round(sl1h + 0.60 * atr15)
+                sl = (round(sl1h + 0.60 * atr15) if trig == trig1h
+                      else round(sl15 + 0.60 * atr15))
                 # ponytail: TP gap fixed at arm time (3·ATR1h THEN, never
                 # moved — F-2 restated doctrine) — if ATR1h later grows
                 # past ~3.5× the gap the disaster floor erodes; top up by
