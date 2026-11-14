@@ -4116,3 +4116,17 @@
 
 ## Error Alerts — 2026-11-14 12:35 UTC
 - **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
+
+## Error Alerts — 2026-11-14 13:20 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+- **REPEATED** (7x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **REPEATED** (8x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] AR TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (2x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] AR TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-11-14 13:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
+
+## Error Alerts — 2026-11-14 14:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
