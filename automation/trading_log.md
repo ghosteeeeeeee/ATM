@@ -27306,3 +27306,29 @@ BY: auto_1hr
 - jup_yolo_mirrored payoff inversion: 62% WR but losers avg -$0.134 (atr_sl_hit/hard_max_loss) vs winners avg +$0.070 — beats on frequency, loses on payoff; 14d -$0.84. Regime split: FLAT +0.08 wins, NORMAL -0.38 / HIGH -0.38 lose (n=55/36) — NOT all-regime loss, so kill policy doesn't fire; possible volatility_gate regime block candidate if drift continues
 - 7d still RED -$0.62; 24h GREEN +$0.73 at 47.4% WR
 BY: auto_1hr
+
+## [2026-11-15 16:55] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** $-0.14 this hour | 24h 19T 42.1% +$0.57 GREEN | 7d 109T 45.9% -$0.83 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 1L — DYDX atr-trend- SHORT hard_max_loss -0.14 (-6.12%); 3 open (MNT/HYPER/ENS atr-trend- SHORTs, flat)
+- No storm: window-min -0.47% / at-run -0.21% (both well inside gate)
+- Kill check: no 0% WR n>=3 — 1h only 1 close; 24h worst jup_yolo_mirrored 3T 33.3% -0.14, not 0%
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/19 = 15.8% of 24h closes (<40%); tpsl_utils deployed; manual_sl_hit 3/19 avg -0.237 = CEO manual trades
+- Boost: none eligible — no signal n>=5 in 24h (ai-trader-pending 4T 25%, jup_yolo_mirrored 3T 33.3% worst)
+- Arm rate: unarmed 13/19 = 68.4% (<70%) WR 23.1% -$0.20 NEGATIVE vs armed 6/6 83.3% +$0.77 — unarmed WR trend 27->25->23, stall stack owns fix, no new gate
+- Neg streak: 15h zero closes broke prior streak; 16h -0.14 = 1 consecutive (need 3); regime 24h EXTREME/HIGH/NORMAL (no NEUTRAL) -> no size cut
+- Frequency: 1 close/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR slipped 47.4 -> 42.1% and PnL 0.73 -> 0.57; HIGH regime 5T -$0.61 still negative (avg loss > avg win)
+- Unarmed cohort fully negative (-$0.20 at 23.1% WR) while armed 6/6 +$0.77 — stall stack owns fix
+- 7d RED deepened -$0.62 -> -$0.83 (45.9% WR)
+BY: auto_1hr
