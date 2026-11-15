@@ -188,12 +188,14 @@ MAX_LEVERAGE = 5
 
 
 def structure_governed(signal, stop_loss):
-    """Gates BOTH non-structure exit clocks for MANAGED trades carrying an
-    active structure stop (CEO 2026-11-14 doctrine: EXITS ARE STRUCTURE-
-    BREAK ONLY):
+    """Gates ALL THREE non-structure exit clocks for MANAGED trades
+    carrying an active structure stop (CEO 2026-11-14/15 doctrine:
+    EXITS ARE STRUCTURE-BREAK ONLY):
       - UNIVERSAL_MAX_HOLD (8h clock) — it cut #16902's +4.27% winner;
       - stale_exit PnL-stall (loser -1.0%/8min, winner +0.6%/120min) —
-        it was #16909's second near-miss (verifier 0090d750 F-2).
+        #16909's second near-miss (verifier 0090d750 F-2);
+      - the AT-TARGET hit (check_atr_tp_sl_hits) — #16913's
+        manual_tp_hit cut +31.67% mid-ride (verifier bf763207).
     Safety retained for this class: the structure stop itself + the
     structure-lag trail + guardian's HL-side stop + price-FEED staleness
     (age of prices.json) + serial one-at-a-time. What does NOT run: the
@@ -653,6 +655,10 @@ def check_atr_tp_sl_hits(open_positions: List[Dict]) -> List[Dict]:
                     # profit-taker (third gated clock: maxhold, stale, TP).
                     hit = None
                 elif hit == 'atr_tp_hit':
+                    # UNREACHABLE for stop-bearing managed today (the gate
+                    # above catches them and pm:619 skips stop-less managed)
+                    # — kept as the fail-open wrong-side-TP labeler if that
+                    # skip ever changes (bf763207 F-4).
                     # F-3 relabel guard (bug_hunter 2026-11-12): a "TP" whose
                     # level sits on the loss side of entry books a loss —
                     # label the loss family honestly instead (wrong-side-TP

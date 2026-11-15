@@ -428,18 +428,18 @@ def tweak_structure_fixed(decision, open_positions):
         _st_dirty = [False]           # nonlocal-ish for nested helper
 
         def _lag_stop(pid, side, s15, s1h, price, stop, entry):
-            """Structure-lag with REGIME/MAJOR split (CEO 2026-11-13: "your
-            SL is still not being placed right... we should have still been
-            in the previous trade, not shaken out on small move like that"):
-              - FAVORABLE steps (trail with the trend): source = 15m in
-                TREND (responsive — books rides, #16886 proven) but **1h in
-                CHOP** (box interiors get shaken — #16891's raise to the
-                15m interior 69106 and #16896's armed 68950 both died
-                inside the base box).
-              - ADVERSE raises (never chase; raise to the invalidation
-                line): ALWAYS 1h — the major ceiling/floor, never interior.
-            State records BOTH TFs (sh15/sl15/sh1h/sl1h/ts); old-format rows
-            (sh/sl only) re-seed WITHOUT moving the stop.
+            """Structure-lag v3 (favorable=15m always, adverse=1h always,
+            BE-cap in profit) — the three-day evolution:
+              - FAVORABLE steps: 15m ALWAYS (CEO 2026-11-15, #16913: the
+                old CHOP->1h source never steps during a collapse; steps
+                TIGHTEN ONLY (F-6) and never target past breakeven while
+                winning (_be).
+              - ADVERSE raises: ALWAYS the 1h major line (never interior —
+                #16882 chase, #16891/#16896 box kills), capped at _be.
+              - BIRTH: re-anchor interior stops to the 1h line (F-1)
+                EXCEPT in profit -> BE-LOCK immediately.
+            State records BOTH TFs (sh15/sl15/sh1h/sl1h/ts); old rows re-seed
+            through the same birth rules. Regime no longer selects anything.
             """
             key = str(pid)
             prev = _smap.get(key)
@@ -458,12 +458,11 @@ def tweak_structure_fixed(decision, open_positions):
                 return
             # FAVORABLE source = 15m ALWAYS (CEO 2026-11-15: "catch profits
             # with the trailing SL that moves with the structural moves" —
-            # the regime-split's CHOP->1h favorable source NEVER stepped
-            # during the #16913 collapse: stop pinned at 66,265 while price
-            # ran to 62,8xx, only the disaster-TP banked it. Favorable steps
-            # only TIGHTEN while in profit = they lock, never shake out;
-            # the SHAKEOUT protection stays in the adverse direction, which
-            # always raises only to the 1h major line below.)
+            # the old regime-split CHOP->1h source never steps during a
+            # collapse; #16913's stop sat pinned far above the run while
+            # only the disaster-TP banked it. Favorable = tighten-only,
+            # capped at breakeven in profit; SHAKEOUT protection lives in
+            # the adverse branch, which raises only to the 1h major line.)
             sfx = '15'   # state keys: sh15/sl15/sh1h/sl1h (both recorded)
             cur_sh, cur_sl, cur_atr = s15
             fld = 'sh' if side == 'SHORT' else 'sl'
@@ -569,6 +568,8 @@ def tweak_structure_fixed(decision, open_positions):
                     target = min(target, price * 1.05)    # F-4 stale cap
                     if _be and target > _be:
                         target = _be                      # BE-cap: in profit
+                    if target > stop:
+                        target = None     # F-6: favorable = tighten ONLY
                 else:
                     target = prev_val - 0.10 * cur_atr
                     if target >= price:
@@ -576,6 +577,8 @@ def tweak_structure_fixed(decision, open_positions):
                     target = max(target, price * 0.95)    # F-4 cap
                     if _be and target < _be:
                         target = _be                      # BE-cap: in profit
+                    if target < stop:
+                        target = None     # F-6: favorable = tighten ONLY
             else:
                 # ADVERSE (short: higher swing / long: lower swing) ->
                 # NEVER chase interior; raise to the MAJOR (1h) invalidation

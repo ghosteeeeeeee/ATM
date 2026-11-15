@@ -152,7 +152,11 @@ trades** (CEO directive 2026-10-22). The rules:
    race that recorded 2 CEO trades as `hard_tp`).
 4. **Exit labels are the ownership receipt:**
    - `manual_sl_hit` — your predefined stop did its job
-   - `manual_tp_hit` — your predefined target hit
+   - `manual_tp_hit` — predefined target hit (NOTE 2026-11-15: for
+     stop-bearing structural trades this hit is SUPPRESSED — the TP is
+     validation-only; you will see it only on non-managed/no-stop
+     trades. Profits are taken by the trailing structure stop with the
+     breakeven-cap)
    - `manual_trail_hit` — the close trail took profit
    - Seeing `rr_engine_*` or `atr_*` on one of these trades = a routing
      bug — report it immediately.
@@ -340,7 +344,10 @@ duplicate real trade #16832).
     CEO (2026-11-13): "unless structure is broken we don't exit — how
     can structure be broken if something is going straight down?"**:
     the watchdog NEVER moves a TP, and a TP is NEVER a take-profit —
-    it is a DISASTER circuit breaker set at ≥3·ATR1h depth (rule-10
+    2026-11-15: for structural (managed+stop) trades the target no
+    longer CLOSES anything (`check_atr_tp_sl_hits` suppresses the hit —
+    it is shape/validation only); the trailing structure stop with the
+    breakeven-cap owns profits, structural breaks own exits (rule-10
     snap removed earlier for booking loss-"TPs"; 2026-11-13: TP caps
     during directional travel cost the difference between **7
     fragmented trades Nov-11 19:00 → Nov-13 = +16.0% margin** and

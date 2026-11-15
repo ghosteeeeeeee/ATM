@@ -109,7 +109,8 @@ cur.close(); conn.close()
 - `HL_CLOSED` — Closed on Hyperliquid directly
 - `trail_sl` — Trailing stop loss hit
 - `manual_sl_hit` — CEO trade's predefined stop did its job (exit contract)
-- `manual_tp_hit` — CEO trade's predefined target hit (exit contract)
+- `manual_tp_hit` — predefined target hit (2026-11-15: suppressed for
+  stop-bearing structural trades — target is validation-only there)
 - `manual_trail_hit` — CEO trade's close trail took profit (exit contract)
 - `manual_*`/`rr_engine_*`/`atr_*` mismatch on a signal type = routing bug — report it
 
