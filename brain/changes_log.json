@@ -4298,5 +4298,27 @@
     "after": "🚫 [CONTINUUM-BLOCK] {token} LONG BLOCKED — BTC bearish structure (bypass leg only — confluence>=2 not gated here)",
     "rationale": "message claimed a full block while confluence>=2 signals execute anyway (ZRO #16920 7s later; #138 re-eval n=103 z=0.13 proves leak cohort = base) — misleading logs caused a wasted re-investigation this run",
     "impact": "ZERO trading behavior — log string only; py_compile PASS; blocked_but_executed selfcheck PASS; no exact-string consumers repo-wide"
+  },
+  {
+    "timestamp": "2026-11-15T16:46:20Z",
+    "agent": "brain_auditor",
+    "type": "bugfix",
+    "change": "contrarian_outcome_join: retention-hole guard on the 5m outcome window (WINDOW_SLACK_S=1800)",
+    "file": "analysis/contrarian_outcome_join.py",
+    "before": "SELECT ... WHERE token=? AND ts>signal_ts ... LIMIT 30 with no lower bound — rows older than candles.db 30d retention silently read retention-floor candles 2.5-71h AFTER the signal and re-classified every time the floor slid",
+    "after": "first candle must start within 1800s of the signal else NO_DATA; selfcheck fixture added (--selfcheck PASS exit=0)",
+    "rationale": "measured run #266: 246/352 pc- decided rows were gap-contaminated, pc- flip-WR reported 45.2% vs clean 65.1% (69/106); the 11-13 CONTRARIAN_LIVE demote trigger and #263 'tape-compositional' swing were contamination, not tape. Root cause, not symptom.",
+    "impact": "corrected shadow metric only — zero trading behavior (join writes data/contrarian_outcome_join.json); 11-18 re-promote review now reads 65.1%/80.6%-BELOW on clean data"
+  },
+  {
+    "timestamp": "2026-11-15T16:46:20Z",
+    "agent": "brain_auditor",
+    "type": "bugfix",
+    "change": "floor_admit_outcome_join: same retention-hole guard (classify_from_entry + entry_for)",
+    "file": "analysis/floor_admit_outcome_join.py",
+    "before": "same unbounded ts>signal query; entry_for could take a retention-floor OPEN as the entry price; 332/5680 shadow rows already past the 30d floor on 2026-11-15",
+    "after": "WINDOW_SLACK_S=1800 -> NO_DATA / entry_for returns None; selfcheck gap fixture added (--selfcheck PASS exit=0)",
+    "rationale": "same bug class as the contrarian fix; floor_admit would have started corrupting 2026-11-24 when the floor crosses SHADOW_START",
+    "impact": "join output shifts classified 2253->2106 no_data 6->155; verdict UNCHANGED (floor_only 49.7% vs always 45.5%->45.2%, fisher p=0.138 >0.05 = NO-SHIP route stays closed)"
   }
 ]

@@ -24,6 +24,14 @@ ADV_PCT = 0.40   # adverse threshold (matches hard stop distance)
 MAX_CANDLES = 30 # 30 × 5m = 2.5h horizon
 TAPE_SLACK_S = 600  # matches decider_run live stamp guard (<600), tape_state_arm_census
 MIN_TOKEN_N = 10    # token cells below this are noise for the heterogeneity test
+# candles_1m/5m retention is ~30d (floor slides forward every hour). If the first
+# available candle starts well AFTER the signal, the true post-signal window was
+# pruned and the query silently reads retention-floor candles 2.5h-71h LATER as if
+# they were the post-signal window — outcome then rewrites itself every time the
+# floor slides. Found 2026-11-15 (run #266): 246/352 pc- decided rows were in that
+# state, dragging pc- flip-WR 65.1% (valid) -> 45.2% (reported) and deflating the
+# 11-13 CONTRARIAN_LIVE demote read. Valid rows show gap 0.5-4.7min, span exactly 145min.
+WINDOW_SLACK_S = 1800  # first candle must start within 30min of signal, else NO_DATA
 
 def ts_to_unix(ts_str):
     """ISO '2026-10-13T17:12' → unix seconds."""
@@ -53,6 +61,9 @@ def classify(entry, conn):
     """, (token, ts_unix, MAX_CANDLES))
     rows = cur.fetchall()
     if not rows:
+        return ('NO_DATA', 0, 0, 0)
+    if rows[0][0] - ts_unix > WINDOW_SLACK_S:
+        # retention hole, not a real post-signal window (see WINDOW_SLACK_S note)
         return ('NO_DATA', 0, 0, 0)
 
     max_fav = 0.0
@@ -165,6 +176,30 @@ def main():
         b = cell_block(fx)
         assert b == {'WINNER': 2, 'LOSER': 1, 'SHALLOW': 1,
                      'n': 4, 'decided': 3, 'flip_wr': 66.7}, b
+        # retention-hole guard: a window whose first candle starts after the slack
+        # must be NO_DATA, not a fabricated outcome off retention-floor candles.
+        import tempfile
+        tmp = sqlite3.connect(tempfile.mktemp(suffix='.db'))
+        tmp.execute("CREATE TABLE candles_5m (token TEXT, ts INTEGER, open REAL,"
+                    " high REAL, low REAL, close REAL, volume REAL, is_closed INT)")
+        base = ts_to_unix('2026-10-13T17:12:00+00:00')
+        # gap: nothing for 3 days after the signal, then candles from the floor
+        for i in range(40):
+            ts = base + 3 * 86400 + i * 300
+            tmp.execute("INSERT INTO candles_5m VALUES (?,?,?,?,?,?,?,1)",
+                        ('LDO', ts, 1.0, 1.1, 0.9, 1.0, 10))
+        gap = classify({'ts': '2026-10-13T17:12:00+00:00', 'token': 'LDO',
+                        'entry_price': 1.0, 'contrarian_direction': 'LONG'}, tmp)
+        assert gap[0] == 'NO_DATA', gap
+        # normal window still classifies
+        for i in range(40):
+            tmp.execute("DELETE FROM candles_5m WHERE ts=?", (base + 3 * 86400 + i * 300,))
+            tmp.execute("INSERT INTO candles_5m VALUES (?,?,?,?,?,?,?,1)",
+                        ('LDO', base + 60 + i * 300, 1.0, 1.1, 0.9, 1.0, 10))
+        ok = classify({'ts': '2026-10-13T17:12:00+00:00', 'token': 'LDO',
+                       'entry_price': 1.0, 'contrarian_direction': 'LONG'}, tmp)
+        assert ok[0] in ('WINNER', 'LOSER', 'SHALLOW'), ok
+        tmp.close()
         # heterogeneity: identical cells must NOT be significant, split cells must be
         same = []
         for t in ('A', 'B', 'C', 'D'):

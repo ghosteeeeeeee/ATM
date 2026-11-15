@@ -4244,3 +4244,16 @@
 
 ## Error Alerts — 2026-11-15 12:48 UTC
 - **[WARN]** (checkpoint_watch): **DUE** `arm-tripwire-run2-1115` (due 2026-11-15T12:45:00+00:00): arm-tripwire RUN 2 DECIDES: 7d LONG arm<50 AND SHORT>55 both met run #265 (42.1/55.4) -> if met again, CEO flag WITH leaderboard context, NO auto-config
+
+## Error Alerts — 2026-11-15 13:38 UTC
+- **REPEATED** (8x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-11-15 14:18 UTC
+- **[WARN]** (checkpoint_watch): **OVERDUE** `arm-tripwire-run2-1115` (due 2026-11-15T12:45:00+00:00): arm-tripwire RUN 2 DECIDES: 7d LONG arm<50 AND SHORT>55 both met run #265 (42.1/55.4) -> if met again, CEO flag WITH leaderboard context, NO auto-config
+
+## Error Alerts — 2026-11-15 15:38 UTC
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-11-15 16:38 UTC
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`

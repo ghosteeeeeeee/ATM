@@ -39,6 +39,13 @@ OUT = "/root/.hermes/data/floor_admit_outcome_join.json"
 ARM_PCT = 0.40
 ADV_PCT = 0.40
 MAX_CANDLES = 30
+# candles_1m/5m retention is ~30d and the floor slides forward hourly. A window
+# whose first available candle starts well AFTER the signal is a retention hole:
+# the query would read retention-floor candles (2.5h-71h later) as if they were the
+# post-signal window, and the outcome silently rewrites every time the floor moves.
+# Same class as the contrarian_outcome_join fix (2026-11-15 #266): 332/5680
+# floor_admit rows were already past the floor on 2026-11-15.
+WINDOW_SLACK_S = 1800  # first candle must start within 30min of signal, else NO_DATA
 MIN_EXEC_CONFIDENCE = 40
 DEDUP_KEYLEN = 15  # 'YYYY-MM-DDTHH:MM' = 5-minute bucket
 EPISODE_GAP_S = 600  # merge same (token,direction,source) episodes closer than 10 min —
@@ -90,17 +97,19 @@ def cohort_of(r):
 def classify_from_entry(direction, entry_price, ts_unix, token, conn):
     cur = conn.cursor()
     cur.execute("""
-        SELECT open, high, low, close FROM candles_5m
+        SELECT ts, open, high, low, close FROM candles_5m
         WHERE token = ? AND ts > ? AND is_closed = 1
         ORDER BY ts ASC LIMIT ?
     """, (token, ts_unix, MAX_CANDLES))
     rows = cur.fetchall()
     if not rows:
         return "NO_DATA", 0.0, 0.0, 0
+    if rows[0][0] - ts_unix > WINDOW_SLACK_S:
+        return "NO_DATA", 0.0, 0.0, 0  # retention hole — window not recoverable
     max_fav = 0.0
     max_adv = 0.0
     outcome = "SHALLOW"
-    for (_, h, l, c) in rows:
+    for (_, _o, h, l, c) in rows:
         if direction == "LONG":
             fav = (h - entry_price) / entry_price * 100
             adv = (entry_price - l) / entry_price * 100
@@ -136,11 +145,13 @@ def entry_for(r, ts_unix, conn):
     price a system trade could actually have filled at (no lookahead)."""
     cur = conn.cursor()
     cur.execute("""
-        SELECT open FROM candles_5m
+        SELECT ts, open FROM candles_5m
         WHERE token = ? AND ts > ? AND is_closed = 1 ORDER BY ts ASC LIMIT 1
     """, (r.get("token"), ts_unix))
     row = cur.fetchone()
-    return float(row[0]) if row else None
+    if not row or row[0] - ts_unix > WINDOW_SLACK_S:
+        return None  # no window, or retention hole (entry would be a floor candle)
+    return float(row[1])
 
 
 def load_rows():
@@ -359,6 +370,11 @@ def selfcheck():
     # entry 100. LONG: +0.5% high, never adverse -> WINNER
     _c("W", 1, 100, 100.5, 99.9, 100.4)
     assert classify_from_entry("LONG", 100.0, T0, "W", fx)[0] == "WINNER"
+    # retention hole: first candle 35min after the signal -> NO_DATA, not a
+    # fabricated outcome read off retention-floor candles (guard WINDOW_SLACK_S).
+    _c("GAP", 7, 100, 100.5, 99.9, 100.4)
+    assert classify_from_entry("LONG", 100.0, T0, "GAP", fx)[0] == "NO_DATA"
+    assert entry_for({"token": "GAP"}, T0, fx) is None
     # LONG: -0.5% low first -> LOSER
     _c("L", 1, 100, 100.1, 99.5, 99.6)
     assert classify_from_entry("LONG", 100.0, T0, "L", fx)[0] == "LOSER"

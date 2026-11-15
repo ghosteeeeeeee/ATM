@@ -785,7 +785,7 @@
       "default_action": "report-only: if still 0 real trades at deadline, either extend watch 7d with evidence or disable CONTRARIAN_LIVE_PREFIXES (CEO) — do NOT leave it drifting unwatched",
       "owner": "main-session",
       "evidence": "fresh 2026-11-04 (registry progress_eval SQL): n=32 real pc- LONG fills, gross +$0.130, fees $0.335, NET -$0.205, WR 45.2% (14W/17L/1fl) vs pre-fade baseline 13T 38.5% (+6.7pp directional). Conversion: 178 CONTRARIAN-LIVE approvals (33 tokens) -> 22/33 tokens filled = 66.7%; 0 Z-FLIP skips BUT that check is near-vacuous (96.6% of pc- signals carry z<0, LONG branch needs z>0 — see BUG-078). Promote gate (NET>=0) unmet: avg gross +$0.0041/trade < fee $0.0108/trade = structurally fee-negative at current size -> fade-size/fee review at 11-10/11-11. Kill gate (0 fills) not triggered. NOTE: prior evidence_20261103 (n=33/NET-0.37/baseline 27.3% n=22) did NOT reproduce — superseded by these numbers.",
-      "notes": "migrated from brain/trial_tracking_dashboard.md (archived 2026-10-31). Pairs with done entry flip-contrarian-pc (its notes carry the same 11-03 watch). | progress_eval 'contrarian_live' counts PG pc- LONG opens since 'started' (review HIGH-1: old log-grep path logs/decider*.log never existed; logs rotate, approved != executed). | 16:30Z refresh: fade cooled to +0.07 (22T) — still positive; 11-03 disposition judges (extend-to-11-10 rec stands). | 11-11 deadline adjudicated: EXTEND to 11-18 (brain_auditor #246). | #263 2026-11-14T20:52:56Z: pc- overall flip 55.7% (196/352) still <58 re-promote bar; NEW tape-split pre-registered — pc-|BTC-BELOW 62.0% n=213 vs AT 43.2% n=111 vs ABOVE 57.1% n=28 (join by_regime); overall swing 49.0->54.3->55.7 in 8h = tape-compositional. Re-promote review MUST inspect the tape split (and per-token heterogeneity chi2 p=0.0032) alongside the overall >=58 bar. Token heterogeneity: per-token never blanket.",
+      "notes": "migrated from brain/trial_tracking_dashboard.md (archived 2026-10-31). Pairs with done entry flip-contrarian-pc (its notes carry the same 11-03 watch). | progress_eval 'contrarian_live' counts PG pc- LONG opens since 'started' (review HIGH-1: old log-grep path logs/decider*.log never existed; logs rotate, approved != executed). | 16:30Z refresh: fade cooled to +0.07 (22T) — still positive; 11-03 disposition judges (extend-to-11-10 rec stands). | 11-11 deadline adjudicated: EXTEND to 11-18 (brain_auditor #246). | #263 2026-11-14T20:52:56Z: pc- overall flip 55.7% (196/352) still <58 re-promote bar; NEW tape-split pre-registered — pc-|BTC-BELOW 62.0% n=213 vs AT 43.2% n=111 vs ABOVE 57.1% n=28 (join by_regime); overall swing 49.0->54.3->55.7 in 8h = tape-compositional. Re-promote review MUST inspect the tape split (and per-token heterogeneity chi2 p=0.0032) alongside the overall >=58 bar. Token heterogeneity: per-token never blanket. | #266 2026-11-15T16:45Z: JOIN WINDOW BUG FIXED — contrarian_outcome_join.classify() read retention-floor candles for any row older than candles.db 30d retention (first-candle gap 2.5h-71h), so outcomes rewrote themselves every time the floor slid. 246/352 pc- decided rows were contaminated TODAY. Clean re-read with WINDOW_SLACK_S=1800 guard: pc- flip-WR 65.1% (69/106), halves 67.3%/63.2% = ABOVE the 58 re-promote bar; pc-|BTC-BELOW 80.6% n=62 / AT 37.5% n=40 / ABOVE 100% n=4. Prior reads 64.6% (Oct-27..Nov-11) were CLEAN (floor predated pc- start); the 11-13 demote read (52.9%) and #263 'tape-compositional' swing happened exactly as the floor crossed the Oct-13..16 rows = CONTAMINATION not tape composition. 11-18 review MUST use the fixed script. NOTHING auto-changes: re-promote still needs CEO/T sign-off AND the fee hurdle is unchanged (live fade NET -0.245 at $11.69 notional).",
       "evidence_20261101": {
         "pc_long_since_1027": "9T +0.31 WR 44.4% (cooled from 11T +0.45)",
         "shadow_join": "pc- flip-WR 64.6% n=350 (re-ran 04:30Z)",
@@ -834,6 +834,13 @@
         "subcohort": "v6-combo fade (6T) gross -0.060 vs bare pc- +0.190 — v6 combos drag; exclude from future promote math or kill fade on v6 combos at 11-18 read",
         "recommendation": "EXTEND to 11-18 with fee-hurdle review (gross/trade 0.0036-0.0063 vs fee/trade ~0.0104 = structurally fee-negative at $11.69 avg notional). Do NOT disable: shadow edge real (64.6% n=350), kill gate unmet, instrument works. CEO option: fade-size bump or min-expected-move>2x fee filter (see creative_improvements fee-hurdle idea).",
         "measured_at": "2026-11-11T00:45:00Z"
+      },
+      "evidence_20261115_windowfix": {
+        "join": "fixed script 2026-11-15T16:44Z: pc- 69W/37L = 65.1% n=106 (was 45.2% n=352 contaminated); rider 41.0% n=1524 do-NOT stands; overall 42.6%",
+        "bug": "no lower bound on the 5m window query — rows older than candles retention (30d floor, slides hourly) read floor candles 2.5-71h after the signal",
+        "fix": "analysis/contrarian_outcome_join.py WINDOW_SLACK_S=1800 -> NO_DATA; --selfcheck PASS exit=0",
+        "demote_impact": "CONTRARIAN_LIVE demote (2026-11-13 #257) primary trigger invalidated (metric contaminated from that day); live-fee gate (NET>=0) independent and still unmet -> no re-promote now",
+        "measured_at": "2026-11-15T16:50:00Z"
       }
     },
     {
@@ -1563,8 +1570,8 @@
       "evidence": "5T 100% WR +0.32, 100% arm, last close 2026-11-09 (fresh); signal live since 2026-11-06 (n<10 = early, labeled per AMPLIFY rule)",
       "not_a_duplicate_of": "atr-trend-accel-shadow (that is the shadow collector due 12-06; this is the winner-cell promote watch)",
       "risk": "low",
-      "progress_note": "EARLY RE-MEASURE 2026-11-14 (#261): 30d cell now n=13 net '+0.06' WR 69.2% arm 69.2% (was 5T 100% '+0.32' at creation) — letter-of-bar met (n>=10 AND net>0) BUT decayed to noise: +0.005/trade, WR 100->69.2. Recommend close as NO-CELL at 11-16 deadline unless net >= '+0.25' by then. No notional action.",
-      "last_measured_at": "2026-11-14T12:49:19Z"
+      "progress_note": "EARLY RE-MEASURE 2026-11-14 (#261): 30d cell now n=13 net '+0.06' WR 69.2% arm 69.2% (was 5T 100% '+0.32' at creation) — letter-of-bar met (n>=10 AND net>0) BUT decayed to noise: +0.005/trade, WR 100->69.2. Recommend close as NO-CELL at 11-16 deadline unless net >= '+0.25' by then. No notional action. | #266 2026-11-15T16:45Z pre-deadline read: 30d cell 13T net '+0.06' WR 69.2% arm 69.2% avg +0.0046 — UNCHANGED from 11-14, still << the '+0.25' promotion bar -> CLOSE as NO-CELL at the 11-16 00:00Z deadline (do not promote; +0.005/trade is noise). Next run after deadline dispositions status=done.",
+      "last_measured_at": "2026-11-15T16:50:00Z"
     },
     {
       "id": "amplify-structure-flip-early-exit",
@@ -1852,7 +1859,27 @@
       "evidence": "#191 tape stamp n=233/14d coverage 87.6%; arm split AT/BELOW 41.6% vs ABOVE 60.0% z=-2.26 IS significant — profit translation is the open question",
       "not_a_duplicate_of": "LONG_NEUTRAL_BLOCK already gates AT/Below in NEUTRAL regimes; this is the non-NEUTRAL residual cohort",
       "risk": "low"
+    },
+    {
+      "id": "amplify-pcfade-windowfix-repromote-review",
+      "stream": "AMPLIFY (weekly offense) — pc- fade edge RE-BASELINED on the window-fixed join (retention bug fix #266)",
+      "kind": "amplify",
+      "proposal_type": "(a) conditional re-promote counterfactual on a validated shadow cell (tape-scoped, not blanket)",
+      "status": "open",
+      "started": "2026-11-15",
+      "deadline": "2026-11-18T00:00:00Z",
+      "owner": "brain_auditor weekly AMPLIFY + CEO/T sign-off (CONTRARIAN_LIVE is a live flag)",
+      "created_by": "brain_auditor #266",
+      "evidence": "WINDOW-FIXED join 2026-11-15T16:44Z (analysis/contrarian_outcome_join.py WINDOW_SLACK_S guard, --selfcheck PASS): pc- flip-WR 65.1% = 69/106, halves 67.3% (n=49) / 63.2% (n=57) same-sign, binomial vs 50% z=3.11 p~0.002. Tape split (clean): BTC-BELOW 80.6% n=62 / AT 37.5% n=40 / ABOVE n=4 noise. Control: btc-pump-rider+ 41.0% n=1524 = do-NOT-flip stands. The pre-fix readings (45.2% today, 52.9% at the 11-13 demote) were retention-contaminated: 246/352 pc- decided rows had their 'post-signal' window read from candles 2.5-71h later. Live control: real fade cohort since 10-27 = 37T +0.09 gross / -0.245 net (fees) — fee gate unchanged.",
+      "threshold": "ALL bars before ANY live action: (i) corrected pc- overall flip-WR >=58 at the 11-18 read AND both halves same-sign; (ii) pc-|BTC-BELOW >=65% with n>=50 (the scoped cell — do NOT promote an unscoped fade given AT=37.5%); (iii) live fee gate: fade cohort NET >= 0 at $11.10-11.69 notional (currently NET -0.245 = still structurally fee-negative) OR CEO accepts fade-size/min-expected-move>2x-fee filter; (iv) CEO/T sign-off to flip CONTRARIAN_LIVE_ENABLED back to True. NO-SHIP default, shadow stays as-is until all four hold.",
+      "units_guard": "flip-WR is a count ratio; live gate uses pnl_usdt vs pnl_usdt (never leveraged pnl_pct #193)",
+      "impact_on_winners": "n/a — re-promote restores a demoted shadow edge, does not block any current winner; kill/remains-default is the safe branch",
+      "risk": "low (default NO CHANGE; only CEO/T can flip the live flag)",
+      "not_a_duplicate_of": "watch-contrarian-live (that is the real-trade/fee watch) and watch-pc-flip-demote-55 (done: the demote itself) — this is the offense-side re-promote path on corrected data",
+      "prior_art": "session-brain query 'have we tried flipping pump-chain contrarian direction before demote re-promote' -> hits are the demote/flip trail [watch-pc-flip-demote-55 2026-11-13, 'DEMOTE EXECUTED ... bar breached on any-read basis'] = this entry supersedes that metric basis, not a re-proposal of shipped work",
+      "status_note": "AMPLIFY weekly emit #266 (satisfies >=1 proposal/run mandate)",
+      "caveat": "Per-token heterogeneity is UNTESTABLE at corrected n (pc- now only 2 tokens with n>=10, chi2 null) — pre-fix 'p=0.0001 HETEROGENEOUS' came from contaminated rows. Bar (ii) tape-split (BELOW n=62) is therefore the ONLY scoping test available; do not widen to unscoped pc- fade on this evidence."
     }
   ],
-  "updated_at": "2026-11-14T12:49:19Z"
+  "updated_at": "2026-11-15T16:50:00Z"
 }

@@ -11453,5 +11453,23 @@
     "category": "contrarian",
     "status": "watch",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-15T16:46:20Z",
+    "idea": "Candle-window guard audit: every analysis that reads candles with ts>signal and no upper/slack bound is one retention-slide away from fabricating outcomes",
+    "rationale": "run #266 found two live joins (contrarian, floor_admit) silently classifying signals against candles 2.5h-71h after the signal whenever the 30d retention floor had passed their timestamp — the metric rewrote itself hourly. Sibling scan: analysis/contrarian_both_sides_2026-10-26.py has the same unbounded pattern (historical one-off, not scheduled). Any future candle-windowed study (MFE replays, exit A/B, signal quality) must assert first-candle gap <= slack or mark NO_DATA.",
+    "expected_impact": "prevents a whole class of drifting/non-reproducible findings; every cross-run number becomes re-runnable (today's pc- 45.2% vs 56.8% vs 64.6% was 3 different retention states, not 3 market states)",
+    "category": "measurement integrity",
+    "status": "shipped-guard-2-jobs-audit-open",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-15T16:46:20Z",
+    "idea": "Tripwire leaderboard: separate 'arm-rate defect' from 'arm-rate healthy' legs so the LONG<50/SHORT>55 flag stops reading a healthy SHORT leg as a problem",
+    "rationale": "run #266 flagged both legs but SHORT arm 55.9% carries 84.2% WR +2.76 (armed) — high SHORT arm is the system working. The defect is exclusively the LONG leg (45.2% arm, unarmed LONG -2.13/23T at 4.3% WR). Reporting the two legs with their PnL attribution makes the flag actionable instead of symmetric-looking.",
+    "expected_impact": "faster triage on future tripwire fires; avoids proposed 'fixes' aimed at the healthy SHORT leg",
+    "category": "signal quality",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
