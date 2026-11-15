@@ -27124,3 +27124,28 @@ BY: auto_1hr
 - 24h WR drifted to 53.3% (from 61-63% earlier today) while 7d stays RED -$1.53; unarmed cohort WR at 40% — watch stall-stack follow-up
 - 3 fresh btc-pump-rider+ LONGs open against a SHORT_BIAS 4h regime — pump-chasing in a downtrend, watch how they resolve
 BY: auto_1hr
+
+## [2026-11-15 09:55] Hourly Analysis
+
+**Trades:** 3 closed (2 wins, 1 loss)
+**PnL:** $+0.43 this hour | 24h 18T 55.6% +$1.14 GREEN | 7d 106T 47.2% -$1.00 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: XAI btc-pump-rider+ LONG profit-monster-trail +0.18 (+4.91%), CHIP pump-rider+/ema-reclaim LONG profit-monster-trail +0.26 (+6.89%), POL pump-rider+ LONG ugb_pt -0.01 (-0.57%); 2 open (ZRO LONG +0.30, BTC continuum-trend+ LONG +0.13)
+- No storm: window-min -0.90% / at-run +0.00% (both inside gate)
+- Kill check: worst jup_yolo_mirrored 4T 50% -0.07 (not 0% WR n>=3); atr-trend+ 1T 0% n=1 — no regime-kill eligibility
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/18 = 11.1% (<40%); tpsl_utils deployed; hard_max_loss 1/18 avg -0.22 expected at leverage
+- Boost: none eligible — ai-trader-pending 7T 42.9% fails WR>55; all others n<5
+- Arm rate: unarmed 11/18 = 61.1% (<70%) WR 36.4% +0.40 vs armed 7/7 85.7% +0.74 — unarmed WR falling (50->40->36), share still under threshold, stall stack owns fix, no new gate
+- Neg streak: 08 -0.13 then 09 +0.43 positive -> streak broken; regime not NEUTRAL anyway -> no size cut
+- Frequency: 3 closes/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- Unarmed cohort WR at 36.4% and declining (50% -> 40% -> 36% over 3 runs) while unarmed share stays 61% — flagging trend for stall-stack follow-up
+- 7d still RED -$1.00 (47.2% WR); 24h GREEN +$1.14
+BY: auto_1hr
