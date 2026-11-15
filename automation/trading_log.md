@@ -27048,3 +27048,29 @@ BY: auto_1hr
 - 02:30 BTC pending SHORT stopped for -$0.56 (largest single loss in 24h) — CEO manual trade, report only
 - 7d still RED -$1.15 (47.5% WR); 24h GREEN +$1.00
 BY: auto_1hr
+
+## [2026-11-15 04:22] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** $-0.20 this hour | 24h 16T 62.5% +$0.80 GREEN | 7d 103T 46.6% -$1.35 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 2 closes, both losses (BTC ai-trader-pending LONG manual_sl_hit '-0.15' '-12.81%' acct open 03:02 close 04:10; MERL atr-trend+ LONG profit-monster-trail '-0.05' '-1.30%'), 1 open (BTC ai-trader-pending SHORT 04:12 flat)
+- No storm: window-min -0.73% / at-run -0.41% (both inside gate)
+- Kill check: worst jup_yolo_mirrored 4T 50% '-0.09'; atr-trend+ 1T 0% n=1 — neither is 0% WR n>=3, no regime-kill eligibility
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/16 = 12.5% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 1/16 avg '-0.22' expected at leverage
+- Boost: none eligible — ai-trader-pending 7T 57.1% '+0.69' passes WR/n/PnL but all 7 on BTC (single-token) + manual signal, fails multi-token consistency; rest fail n<5 or negative
+- Arm rate: unarmed 10/16 = 62.5% (<70%) WR 50.0% '+0.49' vs armed 6/6 83.3% '+0.31' — under threshold, stall stack owns fix, no new gate
+- Neg streak: 02 '-0.56', 03 '-0.05', 04 '-0.15' = 3 consecutive negative hours BUT regime is SHORT_BIAS (4h: 114 short / 1 long / 11 neutral, 5m: SHORT_BIAS) — not NEUTRAL, so no size cut per rule; size-reduce file absent -> 1.0x
+- Frequency: 2 closes/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 3 straight negative hours (-0.76 total) in a SHORT_BIAS regime — small losses, all sub-'0.60'; watch hour 05 for a 4th before any size action
+- 7d still RED -$1.35 (46.6% WR); 24h GREEN +$0.80
+- SIDeways find: data/regime.db is 0 bytes (empty schema) — regime data actually lives in /var/www/html/regime_4h.json + /var/www/hermes/data/regime_5m.json; regime.db looks like dead legacy, worth removing or wiring up
+BY: auto_1hr

@@ -1,36 +1,55 @@
 {
-  "timestamp": "2026-11-15T00:50:27.083404+00:00",
-  "steers": [
-    {
-      "severity": "info",
-      "category": "profit_lock",
-      "title": "Move BTC stop to breakeven \u2014 up 2.0%",
-      "detail": "Trade is +2.0%. Lock breakeven at 64929.0000.",
-      "trade_id": 16913,
-      "action": {
-        "type": "move_stop",
-        "symbol": "BTC",
-        "direction": "short",
-        "new_stop": 64929.0
-      },
-      "auto_executable": true,
-      "id": "steer-001"
-    }
-  ],
+  "timestamp": "2026-11-15T03:20:28.298003+00:00",
+  "steers": [],
   "portfolio_health": "good",
   "regime": {
     "btc_15m": "LONG_BIAS",
-    "btc_4h": "SHORT_BIAS",
-    "continuum": "BELOW",
-    "volatility": "LOW",
-    "zscore_tier": "NEUTRAL",
-    "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
-    "volume_regime": "LOW",
-    "linreg_alignment": 0.75,
-    "wyckoff_phase": "ACCUMULATION",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "btc_4h": "SHORT_BIAS"
   },
-  "open_count": 1
+  "open_count": 1,
+  "deep_analysis": "Regime flipped hard LONG overnight: BTC 1m reclaimed EMA300 at ~01:03 and has held 137 consecutive closes (STRONG_UP, linreg BULL, zscore POS), aggregate LONG_BIAS with 124/129 coins long-biased. The 01:55 LTC SHORT pick is dead \u2014 its own stated invalidation (BTC holds above EMA300 15-30m) fired hours ago; superseded this cycle. Caveat on stability: 4h regime is still SHORT_BIAS and BTC 15m flipped 29 times in 24h (>= p95 26 = unusually unstable; aggregate 18/24h is normal churn). Direction prose is cheap in this tape \u2014 every steer below is condition-keyed, not snapshot-keyed.\n\nONE open trade: BTC LONG #16916 @ 65515, -0.45%, opened 03:02 at meta_rsi 80.7 (backfill). Direction is RIGHT \u2014 aligned with the 1m/15m tape and the 124-coin long bias; we are on the winning side of the current move. Timing is LATE: 7d meta_rsi 65+ LONG is the worst cell in the book (8T, 12.5% WR, -$0.54) and ai-trader-pending LONG is 3T 0% WR at avg meta_rsi 83.2 (7d). Would I open it fresh today? Yes \u2014 but only while 1m closes hold above EMA300 (64131), and not as a fresh entry at RSI 80 (that chase is the losing cell; we hold it because the tape says LONG, not because the entry was good). SL 64672 (-1.29%) sits 0.33% above the last-hour low 64243 and ~2x 5m-ATR (0.47%) below price \u2014 a retest of the launch pad stops us before EMA300 structure breaks, so treat the SL as backstop, not thesis: exit if 1m closes below EMA300 for 15-30m. TP 67296 (+2.72%), R:R ~2.1 \u2014 acceptable. Nothing to lock yet (needs +0.40% MFE = 65777 to arm trail).\n\nPortfolio: 1/6 slots used, single directional book (all long). No correlation cluster yet \u2014 but 124/129 coins are LONG_BIAS, so every alt added from here is the same BTC-dump beta as #16916; size accordingly, do not treat alts as diversification. 5 slots free. auto_trader (MANAGE_ONLY): n=58 44.8% WR, long 25T 36% WR vs short better \u2014 long side has been the weaker book historically even as it is correct right now; the edge today is regime alignment, not the long signal family itself. Opportunity cost is low (nothing ripping without us \u2014 BTC ATR 0.47%/h is modest).",
+  "regime_context": "Sources disagree \u2014 state them separately:\n- continuum 1m: ABOVE EMA300 (64131) 137 consecutive closes (~2.3h), linreg_direction BULL, trend_quality STRONG_UP, zscore POS, volume LOW, velocity SLOW.\n- regime_5m aggregate: LONG_BIAS 124 long / 1 short / 4 neutral (129 tokens).\n- 15m scanner: aggregate LONG_BIAS, BTC LONG_BIAS (last dump 03:15).\n- 4h scanner: SHORT_BIAS (stale relative to the 1m reclaim).\n- Flip rate 24h: aggregate 18 (normal, p50=19), BTC 15m 29 (>= p95 26 = unusually unstable). Average direction state survives ~1h in the 15m scanner \u2014 never write a direction steer without re-testing it next cycle.\nImplication: LONG side is correct on 1m/15m/aggregate; the 4h SHORT_BIAS says do not lever up or add a cluster of same-direction alts at market \u2014 any LONG pick must carry a below-EMA300 invalidation. This is a snap-long-in-a-lower-timeframe-uptape, not a confirmed 4h trend change.",
+  "pattern_alerts": "All verified from PostgreSQL this cycle (meta_rsi = _signal_metadata->>'rsi_14', never entry_rsi_14).\n\n1) OVERSOLD SHORTS STILL BLEED (7d, n=18): meta_rsi<35 SHORT = 18T, 44.4% WR, -$0.47. WINNING SIDE = mid-band and high-band shorts: 45-65 = 16T 68.8% WR +$0.36; 65+ = 16T 56.3% +$0.50. Why weren't we on it: 2 of the last 4 daily losers were ai-trader BTC shorts ARMED below the floor \u2014 #16915 at meta_rsi 27.6 (-0.56) and #16909 at meta_rsi 21.5 (-0.22, hard_max_loss, MFE -0.02). SHORT_RSI_HARD_FLOOR=45 blocks these in signals but manual arms bypass it. Fix: do not arm SHORTs with meta_rsi <45.\n\n2) OVERBOUGHT LONGS ARE THE WORST CELL (7d, n=8): meta_rsi 65+ LONG = 12.5% WR, -$0.54; LONG 45-65 = 45.5% -$0.53; only profitable long band is 35-45 (7T 57.1% +$0.22). ai-trader-pending LONG 7d = 3T 0% WR avg meta_rsi 83.2. Open trade #16916 sits in this cell (80.7) \u2014 it wins only if the trend carries it; that is why the EMA300 condition, not the RSI, is the exit key.\n\n3) TREND RULE CONFIRMED (14d): trail-armed 109T 89.0% WR +$5.49 | hard_max_loss 49T 0.0% WR -$5.92 | other-never-trailed 116T 40.5% -$2.65. Following trends pays; chop entries pay nothing. Same for MFE ownership: trades that never armed (+0.40%) are the chop cohort.\n\n4) TRAIL ARM GAP (14d, new this cycle): 50 closed trades reached +0.40% MFE WITHOUT trailing_activated, netting only +$2.84 vs +$5.54 for the 88 that armed. Losers in that gap: ai-trader-pending 4T -$0.74, hl_copy_trader 3T -$0.23. #16915 reached MFE +1.24% (trailing_activation=0.004 is set on the row) yet trailing_activated stayed False and it exited manual_sl_hit at -0.56. Question for next cycle: does the trail engine actually watch manual-armed / copy trades, or does it only arm engine-opened positions? If it does not, manual arms are running without the one mechanism that produced 89% WR.\n\n5) DEAD-SIGNAL CHECK: no stale-window re-prints this cycle. Families with 7d losses all have live traffic and enabled flags \u2014 jup_yolo_mirrored 22T (-0.36), atr-trend 25T (-0.16), bb-squeeze 5T (-0.26), warrior-sr-confirm 4T (-0.18), pump-chain 3T (-0.22), ai-trader-pending 29T (+0.47). n too small on the small ones for any kill proposal \u2014 brain-auditor territory only if the bleed persists.\n\n6) CHOP-BLEED KPI (dollar share, NULL mfe losers=0 in all three windows): 7d 84.5% (43 of 50 losers never armed) vs 84.1% baseline = stable. 14d 90.8% vs 85.6% baseline, 30d 90.6% vs 80.6% baseline = drifting up 5-10pt toward the 92% entry-quality tripwire but not there. Same-day arm rate 78.6% (14 closes) \u2014 companion reading only, not a forecast (brain_auditor #196). Interpretation: ownership still sits with ENTRY quality, so the levers are entry gates, not trail distance \u2014 and nothing here authorizes an exit-trail change.",
+  "steer_recommendations": [
+    {
+      "severity": "warning",
+      "category": "health",
+      "action": "Verify the trail engine covers manual-armed (ai-trader-pending) and hl_copy_trader positions \u2014 14d shows 50 trades reached +0.40% MFE with trailing_activated=False (net +$2.84 vs +$5.54 armed); #16915 hit MFE +1.24% with trailing_activation=0.004 set and still exited manual_sl_hit -0.56.",
+      "condition": "re-test next cycle: count of mfe_pct>=0.40 AND NOT trailing_activated losers in trailing 14d"
+    },
+    {
+      "severity": "warning",
+      "category": "profit_lock",
+      "action": "BTC LONG #16916: hold only while 1m closes hold above EMA300 (64131). Exit if 1m closes below EMA300 for 15-30m. SL 64672 is the backstop (0.33% above the 1h low 64243), not the thesis. If it reaches +0.40% MFE (65777), confirm trailing arms.",
+      "condition": "1m close vs EMA300 64131; re-read each cycle"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "action": "Before arming any new LONG: 124/129 coins are LONG_BIAS and #16916 is already long BTC \u2014 new alts are the same BTC-dump beta, not diversification. Cap same-direction adds and prefer mid-band RSI 45-60 entries (7d: LONG 65+ = 12.5% WR).",
+      "condition": "aggregate regime_5m long_bias >= 100 of 129 and #16916 still open"
+    },
+    {
+      "severity": "warning",
+      "category": "health",
+      "action": "Stop arming SHORTs with meta_rsi <45: 7d <35 SHORT = 18T 44.4% -$0.47 while 45-65 SHORT = 68.8% +$0.36; #16915 (27.6) and #16909 (21.5) both lost.",
+      "condition": "meta_rsi at arm time < SHORT_RSI_HARD_FLOOR 45"
+    },
+    {
+      "severity": "info",
+      "category": "regime",
+      "action": "BTC 15m flipped 29x/24h (>= p95 26, unusually unstable); aggregate 18/24h normal; 4h still SHORT_BIAS while 15m/aggregate are LONG_BIAS. Direction steers this cycle are condition-keyed only \u2014 do not read any single 'LONG/SHORT' label as durable.",
+      "condition": "re-read flip rate and both scanners next cycle"
+    },
+    {
+      "severity": "info",
+      "category": "opportunity",
+      "action": "PICK (watchlist only \u2014 AI_TRADER_ENABLED=False, will NOT execute): AVAX LONG @7.158, RSI 57.7, conf 74 \u2014 precheck PASS all gates, LONG_BIAS 87.6, ATR 2.72%, mid-band RSI. Discard if BTC 1m closes below EMA300 64131 for 15-30m, or AVAX RSI drifts >15pts or drops <45.",
+      "condition": "BTC 1m vs EMA300 + AVAX RSI band 45-72.75"
+    }
+  ],
+  "retractions": [
+    "EXPIRED \u2014 prior LTC SHORT pick (2026-11-15 01:55, watchlist-only): its stated discard condition 'BTC 1m closes hold ABOVE EMA300 for 15-30m' fired at ~01:03-01:33 reclaim and BTC has now held 137 consecutive closes above (03:20). Superseded by AVAX LONG pick this cycle."
+  ],
+  "agent_timestamp": "2026-11-15T03:25:44.353278+00:00"
 }
