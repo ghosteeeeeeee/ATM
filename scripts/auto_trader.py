@@ -367,8 +367,9 @@ def tweak_structure_fixed(decision, open_positions):
     # step during #16879's move: zero trailing, TP did all the exiting).
     sd = (decision.get('structure_detail') or {}).get('15m') or {}
     sh, sl, atr = sd.get('sh'), sd.get('sl'), sd.get('atr')
-    # 1h structure for the lag's MAJOR targets (adverse raises always,
-    # favorable steps when regime=CHOP) — CEO 2026-11-13 shakeout fix.
+    # 1h structure for the lag's MAJOR targets: adverse raises always use
+    # it, and the birth re-anchor's line (favorable = 15m always since
+    # v3; BE-cap in profit) — CEO 2026-11-13/15 lineage.
     sd_h = (decision.get('structure_detail') or {}).get('1h') or {}
     sh_h, sl_h, atr_h = sd_h.get('sh'), sd_h.get('sl'), sd_h.get('atr')
     if not (sh and sl and atr) or not (sh_h and sl_h and atr_h):
@@ -526,6 +527,12 @@ def tweak_structure_fixed(decision, open_positions):
                     line = s1h[0] + 0.10 * s1h[2]
                     line = max(line, price * 1.001)   # never at/below price
                     line = min(line, price * 1.05)    # F-4 stale cap
+                    if _be and line > _be:
+                        line = _be   # N-3: in profit the re-anchor never
+                                     # lines past breakeven (fall-through
+                                     # case: stop already <= _be skips the
+                                     # BE-lock above; verifier-proven
+                                     # 64900 -> 65056.66 > _be 64993.93)
                     if floor_top < stop < line - 1:
                         if _apply_stop(line, stop, pid):   # CAS; miss →
                             _smap[key] = _rec; _st_dirty[0] = True   # retry
@@ -543,6 +550,8 @@ def tweak_structure_fixed(decision, open_positions):
                     # dictated stop — e.g. a line above entry is invalid).
                     line = s1h[0] - 0.60 * s15[2]
                     line = max(line, price * 0.95)    # F-4 floor
+                    if _be and line < _be:
+                        line = _be   # N-3 mirror: never past breakeven
                     if line < price * 0.999 and abs(stop - line) > 1:
                         if _apply_stop(line, stop, pid):
                             _smap[key] = _rec; _st_dirty[0] = True
