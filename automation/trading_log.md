@@ -27280,3 +27280,29 @@ BY: auto_1hr
 - HIGH regime 5T 60% -$0.45 negative despite positive WR (avg loss bigger than avg win)
 - window-min -1.23% close to the -1.5 storm gate — watch next run
 BY: auto_1hr
+
+## [2026-11-15 15:50] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 this hour | 24h 19T 47.4% +$0.73 GREEN | 7d 110T 47.3% -$0.62 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 open trades
+- No storm: window-min -0.38% / at-run -0.20% (both inside gate)
+- Kill check: no 0% WR n>=3 (0 closes this hour); 14d worst n>=5 jup_yolo_mirrored 100T 62% -$0.84, r2v2-long3 6T 33.3% -0.40 — neither is 0% WR
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/19 = 15.8% (<40%); tpsl_utils deployed; manual_sl_hit 3/19 avg -0.237 = CEO manual trades
+- Boost: none eligible — no signal has n>=5 AND WR>55% in 24h (jup_yolo_mirrored n=3 33%; ai-trader-pending 4T 25%)
+- Arm rate: unarmed 12/19 = 63.2% (<70%) WR 25.0% -$0.06 (turned NEGATIVE) vs armed 7/7 85.7% +$0.79 — stall stack owns fix, no new gate
+- Neg streak: 13h -0.01, 14h -0.02 = 2 consecutive (need 3); 15h zero closes; regime 24h EXTREME/HIGH/NORMAL (no NEUTRAL) -> no size cut
+- Frequency: 0 close/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- Unarmed cohort PnL went negative (-$0.06) with WR 25% while armed is 7/7 +$0.79 — unarmed WR trend 50→40→36→33→27→25; stall stack owns the fix
+- jup_yolo_mirrored payoff inversion: 62% WR but losers avg -$0.134 (atr_sl_hit/hard_max_loss) vs winners avg +$0.070 — beats on frequency, loses on payoff; 14d -$0.84. Regime split: FLAT +0.08 wins, NORMAL -0.38 / HIGH -0.38 lose (n=55/36) — NOT all-regime loss, so kill policy doesn't fire; possible volatility_gate regime block candidate if drift continues
+- 7d still RED -$0.62; 24h GREEN +$0.73 at 47.4% WR
+BY: auto_1hr
