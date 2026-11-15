@@ -27253,3 +27253,30 @@ BY: auto_1hr
 - 7d still RED -$0.61 (46.8% WR) but improving; 24h GREEN +$1.33 at 50.0% WR
 - NORMAL 5T 80% +1.49 still carries 24h PnL; EXTREME 12T 33.3% +0.27, HIGH 3T 66.7% -0.43
 BY: auto_1hr
+
+## [2026-11-15 14:51] Hourly Analysis
+
+**Trades:** 2 closed (1 wins, 1 losses)
+**PnL:** $-0.02 this hour | 24h 21T 47.6% +$0.85 GREEN | 7d 111T 46.8% -$0.63 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 1W1L — BIGTIME atr-trend- SHORT profit-monster-trail +0.08 (+2.04%), BTC continuum-osc+ LONG hard_max_loss -0.10 (-4.70%); 0 open trades
+- No storm: window-min -1.23% / at-run -0.99% (both inside gate, window-min approaching -1.5)
+- Kill check: no 0% WR n>=3 — jup_yolo_mirrored 3T 33.3% -0.14 worst; continuum-osc+/r2v2-long3/atr-trend+/hl_copy_trader 0% but n=1 each
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/21 = 14.3% of 24h closes (<40%); tpsl_utils deployed; manual_sl_hit 3/21 avg -0.237 = CEO manual trades
+- Boost: none eligible — ai-trader-pending 6T 33.3% +0.13 fails WR>55; all others n<5
+- Arm rate: unarmed 14/21 = 66.7% (<70%) WR 28.6% +0.06 vs armed 7/7 85.7% +0.79 — unarmed WR falling (35.7->28.6), stall stack owns fix, no new gate
+- Neg streak: 13h -0.01, 14h -0.02 = 2 consecutive (need 3); regime 24h EXTREME/HIGH/NORMAL (no NEUTRAL) -> no size cut; size-reduce file absent -> 1.0x
+- Frequency: 2 close/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- Unarmed WR dropped to 28.6% (+0.06 total) while armed 7/7 85.7% — unarmed cohort carrying almost no PnL; stall stack owns fix
+- 7d still RED -$0.63 (46.8% WR); 24h GREEN +$0.85 but WR slipped to 47.6%
+- HIGH regime 5T 60% -$0.45 negative despite positive WR (avg loss bigger than avg win)
+- window-min -1.23% close to the -1.5 storm gate — watch next run
+BY: auto_1hr
