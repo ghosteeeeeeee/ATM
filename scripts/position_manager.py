@@ -1193,6 +1193,37 @@ def _record_ab_close(token, direction, pnl_pct, pnl_usdt, experiment, sl_dist, n
     # Loss cooldown handled there too — avoid double-recording to signal_outcomes
 
 
+def _xmirror_pro_sz(pos, token):
+    """Net size the tracked pro holds in `token` (hl_copy.trader_positions).
+
+    Returns None when there is no evidence (no trader_wallet in metadata, no
+    position row, or read error) — callers must treat None as 'hold', never
+    as 'exit'. Sign convention: >0 long, <0 short.
+    """
+    meta = pos.get('signal_metadata') or pos.get('_signal_metadata')
+    if isinstance(meta, str):
+        try:
+            meta = json.loads(meta)
+        except (ValueError, TypeError):
+            meta = None
+    wallet = meta.get('trader_wallet') if isinstance(meta, dict) else None
+    if not wallet:
+        return None
+    try:
+        import sqlite3 as _sqlite3_xm
+        from paths import HL_COPY_DB as _HL_COPY_DB_XM
+        _conn_xm = _sqlite3_xm.connect(_HL_COPY_DB_XM, timeout=5)
+        try:
+            _row_xm = _conn_xm.execute(
+                "SELECT sz FROM trader_positions WHERE wallet = ? AND coin = ?",
+                (str(wallet), str(token).upper())).fetchone()
+        finally:
+            _conn_xm.close()
+        return float(_row_xm[0]) if _row_xm else None
+    except Exception:
+        return None
+
+
 def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) -> bool:
     """Close a paper position via direct SQL UPDATE.
 
@@ -3271,6 +3302,24 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     exit_detail=(f'exact-mirror catastrophic floor: '
                                  f'pnl={live_pnl:.2f}% <= {_xmf_pct:.2f}%'))
                 closed_count += 1
+            else:
+                # MIRROR EXIT (brain_auditor #266): the only profitable T1 exit —
+                # pro fully flattening the coin — had NEVER fired (0 trader_exit
+                # closes all-time; book-holding wallets rarely reach sz~0), so every
+                # T1 trade was floor-bound by construction. A direction flip IS their
+                # exit of our side, so mirror it. Fail-safe: no wallet/row = hold.
+                try:
+                    from trust_tiers import pro_position_side_gone as _xmf_gone
+                    _xmf_sz = _xmirror_pro_sz(pos, token)
+                    if _xmf_gone(_xmf_sz, direction):
+                        if close_paper_position(trade_id, 'trader_exit',
+                                exit_detail=(f'exact-mirror: pro net position no longer on '
+                                             f'our side (pro_sz={_xmf_sz}, our={direction})')):
+                            closed_count += 1
+                            log(f"  [XMIRROR-EXIT] {token} {direction}: pro net sz={_xmf_sz} "
+                                f"— they left our side, mirrored exit (trader_exit)")
+                except Exception as _xmf_e2:
+                    log(f"  [XMIRROR-EXIT] {token}: check failed — {_xmf_e2}", "WARN")
             continue  # hold while they hold — engine exits skipped
 
         # ── 0b. SL Zone Exit Check — tighten trail near death zones ────────────

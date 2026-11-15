@@ -102,3 +102,32 @@ def is_exact_mirror_trade(pos_or_meta) -> bool:
     if not isinstance(meta, dict):
         return False
     return meta.get('trust_tier') == 'T1'
+
+
+def pro_position_side_gone(sz, direction) -> bool:
+    """True when the pro's net position is no longer on OUR side.
+
+    T1 exact mirror only exits when the pro "fully exits" the coin
+    (|sz| ~ 0). Book-holding wallets rarely flatten, so the mirror's one
+    profitable exit path (trader_exit) had never fired — every T1 trade
+    rode to the catastrophic floor. A direction FLIP is also their exit
+    of our side: pro short while we are long = they are not in this trade.
+
+    `sz` = net size from hl_copy.trader_positions (sign: >0 long, <0 short).
+    None = no wallet/position row = NO EVIDENCE → False (fail-safe: hold).
+    Only positive evidence (a row that contradicts us) flips us out.
+    """
+    if sz is None:
+        return False
+    try:
+        s = float(sz)
+    except (TypeError, ValueError):
+        return False
+    if abs(s) < 1e-9:
+        return True  # flattened — their exit is our exit (matches is_trader_full_exit)
+    d = str(direction or '').upper()
+    if d == 'LONG':
+        return s < 0
+    if d == 'SHORT':
+        return s > 0
+    return False

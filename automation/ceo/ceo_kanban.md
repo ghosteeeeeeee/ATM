@@ -1638,3 +1638,6 @@ BY: brain_auditor
 
 ## shadow_disposition run 2026-11-15T00:47:20.132031+00:00 (1 action(s))
 - [2026-11-15T00:47:20.132031+00:00] shadow-disposition: ⚠️ DECISION DUE amplify-atr-trend-short-cell-watch — deadline 2026-11-16T00:00:00Z within 24h. Threshold: atr-trend- NORMAL SHORT cell reaches n>=10 closed AND net>0 over trailing 30d -> promote to winner-cell notional-mult evaluation (WINNER_CELLS path); if net<=0 or n<10 at deadline -> close as no-cell. Default if silent: ?
+
+## ⏰ Checkpoint Watch — 2026-11-15 12:48 UTC
+- **[DUE]** `arm-tripwire-run2-1115` (due 2026-11-15T12:45:00+00:00): arm-tripwire RUN 2 DECIDES: 7d LONG arm<50 AND SHORT>55 both met run #265 (42.1/55.4) -> if met again, CEO flag WITH leaderboard context, NO auto-config

@@ -1382,3 +1382,9 @@ Proactive Q (14 rows, 14%14=0 → "What's the PnL?"): 24h green +$0.29, 7d -$1.4
 ### Numbers: 24h 13T +0.84 61.5% | 7d 102T -1.40 46.1%
 ### Findings: disk 90% WARN recurring (health_monitor x4 today); proactive Q="worst signal" — jup_yolo_mirrored SHORT 15T -0.54 46.7% (7d worst, n>=5); overdue: stop-tighten-slippage-column (1d)
 ### Recommendation: free disk space before it trips pipeline; slippage-column build still owed by main-session
+
+## CEO Status — 20261115T113815Z
+### Health: pipeline=idle(timer-ok, last run exit 0 @11:39Z) guardian=active open_pos=2
+### Numbers: 24h 17T +0.95 47.1% | 7d 106T -0.99 46.2%
+### Findings: proactive Q (15%14=worst signal): jup_yolo_mirrored SHORT 16T -0.67 43.8% 7d — already owned by 8 registered jup items, no new action; 1 OVERDUE control-tower item `stop-tighten-slippage-column` (1d late, main-session owner); disk 90% WARN recurring (health_monitor).
+### Recommendation: main-session ship the slippage-column build (stated-not-realized CFs stay labeled until then); disk cleanup for the 90% WARN.

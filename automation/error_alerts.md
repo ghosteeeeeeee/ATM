@@ -4234,3 +4234,13 @@
 - **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
 - **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: CC TOK — signal TOK rolled back (prevents retry loop)`
 - **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): CC TOK — TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`
+
+## Error Alerts — 2026-11-15 10:38 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-11-15 12:38 UTC
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+
+## Error Alerts — 2026-11-15 12:48 UTC
+- **[WARN]** (checkpoint_watch): **DUE** `arm-tripwire-run2-1115` (due 2026-11-15T12:45:00+00:00): arm-tripwire RUN 2 DECIDES: 7d LONG arm<50 AND SHORT>55 both met run #265 (42.1/55.4) -> if met again, CEO flag WITH leaderboard context, NO auto-config
