@@ -427,7 +427,7 @@ def tweak_structure_fixed(decision, open_positions):
             _smap = {}                    # raise at .get and abort the cycle
         _st_dirty = [False]           # nonlocal-ish for nested helper
 
-        def _lag_stop(pid, side, s15, s1h, price, stop):
+        def _lag_stop(pid, side, s15, s1h, price, stop, entry):
             """Structure-lag with REGIME/MAJOR split (CEO 2026-11-13: "your
             SL is still not being placed right... we should have still been
             in the previous trade, not shaken out on small move like that"):
@@ -467,6 +467,20 @@ def tweak_structure_fixed(decision, open_positions):
             sfx = '15'   # state keys: sh15/sl15/sh1h/sl1h (both recorded)
             cur_sh, cur_sl, cur_atr = s15
             fld = 'sh' if side == 'SHORT' else 'sl'
+            # BREAKEVEN-CAP when in profit (CEO 2026-11-15: #16915 'got
+            # pummeled waiting for structure to break' — it sat +9.96%
+            # at the 62006 dip with NO lock: favorable steps need a lower
+            # swing-HIGH which only prints AFTER a bounce, so the V tagged
+            # the loose stop at -24.51%. 'Catch profits with the trailing
+            # SL' = while IN PROFIT the trail never targets past breakeven
+            # (+0.1% hair); UNDERWATER trades keep full structure room
+            # (shakeout protection unchanged) and trail down from there.
+            _be = 0.0
+            if entry and price:
+                if side == 'SHORT' and price < entry:
+                    _be = entry * 1.001
+                elif side == 'LONG' and price > entry:
+                    _be = entry * 0.999
             if not (s15[2] and s1h[2]) or not (cur_sh and cur_atr):
                 return
             if prev is None:
@@ -486,6 +500,15 @@ def tweak_structure_fixed(decision, open_positions):
                 # then-line ~73674 — harmless, price never returned).
                 _rec = {'sh15': s15[0], 'sl15': s15[1],
                         'sh1h': s1h[0], 'sl1h': s1h[1], 'ts': time.time()}
+                # In-profit at birth → BE-LOCK NOW: the raise-only birth
+                # path would give the profit back until the first favorable
+                # step prints (up to a full cycle — #16915 raised to 65059
+                # at 01:20 while winning, the V came at 02:00).
+                if _be and ((side == 'SHORT' and stop > _be) or
+                            (side == 'LONG' and stop < _be)):
+                    if _apply_stop(_be, stop, pid):
+                        _smap[key] = _rec; _st_dirty[0] = True
+                    return
                 if side == 'SHORT':
                     if not (s1h[0] and s1h[1]):
                         _smap[key] = _rec; _st_dirty[0] = True; return
@@ -544,11 +567,15 @@ def tweak_structure_fixed(decision, open_positions):
                     target = prev_val + 0.10 * cur_atr
                     target = max(target, price * 1.001)   # never <= price
                     target = min(target, price * 1.05)    # F-4 stale cap
+                    if _be and target > _be:
+                        target = _be                      # BE-cap: in profit
                 else:
                     target = prev_val - 0.10 * cur_atr
                     if target >= price:
                         target = price * 0.999
                     target = max(target, price * 0.95)    # F-4 cap
+                    if _be and target < _be:
+                        target = _be                      # BE-cap: in profit
             else:
                 # ADVERSE (short: higher swing / long: lower swing) ->
                 # NEVER chase interior; raise to the MAJOR (1h) invalidation
@@ -559,11 +586,15 @@ def tweak_structure_fixed(decision, open_positions):
                         _record(); return
                     t2 = s1h[0] + 0.10 * s1h[2]
                     t2 = min(max(t2, price * 1.001), price * 1.05)
+                    if _be and t2 > _be:
+                        t2 = _be        # never give back past BE in profit
                 else:
                     if not s1h[1]:
                         _record(); return
                     t2 = s1h[1] - 0.10 * s1h[2]
                     t2 = max(min(t2, price * 0.999), price * 0.95)
+                    if _be and t2 < _be:
+                        t2 = _be        # never give back past BE in profit
                 target = t2 if t2 > stop + 1 else None   # only ever raise
             if target is None:
                 _record()   # already at/above the major line — keep stop
@@ -600,12 +631,14 @@ def tweak_structure_fixed(decision, open_positions):
                 # the void ran on; "TP should only kick in if there's a
                 # giant candle between SL updates").
                 _lag_stop(pos['id'], 'SHORT', (sh, sl, atr),
-                          (sh_h, sl_h, atr_h), price, stop)
+                          (sh_h, sl_h, atr_h), price, stop,
+                          float(pos.get('entry_price') or 0))
             elif d == 'LONG':
                 # STRUCTURE-LAG mirror on 15m, one swing behind; TP =
                 # giant-candle backstop only (R2 removed — see SHORT).
                 _lag_stop(pos['id'], 'LONG', (sh, sl, atr),
-                          (sh_h, sl_h, atr_h), price, stop)
+                          (sh_h, sl_h, atr_h), price, stop,
+                          float(pos.get('entry_price') or 0))
         # persist structure-lag state (72h prune, atomic — mirrors mxm)
         if _st_dirty[0]:
             _now = time.time()
