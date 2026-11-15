@@ -27099,3 +27099,28 @@ BY: auto_1hr
 - No closes in 3.5h (last close 04:10) — quiet market / possibly over-filtered? 24h still only 13T. Watch, don't touch
 - 7d still RED -$1.40 (47.1% WR); 24h GREEN +$0.84
 BY: auto_1hr
+
+## [2026-11-15 08:50] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 1 loss, 1 flat)
+**PnL:** $-0.13 this hour | 24h 15T 53.3% +$0.71 GREEN | 7d 104T -$1.53 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: BTC ai-trader-pending SHORT manual_sl_hit '0.00' (opened 04:12, closed 08:32 flat); SOL jup_yolo_mirrored SHORT atr_sl_hit '-0.13' '-3.21%'; 3 open (ZRO/CHIP/XAI btc-pump-rider+ LONGs)
+- No storm: window-min -0.92% / at-run +1.37% (both inside gate)
+- Kill check: worst jup_yolo_mirrored 4T 50% '-0.07'; atr-trend+ 1T 0% n=1 — neither 0% WR n>=3, no regime-kill eligibility
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/15 = 13.3% of 24h closes (<40%); tpsl_utils deployed; hard_max_loss 1/15 '-0.22' expected at leverage
+- Boost: none eligible — ai-trader-pending 7T 42.9% '+0.59' fails WR>55; atr-trend- 2T 100% n<5; no multi-token consistent candidate
+- Arm rate: unarmed 10/15 = 66.7% (<70%) WR 40.0% '+0.41' vs armed 5/5 80.0% '+0.30' — under threshold but unarmed WR at 40% and falling (was 50-63% earlier); stall stack owns fix, no new gate
+- Neg streak: 05-07 zero closes broke streak; hour 08 '-0.13' = 1 negative hour; regime SHORT_BIAS (4h 110 short / 2 long; 5m 77 short) not NEUTRAL → no size cut; size-reduce file absent -> 1.0x
+- Frequency: 2 closes/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR drifted to 53.3% (from 61-63% earlier today) while 7d stays RED -$1.53; unarmed cohort WR at 40% — watch stall-stack follow-up
+- 3 fresh btc-pump-rider+ LONGs open against a SHORT_BIAS 4h regime — pump-chasing in a downtrend, watch how they resolve
+BY: auto_1hr
