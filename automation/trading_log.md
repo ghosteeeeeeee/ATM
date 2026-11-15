@@ -27175,3 +27175,29 @@ BY: auto_1hr
 - 7d still RED -$0.99 (46.2% WR); 24h GREEN +$1.02 at exactly 50% WR
 - 24h EXTREME regime 10T flat '-0.04' and HIGH 3T '-0.43' vs NORMAL 5T '+1.49' — NORMAL is where money is made
 BY: auto_1hr
+
+## [2026-11-15 11:51] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 this hour | 24h 17T 47.1% +$0.95 GREEN | 7d 106T 46.2% -$0.99 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes; 2 open flat (ZRO btc-pump-rider+ LONG 0.00, BTC continuum-trend+ LONG 0.00)
+- No storm: window-min -0.13% / at-run -0.08% (both inside gate)
+- Kill check: no 0% WR n>=3 — worst n>=3 jup_yolo_mirrored 3T 33.3% -0.14 (not 0%); r2v2-long3/atr-trend+ 0% but n=1
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/17 = 17.6% (<40%); tpsl_utils deployed; manual_sl_hit 3/17 avg -0.237 = CEO manual trades
+- Boost: none eligible — ai-trader-pending 7T 42.9% +0.59 fails WR>55; all others n<5
+- Arm rate: unarmed 11/17 = 64.7% (<70%) WR 27.3% +0.24 vs armed 6/6 83.3% +0.71 — unarmed WR falling (50->40->36->33->27), share under threshold, stall stack owns fix, no new gate
+- Neg streak: 08 -0.13, 09 +0.43 positive, 10 -0.09, 11 no closes — not 3 consecutive negative -> no size cut; regime 24h EXTREME 9T -0.11 / NORMAL 5T +1.49 not NEUTRAL anyway
+- Frequency: 0 close/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- Unarmed cohort WR at 27.3% and declining (50->40->36->33->27 over 5 runs) while share sits 64.7% — stall-stack follow-up, no new gate
+- 7d still RED -$0.99 (46.2% WR); 24h GREEN +$0.95 at 47.1% WR
+- EXTREME regime 9T 22.2% -0.11 is the drag; NORMAL 5T 80% +1.49 carries the PnL
+BY: auto_1hr
