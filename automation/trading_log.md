@@ -27358,3 +27358,30 @@ BY: auto_1hr
 - Unarmed cohort negative (-$0.20 at 21.4% WR) while armed 8/8 +$0.79 — stall stack owns fix
 - 7d RED -$0.66 at 45.9% WR
 BY: auto_1hr
+
+## [2026-11-15 18:51] Hourly Analysis
+
+**Trades:** 2 closed (1 wins, 1 losses)
+**PnL:** $0.02 this hour | 24h 23T 39.1% +$0.50 GREEN | 7d 113T 46.0% -$0.64 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: WLD hl_copy_trader LONG trader_exit -0.01, BTC continuum-osc-,jup_yolo_mirrored SHORT mfe_exit +0.03; 3 open (MNT/ZORA atr-trend- SHORT +0.02, BTC continuum-trend- SHORT flat)
+- No storm: window-min -0.00% / at-run +0.22% (both well inside gate)
+- Kill check: no 0% WR n>=3 in last hour (only 2 closes); 24h hl_copy_trader 3T 0% -$0.02 at threshold — 14d regime check: EXTREME 7T 57.1% +0.43 WINS, HIGH 4T 0% -0.19, NORMAL 2T 0% -0.18 → wins in a regime + tiny n in losers → keep alive per kill policy, no block
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/23 = 13.0% of 24h closes (<40%); tpsl_utils deployed; manual_sl_hit 3/23 avg -0.237 = CEO manual trades
+- Boost: none eligible — no signal n>=5 in 24h (max n=4 ai-trader-pending 25%)
+- Arm rate: unarmed 16/23 = 69.6% (<70%) WR 25.0% -$0.18 NEGATIVE vs armed 7/7 71.4% +$0.68 — unarmed WR 27->25 trend, stall stack owns fix, no new gate
+- Neg streak: 17h +0.02, 18h +0.02 → streak 0; regime 24h EXTREME/HIGH/NORMAL (no NEUTRAL) → no size cut
+- Frequency: 2 close/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h WR 39.1% (lowest recent) though PnL still +$0.50; HIGH regime 8T -$0.70 still the drag (avg loss > avg win)
+- Unarmed cohort negative (-$0.18 at 25% WR) while armed 7/7 +$0.68 — stall stack owns fix
+- hl_copy_trader 14d HIGH/NORMAL 0% WR (n=4/n=2) — recheck if n grows to ~10 before considering regime block
+- 7d RED -$0.64 at 46.0% WR
+BY: auto_1hr
