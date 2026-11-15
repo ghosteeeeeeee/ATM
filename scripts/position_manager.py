@@ -639,7 +639,20 @@ def check_atr_tp_sl_hits(open_positions: List[Dict]) -> List[Dict]:
         if hit in ('atr_sl_hit', 'atr_tp_hit'):
             import manual_exit_manager as _mxm2
             if _mxm2.is_managed_signal(pos.get('signal', '')):
-                if hit == 'atr_tp_hit':
+                if hit == 'atr_tp_hit' and structure_governed(pos.get('signal', ''), sl):
+                    # CEO 2026-11-15: "we want to catch profits with the
+                    # trailing SL that moves with the structural moves" —
+                    # the disaster-TP kept cutting winning rides mid-trend
+                    # (#16913: +31.67% banked at the TP while its trailed
+                    # stop sat PINNED at 66,265 vs price 62,8xx — the 1h
+                    # favorable source never steps during a straight-line
+                    # collapse; and the serial re-entry #16915 55 seconds
+                    # later shows the ADD is the ladder's job, not the
+                    # TP's). For structural trades the target is
+                    # validation-only: the trailing structure stop is the
+                    # profit-taker (third gated clock: maxhold, stale, TP).
+                    hit = None
+                elif hit == 'atr_tp_hit':
                     # F-3 relabel guard (bug_hunter 2026-11-12): a "TP" whose
                     # level sits on the loss side of entry books a loss —
                     # label the loss family honestly instead (wrong-side-TP

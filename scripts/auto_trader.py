@@ -427,7 +427,7 @@ def tweak_structure_fixed(decision, open_positions):
             _smap = {}                    # raise at .get and abort the cycle
         _st_dirty = [False]           # nonlocal-ish for nested helper
 
-        def _lag_stop(pid, side, s15, s1h, regime, price, stop):
+        def _lag_stop(pid, side, s15, s1h, price, stop):
             """Structure-lag with REGIME/MAJOR split (CEO 2026-11-13: "your
             SL is still not being placed right... we should have still been
             in the previous trade, not shaken out on small move like that"):
@@ -456,9 +456,16 @@ def tweak_structure_fixed(decision, open_positions):
                 return
             if side == 'LONG' and stop >= price:
                 return
-            src_1h = str(regime or '').upper() == 'CHOP'
-            sfx = '1h' if src_1h else '15'   # state keys: sh15/sl15/sh1h/sl1h
-            cur_sh, cur_sl, cur_atr = (s1h if src_1h else s15)
+            # FAVORABLE source = 15m ALWAYS (CEO 2026-11-15: "catch profits
+            # with the trailing SL that moves with the structural moves" —
+            # the regime-split's CHOP->1h favorable source NEVER stepped
+            # during the #16913 collapse: stop pinned at 66,265 while price
+            # ran to 62,8xx, only the disaster-TP banked it. Favorable steps
+            # only TIGHTEN while in profit = they lock, never shake out;
+            # the SHAKEOUT protection stays in the adverse direction, which
+            # always raises only to the 1h major line below.)
+            sfx = '15'   # state keys: sh15/sl15/sh1h/sl1h (both recorded)
+            cur_sh, cur_sl, cur_atr = s15
             fld = 'sh' if side == 'SHORT' else 'sl'
             if not (s15[2] and s1h[2]) or not (cur_sh and cur_atr):
                 return
@@ -593,16 +600,12 @@ def tweak_structure_fixed(decision, open_positions):
                 # the void ran on; "TP should only kick in if there's a
                 # giant candle between SL updates").
                 _lag_stop(pos['id'], 'SHORT', (sh, sl, atr),
-                          (sh_h, sl_h, atr_h),
-                          decision.get('regime_state'),
-                          price, stop)
+                          (sh_h, sl_h, atr_h), price, stop)
             elif d == 'LONG':
                 # STRUCTURE-LAG mirror on 15m, one swing behind; TP =
                 # giant-candle backstop only (R2 removed — see SHORT).
                 _lag_stop(pos['id'], 'LONG', (sh, sl, atr),
-                          (sh_h, sl_h, atr_h),
-                          decision.get('regime_state'),
-                          price, stop)
+                          (sh_h, sl_h, atr_h), price, stop)
         # persist structure-lag state (72h prune, atomic — mirrors mxm)
         if _st_dirty[0]:
             _now = time.time()
