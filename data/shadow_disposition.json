@@ -1570,8 +1570,8 @@
       "evidence": "5T 100% WR +0.32, 100% arm, last close 2026-11-09 (fresh); signal live since 2026-11-06 (n<10 = early, labeled per AMPLIFY rule)",
       "not_a_duplicate_of": "atr-trend-accel-shadow (that is the shadow collector due 12-06; this is the winner-cell promote watch)",
       "risk": "low",
-      "progress_note": "EARLY RE-MEASURE 2026-11-14 (#261): 30d cell now n=13 net '+0.06' WR 69.2% arm 69.2% (was 5T 100% '+0.32' at creation) — letter-of-bar met (n>=10 AND net>0) BUT decayed to noise: +0.005/trade, WR 100->69.2. Recommend close as NO-CELL at 11-16 deadline unless net >= '+0.25' by then. No notional action. | #266 2026-11-15T16:45Z pre-deadline read: 30d cell 13T net '+0.06' WR 69.2% arm 69.2% avg +0.0046 — UNCHANGED from 11-14, still << the '+0.25' promotion bar -> CLOSE as NO-CELL at the 11-16 00:00Z deadline (do not promote; +0.005/trade is noise). Next run after deadline dispositions status=done.",
-      "last_measured_at": "2026-11-15T16:50:00Z"
+      "progress_note": "EARLY RE-MEASURE 2026-11-14 (#261): 30d cell now n=13 net '+0.06' WR 69.2% arm 69.2% (was 5T 100% '+0.32' at creation) — letter-of-bar met (n>=10 AND net>0) BUT decayed to noise: +0.005/trade, WR 100->69.2. Recommend close as NO-CELL at 11-16 deadline unless net >= '+0.25' by then. No notional action. | #266 2026-11-15T16:45Z pre-deadline read: 30d cell 13T net '+0.06' WR 69.2% arm 69.2% avg +0.0046 — UNCHANGED from 11-14, still << the '+0.25' promotion bar -> CLOSE as NO-CELL at the 11-16 00:00Z deadline (do not promote; +0.005/trade is noise). Next run after deadline dispositions status=done. | #267 2026-11-15T20:47:11Z final pre-deadline read: 30d cell 15T net '+0.11' WR 73.3% (7d +0.03/12T) — still far below the '+0.25' promotion bar -> NO-CELL confirmed; first run after 11-16 00:00Z flips status=done.",
+      "last_measured_at": "2026-11-15T20:47:11Z"
     },
     {
       "id": "amplify-structure-flip-early-exit",
@@ -1881,5 +1881,5 @@
       "caveat": "Per-token heterogeneity is UNTESTABLE at corrected n (pc- now only 2 tokens with n>=10, chi2 null) — pre-fix 'p=0.0001 HETEROGENEOUS' came from contaminated rows. Bar (ii) tape-split (BELOW n=62) is therefore the ONLY scoping test available; do not widen to unscoped pc- fade on this evidence."
     }
   ],
-  "updated_at": "2026-11-15T16:50:00Z"
+  "updated_at": "2026-11-15T20:47:11Z"
 }

@@ -11471,5 +11471,32 @@
     "category": "signal quality",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-15T20:47:11Z",
+    "idea": "Payoff-inversion KPI in auto_1hr: flag signals with WR>=55% AND net<0 AND avg_loss>=1.5x avg_win",
+    "rationale": "atr-trend- 30d 65.5% WR -0.15 (avg win +0.046 vs avg loss -0.103 = 2.24x) and jup_yolo_mirrored 14d 62.2% -0.88 (2.0x) pass every WR-based kill rule while losing. Session cite: [risk-budget decision, 2026-10-21, 'Own-conclusions verdict ... Don't Flip — The Arithmetic Is Wrong'].",
+    "expected_impact": "detects exit-asymmetry drift days before net-negative rules fire",
+    "category": "telemetry",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-15T20:47:11Z",
+    "idea": "[COPY-STALE] telemetry then freshness check: log hl_copy trades closing <5s after open; fill row already carries is_open (hl_fill_monitor.py:591 uses it only for exits)",
+    "rationale": "3 of today's 3 copy closes were 1.1s phantoms (WLD x2, ZRO) — pro already exited inside our poll window; they drive the watchdog 'hl_copy 5T WR 0%' flag and pay fees for a position never held. Session cite: [full copy_trader yolo (1), 2026-10-31, 'Exit mirroring already exists — check_trader_exits() ... measuring how often it actually fires'].",
+    "expected_impact": "honest signal-health KPIs; blocks dead opens if pattern grows",
+    "category": "correctness",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-15T20:47:11Z",
+    "idea": "REJECTED-WITH-DATA: book-wide direction-aware CHASE gate (LONG rsi_14>=70 OR SHORT <=40)",
+    "rationale": "7d -0.91 / 14d -1.52 / 30d -1.66 BUT rest-of-book 30d -3.05 (chase cohort BETTER at 30d), p=0.29/0.054/0.92, 7d fk 23.4%>20% — sign unstable, never ship; jup-scoped anti-chase (11-17) stays the only chase work.",
+    "expected_impact": "none (rejected)",
+    "category": "entry filter",
+    "status": "rejected_with_data",
+    "risk": "n/a"
   }
 ]
