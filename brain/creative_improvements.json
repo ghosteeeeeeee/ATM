@@ -11399,5 +11399,32 @@
     "category": "telemetry",
     "status": "side-find",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-15T00:45:00Z",
+    "idea": "Winner-cell concentration bar: >=2 positive weeks AND >=2 tokens (or explicit BTC-manual label) before leaving EARLY",
+    "rationale": "ai-trader-pending|NORMAL|SHORT passes 7d/14d/30d all +0.64 but is 26/26 BTC with 21/26 trades in one week — window-stability alone waves through single-week single-token clusters",
+    "expected_impact": "prevents amplifying regime-luck cells; keeps offense honest",
+    "category": "offense guard",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-15T00:45:00Z",
+    "idea": "Capture-ratio weekly KPI (armed winners: price-move/mfe_pct from PG, units price-move) as leading indicator for win-side lever",
+    "rationale": "capture 0.595 14d vs 0.70 bar — track weekly without waiting for shadow build; pre-register capture <0.62 x2 weeks = escalate shadow-build GO",
+    "expected_impact": "turns a blocked CEO item into a measurable weekly dial",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-15T00:45:00Z",
+    "idea": "hl_copy armed->hard_max giveback evidence pack for amplify-ugb-bypass-hole (12-15)",
+    "rationale": "30d: 5T armed(mfe>=0.40) died hard_max_loss; 3 are hl_copy LONGs with MFE 2.5-3.7% riding to -0.58..-0.84% price (ids 16731/16739/16867) — bypassed from BOTH PM trail and UGB-PT",
+    "expected_impact": "concrete trade ids for the 12-15 walk; largest single-trade givebacks in the book",
+    "category": "exit-side",
+    "status": "evidence-logged",
+    "risk": "low"
   }
 ]

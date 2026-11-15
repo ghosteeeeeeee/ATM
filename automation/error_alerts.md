@@ -4170,3 +4170,27 @@
 
 ## Error Alerts — 2026-11-14 21:20 UTC
 - **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-11-14 21:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 91% used (>= 85%)
+
+## Error Alerts — 2026-11-14 22:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 91% used (>= 85%)
+
+## Error Alerts — 2026-11-14 23:00 UTC
+- **[WARN]** (freq_deviation_shadow): `warrior-sr-confirm+`: FREQ DEVIATION UNDER source=warrior-sr-confirm+ baseline=0.033/h current=0.000/h ratio=0.00 n_base=11 n_cur=0
+
+## Error Alerts — 2026-11-14 23:20 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] BIGTIME TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-11-14 23:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 91% used (>= 85%)
+
+## Error Alerts — 2026-11-15 00:20 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] USELESS TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] USELESS TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-15 00:35 UTC
+- **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)

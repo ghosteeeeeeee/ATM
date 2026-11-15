@@ -26942,3 +26942,29 @@ BY: auto_1hr
 - 7d still RED -$1.02 (49.0% WR); 24h GREEN +$0.96
 - 1 open trade at run time (BTC ai-trader-pending SHORT +0.39)
 BY: auto_1hr
+
+## [2026-11-15 00:21] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** $-0.12 this hour | 24h 12T 75.0% +$0.84 GREEN | 7d 101T 49.0% -$1.14 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 1 close (HYPE jup_yolo_mirrored SHORT atr_sl_hit -$0.12 -5.06%), 1 open (BTC ai-trader-pending SHORT opened 21:42, +$0.25 unrealized)
+- Entry quality: 24h winners avg SL dist 0.764%; arm-rate unarmed WR 57.1% OK
+- Arm rate: unarmed 7/12 = 58.3% (<70%) WR 57.1% (+$0.48) vs armed 5/5 100% (+$0.36) — under threshold, stall stack owns fix, no new gate
+- Kill check: 1 close/hr; worst 24h signal jup_yolo_mirrored 4T 50% -$0.09 (not 0% WR n>=3) — no regime-kill eligibility
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/12 = 16.7% of 24h closes (<40%); tpsl_utils deployed -> no alert; hard_max_loss 1/12 = 8.3% avg -$0.22 — expected at leverage
+- Boost: none eligible (ai-trader-pending 4T 75% +$0.68 all-BTC single-token + manual; atr-trend- 3T 100% n<5)
+- Neg streak: last close-hours 21 +0.19, 23 -0.12 — not 3 consecutive negative, no size cut
+- Frequency: 1 close/hr — well under 20
+- No constants change -> no signal_versions entry
+- Storm gate: NOT fired (window-min -0.59% / at-run +0.73%) — no packet
+
+**Open Questions:**
+- 7d still RED -$1.14 (49.0% WR); 24h GREEN +$0.84
+- Streak counter: last storm 23:22 negative, streak 0/3 (deadline 2026-11-19)
+BY: auto_1hr

@@ -1530,12 +1530,12 @@
       "kind": "shadow",
       "status": "open",
       "started": "2026-11-08",
-      "deadline": "2026-11-15T00:00:00Z",
+      "deadline": "2026-11-22T00:00:00Z",
       "threshold": "MFE_EXIT_GIVEBACK_PCT 0.30→0.20 and/or PM_TRAIL_DISTANCE_PCT 0.002→0.003 SHADOW: prove no ATR-SL race first — constants:1967 says DO NOT WIDEN 'ATR SL beats wider trails'; ship only if capture 0.57→0.70 improves net30 ≥ +$0.10/day with fk<20%",
       "default_action": "no change (winners capture 56.7% of MFE price today)",
       "owner": "CEO",
       "evidence": "CEO 20261108T180116Z: win-side lever worth +$0.10/day if capture0.57→0.70",
-      "notes": " | BONUS COHORT (CEO 20261113T040327Z): the 11 crash shorts (11-11/13) — wins avg +1.31%, losses avg -3.45%, payoff0.38, BE-WR72.4% vs actual72.7% = EV+0.01%/trade then fees -$0.126 -> net -$0.164. pm_trail capped winners at +2.57% while stops gave -3.0..-3.7. Feed this cohort into the read; NO new proposals."
+      "notes": " | BONUS COHORT (CEO 20261113T040327Z): the 11 crash shorts (11-11/13) — wins avg +1.31%, losses avg -3.45%, payoff0.38, BE-WR72.4% vs actual72.7% = EV+0.01%/trade then fees -$0.126 -> net -$0.164. pm_trail capped winners at +2.57% while stops gave -3.0..-3.7. Feed this cohort into the read; NO new proposals. | #264 MEASUREMENT 2026-11-15: capture (price-move/mfe_pct, armed winners, pnl_usdt units) = 0.595 14d (n=128) / 0.589 30d (n=301) vs baseline 0.57, bar 0.70 -> +0.025 improved, 0.105 short of bar. By exit engine 14d: mfe_exit 0.624 / pm_trail 0.584. Shadow STILL NOT BUILT (no log-only giveback-0.20 line exists in position_manager). PM_TRAIL_DISTANCE_PCT leg BLOCKED for auditor (CEO_PROTECTED 'DO NOT WIDEN'). Giveback 0.30->0.20 leg = one log-only line + one shadow flag, needs CEO GO (owner CEO). Prior art: [yolo dash 2026-11-02] arm x giveback grid tested 30% vs 40% (40% loses) — 0.20 NOT in that grid. EXTENDED to 11-22 for CEO GO-or-decline on shadow build."
     },
     {
       "id": "hml-vol-atr-mult-shadow",
@@ -1694,7 +1694,7 @@
       "id": "exitstack-day-kpi-1114",
       "kind": "eval",
       "status": "open",
-      "deadline": "2026-11-15T00:00:00Z",
+      "deadline": "2026-11-17T00:00:00Z",
       "desc": "Aggregate KPI for 11-14 EXIT-STACK DAY ships (mfe-cut, prearm-BE, stop-tighten x3, jup-short-walk, tat-neverarmed, mult-150, drop-pcplus, bbsqueeze batch): trailing-30 closed-trade avg loss magnitude must fall from -0.092 (14d read 2026-11-13) to <= -0.070, OR armed/unarmed gap must narrow (14d unarmed -13.81). If bar fails, identify failing leg and flag for revert (harvest-ship pattern).",
       "threshold": "trailing-30 avg loss <= -0.070 magnitude (i.e. >= -0.070) at n>=30 closes after 11-14 ships",
       "measurement": "PG: AVG(pnl_usdt) WHERE pnl_usdt<0 AND close_time > last-ship-time, trailing 30 closes; units pnl_usdt (NOT pnl_pct)",
@@ -1702,7 +1702,7 @@
       "owner": "brain_auditor",
       "created_by": "brain_auditor #254",
       "created_at": "2026-11-13T04:42:42Z",
-      "notes": " | #263 early read 2026-11-14T20:52:56Z: trailing-30 avg loser -0.1069 (bar -0.070) still failing, BUT only n=10 closes post-ship (2 losers avg -0.185) — formal read NOT possible before 11-15 at n>=30. Walk A prearm lock thr=0.25 re-verified ALL BARS (net30 +6.51, fk 13.3%); walk B tat-age-widen FAIL (net30 -0.49) = no-change correct. Flag failing leg for CEO revert review as specified if bar still fails at formal read."
+      "notes": " | #263 early read 2026-11-14T20:52:56Z: trailing-30 avg loser -0.1069 (bar -0.070) still failing, BUT only n=10 closes post-ship (2 losers avg -0.185) — formal read NOT possible before 11-15 at n>=30. Walk A prearm lock thr=0.25 re-verified ALL BARS (net30 +6.51, fk 13.3%); walk B tat-age-widen FAIL (net30 -0.49) = no-change correct. Flag failing leg for CEO revert review as specified if bar still fails at formal read. | #264 read 2026-11-15T00:40Z: FORMAL READ NOT POSSIBLE — only 12 closes since 11-14 00:00Z (bar n>=30); 3 losers avg -0.163 (worse than bar) and trailing-30 all-time avg loser -0.1117 vs -0.070 = early trend FAIL but window still dominated by pre-ship closes. EXTENDED to 11-17 (~30 closes at current rate). Kill-confirm done: MFE_CUT_SHADOW_ENABLED=False verified + pump-chain+|EXTREME|LONG absent from WINNER_CELLS_VALIDATED. If formal read fails, failing-leg candidates: stop-tighten x3 (unverifiable until slippage-column ships) + tat age-widen (walk B already FAILed, correctly not shipped) + jup-short-walk."
     },
     {
       "id": "amplify-vb-high-short-underdeploy",
@@ -1811,6 +1811,33 @@
       "default_action": "NO-SHIP — hard ceiling stays 75 unless EVERY threshold below clears; 'oversold/bounce-risk even in bear' doctrine (bf96d7cd 2026-10-03) is the prior ruling and stands until proven wrong",
       "threshold": "SHIP only if ALL: (1) gate_shadow token-day-dedup fwd_4h for the PURE >75 hard-ceiling cohort (regex splits '(hard ceiling' from the soft '(overbought)' variant — the two were pooled in every prior read) stays >= +0.35% with cluster CR1 |t|>=2 AND SAME SIGN in BOTH the <2026-11-03 and >=2026-11-03 windows (post +0.3756% t=+3.33 n=339 tok_n=69 ALREADY MEETS; pre +0.1110% t=+0.89 n=115 tok_n=30 currently FAILS the t>=2 leg); (2) tape-split same-sign per the CEO amendment; (3) REALIZED 75-85 SHORT cohort n>=15 with net>0 AND fk<20% of 30d SHORT winners — CURRENTLY CONTRADICTS: rsi_14 75-85 = 30d 11T 54.5% -0.28 / 14d 8T 50.0% -0.21 (both n<15, so insufficient not refuted); (4) a 1m candle-walk of the blocked set net >= +$1.00/14d. UNITS: fwd_4h% x live notional (pnl_usdt basis), never pnl_pct (leverage landmine).",
       "evidence": "2026-11-14T16:57Z brain_auditor #262. Same instrument+method the CEO already accepted once — SHORT_RSI_CEILING 65->75 (hermes_constants:1282) shipped on 'token-day-dedup fwd +0.376% n=88'. Post-11-03 the ceiling sits at 75 and the blocked set is PURELY >75: n=339 tok_n=69 fwd +0.3756% t_CR1=+3.33 pos 54.6% $-eq +$16.65/11d. Pre-11-03 pure >75: n=115 tok_n=30 +0.1110% t=+0.89 pos 48.7% = SAME SIGN but not significant. Live blocks today are real: 896 [SHORT-RSI-CEILING] lines since 11-03 (AIXBT 82.4, RESOLV 81.4, BLUR 84.4, WLFI 78.5). CONTRADICTION TO RESOLVE (why this is a walk, not a ship): the realized leaked 75-85 cohort is NEGATIVE (-0.28/30d) while the shadow counterfactual is positive (+0.38) — same post-gate adverse-selection gap #237 documented for the fade cohort. DOCTRINE TENSION: shorting RSI>75 = shorting into a pump, which cuts against 'every pump is a LONG opportunity'; the bear-tape counter is that an RSI 82 spike inside STRONG_DOWN is a dead-cat bounce. PRIOR ART: session-brain [risk-budget decision] 'The bear override was intentionally removed ... bf96d7cd completion 2026-10-03: NO bearish override — oversold = bounce risk even in bear'; [ceo (2)] 'STX SHORT passed ALL gates but blocked at the last one: EXEC-RSI-CEILING RSI 71.1 > 65' (that 65 leg is already fixed by the 11-03 raise). NOT a duplicate: rsi-ceiling-75-live is done; no open item covers 75->85. REPRODUCE: the >75 split is the regex in brain/analysis (SHORT-RSI-CEILING log variant) + gate_shadow fwd_4h. 0 trading-constant changes this run."
+    },
+    {
+      "id": "floor-admit-same-sign-verdict",
+      "stream": "floor_admit_shadow outcome join — pre-registered 11-15 mature-window verdict (n>=200 + 30d same-sign)",
+      "kind": "eval",
+      "status": "done",
+      "started": "2026-10-25",
+      "deadline": "2026-11-15T00:00:00Z",
+      "threshold": "n>=200 AND 30d same-sign AND fisher p<0.05 (house Step-5c significance bar) to ship floor-admit over always-admit",
+      "default_action": "NO SHIP if any bar fails",
+      "owner": "brain_auditor",
+      "done_at": "2026-11-15T00:40:00Z",
+      "adjudicated_by": "brain_auditor #264",
+      "disposition": "NO-SHIP, route CLOSED. Join re-ran 00:31Z: floor_only n=1835 decided 49.1% vs always_admit n=344 43.9% (blocked n=0); bars: n>=200 PASS, 30d same-sign PASS, fisher p=0.0877 FAIL (>0.05). p trajectory across runs: 0.138 -> 0.0321 -> 0.0442 -> 0.0545 -> 0.0877 = significance DECAYING as n grows (early small-n artifact, classic). Directional edge persists (+5.2pp) but house rule = p>0.05 is noise. Prior-art cite: [calwndar, 2026-10-31, 'census exact where cohort matches... single uncorrected p<0.05 among 20 tests flagged as weak'] = same class of weak-significance caution. Do NOT re-propose without a NEW pre-registered bar; any future ask needs CEO."
+    },
+    {
+      "id": "amplify-ai-trader-pending-normal-short-btc-cell",
+      "stream": "AMPLIFY (weekly offense) — winner-cell coverage hole: ai-trader-pending|NORMAL|SHORT",
+      "kind": "amplify",
+      "status": "open",
+      "started": "2026-11-15",
+      "deadline": "2026-11-22T00:00:00Z",
+      "threshold": "EARLY LABEL. Cell already passes windows (7d 21T +0.64 / 14d 21T +0.64 / 30d 26T +0.64, all net>0). Remaining bars before ANY live action: (i) REPLICATION — same-sign positive in the 11-16 week (single-week concentration: 21/26 trades closed in week starting 11-09); (ii) 2-token test — cell is 26/26 BTC (single-token; require either >=2 tokens or explicit BTC-manual label accepted by CEO); (iii) amount_usdt floor check (#234: % fills at HL_MIN notional, must be <50% for notional axis else use confidence path); (iv) CEO sign-off — money-sizing on CEO-domain signal. NO-SHIP default.",
+      "default_action": "NO CHANGE — mult stays 1.0, cell NOT added to WINNER_CELLS_VALIDATED until all four bars pass",
+      "owner": "CEO (ai-trader = CEO domain, steer-001 owns the signal-level view)",
+      "evidence": "PG 2026-11-15: only n>=10 net>0 cell with ZERO in-flight amplify/eval entries (coverage invariant, #260 precedent). Exits: manual_tp_hit 10T +1.39 (arm 60%), manual_sl_hit 5T -0.40; conf 55-60; avg hold 140min winners. OTHER ai-trader cells 30d net -0.53 (NORMAL LONG -0.14 / FLAT -0.13 / HIGH -0.26) = amplify THE CELL, not the signal (steer-001 37% WR signal-level stands). Prior-art query 'ai-trader-pending NORMAL SHORT winner cell amplify' -> NO RESULTS (no prior art found).",
+      "notes": "Context cite: [🧠 ai-trader btc auto trader, 2026-10-21, 'AI-trader manual trades are our analysis — we override the gates'] = why owner must be CEO. Weekly split: 10-19 week 5T 0.00, 11-09 week 21T +0.64."
     }
   ],
   "updated_at": "2026-11-14T12:49:19Z"
