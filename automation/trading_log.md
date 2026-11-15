@@ -27074,3 +27074,28 @@ BY: auto_1hr
 - 7d still RED -$1.35 (46.6% WR); 24h GREEN +$0.80
 - SIDeways find: data/regime.db is 0 bytes (empty schema) — regime data actually lives in /var/www/html/regime_4h.json + /var/www/hermes/data/regime_5m.json; regime.db looks like dead legacy, worth removing or wiring up
 BY: auto_1hr
+
+## [2026-11-15 07:53] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 this hour | 24h 13T 61.5% +$0.84 GREEN | 7d 102T 47.1% -$1.40 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes since 04:10, 1 open (BTC ai-trader-pending SHORT 04:12 flat)
+- No storm: window-min -0.92% / at-run -0.92% (both inside gate)
+- Kill check: no 0% WR with n>=3 in any window; worst is atr-trend+ 1T 0% n=1 — not eligible
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/13 = 7.7% (<40%); tpsl_utils deployed; hard_max_loss 1/13 avg -$0.22 — expected at leverage
+- Boost: none eligible — ai-trader-pending 6T 50% fails WR>55; atr-trend- 2T 100% n<5; jup_yolo 3T 66.7% n<5; multi-token fail
+- Arm rate: unarmed 8/13 = 61.5% (<70%) WR 50.0% +$0.54 vs armed 5/5 80% +$0.30 — under threshold, stall stack owns fix, no new gate
+- Neg streak: 02 -0.56, 03 -0.05, 04 -0.15 = 3 negative hours, but hours 05-07 have ZERO closes (streak not extended); regime SHORT_BIAS (4h 110 short / 5m 75 short) not NEUTRAL → no size cut per rule
+- Frequency: 0 closes/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- No closes in 3.5h (last close 04:10) — quiet market / possibly over-filtered? 24h still only 13T. Watch, don't touch
+- 7d still RED -$1.40 (47.1% WR); 24h GREEN +$0.84
+BY: auto_1hr
