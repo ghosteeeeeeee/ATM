@@ -27023,3 +27023,28 @@ BY: auto_1hr
 - Storm counterfactual POSITIVE $+3.55 breaks the negative streak — streak now 1/3 (deadline 2026-11-19)
 - 7d still RED -$0.42 (49.0% WR); 24h GREEN +$1.56
 BY: auto_1hr
+
+## [2026-11-15 03:21] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** $-0.56 this hour | 24h 14T 71.4% +$1.00 GREEN | 7d 101T 47.5% -$1.15 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 1 close (BTC ai-trader-pending SHORT manual_sl_hit -$0.56 -24.51% acct, 2.30 size, open 01:05 close 02:30), 1 open (BTC ai-trader-pending LONG 03:02, flat)
+- No storm: window-min +1.29% / at-run +1.25% (both inside gate)
+- Kill check: worst jup_yolo_mirrored 4T 50% -$0.09 — not 0% WR n>=3, no regime-kill eligibility
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/14 = 14.3% (<40%); tpsl_utils deployed; hard_max_loss 1/14 avg -$0.22 — expected at leverage
+- Boost: none eligible (ai-trader-pending 6T 66.7% +$0.84 all-BTC single-token + manual; atr-trend- 3T 100% n<5)
+- Arm rate: unarmed 9/14 = 64.3% (<70%) WR 55.6% +$0.64 vs armed 5/5 100% +$0.36 — under threshold, stall stack owns fix, no new gate
+- Neg streak: 23 -0.12, 01 +0.72, 02 -0.56 — 1 negative hour only, not 3 consecutive, no size cut
+- Frequency: 1 close/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 02:30 BTC pending SHORT stopped for -$0.56 (largest single loss in 24h) — CEO manual trade, report only
+- 7d still RED -$1.15 (47.5% WR); 24h GREEN +$1.00
+BY: auto_1hr
