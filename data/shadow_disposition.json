@@ -1838,6 +1838,20 @@
       "owner": "CEO (ai-trader = CEO domain, steer-001 owns the signal-level view)",
       "evidence": "PG 2026-11-15: only n>=10 net>0 cell with ZERO in-flight amplify/eval entries (coverage invariant, #260 precedent). Exits: manual_tp_hit 10T +1.39 (arm 60%), manual_sl_hit 5T -0.40; conf 55-60; avg hold 140min winners. OTHER ai-trader cells 30d net -0.53 (NORMAL LONG -0.14 / FLAT -0.13 / HIGH -0.26) = amplify THE CELL, not the signal (steer-001 37% WR signal-level stands). Prior-art query 'ai-trader-pending NORMAL SHORT winner cell amplify' -> NO RESULTS (no prior art found).",
       "notes": "Context cite: [🧠 ai-trader btc auto trader, 2026-10-21, 'AI-trader manual trades are our analysis — we override the gates'] = why owner must be CEO. Weekly split: 10-19 week 5T 0.00, 11-09 week 21T +0.64."
+    },
+    {
+      "id": "tape-at-long-remeasure-1129",
+      "kind": "eval",
+      "status": "open",
+      "deadline": "2026-11-29T00:00:00Z",
+      "desc": "BTC tape-state LONG-AT entry-block re-measure (from #191 pre-reg census executed #265): LONG while btc_ema300_position='AT' 14d 54T net -1.85 arm 40.7% / 30d 109T -1.83 arm 40.4% but older16d half +0.02 = SIGN FLIP and WR z=-1.22 -> COLLECT no-ship",
+      "threshold": "SHIP-review only if ALL: n>=150 stamped closed LONG-AT trades, net<0 in BOTH >=14d and >=30d halves (same-sign), two-prop z>=1.96 vs LONG non-AT, fk<20% of 30d LONG winners. Else close as noise. Units: pnl_usdt.",
+      "measurement": "PG: direction='LONG' AND _signal_metadata->>'btc_ema300_position'='AT', windows split at >=14d and >=30d; arm=mfe_pct>=0.40",
+      "owner": "brain_auditor",
+      "created_by": "brain_auditor #265",
+      "evidence": "#191 tape stamp n=233/14d coverage 87.6%; arm split AT/BELOW 41.6% vs ABOVE 60.0% z=-2.26 IS significant — profit translation is the open question",
+      "not_a_duplicate_of": "LONG_NEUTRAL_BLOCK already gates AT/Below in NEUTRAL regimes; this is the non-NEUTRAL residual cohort",
+      "risk": "low"
     }
   ],
   "updated_at": "2026-11-14T12:49:19Z"

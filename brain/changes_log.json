@@ -4287,5 +4287,16 @@
     "after": "+ date (sessions.created_at), excerpt (text alias), chunk_type (type alias), topic (chunks.topic)",
     "rationale": "documented contract in brain_auditor_prompt.md was never implemented (git -S proves excerpt never existed); citation mandate unfulfillable",
     "impact": "zero trading behavior; citations restored 0/12 -> 15/23; bug_hunter SHIP, selfcheck PASS"
+  },
+  {
+    "timestamp": "2026-11-15T08:55:00Z",
+    "agent": "brain_auditor",
+    "change": "[CONTINUUM-BLOCK] LONG log message clarified: added '(bypass leg only — confluence>=2 not gated here)' + explanatory comment",
+    "type": "tweak",
+    "file": "scripts/signal_compactor.py",
+    "before": "🚫 [CONTINUUM-BLOCK] {token} LONG BLOCKED — BTC bearish structure",
+    "after": "🚫 [CONTINUUM-BLOCK] {token} LONG BLOCKED — BTC bearish structure (bypass leg only — confluence>=2 not gated here)",
+    "rationale": "message claimed a full block while confluence>=2 signals execute anyway (ZRO #16920 7s later; #138 re-eval n=103 z=0.13 proves leak cohort = base) — misleading logs caused a wasted re-investigation this run",
+    "impact": "ZERO trading behavior — log string only; py_compile PASS; blocked_but_executed selfcheck PASS; no exact-string consumers repo-wide"
   }
 ]

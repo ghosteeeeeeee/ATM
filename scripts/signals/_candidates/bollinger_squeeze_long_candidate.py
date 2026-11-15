@@ -7,7 +7,7 @@ Direction: LONG
 Backtest WR: 59.0%
 Backtest PnL: +0.4693%
 Backtest trades: 454
-Generated: 2026-11-15 03:58 UTC
+Generated: 2026-11-15 08:18 UTC
 
 STATUS: CANDIDATE — requires human review before enabling.
 """

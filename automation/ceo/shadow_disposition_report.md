@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-15T00:47:20.132031+00:00
-registry: 117 entries (open=47)
+# Shadow disposition report — 2026-11-15T08:51:35.583194+00:00
+registry: 118 entries (open=48)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -100,7 +100,6 @@ registry: 117 entries (open=47)
 - OPEN win-side-capture-shadow: deadline=2026-11-22T00:00:00Z | (no parseable source)
 - OPEN hml-vol-atr-mult-shadow: deadline=2026-11-18T00:00:00Z | (no parseable source)
 - OPEN amplify-atr-trend-short-cell-watch: deadline=2026-11-16T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for amplify-atr-trend-short-cell-watch
 - OPEN amplify-structure-flip-early-exit: deadline=2026-11-21T00:00:00Z | (no parseable source)
 - DONE amplify-tat-neverarmed-age-widen: FAIL -> NO CHANGE stands (brain_auditor #258, walk B in exit_stack_walk_2026_11_14.py): walked n=60 (pooled bar >=40 MET) but net30 -0.51, net14 -0.19, halves -0.31/-0.20 = same-sign NEGATIVE; armed-during-extension 23 excluded from net (trail takes over); fk_flip 2/22 = 9.1%. Extending TAT 52->90m LOSES money — stalls keep drifting against, cut-at-52 validated. COLLISION RESOLVED: prearm-breakeven-lock (opposite direction) wins the joint 11-14 adjudication; ship-at-most-one satisfied. Per-signal walk output available in run log. done_at 2026-11-14 (?)
 - OPEN amplify-atr-trend-short-clonehunt: deadline=2026-11-18T00:00:00Z | (no parseable source)
@@ -120,3 +119,4 @@ registry: 117 entries (open=47)
 - OPEN amplify-short-rsi-hard-ceiling-85-walk: deadline=2026-11-21T00:00:00Z | (no parseable source)
 - DONE floor-admit-same-sign-verdict: NO-SHIP, route CLOSED. Join re-ran 00:31Z: floor_only n=1835 decided 49.1% vs always_admit n=344 43.9% (blocked n=0); bars: n>=200 PASS, 30d same-sign PASS, fisher p=0.0877 FAIL (>0.05). p trajectory across runs: 0.138 -> 0.0321 -> 0.0442 -> 0.0545 -> 0.0877 = significance DECAYING as n grows (early small-n artifact, classic). Directional edge persists (+5.2pp) but house rule = p>0.05 is noise. Prior-art cite: [calwndar, 2026-10-31, 'census exact where cohort matches... single uncorrected p<0.05 among 20 tests flagged as weak'] = same class of weak-significance caution. Do NOT re-propose without a NEW pre-registered bar; any future ask needs CEO. (2026-11-15T00:40:00Z)
 - OPEN amplify-ai-trader-pending-normal-short-btc-cell: deadline=2026-11-22T00:00:00Z | (no parseable source)
+- OPEN tape-at-long-remeasure-1129: deadline=2026-11-29T00:00:00Z | (no parseable source)

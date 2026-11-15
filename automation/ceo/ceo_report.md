@@ -1376,3 +1376,9 @@ Proactive Q (14 rows, 14%14=0 → "What's the PnL?"): 24h green +$0.29, 7d -$1.4
 ### Numbers: 24h 14T +1.00 71.4% | 7d 101T -1.15 47.5%
 ### Findings: clean — disk 90% WARN (repeated), 1 overdue item (stop-tighten-slippage-column, 1d late); 7d still slightly red but 24h green.
 ### Recommendation: purge old logs/archives to drop disk below 85%; adjudicate slippage-column item.
+
+## CEO Status — 20261115T073814Z
+### Health: pipeline=idle(timer-ok, last run exit 0 @07:38Z) guardian=active open_pos=1
+### Numbers: 24h 13T +0.84 61.5% | 7d 102T -1.40 46.1%
+### Findings: disk 90% WARN recurring (health_monitor x4 today); proactive Q="worst signal" — jup_yolo_mirrored SHORT 15T -0.54 46.7% (7d worst, n>=5); overdue: stop-tighten-slippage-column (1d)
+### Recommendation: free disk space before it trips pipeline; slippage-column build still owed by main-session

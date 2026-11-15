@@ -3214,7 +3214,12 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 log(f"  ✅ [CONTINUUM-OVERRIDE] {token} LONG — BTC bearish BUT coin rising (vel={_vel2:+.2f}%, above SMA), allowing")
                             else:
                                 _btc_mom_ok_for_bypass = False
-                                log(f"  🚫 [CONTINUUM-BLOCK] {token} LONG BLOCKED — BTC bearish structure")
+                                # log-honesty fix brain_auditor #265: this flag only scopes the
+                                # standalone-bypass leg of the NEUTRAL gates — confluence>=2
+                                # signals still execute (ZRO #16920 block->EXEC 7s, and the
+                                # #138 re-eval at n=103 closed shows the leak cohort is
+                                # statistically identical to base LONG, z=0.13, no enforcement).
+                                log(f"  🚫 [CONTINUUM-BLOCK] {token} LONG BLOCKED — BTC bearish structure (bypass leg only — confluence>=2 not gated here)")
                         elif direction.upper() == 'LONG' and _cont_bullish:
                             _btc_mom_ok_for_bypass = True
                             log(f"  ✅ [CONTINUUM-BULL] {token} LONG — BTC bullish structure ({_continuum_phase}+{_cont_row_data.get('linreg_direction')}+{_cont_row_data.get('ema300_position')}), bypass allowed")

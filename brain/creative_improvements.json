@@ -11426,5 +11426,32 @@
     "category": "exit-side",
     "status": "evidence-logged",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-15T08:55:00Z",
+    "idea": "#191 tape-state arm census EXECUTED (n=233): LONG arm AT/BELOW EMA300 41.6% vs ABOVE 60.0% z=-2.26 — arm deficit real, profit gate FAILS OOS (older16d +0.02 sign-flip, WR z=-1.22) -> COLLECT, re-measure 11-29",
+    "rationale": "pre-registered next lever from #191; the stamp landed (87.6% coverage 14d) so the census was due; AT-tape is where LONGs stop arming (40.4-40.7% arm, -1.83/109 30d)",
+    "expected_impact": "if it re-measures clean at 11-29 (n>=150, same-sign both halves, z>=1.96): entry-gate candidate for AT-tape LONGs; if not, closes the lever",
+    "category": "entry quality",
+    "status": "collected-no-ship",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-15T08:55:00Z",
+    "idea": "#138 CONTINUUM-BLOCK leak re-eval EXECUTED at n=103 closed -> CLOSED no-enforcement + log-honesty fix shipped",
+    "rationale": "ZRO #16920 block 08:27:00 -> EXEC 08:27:07 re-surfaced the #138 gate-integrity drift; 337 block->EXEC matches over 10-10..11-15 logs, 104 PG opens: cohort 45.6% vs base 44.9% z=0.13, fkA 17.7% — leak is statistically identical to base",
+    "expected_impact": "closes a 21-day pre-reg debt; log message now says bypass-leg-only so future agents stop re-investigating; zero trading behavior change",
+    "category": "gate integrity",
+    "status": "shipped-log-only",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-15T08:55:00Z",
+    "idea": "pc- flip trajectory watch 52.8% -> 56.8% toward the 58 promote bar",
+    "rationale": "contrarian join 08:30Z: pc- flip now 200/352=56.8% (was 186/352); if it crosses 58 with tape-split confirmation the demote-veto question reopens — but pre-registered tape-split check is 11-18, do not act early",
+    "expected_impact": "prevents both premature promotion and missed promotion at the 11-18 check",
+    "category": "contrarian",
+    "status": "watch",
+    "risk": "low"
   }
 ]
