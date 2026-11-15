@@ -361,7 +361,11 @@ duplicate real trade #16832).
     the **1h MAJOR floor** (trigger = sl1h − 60, reclaim SL = sl1h +
     0.6·ATR15, TP = trigger − 3·ATR1h disaster depth AT ARM TIME;
     loop-safe: a derived trigger outside reach — including price already
-    at/below it — is skipped); (b) no
+    at/below it — is skipped). **HAND-ARMED RUNGS MUST PASS THE SAME
+    ITM GUARD (lesson 2026-11-15): a long trigger must sit ABOVE live
+    price and a short trigger BELOW — an ITM hand-run sits armed-crossed
+    and fires at market on the next flat with the full stop distance as
+    risk (the 60k-long was pulled at 62,694 before it could); (b) no
     unfired BTC long rung
     WITHIN REACH (≤3·ATR1h above price — stacked 72k+ rungs do NOT count,
     a rubberband snap from 68k would leave them behind) → derive at the
