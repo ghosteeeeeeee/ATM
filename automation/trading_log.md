@@ -27227,3 +27227,29 @@ BY: auto_1hr
 - 24h: NORMAL 5T 80% +1.49 still carries PnL; EXTREME 11T 36.4% +0.25, HIGH 3T 66.7% -0.43
 - Unarmed cohort 68.4% share brushing the 70% line — watch next run, stall stack owns the fix
 BY: auto_1hr
+
+## [2026-11-15 13:51] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** $-0.01 this hour | 24h 20T 50.0% +$1.33 GREEN | 7d 109T 46.8% -$0.61 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 1L — ZRO hl_copy_trader LONG trader_exit -0.01 (-0.24%); 2 open (BTC continuum-osc+ LONG 13:48 flat, BIGTIME atr-trend- SHORT 12:23 -0.04)
+- No storm: window-min +0.03% / at-run +0.12% (both inside gate)
+- Kill check: no 0% WR n>=3 — worst jup_yolo_mirrored 3T 33.3% -0.14; r2v2-long3/atr-trend+/hl_copy_trader 0% but n=1 each
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/20 = 15.0% (<40%); tpsl_utils deployed; manual_sl_hit 3/20 avg -0.237 = CEO manual trades
+- Boost: none eligible — ai-trader-pending 7T 42.9% +0.59 fails WR>55; all others n<5
+- Arm rate: unarmed 14/20 = 70.0% (at, not above, the 70% line) WR 35.7% +0.62 vs armed 6/6 83.3% +0.71 — stall stack owns fix, no new gate
+- Neg streak: 10 -0.09, 12 +0.39 positive, 13 -0.01 — not 3 consecutive; regime 24h EXTREME/NORMAL/HIGH (no NEUTRAL) -> no size cut
+- Frequency: 1 close/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- Unarmed share hit exactly 70.0% (14/20) — first time at the line; unarmed WR 35.7% held (was 38.5). Watch next run
+- 7d still RED -$0.61 (46.8% WR) but improving; 24h GREEN +$1.33 at 50.0% WR
+- NORMAL 5T 80% +1.49 still carries 24h PnL; EXTREME 12T 33.3% +0.27, HIGH 3T 66.7% -0.43
+BY: auto_1hr
