@@ -26996,3 +26996,30 @@ BY: auto_1hr
 - 7d still RED -$0.42 (49.0% WR); 24h GREEN +$1.56
 - 1 open trade at run time (BTC ai-trader-pending SHORT 01:05)
 BY: auto_1hr
+
+## [2026-11-15 02:22] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 this hour | 24h 13T 76.9% +$1.56 GREEN | 7d 102T 49.0% -$0.42 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**Storm Packet:** 🌩️ [STORM-READINESS] window-min -2.31% / at-run +2.43% | blocked 162 (combo_key-stale 40, expired-hotset 35, rr-engine-hard-block 20, long-rsi-ceiling 13, short-rsi-hard-floor 13, vol-gate-override-0.0 12, compaction_stale_10min 11, spike-filter-long 9, pump-chain-rsi-max-long 5, oversold-knife 2, pump-chain-vel 2) | true-starvation 39 RSI>=35 (114 raw rows RSI>=35, deduped first-fire-per-token 39; 39 walked, 0 missing) | counterfactual $+3.55 (touch 12/39) | waiver: SHADOW=True ENFORCE=False — counterfactual POSITIVE -> **streak 1/3** (01:22 -1.08 reset it; 2 more positives flip enforce bar, deadline 2026-11-19); split: blocked LONGs $+6.49 (25), blocked SHORTs $-2.95 (14) — recovered pump: dump LONG winners were gate-starved, dump SHORTs were right to be blocked into the bounce
+
+**No Change Needed:**
+- Last hour: 0 closes, 1 open (BTC ai-trader-pending SHORT 01:05, -$0.51 unrealized)
+- Kill check: 0 close/hr; 24h worst jup_yolo_mirrored 4T 50% -$0.09 — not 0% WR n>=3, no regime-kill eligibility
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/13 = 15.4% of 24h closes (<40%); tpsl_utils deployed -> no alert
+- Boost: none eligible (ai-trader-pending 5T 80% +$1.40 all-BTC single-token + manual; atr-trend- 3T 100% n<5; jup_yolo_mirrored 4T 50% negative)
+- Arm rate: unarmed 8/13 = 61.5% (<70%) WR 62.5% (+$1.20) vs armed 5/5 100% (+$0.36) — under threshold, stall stack owns fix, no new gate
+- Neg streak: 23 -0.12, 01 +0.72, 02 no closes — not 3 consecutive negative, no size cut
+- Frequency: 0 closes/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- at-run +2.43% fresh pump after -2.31% window-min dump — volatile reversal; watch the open BTC short (-$0.51)
+- Storm counterfactual POSITIVE $+3.55 breaks the negative streak — streak now 1/3 (deadline 2026-11-19)
+- 7d still RED -$0.42 (49.0% WR); 24h GREEN +$1.56
+BY: auto_1hr
