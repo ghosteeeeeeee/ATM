@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-15 13:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-15 19:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,818 | **WR:** 51.3% | **PnL:** -115.85%
+- **Total trades (all time):** 3,828 | **WR:** 51.3% | **PnL:** -118.78%
 - **Date range:** 2026-07-29 → 2026-11-15
 
 ---
@@ -23,9 +23,9 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| jup_yolo_mirrored | SHORT | 3 | 33.3% | -0.98 | ❓ | Needs more data |
+| atr-trend- | SHORT | 6 | 50.0% | -2.19 | ❓ | Borderline |
+| ai-trader-pending | SHORT | 3 | 33.3% | +0.30 | ❓ | Needs more data |
 | btc-pump-rider+ | LONG | 2 | 50.0% | +1.52 | ❓ | Needs more data |
-| ai-trader-pending | SHORT | 6 | 50.0% | +2.83 | ❓ | Borderline |
 
 ---
 
@@ -43,9 +43,9 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] jup_yolo_mirrored SHORT** — WR=33.3%, PnL=-0.98% over 3 trades. Monitor next cycle.
-2. **[WATCH] btc-pump-rider+ LONG** — WR=50.0%, PnL=+1.52% over 2 trades. Monitor next cycle.
-3. **[WATCH] ai-trader-pending SHORT** — WR=50.0%, PnL=+2.83% over 6 trades. Monitor next cycle.
+1. **[WATCH] atr-trend- SHORT** — WR=50.0%, PnL=-2.19% over 6 trades. Monitor next cycle.
+2. **[WATCH] ai-trader-pending SHORT** — WR=33.3%, PnL=+0.30% over 3 trades. Monitor next cycle.
+3. **[WATCH] btc-pump-rider+ LONG** — WR=50.0%, PnL=+1.52% over 2 trades. Monitor next cycle.
 
 ---
 

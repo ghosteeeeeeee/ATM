@@ -1394,3 +1394,11 @@ Proactive Q (14 rows, 14%14=0 → "What's the PnL?"): 24h green +$0.29, 7d -$1.4
 ### Numbers: 24h 20T +0.51 45.0% | 7d 111T -0.63 46.8%
 ### Findings: arm-tripwire RUN 2 decision OVERDUE since 12:45Z (both legs met at run #265: LONG arm 42.1% <50, SHORT 55.4% >55 — CEO flag w/ leaderboard context, no auto-config); tower overdue: stop-tighten-slippage-column (1d, main-session). Proactive Q (new signals this week): 0 — newest scripts/signals file Nov 6 (>7d), none shipped 11-09..11-15.
 ### Recommendation: CEO closes arm-tripwire RUN 2 flag this session; delegate 1 new signal build to signal_analyst (0/wk vs target 1).
+
+## CEO Status — 20261115T193815Z
+### Health: pipeline=active guardian=active open_pos=4
+### Numbers: 24h 25T +0.29 36.0% | 7d 112T -0.80 44.6%
+### Findings: clean (24h PnL positive despite 36% WR — small-win shape, not a flag); 1 overdue decision item: stop-tighten-slippage-column OVERDUE 1d; NEW alerts 19:38Z: hotset failure recorded + `no attribute 'get'` in hotset path.
+### Recommendation: main-session ship slippage-column BUILD #1 (7th resurface) and glance at the new hotset AttributeError — status run only, no changes made.
+
+Rotating Q (idx 10 = "new signals this week?"): 0 SHIPPED (matches 15381Z run), but 5 AMPLIFY eval cells registered 11-09..11-14 (pcv6/r2v2-clone/slope-jup/vb-/ema300), all NO-SHIP default, due 11-18..11-21.

@@ -4257,3 +4257,21 @@
 ## Error Alerts — 2026-11-15 16:38 UTC
 - **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
 - **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`
+
+## Error Alerts — 2026-11-15 17:00 UTC
+- **[WARN]** (freq_deviation_shadow): `atr-trend-`: FREQ DEVIATION OVER source=atr-trend- baseline=0.080/h current=0.208/h ratio=2.59 n_base=27 n_cur=5
+
+## Error Alerts — 2026-11-15 17:38 UTC
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **REPEATED** (10x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-15 18:00 UTC
+- **[WARN]** (freq_deviation_shadow): `hl_copy_trader`: FREQ DEVIATION OVER source=hl_copy_trader baseline=0.030/h current=0.083/h ratio=2.80 n_base=10 n_cur=2
+
+## Error Alerts — 2026-11-15 18:38 UTC
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-15 19:38 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   📉 hotset failure recorded: TOK TOK (count=N)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: no attribute 'get'`
