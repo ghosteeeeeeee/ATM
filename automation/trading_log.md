@@ -27149,3 +27149,29 @@ BY: auto_1hr
 - Unarmed cohort WR at 36.4% and declining (50% -> 40% -> 36% over 3 runs) while unarmed share stays 61% — flagging trend for stall-stack follow-up
 - 7d still RED -$1.00 (47.2% WR); 24h GREEN +$1.14
 BY: auto_1hr
+
+## [2026-11-15 10:52] Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 loss)
+**PnL:** $-0.09 this hour | 24h 18T 50.0% +$1.02 GREEN | 7d 106T 46.2% -$0.99 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: W r2v2-long3 LONG atr_sl_hit '-0.09' '-3.97%' (MAE 0.68%, MFE never positive, EXTREME regime); 2 open (ZRO LONG +0.28, BTC continuum-trend+ LONG +0.15)
+- No storm: window-min -0.79% / at-run +0.22% (both inside gate)
+- Kill check: no 0% WR n>=3 — last hour n=1; 24h worst jup_yolo_mirrored 4T 50% '-0.07', r2v2-long3 1T 0% n=1 (all-time 33T 51.5% flat), atr-trend+ n=1
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/18 = 16.7% of 24h closes (<40%); tpsl_utils deployed; manual_sl_hit 3/18 avg '-0.237' = CEO manual trades
+- Boost: none eligible — ai-trader-pending 7T 42.9% '+0.59' fails WR>55; all others n<5
+- Arm rate: unarmed 12/18 = 66.7% (<70%) WR 33.3% '+0.31' vs armed 6/6 83.3% '+0.71' — unarmed WR falling (50->40->36->33), share under threshold, stall stack owns fix, no new gate
+- Neg streak: 09 hour '+0.43' positive broke streak; 10 '-0.09' = 1 negative hour; regime 4h SHORT_BIAS (110 short / 2 long) not NEUTRAL -> no size cut; size-reduce file absent -> 1.0x
+- Frequency: 1 close/hr — well under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- Unarmed cohort WR at 33.3% and declining (50->40->36->33 over 4 runs) while share sits 66.7% — stall-stack follow-up, no new gate
+- 7d still RED -$0.99 (46.2% WR); 24h GREEN +$1.02 at exactly 50% WR
+- 24h EXTREME regime 10T flat '-0.04' and HIGH 3T '-0.43' vs NORMAL 5T '+1.49' — NORMAL is where money is made
+BY: auto_1hr
