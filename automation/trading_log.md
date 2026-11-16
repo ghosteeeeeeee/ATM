@@ -27912,3 +27912,32 @@ BY: auto_1hr
 - 24h RED -$0.58 at 25.0% WR; 7d RED -$0.84; at-run BTC +1.42% just under pump gate — watch next run
 - Unarmed cohort 75.0% of closes at 8.3% WR (-$0.77) vs armed 4/4 +$0.19 — stall stack owns fix
 BY: auto_1hr
+
+## 2026-11-16 15:52 Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 this hour (flat — 0 closes) | 24h 16T 25.0% -$0.58 RED | 7d 110T 44.5% -$0.84 RED | **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** 🌩️ [STORM-READINESS] window-min -1.52% / at-run -0.74% | blocked 258 (combo_key-stale 74, expired-hotset 57, compaction_stale_10min 35, pump-chain-* 29, long-*gates 24, confluence single-type 15, rr-engine-hard-block 7, oversold-knife 5, vol-gate-override-0.0 5, maxxed-vol 4, short-rsi-hard-floor 2, short-regime-gate 1) | true-starvation 60 RSI>=35 (176 raw rows RSI>=35 price>0, deduped first-fire-per-token 60; 60 walked, 0 skipped) | counterfactual $-2.37 (touch 45/60) | waiver: SHADOW=True ENFORCE=False — counterfactual NEGATIVE -> **streak stays 0/3** (deadline 2026-11-19); split: blocked SHORTs $+0.35 (13), blocked LONGs $-2.72 (47) — gates correctly kept dump LONG losers out
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 open
+- Storm gate FIRED (window-min -1.52% <= -1.5) — packet emitted above; at-run -0.74% inside gate but window-peak rule governs
+- Kill check: last hour n=0; 24h 0%-WR candidates ai-trader-pending 3T 0% -$0.18 but 14d NORMAL 27T 40.7% +$1.12 wins -> keep; hl_copy_trader 14d EXTREME 7T 57.1% +$0.43 wins -> keep; atr-trend- 7T 28.6% not 0%
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/16 = 18.8% of 24h closes (<40%); tpsl_utils deployed
+- Boost: none eligible — only n>=5 signal is atr-trend- 7T 28.6% -$0.39 (fails WR>55% and PnL>$0.05)
+- Arm rate: unarmed 12/16 = 75.0% (>70% — CHOP ENTRIES DOMINATING) WR 8.3% -$0.77 NEGATIVE vs armed 4/4 75.0% +$0.19 — stall stack owns the fix, no new gate
+- Neg streak: closes 05h (-0.07), 10h (-0.07), 14h (+0.10) — not 3 consecutive; 24h regimes HIGH/NORMAL/EXTREME not NEUTRAL -> no size cut
+- Frequency: 0 close/hr — well under 20
+- Winners MAE 0.241% avg 24h (<0.5% — entry quality OK)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED -$0.58 at 25.0% WR; 7d RED -$0.84; quiet market (0 closes in last hour)
+- Unarmed cohort 75.0% of closes at 8.3% WR (-$0.77) vs armed 4/4 +$0.19 — stall stack owns fix
+- storm-confl-waiver bar 0/3 with deadline 2026-11-19; negative counterfactuals keep resetting it
+BY: auto_1hr
