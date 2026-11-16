@@ -27782,3 +27782,29 @@ BY: auto_1hr
 - 24h RED -$0.34 at 31.6% WR (weakest WR stretch); 7d RED -$1.10; quiet market (1 close in 8h)
 - Unarmed cohort 78.9% of closes at 20% WR (-$0.47) vs armed 4/4 +$0.13 — stall stack owns fix
 BY: auto_1hr
+
+## 2026-11-16 10:52 Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 1 losses)
+**PnL:** $-0.07 this hour (BTC ai-trader-pending SHORT manual_sl_hit -0.07 / -3.33% — CEO manual) | 24h 19T 31.6% -$0.32 RED | 7d 110T 43.6% -$1.17 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 1 close (CEO manual BTC), 0 open
+- No storm: window-min -0.39% / at-run +0.39% (both inside gate)
+- Kill check: last hour n=1; hl_copy_trader 24h 3T 0% but 14d EXTREME 7T 57.1% +$0.43 wins -> keep per regime policy; ai-trader-pending 14d NORMAL 26T 42.3% +$1.16 wins -> keep; atr-trend- 8T 37.5% not 0%
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/19 = 15.8% of 24h closes (<40%); tpsl_utils deployed
+- Boost: none eligible — atr-trend- 8T 37.5% -$0.31 (fails WR>55% + PnL>$0.05); hl_copy_trader 0%
+- Arm rate: unarmed 15/19 = 78.9% (>70% — CHOP ENTRIES DOMINATING) WR 20.0% -$0.45 NEGATIVE vs armed 4/4 75.0% +$0.13 — stall stack owns the fix, no new gate
+- Neg streak: closes only at 05:00 (-0.07) and 10:00 (-0.07) — not 3 consecutive hours
+- Frequency: 1 close/hr — well under 20
+- Winners MAE 0.111% avg 24h (<0.5% — entry quality OK)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED -$0.32 at 31.6% WR; 7d RED -$1.17; quiet market (2 closes in 12h)
+- Unarmed cohort 78.9% of closes at 20% WR (-$0.45) vs armed 4/4 +$0.13 — stall stack owns fix
+BY: auto_1hr

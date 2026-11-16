@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-16T00:32:51.520708+00:00
-registry: 119 entries (open=48)
+# Shadow disposition report — 2026-11-16T09:14:49.590914+00:00
+registry: 119 entries (open=47)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -60,24 +60,16 @@ registry: 119 entries (open=48)
 - DONE amplify-stop-tighten-probe-080: SUPERSEDED — probe assumed ENFORCE=False shadow knob at 0.80; CEO shipped ENFORCE=True cap 0.75 on 2026-11-04 (T-override) BEFORE this read, so the 0.80 probe stream never existed live and no post-retune new-data window is definable. Live-clamp measurement belongs to stop-tighten-enforce-eval (KEEP this run). Do not re-open. done_at 2026-11-14 (?)
 - DONE jup-hml-shadow-065-050: REJECT — pre-registered eval ran 2026-11-02 (n=84): hml65 net -$0.30, hml50 net -$0.42 vs baseline +$1.44 → both REJECT, no enforce (verdicts stable across re-runs). Registered retroactively 2026-11-03 (was unregistered — chase-move-shadow governance-gap class). (2026-11-02)
 - OPEN jup-trail-shadow-1xatr: deadline=2026-11-17T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for jup-trail-shadow-1xatr
 - OPEN jup-atrsl-shadow-parity: deadline=2026-11-17T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for jup-atrsl-shadow-parity
 - OPEN short-regime-exempt-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for short-regime-exempt-shadow
 - OPEN flip1-bear-override-reshadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for flip1-bear-override-reshadow
 - DONE ichimoku-short-pause: PAUSED — 0 fills/7d waste; re-enable only on backtest (2026-11-03)
 - DONE rsi-ceiling-75-live: KEEP 75 (audit #244 revert-rule read): 14d SHORT rsi 65-75 realized n=9 <15 FAIL sample floor; WR 77.8% (not <50); net +0.27 (not <0). Revert-to-65 bar NOT met on all three limbs. Post-11-03 slice n=3 +0.14. Ceiling stays 75. HARD_CEILING/FLOOR/knife untouched. (2026-11-09T20:55:00Z)
 - OPEN bear-single-source-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for bear-single-source-shadow
 - OPEN volgate-short-exempt-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for volgate-short-exempt-shadow
 - OPEN maxxed-short-exempt-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for maxxed-short-exempt-shadow
 - DONE gate-shadow-dedup-convention: DONE 2026-11-09 audit #244 — convention ADOPTED: #234/#235/#239 all quote token-day deduped means; gate_ev_dedup.py + winner_cell_set_kpi.py ship the tooling; PC-SHORT-HIGH dual-base reconcile note remains in notes for any future pc-high citation (report-only). (2026-11-09T20:55:00Z)
 - OPEN long-bypass-regime-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for long-bypass-regime-shadow
 - DONE short-shadow-join-builder: EVAL (2026-11-06)
 - DONE timer-cadence-recheck: RE-DAILY EXECUTED — option (a) taken as registered default: OnCalendar back to *-*-* 08:15 (repo + /etc, daemon-reload + timer restart verified). Rationale: weekly (Mon-only, from disposition-cadence-revert) could not honor 11-05/11-06/11-07 reads incl. the 11-07 fold-line packet; calendar now has 6+ deadlines 11-07..11-17. Re-evaluate cadence when calendar is sparse (new entry needed then). (2026-11-04)
 - DONE harvest-ship-2026-11-04: EARLY FAIL WARNING — rolling-50 jup share 44.0-45.2% (bar <35% FAIL) | HML 7d 37 (bar <15 FAIL, jup owns 22/37=-3.20) | daily net day-1 -0.14 day-2 -0.29 (bar sustained $0 72h FAIL) | LONG 48h -0.43. 3 of 4 metrics failing with 2 days left before 11-07. CEO should pre-position revert decision. (?)
@@ -89,15 +81,10 @@ registry: 119 entries (open=48)
 - OPEN amplify-ema300-underdeploy: deadline=2026-11-19T00:00:00Z | (no parseable source)
 - DONE amplify-bbsqueeze-chop-exempt: NO SHIP 2026-11-13 (run #253). Required frame = log-reparse (threshold explicitly excludes gate_shadow.db). Fresh 30d pipeline.log reparse: LONG-NEUTRAL-CHOP blocks 5723; source-attributed via CONFLUENCE-DEBUG/HOTSET-FINAL-ADD within 15min: only 131 deduped events total (86% unattributable — block tokens rarely have a source line in window); bb-squeeze+ LONG = n=2 deduped — FAILS n>=15 by a wide margin. gate_shadow.db frame (n=58, 77.6% would-win, fwd_4h +0.30) is the frame the threshold FORBIDS (non-random 15-30% capture). would-win/candle-walk/fk legs not reached. Data-quality side-find: log source-attribution covers only ~13% of LONG-NEUTRAL-CHOP blocks — future exempt claims in this frame need a source column on the block line itself. Gate stays global; chop-bleed KPI owns entry quality. (?)
 - OPEN jup-cluster-gate: deadline=2026-11-17T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for jup-cluster-gate
 - OPEN jup-anti-chase: deadline=2026-11-17T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for jup-anti-chase
 - OPEN jup-pro-selection: deadline=2026-11-17T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for jup-pro-selection
 - OPEN btc-standalone-deny-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for btc-standalone-deny-shadow
 - OPEN setup-recall-shadow: deadline=2026-11-17T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for setup-recall-shadow
 - DONE linreg-fade-fill-funnel: FAIL 2026-11-13 (run #253) — fill bar 0 PG fills < 5 required. ROOT CAUSE FOUND (one lever escalated per threshold): VOL-GATE-v2 REGIME_SIGNALS has NO linreg-fade entry in ANY regime, so every EXEC is allowlist-killed. 30d log: 63 EXEC: [linreg-fade-] lines, 63/63 paired with '[VOL-GATE-v2] <tok>: SKIP — linreg-fade- not suited for NORMAL/HIGH' within the same second (deduped 26 token-events; top: LIT 13, NEAR 7, ATOM 5). STANDALONE_BYPASS shipped 11-05 unlocked confluence/hotset/approve but never touched the vol-gate allowlist — last mile still wired shut. SHADOW COUNTERFACTUAL (this run, 1m candle walk, pnl-free price-move units): 21/26 walkable — +30m 47.6% WR avg -0.085%, +2h 52.4% +0.048%, +8h 61.9% avg +0.195% med +0.520%; crude arm(+0.40)/stop(-1%) sim = 15 arm / 6 stop ≈ 0.00% net. At $11 notional ≈ +$0.02/trade → ~+$0.56/30d — POSITIVE but NOT significant (n=21, +8h binomial p≈0.08 vs 50%) and below +$1.00/30d-class bars. DEFAULT = NO CHANGE (do not add to REGIME_SIGNALS yet). Escalation delivered: wiring-flip candidate registered as amplify-linregfade-volgate-admit with pre-registered bar; re-measure 2026-11-27 when killed-EXEC cohort ~doubles. Secondary blocker noted (not the escalated lever): BTC-CRASH gate also killed approved IOTA SHORT 11-12 18:47. Prior art: session brain hit 'Build New Linear Regression Signal' (score 0.80) — signal-build sessions, no prior REGIME_SIGNALS admission attempt found. (?)
 - DONE amplify-bbsqueeze-warrior-uninert: REVERT EXECUTED 2026-11-14 (brain_auditor #258) — BOTH legs failed: (a) share of next-100 closed fills = 11% (bb-squeeze 7 + warrior 4 of 100; window 11-06 14:48 -> 11-13 23:03) < 25% bar, decaying (was 23% at #241); (b) bb-squeeze+ 7d net -0.26 < 0. Actions: data/combo_weights.json bb-squeeze+ 1.3->1.1, warrior-sr-confirm+ 1.6->1.04, warrior-sr-confirm- key deleted (absent pre-pin); scripts/self_learner.py PINNED_COMBO_WEIGHTS={}. NOTE (bug-hunter #258): static fallback for warrior-sr-confirm- is 1.6 (signal_compactor:719) so only its json copy was removed — effective unchanged. Traffic confounder (LOW-vol setup scarcity, 100 fills took 7d) recorded for any CEO re-pin. Auto-tuning resumes at 06:00 recalc. done_at 2026-11-14 (?)
 - DONE amplify-bbsqueeze-neutral-exempt: NO SHIP (default) — bar (ii) FAILS at 11-14 read: gate_shadow.db LONG-NEUTRAL blocked bb-squeeze+ LONG = 54 events/30d, would-win 37/54 = 68.5% < 70% bar. Token-day dedup across gates = 76 (n-bar would pass, but a failed bar stops the walk). LONG-NEUTRAL gate stays global; sibling amplify-bbsqueeze-chop-exempt (11-13) owns the CHOP leg independently. done_at 2026-11-14 (?)
@@ -108,8 +95,7 @@ registry: 119 entries (open=48)
 - OPEN amplify-bbsqueeze-module-rsi-reband: deadline=2026-11-21T00:00:00Z | (no parseable source)
 - DONE amplify-stoptighten-scope-widen: SCOPE WIDEN ENFORCED — top-6 sources appended to STOP_TIGHTEN_SOURCES (walk bars PASS: n=55, +$0.88/14d, fk3.9%, 5/5wk); combo-substring bug fixed (tpsl_utils:1107) — CAVEATS (adversarial review 2026-11-08): those bars are the walk-script CEILING MATH over ALL out-of-scope stop-family trades (the population the CEO verdict adjudicated), not the 1m/5m candle-walk threshold limb (i) names; and restricted to the population this change actually covers (new 6 + jup combos: n=31, ceiling $0.62, fk 3.0%, net $0.41/14d = $0.88/30d pace) the net limb sits BELOW the +$1.00/30d bar. Candle-walk owed before this entry’s 2026-11-21 deadline — if it fails there, REVERT = drop the 6 appended tuple entries. (2026-11-08)
 - DONE amplify-winner-cell-drop-pcplus: BAR MET at 11-14 read — pump-chain+ EXTREME 30d fresh = 47T net -0.04 WR 40.4% <= 0 (was 66T -0.04 on 11-08; window rotated, verdict unchanged). EXECUTION DEFERRED by the 2-change cap this run (shipped: prearm shadow + combo revert). Inert while WINNER_CELL_SIZE_MULT=1.0 (CEO 11-13 revert). Queued 11-15: remove ('pump-chain+','EXTREME','LONG') from WINNER_CELLS_VALIDATED; RE-ADD bar unchanged (30d >= +0.50 and 2 consecutive positive weeks and n>=40). adjudicated_by brain_auditor #258 | EXECUTED 2026-11-14 brain_auditor #259: removed from WINNER_CELLS_VALIDATED (30d 49T net -0.18 <=0 bar met; inert while mult=1.0). (?)
-- OPEN stop-tighten-slippage-column: deadline=2026-11-14T00:00:00Z | (no parseable source)
-  -> deadline passed (packet already issued) for stop-tighten-slippage-column
+- DONE stop-tighten-slippage-column: SHIPPED 2026-11-16 by main-session (daily-orchestrator): PG trades.exit_slippage_pct = GENERATED ALWAYS AS abs(exit_price - stop_loss)/stop_loss*100 (STORED) — zero writer changes, covers ALL close paths (brain/guardian/position_manager/etc), auto-backfills every historical row on ALTER. Verified: 500-row independent Python recompute 0 mismatches, null-contract 0 violations, 6506/6531 rows populated (remainder = open/no-stop), pipeline 0 tracebacks post-ALTER. atr_sl_hit 30d avg = 0.1093% (n=110) — consistent with CEO ~0.117% claim. FORWARD RULE: all stop-tighten counterfactuals MUST use realized exit (exit_slippage_pct / exit_price), never the stop level — CFs may drop the 'stated-not-realized' label. (2026-11-16)
 - OPEN win-side-capture-shadow: deadline=2026-11-22T00:00:00Z | (no parseable source)
 - OPEN hml-vol-atr-mult-shadow: deadline=2026-11-18T00:00:00Z | (no parseable source)
 - DONE amplify-atr-trend-short-cell-watch: NO-CELL (?)
@@ -123,7 +109,6 @@ registry: 119 entries (open=48)
 - OPEN amplify-linregfade-volgate-admit: deadline=2026-11-27T00:00:00Z | (no parseable source)
 - OPEN compaction-stale-trend-band-eval: deadline=2026-11-20T00:00:00Z | (no parseable source)
 - OPEN exitstack-day-kpi-1114: deadline=2026-11-17T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for exitstack-day-kpi-1114
 - OPEN amplify-vb-high-short-underdeploy: deadline=2026-11-20T00:00:00Z | (no parseable source)
 - OPEN amplify-warrior-sr-normal-long: deadline=2026-11-20T00:00:00Z | (no parseable source)
 - DONE watch-pc-flip-demote-55: DEMOTE EXECUTED 2026-11-13 #257 — CONTRARIAN_LIVE_ENABLED True->False in hermes_constants.py. Bar breached on any-read basis: 12:30Z 56.6% / 16:30Z 52.9% / 16:38Z 53.1% (reproduced) n=350, monotone decay 64.6%->52.9% since 10-27. Corroborating: live fade cohort 38T 39.5% WR net 0.00 (armed 10T 100% +1.06 vs unarmed 28T 17.9% -1.06); this week 3T 0% -0.22. Shadow-only again. Re-promote bar: flip-WR >=58% + CEO/T sign-off. Flagged to CEO in kanban for veto. (2026-11-13T16:40:00Z)

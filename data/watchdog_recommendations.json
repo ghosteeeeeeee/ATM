@@ -1,19 +1,19 @@
 {
-  "timestamp": "2026-11-16T07:08:30.931803+00:00",
+  "timestamp": "2026-11-16T10:38:32.654201+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
       "title": "Losing streak: 12/20 recent trades lost",
-      "detail": "Win rate 30% over last 20 trades. Total PnL: -0.35 USDT. Something is wrong.",
+      "detail": "Win rate 30% over last 20 trades. Total PnL: -0.41 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     }
   ],
   "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
-    "btc_4h": "LONG_BIAS",
+    "btc_15m": "LONG_BIAS",
+    "btc_4h": "NEUTRAL",
     "continuum": "AT",
     "volatility": "LOW",
     "zscore_tier": "NEUTRAL",
@@ -22,7 +22,7 @@
     "volume_regime": "LOW",
     "linreg_alignment": 0.5,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "CALM",
+    "market_phase": "DECLINING",
     "trend_quality": "STRONG_UP"
   },
   "open_count": 0

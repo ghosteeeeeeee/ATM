@@ -1,12 +1,6 @@
 # CONTROL TOWER — shadows, trials, decision calendar
-generated 2026-11-16T00:32:51.520708+00:00 by scripts/shadow_disposition.py (daily 08:15 + on any registry change via hermes-shadow-disposition.path) — REGENERATED FILE, do not hand-edit (edit data/shadow_disposition.json)
-48 open / 71 done / 119 registry entries
-
-## 🔴 OVERDUE — default packet issued; override needs decision + evidence within 24h (1)
-- 2026-11-14 [OVERDUE 2d] `stop-tighten-slippage-column` (owner: main-session)
-  - bar: slippage column shipped: per closed exit `exit_price - stop_loss` (abs price %) persisted (PG column or trades JSON f...
-  - progress: —
-  - if silent: clamp CFs stay labeled 'stated-not-realized' until shipped
+generated 2026-11-16T09:14:49.590914+00:00 by scripts/shadow_disposition.py (daily 08:15 + on any registry change via hermes-shadow-disposition.path) — REGENERATED FILE, do not hand-edit (edit data/shadow_disposition.json)
+47 open / 72 done / 119 registry entries
 
 ## 🟠 DUE ≤24h (14)
 - 2026-11-17 [T-1] `jup-trail-shadow-1xatr` (owner: CEO label + T sign-off)
@@ -210,7 +204,6 @@ generated 2026-11-16T00:32:51.520708+00:00 by scripts/shadow_disposition.py (dai
   - progress: 38 vs >=1 real fade trades (pc- LONG opens since started) — OK
 
 ## 📅 CALENDAR — every dated open item, date-ordered
-- 2026-11-14 [OVERDUE 2d]: stop-tighten-slippage-column
 - 2026-11-17 [T-1]: jup-trail-shadow-1xatr, jup-atrsl-shadow-parity, short-regime-exempt-shadow, flip1-bear-override-reshadow, bear-single-source-shadow, volgate-short-exempt-shadow, maxxed-short-exempt-shadow, long-bypass-regime-shadow, jup-cluster-gate, jup-anti-chase, jup-pro-selection, btc-standalone-deny-shadow, setup-recall-shadow, exitstack-day-kpi-1114
 - 2026-11-18 [T-2]: watch-contrarian-live, amplify-xmirror-giveback, hml-vol-atr-mult-shadow, amplify-atr-trend-short-clonehunt, amplify-ugb-bypass-armgap, amplify-jup-long-flat-cell, amplify-grind-breakout-underdeploy, amplify-pcfade-windowfix-repromote-review
 - 2026-11-19 [T-3]: storm-confl-waiver, amplify-jup-short-high-cell, amplify-ema300-underdeploy
@@ -223,8 +216,8 @@ generated 2026-11-16T00:32:51.520708+00:00 by scripts/shadow_disposition.py (dai
 - 2026-12-06 [T-20]: atr-trend-accel-shadow
 - 2026-12-15 [T-29]: amplify-ugb-bypass-hole
 
-## ✅ DONE / REVERTED (71)
-flip-contrarian-pc, trial-coupled-cutsloser-sl, eval-midband-long-4564, gate-shadow, shadow-trader-bypass, expiry-t5-shadow, mfe-cut-arm-be, relative-regime, rr-engine-shadow, chase-ratio, ichimoku-dampen-flooradmit, volmom-volbreak, tc-temporal-confluence, mom-filter-shadow, acceleration-threshold, wyckoff-shadow, ai-trader-extreme-shadow, oscillator-shadow, bb-tat-shadow, db-mirror-0byte, escalation-17, ugb-pt-045, disposition-cadence-revert, fade-ctx-exempt, winner-cell-size-125, bb-squeeze-hml-entry-profile, amplify-weekly-mandate, fade-volgate-split-analysis, fade-btc-crash-postflip, storm-readiness-packet, signal-zombie-purge, momentum-cache-regime-coverage, pump-detect-ceiling-mismatch, override-vs-ceiling-contradiction, ichimoku-short-solo-counterfactual, jup-yolo-regime-review, amplify-winner-cell-mult-150, chase-move-shadow, conf-filter-parity-split, ichimoku-bypass-lowjoin-ticket, stop-asymmetry-highwr, short-relax-shadow-study, pump-chain-plus-weight-kill-review, trial-wider-sl, trial-extended-time, gate-shadow-capture-coverage-fix, candle-collector-coverage-audit, stop-tighten-enforce-eval, amplify-grind-breakout-deploy, amplify-pc-fade-cell-split, amplify-stop-tighten-probe-080, jup-hml-shadow-065-050, ichimoku-short-pause, rsi-ceiling-75-live, gate-shadow-dedup-convention, short-shadow-join-builder, timer-cadence-recheck, harvest-ship-2026-11-04, daily-fill-cap-brake, amplify-vb-high-short-clonehunt, amplify-bbsqueeze-chop-exempt, linreg-fade-fill-funnel, amplify-bbsqueeze-warrior-uninert, amplify-bbsqueeze-neutral-exempt, dailyfillcap-identity-verify, amplify-stoptighten-scope-widen, amplify-winner-cell-drop-pcplus, amplify-atr-trend-short-cell-watch, amplify-tat-neverarmed-age-widen, watch-pc-flip-demote-55, floor-admit-same-sign-verdict
+## ✅ DONE / REVERTED (72)
+flip-contrarian-pc, trial-coupled-cutsloser-sl, eval-midband-long-4564, gate-shadow, shadow-trader-bypass, expiry-t5-shadow, mfe-cut-arm-be, relative-regime, rr-engine-shadow, chase-ratio, ichimoku-dampen-flooradmit, volmom-volbreak, tc-temporal-confluence, mom-filter-shadow, acceleration-threshold, wyckoff-shadow, ai-trader-extreme-shadow, oscillator-shadow, bb-tat-shadow, db-mirror-0byte, escalation-17, ugb-pt-045, disposition-cadence-revert, fade-ctx-exempt, winner-cell-size-125, bb-squeeze-hml-entry-profile, amplify-weekly-mandate, fade-volgate-split-analysis, fade-btc-crash-postflip, storm-readiness-packet, signal-zombie-purge, momentum-cache-regime-coverage, pump-detect-ceiling-mismatch, override-vs-ceiling-contradiction, ichimoku-short-solo-counterfactual, jup-yolo-regime-review, amplify-winner-cell-mult-150, chase-move-shadow, conf-filter-parity-split, ichimoku-bypass-lowjoin-ticket, stop-asymmetry-highwr, short-relax-shadow-study, pump-chain-plus-weight-kill-review, trial-wider-sl, trial-extended-time, gate-shadow-capture-coverage-fix, candle-collector-coverage-audit, stop-tighten-enforce-eval, amplify-grind-breakout-deploy, amplify-pc-fade-cell-split, amplify-stop-tighten-probe-080, jup-hml-shadow-065-050, ichimoku-short-pause, rsi-ceiling-75-live, gate-shadow-dedup-convention, short-shadow-join-builder, timer-cadence-recheck, harvest-ship-2026-11-04, daily-fill-cap-brake, amplify-vb-high-short-clonehunt, amplify-bbsqueeze-chop-exempt, linreg-fade-fill-funnel, amplify-bbsqueeze-warrior-uninert, amplify-bbsqueeze-neutral-exempt, dailyfillcap-identity-verify, amplify-stoptighten-scope-widen, amplify-winner-cell-drop-pcplus, stop-tighten-slippage-column, amplify-atr-trend-short-cell-watch, amplify-tat-neverarmed-age-widen, watch-pc-flip-demote-55, floor-admit-same-sign-verdict
 
 ---
-freshness: FRESH | registry mtime: 2026-11-16T00:32:51+00:00 | prev tower render: 2026-11-15T20:47:11+00:00 | last run: 15 packet(s), 0 entry error(s)
+freshness: FRESH | registry mtime: 2026-11-16T09:14:49+00:00 | prev tower render: 2026-11-16T08:15:00+00:00 | last run: 0 packet(s), 0 entry error(s)

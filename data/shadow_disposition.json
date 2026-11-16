@@ -23,7 +23,7 @@
       "notes": "Do NOT cite raw shadow n without dedup (#239 pseudo-replication). Signal uses atr exit management (:2357)."
     }
   ],
-  "updated": "2026-11-13T04:40:00Z",
+  "updated": "2026-11-16T09:14:49Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -1522,14 +1522,16 @@
       "id": "stop-tighten-slippage-column",
       "stream": "trades slippage telemetry \u2014 realized exit vs stop_loss distance (per closed trade, 30d backfill)",
       "kind": "build",
-      "status": "open",
+      "status": "done",
       "started": "2026-11-08",
       "deadline": "2026-11-14T00:00:00Z",
       "threshold": "slippage column shipped: per closed exit `exit_price - stop_loss` (abs price %) persisted (PG column or trades JSON field) + backfill for 30d closes; all future stop-tighten counterfactuals MUST use realized-exit not stop level (CEO: CF overstated ~10x at cap0.75 \u2014 realized runs 0.117% past stop_loss)",
       "default_action": "clamp CFs stay labeled 'stated-not-realized' until shipped",
       "owner": "main-session",
-      "evidence": "CEO 20261108T180116Z BUILD #1 \u2014 the #1 blocker to trustworthy numbers",
-      "disposition": "STILL OWED \u2014 owner main-session (CEO BUILD #1 20261108T180116Z), deadline 11-14 passed without ship; brain_auditor cannot ship (not owner). Remains THE blocker to trustworthy stop-tighten counterfactuals (CEO: realized exit runs ~0.117% past stop_loss = CF overstated ~10x at cap0.75). Escalated in 11-14 kanban."
+      "evidence": "CEO 20261108T180116Z BUILD #1 \u2014 the #1 blocker to trustworthy numbers | SHIPPED 2026-11-16: ALTER TABLE trades ADD COLUMN exit_slippage_pct double precision GENERATED ALWAYS AS (CASE WHEN stop_loss>0 AND exit_price IS NOT NULL THEN abs(exit_price-stop_loss)/stop_loss*100 END) STORED; selfcheck PASS (500-row recompute, 0 mismatch); atr_sl_hit 30d avg 0.1093% n=110.",
+      "disposition": "SHIPPED 2026-11-16 by main-session (daily-orchestrator): PG trades.exit_slippage_pct = GENERATED ALWAYS AS abs(exit_price - stop_loss)/stop_loss*100 (STORED) \u2014 zero writer changes, covers ALL close paths (brain/guardian/position_manager/etc), auto-backfills every historical row on ALTER. Verified: 500-row independent Python recompute 0 mismatches, null-contract 0 violations, 6506/6531 rows populated (remainder = open/no-stop), pipeline 0 tracebacks post-ALTER. atr_sl_hit 30d avg = 0.1093% (n=110) \u2014 consistent with CEO ~0.117% claim. FORWARD RULE: all stop-tighten counterfactuals MUST use realized exit (exit_slippage_pct / exit_price), never the stop level \u2014 CFs may drop the 'stated-not-realized' label.",
+      "done_at": "2026-11-16",
+      "resolved_at": "2026-11-16T09:14:49Z"
     },
     {
       "id": "win-side-capture-shadow",
@@ -1884,5 +1886,5 @@
       "caveat": "Per-token heterogeneity is UNTESTABLE at corrected n (pc- now only 2 tokens with n>=10, chi2 null) \u2014 pre-fix 'p=0.0001 HETEROGENEOUS' came from contaminated rows. Bar (ii) tape-split (BELOW n=62) is therefore the ONLY scoping test available; do not widen to unscoped pc- fade on this evidence."
     }
   ],
-  "updated_at": "2026-11-16T00:33:00Z"
+  "updated_at": "2026-11-16T09:14:49Z"
 }

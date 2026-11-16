@@ -14,6 +14,15 @@ flushed (best-effort, timeout) so no gate-block line is lost from
 brain/gate_shadow.db at the rotation boundary — gate_shadow.py's own
 offset>size guard then resets on the fresh file.
 
+Also copytruncate-rotates every OTHER logs/*.log over TRUNCATE_ROTATE_BYTES
+(added 2026-11-16, disk 85% WARN): signal-compactor.log (414MB), 15m_regime.log
+(166MB), trade-watchdog.log (127MB) etc. had NO rotator and are written by
+systemd StandardOutput=append: units that hold the FD open — rename-based
+rotation would leave systemd appending to the renamed inode (live file stays
+empty forever). Copytruncate (copy raw -> truncate live -> gzip the copy) works
+for both O_APPEND holders and per-run reopeners; cost = at most the bytes
+written during the copy window (standard copytruncate tradeoff).
+
 Timer: pipeline-log-rotate.timer (daily, RandomizedDelaySec) — systemd, never
 cron (repo rule).
 
@@ -34,6 +43,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import HERMES_LOG_DIR
 
 MAX_SIZE_BYTES = 200 * 1024 * 1024   # rotate when pipeline.log exceeds this
+TRUNCATE_ROTATE_BYTES = 100 * 1024 * 1024  # copytruncate threshold for other logs/*.log
 RETENTION_DAYS = 30                  # delete archives older than this
 FLUSH_TIMEOUT_SEC = 120              # gate_shadow --record flush budget
 
@@ -92,6 +102,50 @@ def rotate(log_path=PIPELINE_LOG, archive_dir=ARCHIVE_DIR,
     return True
 
 
+def rotate_truncate(log_path, archive_dir=ARCHIVE_DIR,
+                    max_size=TRUNCATE_ROTATE_BYTES):
+    """copytruncate rotation for logs whose writers hold the FD open
+    (systemd StandardOutput=append: — rename would leave systemd appending to
+    the renamed inode). Copy raw -> truncate live file -> gzip the copy.
+    Live file keeps its inode, so O_APPEND writers continue on a fresh empty
+    file. Returns True if rotated."""
+    if not os.path.isfile(log_path):
+        return False
+    size = os.path.getsize(log_path)
+    if size < max_size:
+        return False
+    os.makedirs(archive_dir, exist_ok=True)
+    ts = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')
+    base = os.path.basename(log_path)
+    raw = os.path.join(archive_dir, f'{base}.{ts}')
+    dest = raw + '.gz'
+    shutil.copyfile(log_path, raw)       # fast raw copy first
+    with open(log_path, 'r+b') as f:     # truncate live file in place
+        f.truncate(0)
+    with open(raw, 'rb') as f_in, gzip.open(dest, 'wb') as f_out:
+        shutil.copyfileobj(f_in, f_out)
+    os.unlink(raw)
+    gz_size = os.path.getsize(dest)
+    log(f'truncate-rotated {base} {size/1e6:.1f}MB -> {base}.{ts}.gz '
+        f'({gz_size/1e6:.1f}MB gzip)')
+    return True
+
+
+def rotate_others():
+    """copytruncate every oversized logs/*.log except pipeline.log (which uses
+    the rename path + gate_shadow flush above)."""
+    rotated = 0
+    for name in sorted(os.listdir(HERMES_LOG_DIR)):
+        if not name.endswith('.log'):
+            continue
+        path = os.path.join(HERMES_LOG_DIR, name)
+        if path == PIPELINE_LOG:
+            continue
+        if rotate_truncate(path):
+            rotated += 1
+    return rotated
+
+
 def prune(archive_dir=ARCHIVE_DIR, retention_days=RETENTION_DAYS):
     """Delete archives (pipeline.log.* and *.gz) older than retention_days."""
     if not os.path.isdir(archive_dir):
@@ -99,7 +153,7 @@ def prune(archive_dir=ARCHIVE_DIR, retention_days=RETENTION_DAYS):
     cutoff = time.time() - retention_days * 86400
     removed = 0
     for name in os.listdir(archive_dir):
-        if not name.startswith('pipeline.log.'):
+        if '.log.' not in name:   # any rotated log archive (pipeline + others)
             continue
         path = os.path.join(archive_dir, name)
         try:
@@ -139,17 +193,36 @@ def selftest():
             assert f.read() == payload, 'archive gzip content mismatch'
         assert os.path.exists(logp) and os.path.getsize(logp) == 0, \
             'original not recreated empty'
-        # prune: 40d-old archive removed, fresh kept
+        # truncate-rotation: FD-held log, live inode kept, content archived
+        tp = os.path.join(base, 'signal-compactor.log')
+        with open(tp, 'wb') as f:
+            f.write(payload)
+        assert rotate_truncate(tp, arch, max_size=len(payload) - 1) is True, \
+            'rotate_truncate did not fire'
+        t_arch = [n for n in os.listdir(arch) if n.startswith('signal-compactor.log.')]
+        assert len(t_arch) == 1 and t_arch[0].endswith('.gz'), \
+            f'expected 1 truncate archive, got {t_arch}'
+        with gzip.open(os.path.join(arch, t_arch[0]), 'rb') as f:
+            assert f.read() == payload, 'truncate archive gzip content mismatch'
+        assert os.path.exists(tp) and os.path.getsize(tp) == 0, \
+            'truncate did not empty live file'
+        # prune: 40d-old archive removed, fresh kept (both naming styles)
         old = os.path.join(arch, 'pipeline.log.20260901000000.gz')
         with gzip.open(old, 'wb') as f:
             f.write(b'old')
         os.utime(old, (time.time() - 40 * 86400,) * 2)
-        assert prune(arch, retention_days=30) == 1, 'prune did not remove old archive'
-        assert os.listdir(arch) == [archives[0]], 'prune removed wrong file'
+        old2 = os.path.join(arch, 'signal-compactor.log.20260901000000.gz')
+        with gzip.open(old2, 'wb') as f:
+            f.write(b'old')
+        os.utime(old2, (time.time() - 40 * 86400,) * 2)
+        assert prune(arch, retention_days=30) == 2, 'prune did not remove old archives'
+        assert sorted(os.listdir(arch)) == sorted([archives[0], t_arch[0]]), \
+            'prune removed wrong file'
         print('PASS: under-threshold skip')
         print('PASS: rotation + gzip archive content valid')
         print('PASS: original recreated empty')
-        print('PASS: prune removed >30d archive, kept fresh')
+        print('PASS: truncate-rotation archives content, empties live file')
+        print('PASS: prune removed >30d archives (both styles), kept fresh')
         print('SELFTEST PASS')
         return 0
     finally:
@@ -165,6 +238,7 @@ def main():
         return selftest()
     prune()
     rotate()
+    rotate_others()
     return 0
 
 
