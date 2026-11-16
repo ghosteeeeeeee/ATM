@@ -26,6 +26,44 @@ from hermes_constants import (
     COPY_TRADE_MIN_TRADES,
 )
 
+# ── HL COPY PLUS-LONG counterfactual shadow (CEO 20261116T153048Z, registry
+# hl-copy-plus-shadow) ───────────────────────────────────────────────────────
+# (token, site, UTC-hour) dedup set — same pattern as signal_compactor shadows.
+# WITHIN a process only: the runner is a fresh process each cycle, so the set
+# resets every run — real bound is the emission cadence, NOT 24/day (tpsl_utils
+# bug_hunter M2 disclosure). Analysis joins by DISTINCT token, never line count.
+_HL_COPY_PLUS_LOGGED = set()
+
+
+def _hl_copy_plus_shadow(coin):
+    """[HL-COPY-PLUS-SHADOW] log-only counterfactual (CEO 20261116T153048Z).
+
+    Fires only when HL_COPY_PLUS_SHADOW is True (polarity: True => lines,
+    False => none; ENFORCE=False — the PLUS LONG lane keeps firing; never flip
+    from here) and is called only when the PLUS LONG lane would fire
+    (direction LONG and HL_COPY_SIGNAL_PLUS_ENABLED) — exactly the signals a
+    PLUS disable would skip. Never touches control flow (returns True iff a
+    line was emitted — probe hook); double-guarded (own try/except inside the
+    gate's) so a logging failure can never alter the skip outcome. Dedup: one
+    line per (token, site 'hl-copy-plus', UTC hour) WITHIN a process (set
+    resets each cycle — see module comment; analysis joins by DISTINCT token,
+    never line count); key added only AFTER the write returns. revert:
+    HL_COPY_PLUS_SHADOW = False (logging off).
+    """
+    try:
+        from hermes_constants import HL_COPY_PLUS_SHADOW
+        if not HL_COPY_PLUS_SHADOW:
+            return False
+        _key = (str(coin), 'hl-copy-plus', int(time.time() // 3600))
+        if _key in _HL_COPY_PLUS_LOGGED:
+            return False
+        print(f"[HL-COPY-PLUS-SHADOW] {coin} LONG WOULD-SKIP — 14d 18.2% WR cohort (ENFORCE=False); keep SHORT lane")
+        _HL_COPY_PLUS_LOGGED.add(_key)
+        return True
+    except Exception:
+        return False  # shadow must never alter the lane skip outcome
+
+
 def is_qualified_trader(wallet: str) -> tuple:
     """Check if trader meets quality criteria for copy trading.
 
@@ -454,6 +492,12 @@ def run_hl_copy_signal():
             from hermes_constants import HL_COPY_SIGNAL_PLUS_ENABLED, HL_COPY_SIGNAL_MINUS_ENABLED
             if signal['direction'] == 'LONG' and not HL_COPY_SIGNAL_PLUS_ENABLED:
                 continue
+            if signal['direction'] == 'LONG' and HL_COPY_SIGNAL_PLUS_ENABLED:
+                # ── [HL-COPY-PLUS-SHADOW] counterfactual (CEO 20261116T153048Z) ──
+                # PLUS LONG lane fires => this signal is what a PLUS disable would
+                # skip. Log-only cohort join; skip outcome untouched (registry
+                # hl-copy-plus-shadow).
+                _hl_copy_plus_shadow(signal.get('coin', '?'))
             if signal['direction'] == 'SHORT' and not HL_COPY_SIGNAL_MINUS_ENABLED:
                 continue
         except ImportError:

@@ -1313,6 +1313,11 @@ OVERSOLD_SHORT_RSI_MAX = 35     # reject SHORT when RSI < 35 (extreme oversold =
 # RSI 35-45 LONG = 18T 44.4%WR -$0.30 (dead zone).
 # Floor at 20 allows the 80% WR oversold bounce band while blocking extreme crash entries.
 LONG_RSI_FLOOR = 20            # LOWERED 30→20 (CEO 2026-09-29). 14d: RSI <25 LONG = 5T 80%WR +$0.15 (BEST). Allows oversold bounces.
+# POLARITY (CEO 20261116T153048Z, registry long-rsi-floor30-shadow): True => log-only
+# [LONG-FLOOR30-SHADOW] WOULD-BLOCK lines for rsi in [LONG_RSI_FLOOR, 30) (ENFORCE=False —
+# zero behavior). False = no shadow lines. The floor itself STAYS 20; do NOT flip this to
+# enforce — enforce = raise LONG_RSI_FLOOR to 30 only at the registered bar with CEO label.
+LONG_RSI_FLOOR_SHADOW30 = True
 LONG_RSI_CEILING = 75            # CEO 2026-10-09: lowered 85→75. Meta-RSI (DRIFT-E ground truth) 30d LONG: 70-75=38T 47.4%WR +$0.24 (keep), 75-80=36T 44.4% -$0.45 + 80-85=4T -$0.14 (block). Post-Oct-7 raise cohort (70-85 band, n=7) 28.6% -$0.26 — 85 didn't pay rent. Matches PUMP_CHAIN_LONG_RSI_MAX=75 + watchdog 2x rec. NOT 70: would block the positive 70-75 band. NOT 65: 65-70=+0.09/47T flat, no edge to cut. Grade A still gets 80 (dynamic tier signal_compactor:3881); BTC-bullish override still bypasses.
 VOLUME_BREAKOUT_LONG_RSI_CEILING = 85  # brain_auditor 2026-10-10: lowered 95→85. Meta-RSI fine bands all-time: 70-75=3T 100%WR +$0.94, 75-80=2T 100%WR +$0.51 (BEST), 80-85=1T 0% -$0.17, 85+=4T 50% -$0.22 (exhausted zone). 95 let BABY@81.82 through → hard_max_loss -$0.17 (2026-10-10). 85 blocks only the exhausted zone; 70-80 profit band stays open. Prior 95 rationale (RSI>95: 2L -$0.32) was too conservative — bleed starts at 80. Sample thin (5T 80+); monitor 7d, revert to 95 if 80-85 band proves profitable.
 
@@ -4050,6 +4055,15 @@ FAST_MOMENTUM_MINUS_ENABLED = True  # Re-enabled 2026-08-10 — backtested: 0.08
 #                         (after blacklist/cooldown/regime checks) executes
 #                         immediately without surviving hot-set cycles.
 HOTSET_ENABLED = True
+# ── APPROVED hotset PIN (CEO 20261116T153048Z, registry hotset-pin-approved-shadow) ──
+# POLARITY: HOTSET_PIN_APPROVED=False (default, ENFORCE) => zero behavior — fell-out
+# APPROVED signals expire exactly as before, rotation byte-identical. True (enforce step,
+# CEO label ONLY at the registered bar) => keep fell-out APPROVED signals eligible through
+# hotset rotation (skip the fell-out expiry + re-add their prev-hotset entry to hotset.json).
+HOTSET_PIN_APPROVED = False
+# POLARITY: HOTSET_PIN_SHADOW=True (shadow) => log [HOTSET-PIN-SHADOW] WOULD-PIN lines at
+# the fell-out site (log-only, ENFORCE still False). False => zero shadow lines (probe).
+HOTSET_PIN_SHADOW = True
 # HH_HL_ENABLED — see Signal Family Killswitches section (line ~398)
 
 # ── Signal Expiry ─────────────────────────────────────────────────────────────
@@ -4363,6 +4377,11 @@ HL_COPY_DASHBOARD_PATH = "/var/www/hermes/dashboard/hl_copy.html"
 HL_COPY_SIGNAL_ENABLED = True       # CEO re-enabled 2026-10-08 — cluster filter (2+ traders) added, SHORT enabled, 30min lookback
 HL_COPY_SIGNAL_PLUS_ENABLED = True  # CEO re-enabled 2026-10-08 — LONG side was backbone (+$2.07/7d 52.4% WR)
 HL_COPY_SIGNAL_MINUS_ENABLED = True # CEO re-enabled 2026-10-08 — 24/7 live, cluster filter protects
+# POLARITY (CEO 20261116T153048Z, registry hl-copy-plus-shadow): True => log-only
+# [HL-COPY-PLUS-SHADOW] WOULD-SKIP lines when the PLUS LONG lane fires (ENFORCE=False —
+# zero behavior; the LONG lane keeps firing). False = no shadow lines. Enforce (disable
+# PLUS) happens only at the registered bar with CEO label — never by flipping this flag.
+HL_COPY_PLUS_SHADOW = True
 HL_COPY_SIGNAL_MIN_SCORE = 70      # Minimum trader score to generate signal
 HL_COPY_SIGNAL_MIN_CONFIDENCE = 60 # Minimum confidence for signal
 HL_COPY_SIGNAL_MAX_CONFIDENCE = 95 # Maximum confidence for signal

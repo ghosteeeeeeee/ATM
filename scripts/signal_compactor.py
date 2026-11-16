@@ -2611,6 +2611,98 @@ def _linreg_fade_storm_shadow(tkn, direction, source, rsi, floor, dry=False):
         return False  # shadow must never alter the floor block
 
 
+# ── LONG floor-20→30 COUNTERFACTUAL shadow (CEO 20261116T153048Z, registry
+# long-rsi-floor30-shadow) ───────────────────────────────────────────────────
+# (token, site, UTC-hour) dedup set — same pattern as _LINREG_FADE_STORM_LOGGED.
+# WITHIN a process only: signal_compactor is a fresh process each pipeline
+# minute, so the set resets every run — real bound at this site is the
+# compaction cadence (~1 line/token/min while the band holds), NOT 24/day
+# (tpsl_utils bug_hunter M2 disclosure). Analysis joins by DISTINCT token,
+# never line count.
+_LONG_FLOOR30_LOGGED = set()
+
+
+def _long_floor30_shadow(tkn, rsi):
+    """[LONG-FLOOR30-SHADOW] log-only counterfactual (CEO 20261116T153048Z).
+
+    Fires only when LONG_RSI_FLOOR_SHADOW30 is True (polarity: True => lines,
+    False => none; ENFORCE=False — LONG_RSI_FLOOR stays 20, never flipped from
+    here) and rsi is in [LONG_RSI_FLOOR, 30) — the band that PASSES the live
+    floor-20 gate but WOULD be blocked by a floor 30. Called from the LONG RSI
+    floor gate AFTER the real block check, so it can only ever describe a pass;
+    it never touches control flow (returns True iff a line was emitted — probe
+    hook) and is double-guarded (own try/except inside the caller's) so a
+    logging failure can never alter the floor outcome. Dedup: one line per
+    (token, site 'long-rsi-floor30', UTC hour) WITHIN a process — the set
+    resets each pipeline minute (see module comment; tpsl M2 disclosure),
+    analysis joins by DISTINCT token, never line count; the key is added only
+    AFTER log() returns (a failed write must never burn the hour's line).
+    revert: LONG_RSI_FLOOR_SHADOW30 = False (logging off).
+    """
+    try:
+        from hermes_constants import LONG_RSI_FLOOR_SHADOW30, LONG_RSI_FLOOR
+        if not LONG_RSI_FLOOR_SHADOW30:
+            return False
+        # 30 = counterfactual floor (registry long-rsi-floor30-shadow) — NOT enforced.
+        if rsi is None or not (LONG_RSI_FLOOR <= rsi < 30):
+            return False
+        _key = (str(tkn), 'long-rsi-floor30', int(time.time() // 3600))
+        if _key in _LONG_FLOOR30_LOGGED:
+            return False
+        log(f"  👁️ [LONG-FLOOR30-SHADOW] {tkn} LONG WOULD-BLOCK — rsi={rsi:.1f} in [{LONG_RSI_FLOOR:.0f},30), new floor 30 counterfactual (ENFORCE=False) — cohort outcome joins at bar")
+        _LONG_FLOOR30_LOGGED.add(_key)
+        return True
+    except Exception:
+        return False  # shadow must never alter the floor block/pass path
+
+
+# ── APPROVED hotset pin shadow/enforce (CEO 20261116T153048Z, registry
+# hotset-pin-approved-shadow) ────────────────────────────────────────────────
+# (token|direction, site, UTC-hour) dedup set — same pattern as above
+# (WITHIN a process, resets each compaction minute; joins by distinct token).
+_HOTSET_PIN_LOGGED = set()
+
+
+def _hotset_pin_fellout(c, top10_keys):
+    """SELECT-only cohort for the APPROVED hotset pin: rows with
+    decision='APPROVED' AND executed=0 whose token:direction is NOT in this
+    cycle's hot-set (top10_keys) — the "fell out of hotset" population, both
+    leak classes (expired-this-cycle rows + still-APPROVED-but-not-in-hotset
+    rows that die at decider EXEC-BLOCK).
+
+    Returns [(id, token, direction), ...]; [] on any error. Shadow
+    ([HOTSET-PIN-SHADOW] WOULD-PIN) logs when HOTSET_PIN_SHADOW is True;
+    enforce (HOTSET_PIN_APPROVED) is applied by the caller. Never raises and
+    never writes — double-guarded (SELECT try, then a separate logging try) so
+    neither a query nor a logging failure can alter the expiry/rotation
+    outcome. revert: HOTSET_PIN_SHADOW = False (lines off).
+    """
+    rows = []
+    try:
+        _tk = {str(k).upper() for k in (top10_keys or set())}
+        for _rid, _tok, _direc in c.execute(
+                "SELECT id, token, direction FROM signals "
+                "WHERE decision='APPROVED' AND executed=0").fetchall():
+            if f"{_tok}:{_direc}".upper() in _tk:
+                continue
+            rows.append((_rid, _tok, _direc))
+    except Exception:
+        return []
+    try:
+        from hermes_constants import HOTSET_PIN_SHADOW, HOTSET_PIN_APPROVED
+        if HOTSET_PIN_SHADOW and rows:
+            for _rid, _tok, _direc in rows:
+                _key = (f"{_tok}:{_direc}".upper(), 'hotset-pin',
+                        int(time.time() // 3600))
+                if _key in _HOTSET_PIN_LOGGED:
+                    continue
+                log(f"  👁️ [HOTSET-PIN-SHADOW] {_tok} {_direc} WOULD-PIN — approved signal fell out of hotset (ENFORCE={HOTSET_PIN_APPROVED})")
+                _HOTSET_PIN_LOGGED.add(_key)
+    except Exception:
+        pass  # shadow must never alter the pin/expiry outcome
+    return rows
+
+
 def run_compaction(dry=False, verbose=False, purge_executed=False):
     """
     Returns {'hotset': [...], 'compaction_cycle': N, 'approved': N, 'rejected': N}
@@ -4885,6 +4977,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         log(f"  🚫 [LONG-RSI-FLOOR] {tkn}: LONG blocked — RSI {_lrf_rsi:.1f} < {LONG_RSI_FLOOR} (extreme oversold — falling knife)")
                         _tombstone_pending(tkn, direction, 'long-rsi-floor', dry)  # CEO label 20261030
                         continue
+                    # ── [LONG-FLOOR30-SHADOW] counterfactual (CEO 20261116T153048Z) ──
+                    # Band [20,30) PASSES the live floor-20 gate above (block path
+                    # untouched) but WOULD be blocked by floor 30 — log-only cohort
+                    # join, double-guarded inside the helper (registry long-rsi-floor30-shadow).
+                    _long_floor30_shadow(tkn, _lrf_rsi)
                 except Exception:
                     pass  # non-fatal
             # ── LONG RSI sweet-spot: boost confidence when RSI is in best band ──────
@@ -6110,6 +6207,49 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             top10_keys = {f"{e['token']}:{e['direction']}" for e in hotset_final}
             top10_combos = {e.get('combo_key') for e in hotset_final if e.get('combo_key')}
 
+            # ── APPROVED hotset PIN (CEO 20261116T153048Z, registry hotset-pin-approved-shadow) ──
+            # Shadow (HOTSET_PIN_SHADOW=True): [HOTSET-PIN-SHADOW] WOULD-PIN per fell-out
+            # row, logged here at the fell-out site (the EXPIRE updates below).
+            # Enforce (HOTSET_PIN_APPROVED=True): pin ids are excluded from those updates
+            # via _pin_clause (keep APPROVED) AND their prev-hotset entry is re-appended
+            # to hotset_final so the token stays in hotset.json (decider EXEC-BLOCK
+            # requires hot-set membership — both leak classes: 42 fell-out + 13 not-in-hotset).
+            # Flag False (default): only the SELECT+log runs — UPDATE SQL byte-identical,
+            # hotset_final untouched (probe: rotation identical with flag off).
+            # FAIL-SAFE: defaults first, whole block guarded — any pin error degrades
+            # to flag-off behavior (a pin bug must never abort compaction / stall hotset).
+            _pin_ids = []
+            _pin_clause = ""
+            try:
+                from hermes_constants import HOTSET_PIN_APPROVED
+                _pin_rows = _hotset_pin_fellout(c, top10_keys)
+                _pin_ids = [r[0] for r in _pin_rows] if HOTSET_PIN_APPROVED else []
+                if _pin_ids:
+                    _pin_clause = f" AND id NOT IN ({','.join(['?'] * len(_pin_ids))})"
+                    _pin_seen = {f"{e.get('token', '')}:{e.get('direction', '')}".upper()
+                                 for e in hotset_final}
+                    _pin_prev = {str(k).upper(): v for k, v in prev_hotset.items()}
+                    for _rid, _ptok, _pdir in _pin_rows:
+                        _pk = f"{_ptok}:{_pdir}".upper()
+                        if _pk in _pin_seen:
+                            continue
+                        _pe = _pin_prev.get(_pk)
+                        # Step 15's write indexes these keys directly (no .get) — only a
+                        # full prev-hotset output dict may be re-appended; anything else
+                        # keeps the row APPROVED only (never a compaction crash).
+                        if not isinstance(_pe, dict) or not all(k in _pe for k in (
+                                'token', 'direction', 'confidence', 'wave_phase',
+                                'is_overextended', 'price_acceleration',
+                                'momentum_score', 'speed_percentile')):
+                            log(f"  ⚠️ [HOTSET-PIN] {_ptok} {_pdir}: no pinnable prev-hotset entry — kept APPROVED only (not re-added)")
+                            continue
+                        hotset_final.append(_pe)
+                        _pin_seen.add(_pk)
+                        log(f"  📌 [HOTSET-PIN] {_ptok} {_pdir}: pinned into hotset (fell-out APPROVED, ENFORCE=True)")
+            except Exception as _pin_e:
+                _pin_ids, _pin_clause = [], ""  # degrade to flag-off (SQL untouched)
+                log(f"  ⚠️ [HOTSET-PIN] block error — degraded to flag-off: {type(_pin_e).__name__}: {_pin_e}")
+
             # ── Process PENDING/WAIT candidates ───────────────────────────────────
             # FIX (2026-08-14): Removed NOT IN exclusion — PENDING signals for tokens
             # with APPROVED signals are now considered for cross-combo confluence merge.
@@ -6301,8 +6441,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                           -- No combo_key (null signals never expire — FIX: now they do)
                           OR (combo_key IS NULL)
                       )
-                      AND combo_key NOT IN ({','.join(['?' for _ in top10_combos]) if top10_combos else "''"})
-                """, approved_ids + list(top10_combos) if top10_combos else approved_ids)
+                      AND combo_key NOT IN ({','.join(['?' for _ in top10_combos]) if top10_combos else "''"}){_pin_clause}
+                """, ((approved_ids + list(top10_combos)) if top10_combos else approved_ids) + _pin_ids)
             else:
                 # FIX (BUG-014): Don't expire APPROVED signals still in current hotset_final.
                 # Preserved signals (PRESERVE-APPROVED-UPSERT) are written as APPROVED but
@@ -6325,8 +6465,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                           ))
                           OR (combo_key IS NULL)
                       )
-                      AND combo_key NOT IN ({','.join(['?' for _ in top10_combos]) if top10_combos else "''"})
-                """, list(top10_combos) if top10_combos else [])
+                      AND combo_key NOT IN ({','.join(['?' for _ in top10_combos]) if top10_combos else "''"}){_pin_clause}
+                """, (list(top10_combos) if top10_combos else []) + _pin_ids)
             left_and_stale = c.rowcount
             if left_and_stale:
                 log(f"EXPIRED {left_and_stale} APPROVED signals (left hot-set, staleness=0)")
