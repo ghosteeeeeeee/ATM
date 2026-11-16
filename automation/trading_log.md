@@ -27860,3 +27860,29 @@ BY: auto_1hr
 - 24h RED -$0.71 at 23.5% WR (worse than yesterday's 31.6%); 7d RED -$1.17; quiet market (2 closes in 12h)
 - Unarmed cohort 76.5% of closes at 7.7% WR (-$0.84) vs armed 4/4 +$0.13 — stall stack owns fix
 BY: auto_1hr
+
+## 2026-11-16 13:51 Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses)
+**PnL:** $0.00 this hour (flat — 0 closes) | 24h 16T 25.0% -$0.70 RED | 7d 110T 43.6% -$1.17 RED | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 open
+- No storm: window-min -0.05% / at-run +0.35% (both inside gate)
+- Kill check: last hour n=0; hl_copy_trader 24h 2T 0% but 14d EXTREME 57.1% +$0.43 wins -> keep; ai-trader-pending 24h 2T 0% but 14d NORMAL 42.3% +$1.16 wins -> keep; atr-trend- 8T 37.5% not 0%
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/16 = 18.8% of 24h closes (<40%); tpsl_utils deployed
+- Boost: none eligible — only n>=5 signal is atr-trend- 8T 37.5% -$0.31 (fails WR>55% and PnL>$0.05)
+- Arm rate: unarmed 12/16 = 75.0% (>70% — CHOP ENTRIES DOMINATING) WR 8.3% -$0.83 NEGATIVE vs armed 4/4 75.0% +$0.13 — stall stack owns the fix, no new gate
+- Neg streak: 19h/20h/21h negative yesterday but broken by 8h gap; last 10h only 05h (-0.07) and 10h (-0.07) — not 3 consecutive; regime not NEUTRAL -> no size cut
+- Frequency: 0 close/hr — well under 20
+- Winners MAE 0.358% avg 24h (<0.5% — entry quality OK)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED -$0.70 at 25.0% WR; 7d RED -$1.17; quiet market (0 closes in last hour, 9 active hours in 24h)
+- Unarmed cohort 75.0% of closes at 8.3% WR (-$0.83) vs armed 4/4 +$0.13 — stall stack owns fix
+BY: auto_1hr
