@@ -4320,5 +4320,16 @@
     "after": "WINDOW_SLACK_S=1800 -> NO_DATA / entry_for returns None; selfcheck gap fixture added (--selfcheck PASS exit=0)",
     "rationale": "same bug class as the contrarian fix; floor_admit would have started corrupting 2026-11-24 when the floor crosses SHADOW_START",
     "impact": "join output shifts classified 2253->2106 no_data 6->155; verdict UNCHANGED (floor_only 49.7% vs always 45.5%->45.2%, fisher p=0.138 >0.05 = NO-SHIP route stays closed)"
+  },
+  {
+    "timestamp": "2026-11-16T00:50:00Z",
+    "agent": "brain_auditor",
+    "change": "[COPY-STALE] telemetry: log hl_copy trader_exit closes <5s after PG open_time (phantom mirror detection)",
+    "type": "tweak",
+    "file": "scripts/hl_fill_monitor.py",
+    "before": "no age check on trader_exit closes — 3 phantom 1.1s mirrors on 11-15 invisible to logs",
+    "after": "after successful close, compute open_time age; if <5s print [COPY-STALE] line; try/except pass = zero behavior change",
+    "rationale": "#267 creative + watchdog hl_copy WR-0% KPI artifact — telemetry-first per pre-registered plan, no gate (n=3/24h)",
+    "impact": "log-only; measures phantom rate over 7d before any freshness gate decision"
   }
 ]

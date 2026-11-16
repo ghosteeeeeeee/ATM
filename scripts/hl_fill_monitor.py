@@ -608,6 +608,7 @@ def check_trader_exits(new_fills: list):
         # fill event permanently (it's only 'new' this cycle) and leave the mirror
         # trade open after the pro exited. Their exit always wins for T1.
         _t1 = False
+        _row = None
         try:
             from trust_tiers import is_exact_mirror_trade as _ixm
             from _secrets import BRAIN_DB_DICT
@@ -617,7 +618,7 @@ def check_trader_exits(new_fills: list):
             _pgc = _pg.connect(**_cfg)
             try:
                 _cur = _pgc.cursor()
-                _cur.execute("SELECT signal, _signal_metadata FROM trades WHERE id = %s",
+                _cur.execute("SELECT signal, _signal_metadata, open_time FROM trades WHERE id = %s",
                              (perf['trade_id'],))
                 _row = _cur.fetchone()
                 _cur.close()
@@ -657,6 +658,21 @@ def check_trader_exits(new_fills: list):
             # trader-performance update so the same close isn't counted twice.
             if _closed_ok:
                 update_trader_performance(perf['trade_id'], current_price, 'trader_exit')
+                # [COPY-STALE] phantom mirror telemetry: pro already out when we
+                # finished opening — age from PG open_time (audit #267 creative).
+                try:
+                    from datetime import datetime, timezone
+                    _ot = _row[2] if _row and len(_row) > 2 else None
+                    if _ot is not None:
+                        if _ot.tzinfo is None:
+                            _ot = _ot.replace(tzinfo=timezone.utc)
+                        _age_s = (datetime.now(timezone.utc) - _ot).total_seconds()
+                        if _age_s < 5:
+                            print(f"[COPY-STALE] trade #{perf['trade_id']} {coin} "
+                                  f"closed {_age_s:.1f}s after open — phantom mirror, "
+                                  f"pro had already exited in our poll window")
+                except Exception:
+                    pass
             else:
                 print(f"[copy_exit] trade #{perf['trade_id']} ({coin}) was already closed — skipping trader-perf update")
         except Exception as e:

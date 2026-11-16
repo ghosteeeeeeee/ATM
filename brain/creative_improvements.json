@@ -11498,5 +11498,32 @@
     "category": "entry filter",
     "status": "rejected_with_data",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-11-16T00:50:00Z",
+    "idea": "Exitstack KPI dual-metric: pair trailing-30 avg-loss with never-armed dollar share so a single deep loser cannot mask arm-rate progress",
+    "rationale": "exitstack-day-kpi-1114 bar is avg-loss <= -0.070; early read -0.111 FAILS but post-11-14 armed split 22W/+2.42 vs 17L/-1.59 shows the ships are converting trades to armed — avg-loss alone is blind to that",
+    "expected_impact": "prevents false-revert of exit-stack day on 11-17 if arm gap narrows while avg-loss lags",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-16T00:50:00Z",
+    "idea": "[COPY-STALE] SHIPPED: log hl_copy trader_exit closes <5s after open (hl_fill_monitor.py); gate decision deferred until 7d phantom rate measured",
+    "rationale": "#267 creative; 3/5 hl_copy 7d closes were 1.1s phantoms dragging signal-health KPI; pre-registered telemetry-first",
+    "expected_impact": "clean hl_copy WR KPI + data for freshness-gate GO/NO-GO",
+    "category": "telemetry",
+    "status": "shipped",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-16T00:50:00Z",
+    "idea": "REJECTED-WITH-DATA: atr-trend- HIGH-regime entry block re-test (7d HIGH 38T 39.5% -1.65 looks tempting) — #267 already showed fk=29% of winners, 30d split-half unstable; not re-proposed",
+    "rationale": "mandate requires prior-art check; #267 rejection stands, n unchanged direction",
+    "expected_impact": "none — documented to prevent re-derivation",
+    "category": "rejected",
+    "status": "rejected_with_data",
+    "risk": "n/a"
   }
 ]
