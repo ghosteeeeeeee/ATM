@@ -28081,3 +28081,31 @@ BY: auto_1hr
 - Unarmed cohort 81.8% of closes at 33.3% WR ('-0.18') vs armed 2/2 '+0.16' — stall stack owns fix
 - storm-confl-waiver bar 0/3 with deadline 2026-11-19; last storm (15:52) counterfactual NEGATIVE
 BY: auto_1hr
+
+## 2026-11-16 21:51 Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses)
+**PnL:** $0.07 this hour | 24h 11T 54.5% '+0.13' GREEN | 7d 112T 48.2% '-0.33' RED | **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** no storm — window-min -0.20% / at-run +0.58% (both inside gate)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: CRV r2v2-long3 LONG profit-monster-trail +0.07 (+3.03%); 0 open
+- Kill check: no 0%-WR signal with 3+ trades this hour (n=1, a win); ai-trader-pending 24h 3T 0% '-0.18' but 14d NORMAL 27T 40.7% '+1.12' wins -> keep (verified this run: HIGH/EXTREME/FLAT lose, NORMAL wins; no regime block)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 0/11 = 0% of 24h closes (<40%); exits trader_exit 4 / manual_sl_hit 3 (CEO manual) / profit-monster-trail 3 / mfe_exit 1 — tpsl_utils deployed and working
+- Boost: none eligible — no signal has n>=5 in 24h (max hl_copy_trader 4T 50% '+0.03')
+- Arm rate: unarmed 8/11 = 72.7% (>70% — CHOP ENTRIES DOMINATING) WR 37.5% '-0.10' NEGATIVE vs armed 3/3 100% '+0.23' — stall stack owns the fix, no new gate
+- Neg streak: 10h -0.07 then 14h +0.10, 17h 0.00, 18h +0.03, 20h +0.07, 21h +0.07 — no negative hour, not 3 consecutive; 24h regimes EXTREME/HIGH/NORMAL not NEUTRAL -> no size cut
+- Frequency: 1 close/hr — well under 20
+- Winners adverse excursion 0.218% avg 24h (<0.5% — entry quality OK)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h turned GREEN '+0.13' at 54.5% WR; 7d still RED '-0.33'
+- Unarmed cohort 72.7% of closes at 37.5% WR ('-0.10') vs armed 3/3 '+0.23' — stall stack owns fix
+- storm-confl-waiver bar 0/3 with deadline 2026-11-19; last storm (15:52) counterfactual NEGATIVE
+BY: auto_1hr
