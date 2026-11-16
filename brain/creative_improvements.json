@@ -11525,5 +11525,32 @@
     "category": "rejected",
     "status": "rejected_with_data",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-11-16T04:36:00Z",
+    "idea": "REJECTED-WITH-DATA: atr-trend- TAT extension (45/60/90m arm-timeout) — winners arm avg 70.9m max 185m (8/19 le45, 11/19 after 45m) so TAT@45 kills 57.9% of winners, @60 47.4%, @90 26.3% all >>20% bar; losers already die <=90m via atr_sl/hard_max/cut-loser",
+    "rationale": "creative eval of exit-side lever for the 11-15 atr-trend- cluster; measured arm delays from pm_armed_at, not assumed",
+    "expected_impact": "none — documented to prevent re-derivation; signal's winners are slow trend rides, not stallers",
+    "category": "rejected",
+    "status": "rejected_with_data",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-11-16T04:36:00Z",
+    "idea": "REJECTED-WITH-DATA: inverse-confidence block on atr-trend- SHORT (conf>=75: losers avg 77.4 vs winners 67.2) — fk 26.3% >20%, fisher p=0.687, n=30",
+    "rationale": "tempting W/L conf separation but sample small and global CONF_FILTER_MIN=70 already exists; house bars fail",
+    "expected_impact": "none — documented",
+    "category": "rejected",
+    "status": "rejected_with_data",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-11-16T04:36:00Z",
+    "idea": "REJECTED-WITH-DATA: require SHORT gap_at_entry<-0.2 (short-into-weakness momentum) — direction right per trend philosophy BUT split-half sign flip (+0.44 older / -0.34 newer), kills 62% of winners, PUMP_CHAIN_SHORT_DEAD_GAP already covers pump-chain",
+    "rationale": "trend-following thesis looked promising at aggregate p=0.041; stability check killed it",
+    "expected_impact": "none — documented",
+    "category": "rejected",
+    "status": "rejected_with_data",
+    "risk": "n/a"
   }
 ]
