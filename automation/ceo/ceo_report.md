@@ -1402,3 +1402,9 @@ Proactive Q (14 rows, 14%14=0 → "What's the PnL?"): 24h green +$0.29, 7d -$1.4
 ### Recommendation: main-session ship slippage-column BUILD #1 (7th resurface) and glance at the new hotset AttributeError — status run only, no changes made.
 
 Rotating Q (idx 10 = "new signals this week?"): 0 SHIPPED (matches 15381Z run), but 5 AMPLIFY eval cells registered 11-09..11-14 (pcv6/r2v2-clone/slope-jup/vb-/ema300), all NO-SHIP default, due 11-18..11-21.
+
+## CEO Status — 20261115T233815Z
+### Health: pipeline=active (timer fired 23:39Z, service running) guardian=active open_pos=0
+### Numbers: 24h 28T -0.13 32.1% | 7d 113T -1.08 44.2%
+### Findings: Control tower 1 overdue (stop-tighten-slippage-column, 11th resurface, owner main-session) + 1 due 11-16 (atr-trend-short-cell-watch); error_alerts show 1x hotset failure + 'no attribute get' at 19:38Z plus routine continuum-override noise; proactive Q = new signals this week: 0 new signal modules (AMPLIFY cell proposals only).
+### Recommendation: main-session ships the overdue slippage column (CFs stay stated-not-realized until then); investigate the 19:38Z hotset 'no attribute get' if it recurs.

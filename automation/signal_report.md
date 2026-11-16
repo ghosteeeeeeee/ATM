@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-15 19:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-16 01:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,828 | **WR:** 51.3% | **PnL:** -118.78%
+- **Total trades (all time):** 3,832 | **WR:** 51.3% | **PnL:** -120.65%
 - **Date range:** 2026-07-29 → 2026-11-15
 
 ---
@@ -23,9 +23,8 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| atr-trend- | SHORT | 6 | 50.0% | -2.19 | ❓ | Borderline |
-| ai-trader-pending | SHORT | 3 | 33.3% | +0.30 | ❓ | Needs more data |
-| btc-pump-rider+ | LONG | 2 | 50.0% | +1.52 | ❓ | Needs more data |
+| atr-trend- | SHORT | 8 | 50.0% | -2.57 | ❓ | Borderline |
+| btc-pump-rider+ | LONG | 3 | 33.3% | +0.80 | ❓ | Needs more data |
 
 ---
 
@@ -43,9 +42,8 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] atr-trend- SHORT** — WR=50.0%, PnL=-2.19% over 6 trades. Monitor next cycle.
-2. **[WATCH] ai-trader-pending SHORT** — WR=33.3%, PnL=+0.30% over 3 trades. Monitor next cycle.
-3. **[WATCH] btc-pump-rider+ LONG** — WR=50.0%, PnL=+1.52% over 2 trades. Monitor next cycle.
+1. **[WATCH] atr-trend- SHORT** — WR=50.0%, PnL=-2.57% over 8 trades. Monitor next cycle.
+2. **[WATCH] btc-pump-rider+ LONG** — WR=33.3%, PnL=+0.80% over 3 trades. Monitor next cycle.
 
 ---
 
@@ -65,7 +63,5 @@ None found. Top performers are already enabled.
 | 2026-11-13 | 6034708 | scripts: fire winner-cell size REVERT 1.25->1.0 (registered ... |
 | 2026-11-10 | b4b7322 | memory: hourly analysis 2026-11-10 17:22 — storm packet (win... |
 | 2026-11-09 | 1f5cf45 | logs: hourly analysis 2026-11-09 13:22 — no config change, 0... |
-| 2026-11-09 | e9035a2 | logs: hourly analysis 2026-11-09 00:20 — no config change, 0... |
-| 2026-11-08 | e91eea0 | skills: full-analysis gains MTF ADX/ATR lifecycle (CEO rules... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
