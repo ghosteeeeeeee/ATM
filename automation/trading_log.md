@@ -27969,3 +27969,31 @@ BY: auto_1hr
 - Unarmed cohort 73.3% of closes at 9.1% WR (-$0.63) vs armed 4/4 +$0.19 — stall stack owns fix
 - storm-confl-waiver bar 0/3 with deadline 2026-11-19; last storm (15:52) counterfactual was NEGATIVE
 BY: auto_1hr
+
+## 2026-11-16 17:51 Hourly Analysis
+
+**Trades:** 1 closed (0 wins, 0 losses)
+**PnL:** $0.00 this hour (flat) | 24h 13T 23.1% -$0.46 RED | 7d 109T 45.0% -$0.74 RED | **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** no storm — window-min +0.45% / at-run +0.45% (both inside gate)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 1 close (ZRO hl_copy_trader LONG trader_exit $0.00 flat), 0 open
+- Kill check: ai-trader-pending 24h 3T 0% -$0.18 but 14d NORMAL wins -> keep; hl_copy_trader 2T n<3 and 14d EXTREME 57.1% +$0.43 wins -> keep; atr-trend- 4T 25% not 0%
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/13 = 23.1% of 24h closes (<40%); tpsl_utils deployed
+- Boost: none eligible — no signal has n>=5 in 24h (max atr-trend- 4T 25.0%)
+- Arm rate: unarmed 11/13 = 84.6% (>70% — CHOP ENTRIES DOMINATING) WR 9.1% -$0.63 NEGATIVE vs armed 2/2 100% +$0.17 — stall stack owns the fix, no new gate
+- Neg streak: 10h -0.07, 14h +0.10, 17h 0.00 — not 3 consecutive; 24h regimes EXTREME/HIGH/NORMAL not NEUTRAL -> no size cut
+- Frequency: 1 close/hr — well under 20
+- Winners MAE 0.270% avg 24h (<0.5% — entry quality OK)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h RED -$0.46 at 23.1% WR; 7d RED -$0.74 — slow bleed continues
+- Unarmed cohort 84.6% of closes at 9.1% WR (-$0.63) vs armed 2/2 +$0.17 — stall stack owns fix
+- storm-confl-waiver bar 0/3 with deadline 2026-11-19; last storm (15:52) counterfactual NEGATIVE
+BY: auto_1hr
