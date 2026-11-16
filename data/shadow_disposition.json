@@ -1884,6 +1884,45 @@
       "prior_art": "session-brain query 'have we tried flipping pump-chain contrarian direction before demote re-promote' -> hits are the demote/flip trail [watch-pc-flip-demote-55 2026-11-13, 'DEMOTE EXECUTED ... bar breached on any-read basis'] = this entry supersedes that metric basis, not a re-proposal of shipped work",
       "status_note": "AMPLIFY weekly emit #266 (satisfies >=1 proposal/run mandate)",
       "caveat": "Per-token heterogeneity is UNTESTABLE at corrected n (pc- now only 2 tokens with n>=10, chi2 null) \u2014 pre-fix 'p=0.0001 HETEROGENEOUS' came from contaminated rows. Bar (ii) tape-split (BELOW n=62) is therefore the ONLY scoping test available; do not widen to unscoped pc- fade on this evidence."
+    },
+    {
+      "id": "long-rsi-floor30-shadow",
+      "stream": "LONG RSI floor 20->30 counterfactual \u2014 [LONG-FLOOR30-SHADOW] lines at the LONG RSI floor gate (scripts/signal_compactor.py, logs/pipeline.log)",
+      "kind": "shadow",
+      "status": "open",
+      "started": "2026-11-16",
+      "deadline": "2026-11-30T00:00:00Z",
+      "owner": "CEO",
+      "threshold": "token-day dedup join of WOULD-BLOCK cohort \u2192 enforce floor30 iff cohort net-of-fee negative AND WR<45% at n>=20 AND blocks <=5 potential winners/day (revert rule: <25 cohort \u226555% WR or >5 winners/day blocked)",
+      "default_action": "keep floor 20",
+      "evidence": "CEO 20261116T153048Z: RSI<25 LONG 10T 30% \u22120.41, 09-29 rationale flipped",
+      "notes": "log-only shadow; LONG_RSI_FLOOR stays 20. ADD-only flag LONG_RSI_FLOOR_SHADOW30=True (ENFORCE=False) \u2014 band [20,30) passes the live gate, would be blocked at floor 30."
+    },
+    {
+      "id": "hl-copy-plus-shadow",
+      "stream": "HL copy PLUS-LONG counterfactual \u2014 [HL-COPY-PLUS-SHADOW] lines at the per-direction kill-switch in scripts/hl_copy_signal.py (logs/pipeline.log)",
+      "kind": "shadow",
+      "status": "open",
+      "started": "2026-11-16",
+      "deadline": "2026-11-30T00:00:00Z",
+      "owner": "CEO",
+      "threshold": "counterfactual: enforce disable only if would-skip cohort keeps LONG net-of-fee negative at n>=10 with any regime \u226555% WR n\u22658 as the documented revert",
+      "default_action": "keep enabled until counterfactual reads",
+      "evidence": "CEO 20261116T153048Z ranked action 2",
+      "notes": "log-only shadow; HL_COPY_SIGNAL_PLUS_ENABLED stays True. ADD-only flag HL_COPY_PLUS_SHADOW=True (ENFORCE=False). 14d LONG 11T 18.2% WR -$0.33, HIGH 0% n=4."
+    },
+    {
+      "id": "hotset-pin-approved-shadow",
+      "stream": "APPROVED hotset pin \u2014 [HOTSET-PIN-SHADOW] WOULD-PIN lines at the fell-out EXPIRE sites in scripts/signal_compactor.py (logs/pipeline.log)",
+      "kind": "shadow",
+      "status": "open",
+      "started": "2026-11-16",
+      "deadline": "2026-11-20T00:00:00Z",
+      "owner": "CEO",
+      "threshold": "baseline fell-out=42/day longs; after pin enable: fell-out longs <10/24h AND long APPROVED\u2192EXECUTED >=8/day (vs 2-3 now) AND no negative side effects on compaction (zero gate changes) \u2014 flip HOTSET_PIN_APPROVED=True only at this bar with CEO label",
+      "default_action": "stay pinned-off",
+      "evidence": "CEO 20261116T153048Z: single highest-quality layer \u201455 longs died post-approval (42 fell-out+13 EXEC-BLOCK) in24h; zero gates touched by the fix",
+      "notes": "pin ships INERT: HOTSET_PIN_APPROVED=False (default) = fell-out UPDATE SQL byte-identical + hotset_final untouched (probe: rotation identical with flag off). HOTSET_PIN_SHADOW=True logs the fell-out cohort (dedup token|direction,site,hour)."
     }
   ],
   "updated_at": "2026-11-16T09:14:49Z"
