@@ -370,7 +370,10 @@ conn.close()
 ```python
 # Look at price action 5-15 minutes before entry
 import sqlite3
-price_db = sqlite3.connect('/root/.hermes/data/prices.db')
+# data/prices.db is a 0-byte dead file (unused since 2026-10-07) — do NOT use it.
+price_db = sqlite3.connect('/root/.hermes/data/candles.db')
+# schema: candles_1m(token TEXT, ts INTEGER epoch-sec, open, high, low, close, volume, is_closed)
+# row = price_db.execute("SELECT close FROM candles_1m WHERE token=? AND ts<=? ORDER BY ts DESC LIMIT 1", (sym, ts)).fetchone()
 # Check: was price trending against us? Was there a sudden spike?
 # Were we chasing? (entered after a big move already happened)
 ```

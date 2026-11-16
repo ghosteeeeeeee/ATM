@@ -1254,6 +1254,22 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
             return False
         token = row['token']
         direction = row['direction']
+        # [COPY-STALE] audit #268 shipped this guard ONLY in hl_fill_monitor's
+        # copy_exit path, but live hl_copy phantoms close here via XMIRROR-EXIT
+        # (position_manager, 2026-11-15 WLD x2 + ZRO = 1.1s, 0 log lines) —
+        # one guard on the shared close covers every caller. Log-only.
+        try:
+            _cs_ot = row['open_time']
+            if _cs_ot is not None:
+                if _cs_ot.tzinfo is None:
+                    _cs_ot = _cs_ot.replace(tzinfo=timezone.utc)
+                _cs_age = (now - _cs_ot).total_seconds()
+                if _cs_age < 5:
+                    log(f"  [COPY-STALE] trade #{trade_id} {token} closed {_cs_age:.1f}s after open "
+                        f"(signal={row['signal']}, reason={reason}) — phantom mirror, "
+                        f"pro had already exited in our poll window")
+        except Exception:
+            pass
         entry_price = float(row['entry_price'] or 0)
         current_price = float(row['current_price'] or entry_price)
         # Bug-fix (2026-05-20): `or` treated 0.0 as falsy → phantom $50 fee base.

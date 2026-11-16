@@ -313,6 +313,66 @@ def collect_recent_closed(limit=20):
         conn.close()
 
 
+def _merge_intervals(ivs):
+    """Merge overlapping (start, end) datetime intervals. Input not mutated."""
+    if not ivs:
+        return []
+    items = sorted((s, e) for s, e in ivs if e > s)
+    if not items:
+        return []
+    merged = [list(items[0])]
+    for s, e in items[1:]:
+        if s <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], e)
+        else:
+            merged.append([s, e])
+    return [(s, e) for s, e in merged]
+
+
+def collect_exposure(hours=24):
+    """Fraction of the last `hours` with >=1 position open (CEO exposure KPI).
+
+    CEO must-have (session 2026-10-02 'can you use the watch (1)' + 2026-11-08
+    youtube watch): "we're flying blind on how much time we're actually
+    in-market". Zero-behaviour — reporting only.
+    """
+    conn = get_db()
+    if conn is None:
+        return None
+    try:
+        cur = conn.cursor()
+        end = datetime.now(timezone.utc)
+        start = end - timedelta(hours=hours)
+        cur.execute("""
+            SELECT open_time, COALESCE(close_time, %s)
+            FROM trades
+            WHERE open_time < %s
+              AND COALESCE(close_time, %s) > %s
+        """, (end, end, end, start))
+        ivs = []
+        for opened, closed in cur.fetchall():
+            if opened is None or closed is None:
+                continue
+            if opened.tzinfo is None:
+                opened = opened.replace(tzinfo=timezone.utc)
+            if closed.tzinfo is None:
+                closed = closed.replace(tzinfo=timezone.utc)
+            if closed > opened:
+                ivs.append((max(opened, start), min(closed, end)))
+        if not ivs:
+            return {"hours": hours, "in_market_pct": 0.0, "trades": 0}
+        merged = _merge_intervals(ivs)
+        covered = sum((e - s).total_seconds() for s, e in merged)
+        pct = 100.0 * covered / (hours * 3600.0)
+        return {"hours": hours, "in_market_pct": round(min(pct, 100.0), 1),
+                "trades": len(ivs)}
+    except Exception as e:
+        log(f"Error collecting exposure: {e}", "ERROR")
+        return None
+    finally:
+        conn.close()
+
+
 def collect_btc_regime():
     """Read current BTC regime from multiple sources."""
     regime = {
@@ -1711,6 +1771,7 @@ def collect_all():
         "coin_tracker": collect_coin_tracker(),
         "pipeline_status": collect_pipeline_status(),
         "signal_performance": signal_performance,
+        "exposure": collect_exposure(24),
     }
     if not db_ok:
         log("⚠ PostgreSQL unreachable — data may be incomplete", "ERROR")
@@ -1800,6 +1861,7 @@ def build_output(data, steers):
             "short_count": short_count,
         },
         "signal_performance": data.get("signal_performance", {}),
+        "exposure": data.get("exposure"),
         "pipeline_status": data.get("pipeline_status", {}),
         # DRIFT-E-safe recent closes for the deep-analysis agent — use meta_rsi,
         # NOT trades.entry_rsi_14 (late/wrong-TF, median |diff| ~13 pts).
@@ -2128,7 +2190,27 @@ def main():
     parser.add_argument("--collect", action="store_true", help="Collect data only")
     parser.add_argument("--analyze", action="store_true", help="Analyze only (requires collected data)")
     parser.add_argument("--dry-run", action="store_true", help="Analyze but don't write outputs")
+    parser.add_argument("--selfcheck", action="store_true",
+                        help="Run interval-merge self-check and exit (no DB, no writes)")
     args = parser.parse_args()
+
+    if args.selfcheck:
+        t0 = datetime(2026, 1, 1, 0, 0, tzinfo=timezone.utc)
+        def h(x):
+            return t0 + timedelta(hours=x)
+        # overlap merges to one 4h block from 0..4
+        m = _merge_intervals([(h(0), h(2)), (h(1), h(4))])
+        assert m == [(h(0), h(4))], m
+        # disjoint stay separate, covered = 2h of 6h window
+        m = _merge_intervals([(h(0), h(1)), (h(3), h(4))])
+        assert len(m) == 2 and sum((e - s).total_seconds() for s, e in m) == 7200, m
+        # empty / zero-length inputs
+        assert _merge_intervals([]) == []
+        assert _merge_intervals([(h(2), h(2))]) == []
+        # abutting intervals (s == prev end) merge — one continuous block
+        assert _merge_intervals([(h(0), h(1)), (h(1), h(2))]) == [(h(0), h(2))]
+        print("selfcheck PASS: 5 interval-merge cases")
+        return
 
     # Determine mode (recommend → autopilot after 48h)
     watchdog_mode, deploy_time, elapsed_hrs = get_watchdog_mode()

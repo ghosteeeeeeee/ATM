@@ -11552,5 +11552,38 @@
     "category": "rejected",
     "status": "rejected_with_data",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-11-16T12:51:32Z",
+    "agent": "brain_auditor",
+    "run": 270,
+    "idea": "Ship the in-market exposure KPI into watchdog.json (collect_exposure: interval-merge of all trade open/close over 24h/72h)",
+    "rationale": "CEO called exposure tracking a must-have twice (session 2026-10-02 'can you use the watch (1)': 'We're flying blind on how much time we're actually in-market. Trivial to add'; again 2026-11-08 youtube watch) and it was never built. First read: 24h 32.8% in-market across 19 closes = ~25min average hold = chop-duration book.",
+    "expected_impact": "pairs WR/PnL with how often we are exposed; objectively flags over-trading days",
+    "category": "measurement",
+    "status": "shipped",
+    "risk": "none (log-only)"
+  },
+  {
+    "date": "2026-11-16T12:51:32Z",
+    "agent": "brain_auditor",
+    "run": 270,
+    "idea": "Consume freq_deviation_shadow: WARNING steer when a source is >=3x baseline OVER-firing AND its 14d WR <50% with n>=10",
+    "rationale": "data/freq_deviation_shadow.jsonl has 1,187 alert rows since 11-08 and ZERO consumers (hermes-freq-deviation-shadow.timer produces, nothing reads). Today it flags hl_copy_trader 3.82x over baseline (0.125/h vs 0.0327/h) with 14d WR 18.2% n=11 — a leading indicator the watchdog can only see after the bleed.",
+    "expected_impact": "turns an orphan collector into a signal-quality alarm; zero trading-path change",
+    "category": "telemetry",
+    "status": "suggested",
+    "risk": "low (steer only, auto_executable=false)"
+  },
+  {
+    "date": "2026-11-16T12:51:32Z",
+    "agent": "brain_auditor",
+    "run": 270,
+    "idea": "EXITSTACK-DUAL-METRIC early read for the 11-17 formal eval (extends #269 creative #2)",
+    "rationale": "post-11-14 vs pre (11-07..13): 94T 46.8% -1.88 -> 41T 43.9% +0.69; arm 48.9%->53.7%; stop-family exit share 46.8%->41.5%. WR fell while net and arm rose — an avg-loss-only KPI would read FAIL and false-revert the exit-stack day.",
+    "expected_impact": "prevents false-revert of exit-stack on 11-17",
+    "category": "measurement",
+    "status": "pre-registered",
+    "risk": "low"
   }
 ]
