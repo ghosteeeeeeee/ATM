@@ -11585,5 +11585,38 @@
     "category": "measurement",
     "status": "pre-registered",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-16T20:51:06Z",
+    "idea": "Pin 'same-sign' in every amplify threshold to mean ALL of 7d/14d/30d",
+    "rationale": "amplify-jup-short-high-cell's literal '30d same-sign' bar read PASS while 14d 18T -0.28 and 7d 8T -0.06 were negative — a literal read would have promoted a decaying cell to WINNER_CELLS_VALIDATED",
+    "expected_impact": "prevents literal-read false promotes",
+    "category": "measurement hygiene",
+    "status": "suggested",
+    "risk": "low",
+    "agent": "brain_auditor",
+    "run": 271
+  },
+  {
+    "date": "2026-11-16T20:51:06Z",
+    "idea": "Report freq_deviation ratio alongside WR when adjudicating any disable-shadow",
+    "rationale": "rate and quality are orthogonal: hl_copy is 3.73x over-fire AND 26.7% WR — the disable counterfactual (hl-copy-plus, due 11-30) should see both axes",
+    "expected_impact": "better-informed shadow verdicts",
+    "category": "shadow adjudication",
+    "status": "suggested",
+    "risk": "low",
+    "agent": "brain_auditor",
+    "run": 271
+  },
+  {
+    "date": "2026-11-16T20:51:06Z",
+    "idea": "Arm-axis pre-reg (#194 creative #2) first qualifier found: hl_copy_trader (14d n=15 arm 33.3% net -0.30)",
+    "rationale": "screen executed fresh; qualifier FAILS its own p<0.05 bar (fisher p=0.185 vs rest) and collides with CEO's in-flight hl-copy-plus-shadow",
+    "expected_impact": "documents why no dampen shipped",
+    "category": "entry quality",
+    "status": "rejected-with-data",
+    "risk": "low",
+    "agent": "brain_auditor",
+    "run": 271
   }
 ]

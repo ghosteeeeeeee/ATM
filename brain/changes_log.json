@@ -4364,5 +4364,17 @@
     "after": "data/candles.db / candles_1m(token, ts, open, high, low, close, volume, is_closed), 179 tokens 7.6M rows",
     "rationale": "auditor autopsy step was pointing at a dead file",
     "impact": "future autopsies get real 1m price action"
+  },
+  {
+    "timestamp": "2026-11-16T20:51:06Z",
+    "agent": "brain_auditor",
+    "run": 271,
+    "change": "3 shadow_disposition dispositions: exitstack-day-kpi-1114 open->done (BAR MET both legs, formal read n=30 avg_loser -0.0687 vs -0.070 bar, unarmed gap -13.81->-9.63), amplify-jup-short-high-cell open->done NO-SHIP (sign-flip 14d -0.28/7d -0.06), hl-copy-plus-shadow evidence += freq-ratio 3.73x + arm-axis p=0.185",
+    "type": "tweak",
+    "file": "data/shadow_disposition.json",
+    "before": "exitstack open / jup-short-high open / hl-copy-plus no freq context",
+    "after": "exitstack done PASS / jup-short-high done NO-SHIP / hl-copy-plus annotated for 11-30",
+    "rationale": "formal read window reached (n>=30); jup cell decayed across shorter windows; freq context is the orthogonal axis for the disable counterfactual",
+    "impact": "closes due-11-17 KPI item early with a PASS (no revert flag); prevents a decaying cell from being promoted; zero trading behavior"
   }
 ]

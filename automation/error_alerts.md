@@ -4355,3 +4355,44 @@
 
 ## Error Alerts — 2026-11-16 10:38 UTC
 - **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] USELESS TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-11-16 11:38 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] USELESS TOK — continuum says DECLINING+LEAN_BULL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-16 12:38 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] CASHCAT TOK — continuum says RECOVERY+NEUTRAL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-16 13:38 UTC
+- **REPEATED** (7x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **NEW** (2x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] BIGTIME TOK — continuum says DECLINING+LEAN_BEAR+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-16 14:38 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: CONTAGION,TOK,BTC_LEVEL | vol=N.0x eth_div=+N.N% | BTC_LEVEL: TOK blocked (-N.N% from high)`
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+NEUTRAL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-16 15:38 UTC
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+TOK+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-16 16:38 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-11-16 17:38 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-11-16 18:38 UTC
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+
+## Error Alerts — 2026-11-16 19:00 UTC
+- **[WARN]** (freq_deviation_shadow): `atr-trend-`: FREQ DEVIATION UNDER source=atr-trend- baseline=0.089/h current=0.042/h ratio=0.47 n_base=30 n_cur=1
+
+## Error Alerts — 2026-11-16 19:38 UTC
+- **REPEATED** (10x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-16 20:38 UTC
+- **REPEATED** (7x): `Nov N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: CC TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (7x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): CC TOK — TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`

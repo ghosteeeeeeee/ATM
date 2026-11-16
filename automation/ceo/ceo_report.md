@@ -1420,3 +1420,21 @@ Rotating Q (idx 10 = "new signals this week?"): 0 SHIPPED (matches 15381Z run), 
 ### Numbers: 24h 24T -0.04 33.3% | 7d 110T -1.08 44.5%
 ### Findings: best signal 7d = ai-trader-pending SHORT 25T +0.59 (WR 44.0%, n>=3); disk 85% WARN; slippage-column OVERDUE 2d (14th resurface)
 ### Recommendation: owner main-session ships stop-tighten-slippage-column and frees disk before 90%.
+
+## CEO Status — 20261116T113816Z
+### Health: pipeline=active (timer oneshot, ran 11:39Z) guardian=active open_pos=0
+### Numbers: 24h 19T -0.32 31.6% | 7d 110T -1.17 43.6%
+### Findings: 24h WR 31.6% is soft but n=19 and 7d -1.17 is small; control tower has 14 shadows due 11-17; disk at 85% warned twice today. Proactive Q (best signal): ai-trader-pending SHORT 7d 26T +0.52 (WR 42.3%) — best cell, positive via win-size not WR; all other n>=5 cells negative.
+### Recommendation: clean disk before it crosses the alert threshold; no config change needed.
+
+## CEO Status — 20261116T153816Z
+### Health: pipeline=timer-run (service inactive between runs, last run 15:39Z OK) guardian=active open_pos=0
+### Numbers: 24h 16T -0.58 25.0% | 7d 110T -0.84 44.5%
+### Findings: 24h WR 25% on small n (-0.58 = 2-3 losers); proactive Q (best signal 7d) = btc-pump-rider+/ema-reclaim-long n=1 +0.26, ai-trader-pending 30T +0.23 (WR 36.7%), jup_yolo_mirrored 19T +0.16 63.2% — no material winner to tune
+### Recommendation: watch 24h WR; no action — 7d bleed (-0.84) is within chop-bleed noise already owned by exitstack/prearm queue
+
+## CEO Status — 20261116T193817Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 12T -0.24 33.3% | 7d 111T -0.63 45.9%
+### Findings: 24h/7d both slightly negative but flat-ish (7d -0.63 over 111 trades); best 7d signal = jup_yolo_mirrored LONG 5T +0.58 100% (n=5, thin), then ai-trader-pending SHORT 26T +0.52 42.3%; error_alerts = routine momentum/boundary blocks + 1 freq-deviation warn on atr-trend-; 14 control-tower items due <=24h (11-17 batch, CEO-owned shadows).
+### Recommendation: none — status run only; CEO owed items (unclog waiver re-arm ratify, slippage-column BUILD #1, prearm enforce GO) still pending from prior runs.
