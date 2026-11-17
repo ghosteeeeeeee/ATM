@@ -4376,5 +4376,16 @@
     "after": "exitstack done PASS / jup-short-high done NO-SHIP / hl-copy-plus annotated for 11-30",
     "rationale": "formal read window reached (n>=30); jup cell decayed across shorter windows; freq context is the orthogonal axis for the disable counterfactual",
     "impact": "closes due-11-17 KPI item early with a PASS (no revert flag); prevents a decaying cell from being promoted; zero trading behavior"
+  },
+  {
+    "timestamp": "2026-11-17T00:51:21Z",
+    "agent": "brain_auditor",
+    "change": "Audit #272: 13-deadline shadow_disposition batch adjudicated (12 done, 1 extended to 12-01), 0 ship, 0 trading-constant changes; new brain/analysis/disposition_deadline_2026-11-17.py (--selfcheck PASS)",
+    "type": "disposition",
+    "file": "data/shadow_disposition.json",
+    "before": "13 entries status=open deadline 2026-11-17",
+    "after": "12 done (all NO-SHIP/STAY-DEFAULT with evidence), jup-atrsl-shadow-parity open->12-01 KEEP+ESCALATE write-path sync",
+    "rationale": "Pre-registered deadline bars read: flip1 tape-split sign flip OVERTURNS early GO; bear ex-best-day -$0.55<+1.00; long-bypass stay LIVE (-$10.09 blocked cohort); all others fail a limb or are under-powered",
+    "impact": "Zero behavior change; governance close-out of the largest deadline batch this quarter; CEO escalations registered"
   }
 ]

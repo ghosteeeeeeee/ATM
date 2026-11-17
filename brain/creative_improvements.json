@@ -11618,5 +11618,23 @@
     "risk": "low",
     "agent": "brain_auditor",
     "run": 271
+  },
+  {
+    "date": "2026-11-17T00:51:12Z",
+    "idea": "days-limb calibration study: across all past shadow_tag_join/disposition reads, does the 2/3-positive-days limb add discrimination beyond the net>=X limb?",
+    "rationale": "This batch: standalone n/net PASS + days FAIL; short-regime n/net PASS + days FAIL (8/13); setup n PASS + net/days FAIL. If days-limb never changes a verdict net-limb wouldn't, propose amending future thresholds to net+LOO only (CEO)",
+    "expected_impact": "cleaner pre-registrations; fewer near-miss disputes",
+    "category": "governance",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-17T00:51:12Z",
+    "idea": "jup-atrsl drift watchdog steer: if [JUP-SHADOW-ATRSL] db!=fix count >=5 in rolling 7d, emit auto_executable=false steer 'write-path sync owed'",
+    "rationale": "stream exists, deadline-driven only (registry note: zero-event auto-KILL cannot fire); drift 59/70 would have surfaced weeks earlier with a steer",
+    "expected_impact": "faster main-session pickup of the SL write-path bug",
+    "category": "observability",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

@@ -1,235 +1,214 @@
 {
-  "timestamp": "2026-11-16T20:51:06Z",
-  "run": 271,
+  "timestamp": "2026-11-17T00:51:12Z",
+  "run": 272,
   "session_brain_stats": {
-    "queries": 8,
-    "hits_total": 27,
-    "prior_art_checked": true
+    "queries": 11,
+    "hits_total": 52,
+    "cited_recommendations": 5,
+    "uncited": 0
   },
   "questions_asked": [
     {
-      "question": "what did we say about hl_copy_trader phantom sub-second trades",
+      "question": "bear single source short confluence gate flip enforce",
       "results_found": 5,
-      "cited": true
+      "cited": true,
+      "citation": "[risk-budget decision, 2026-10-21] confluence gate standalone bypass path analysis"
     },
     {
-      "question": "have we tried filtering hl_copy_trader dust trades before",
+      "question": "btc standalone deny flat tape single source",
+      "results_found": 5,
+      "cited": true,
+      "citation": "[exit asymmetry, 2026-10-31] BTC chop gate blocks standalone bypass when flat"
+    },
+    {
+      "question": "long bypass short bias block long fills",
+      "results_found": 5,
+      "cited": true,
+      "citation": "[calwndar, 2026-10-31] 'not taking enough shorts / long biased in short tape' CEO thread"
+    },
+    {
+      "question": "jup cluster size gate replication",
+      "results_found": 5,
+      "cited": true,
+      "citation": "[yolo dash, 2026-11-02] cluster detection for JUP YOLo mirror origin"
+    },
+    {
+      "question": "short regime exempt shadow tape split",
+      "results_found": 5,
+      "cited": true,
+      "citation": "[calwndar, 2026-10-31] regime-split EXTREME fade valid for exemption"
+    },
+    {
+      "question": "jup atr_sl stop too tight bleed",
+      "results_found": 5,
+      "cited": true,
+      "citation": "[mfe exit, 2026-10-31] jup-specific HML override considered"
+    },
+    {
+      "question": "have we tried RSI filter jup anti chase",
       "results_found": 4,
-      "cited": true
+      "cited": true,
+      "citation": "[brain-rag-improvements, 2026-09-20] RSI>65 EXTREME LONG block proposal (time-block banned neighbor)"
     },
     {
-      "question": "hl_copy_trader over-fire frequency deviation",
-      "results_found": 3,
-      "cited": true
-    },
-    {
-      "question": "what did we say about ai-trader-pending losing streak",
+      "question": "what did we say about jup atr_sl_hit stop distance",
       "results_found": 5,
-      "cited": true
+      "cited": true,
+      "citation": "[calwndar, 2026-10-31] STOP-ASYMMETRY STUDY ship-to-shadow @1.0% price — superseded by live STOP_TIGHTEN 0.75"
     },
     {
-      "question": "giveback hard_max_loss with high MFE trail not protecting",
+      "question": "jup yolo trail shadow MFE giveback exit",
       "results_found": 5,
-      "cited": true
+      "cited": true,
+      "citation": "[yolo dash, 2026-11-02] pm-trail only profitable exit style on 45 closed mirror trades"
     },
     {
-      "question": "have we tried wiring freq deviation over-fire into watchdog steers",
+      "question": "flip1 bear override waiver re-arm decision",
       "results_found": 5,
-      "cited": true
+      "cited": true,
+      "citation": "[calwndar, 2026-10-31] bear override intentionally removed — oversold=bounce risk even in bear"
     },
     {
-      "question": "freq_deviation_shadow consumer over-fire early warning",
+      "question": "standalone bypass denied BTC flat flow recovery",
       "results_found": 5,
-      "cited": true
-    },
-    {
-      "question": "hl_copy_trader over-firing disable plus long",
-      "results_found": 5,
-      "cited": true
+      "cited": true,
+      "citation": "[exit asymmetry, 2026-10-31] pump-chain not in STANDALONE_BYPASS + BTC chop gate"
     }
   ],
   "trade_summary_24h": {
     "trades": 11,
-    "wr": 45.5,
-    "pnl": -0.02,
-    "d7": "112T 47.3% -0.46",
-    "d14": "238T 50.8% -1.90",
-    "d30": "660T 50.5% -4.86",
-    "armed_7d": "56T 85.7% +4.10",
-    "never_7d": "56T 8.9% -4.56",
-    "trail_14d": "profit-monster-trail 72T 95.8% +4.23 / mfe_exit 26T 100% +1.51",
-    "bleed_14d": "atr_sl_hit 42T 0% -4.75 / hard_max_loss 37T 0% -4.21",
-    "chop_bleed_dollar_7d": "84.1% (under 92% gate)",
-    "chop_bleed_dollar_14d": "88.9%",
+    "pnl": 0.13,
+    "wr": 54.5,
+    "by_signal": {
+      "hl_copy_trader LONG 4T +0.03 50%": true,
+      "ai-trader-pending SHORT 2T -0.14 0%": true,
+      "ai-trader-pending LONG 1T -0.04": true,
+      "bb-squeeze+ LONG 1T +0.02": true,
+      "jup SHORT 1T +0.05": true,
+      "r2v2-long3 LONG 1T +0.07": true,
+      "jup LONG 1T +0.14": true
+    },
+    "7d": "108T -0.20 48.1%",
+    "14d": "236T -1.59 51.3%",
+    "30d": "659T -5.11",
+    "armed7d": "55T 85.5% +4.11",
+    "never7d": "53T 9.4% -4.31",
+    "armed14d": "124T 87.9% +7.80",
+    "never14d": "112T 10.7% -9.39",
+    "chop_bleed_7d_dollar": "83.4% (43/50 losers never-armed, $4.47/$5.36)",
     "open": 0
   },
+  "steer_disposition": {
+    "steer-001 ai-trader-pending 3-consec-loss": "ANSWERED (carry #271): CEO manual pending, 14d net +0.14 overall / NORMAL cell +1.12 — report only, no disable"
+  },
   "shadow_analysis": {
-    "contrarian": "join RE-RAN 20:31Z (mandate): overall flip 45.9% n=1822 decided | pump-chain- 68W/36L=65.4% STABLE (live fade holds) | btc-pump-rider+ 768W/950L=44.7% do-NOT | het chi2 p=4e-35 -> per-signal only",
-    "floor_admit": "join RE-RAN 20:34Z: floor_only 49.5% n=1764 vs always 45.0% n=371, fisher p=0.1229; n>=200 PASS / same_sign_30d FAIL -> #264 NO-SHIP CONFIRMED stays CLOSED",
-    "oscillator": "FROZEN + archived 2026-10-27 (fossil) — not answerable",
-    "wyckoff": "PENDING join (no outcome column) — not answerable",
-    "rr_shadow": "ORPHANED (no producer, mtime 24d+) — not answerable",
-    "shadow_trader": "111,051 signals 20:35Z: gates justified (CONFLUENCE-EXPIRY 17438 @47% avg -0.13, COMBO-STALE 6212 @46%, EXEC-BLOCK 2492 @45% -0.18); exit A/B pm_trail +16,760 (n=45059, 100%) vs hard_max -21,327 (0%) vs rr_engine -7,936 vs cut_loser -2,282 -> TRAIL-OR-NOTHING unchanged",
-    "freq_deviation": "ORPHAN-CLAIM RETRACTED — producer hourly live (hermes-freq-deviation-shadow.timer), alert chain verified end-to-end: jsonl + error_alerts.md (18 lines, last 11-16 19:00Z) -> ceo_dashboard_api.get_error_alerts (last-5 blocks) -> ceo_dashboard.html. JSONL is dedup state, not an orphaned output. hl_copy OVER 3.73x sustained.",
-    "overall": "3/6 sources answerable (contrarian, floor, shadow_trader) + freq chain verified; oscillator/wyckoff/rr dead"
+    "contrarian_join": "RE-RAN 00:31Z (mandate): overall 45.9% n=1820 | pump-chain- 66W/34L=66.0% LIVE fade holds | rider 44.7% do-NOT | het p=4e-35 per-signal only",
+    "floor_join": "fresh from #271 20:34Z: floor_only 49.5% vs always 45.0% p=0.1229 COLLECT — #264 NO-SHIP stays closed",
+    "shadow_tag_join": "RAN 00:33Z — 5 tags: short-regime days FAIL / flip1 tape-flip FAIL / bear literal-bar MET but ex-best-day FAIL / volgate n FAIL / maxxed n=1",
+    "oscillator": "FROZEN+archived — none",
+    "wyckoff": "PENDING join — none",
+    "rr": "ORPHANED — none",
+    "overall": "3/6 answerable + shadow_tag_join + disposition_deadline runner; contrarian/floor/shadow_tag fresh this run"
+  },
+  "deadline_batch_2026-11-17": {
+    "total": 13,
+    "done": 12,
+    "extended": 1,
+    "ship_count": 0,
+    "notable": [
+      "flip1 NO-GO OVERTURNS #262 early-read GO (tape-split sign flip chop -$0.54)",
+      "bear-single-source literal bar MET (n=48 WR72.9% +7.35) but ex-best-day -$0.55 < +1.00 amendment FAIL",
+      "long-bypass STAY LIVE: blocked cohort 14d -$10.09 WR17% — block saving money",
+      "btc-standalone n=480 +6.66 but days 6/11 FAIL (SHORT leg 7/11 still short)",
+      "jup-atrsl KEEP+ESCALATE: db!=fix drift 59/70 persists, extended to 12-01"
+    ]
   },
   "drift_findings": [
     {
-      "item": "#270 MED 'freq_deviation_shadow orphan producer, 0 consumers'",
-      "verdict": "RETRACTED — false positive; consumer chain exists and was exercised (hl_copy 2.80x alert landed 11-15 18:00Z in CEO dashboard window)",
-      "severity": "resolved"
+      "item": "jup-atrsl DB write path stores original SL, PM applies ATR-norm",
+      "severity": "MED-LOW (known, escalated again)",
+      "impact": "parity stream cannot auto-kill; manual each run"
     },
     {
-      "item": "entry_feature_split selfcheck sample-shrink (carried from #270)",
-      "verdict": "still open, MED, code OK / sample below bar",
-      "severity": "med"
+      "item": "both outcome joins producer-less (contrarian/floor)",
+      "severity": "MED (known)",
+      "impact": "staleness risk; ran manually this run"
     },
     {
-      "item": "session_brain duplicate-text records owed rebuild",
-      "verdict": "carried LOW",
-      "severity": "low"
+      "item": "entry_feature_split selfcheck sample-shrink",
+      "severity": "MED (carried)",
+      "impact": "selfcheck FAIL is sample, not code"
     },
     {
-      "item": "wyckoff outcome join unbuilt",
-      "verdict": "carried, blocks wyckoff shadow",
-      "severity": "med"
+      "item": "wyckoff join unbuilt",
+      "severity": "MED (carried)",
+      "impact": "3/6 shadow answerable"
     }
   ],
   "recurring_problems": [
-    {
-      "topic": "chop entries never arm (trail-vs-chop)",
-      "status": "OWNED — exitstack day ships measured this run: BAR MET (see changes). Entry-gate route closed on 3 axes (#96/#190/#192); remaining levers all dated in queue."
-    },
-    {
-      "topic": "hl_copy_trader sub-50% + over-fire",
-      "status": "OWNED by CEO hl-copy-plus-shadow (shipped 11-16, due 11-30) — this run added freq-ratio context, did not stack a second lever (one-variable rule)."
-    },
-    {
-      "topic": "jup atr_sl_hit bleed 15T -1.99",
-      "status": "OWNED — jup batch due 11-17 (queue), not duplicated."
-    }
+    "chop-bleed / never-armed class owns dollar loss: 7d 83.4%, armed14d +7.80 vs never -9.39 — 10th+ consecutive window >=83%",
+    "days-limb (2/3 positive days) failed 3 of 4 joins this batch while n/net cleared on 2 — possible threshold-calibration issue (see creative)"
   ],
   "missing_implementations": [
     {
-      "idea": "amplify same-sign window definition (7d/14d/30d all, not 30d-only)",
-      "status": "pre-registered this run (creative #1) — doc/threshold convention, no code"
+      "idea": "producer/timer for contrarian + floor outcome joins",
+      "status": "known gap, manual each run"
+    },
+    {
+      "idea": "jup-atrsl db-vs-fix drift count as watchdog steer",
+      "status": "not built — see creative"
     }
   ],
   "creative_improvements": [
     {
-      "date": "2026-11-16T20:51:06Z",
-      "idea": "Pin 'same-sign' in every amplify threshold to mean ALL of 7d/14d/30d",
-      "rationale": "amplify-jup-short-high-cell's literal '30d same-sign' bar read PASS while 14d 18T -0.28 and 7d 8T -0.06 were negative — a literal read would have promoted a decaying cell to WINNER_CELLS_VALIDATED",
-      "expected_impact": "prevents literal-read false promotes",
-      "category": "measurement hygiene",
+      "date": "2026-11-17T00:51:12Z",
+      "idea": "days-limb calibration study: across all past shadow_tag_join/disposition reads, does the 2/3-positive-days limb add discrimination beyond the net>=X limb?",
+      "rationale": "This batch: standalone n/net PASS + days FAIL; short-regime n/net PASS + days FAIL (8/13); setup n PASS + net/days FAIL. If days-limb never changes a verdict net-limb wouldn't, propose amending future thresholds to net+LOO only (CEO)",
+      "expected_impact": "cleaner pre-registrations; fewer near-miss disputes",
+      "category": "governance",
       "status": "suggested",
       "risk": "low"
     },
     {
-      "date": "2026-11-16T20:51:06Z",
-      "idea": "Report freq_deviation ratio alongside WR when adjudicating any disable-shadow",
-      "rationale": "rate and quality are orthogonal: hl_copy is 3.73x over-fire AND 26.7% WR — the disable counterfactual (hl-copy-plus, due 11-30) should see both axes",
-      "expected_impact": "better-informed shadow verdicts",
-      "category": "shadow adjudication",
+      "date": "2026-11-17T00:51:12Z",
+      "idea": "jup-atrsl drift watchdog steer: if [JUP-SHADOW-ATRSL] db!=fix count >=5 in rolling 7d, emit auto_executable=false steer 'write-path sync owed'",
+      "rationale": "stream exists, deadline-driven only (registry note: zero-event auto-KILL cannot fire); drift 59/70 would have surfaced weeks earlier with a steer",
+      "expected_impact": "faster main-session pickup of the SL write-path bug",
+      "category": "observability",
       "status": "suggested",
-      "risk": "low"
-    },
-    {
-      "date": "2026-11-16T20:51:06Z",
-      "idea": "Arm-axis pre-reg (#194 creative #2) first qualifier found: hl_copy_trader (14d n=15 arm 33.3% net -0.30)",
-      "rationale": "screen executed fresh; qualifier FAILS its own p<0.05 bar (fisher p=0.185 vs rest) and collides with CEO's in-flight hl-copy-plus-shadow",
-      "expected_impact": "documents why no dampen shipped",
-      "category": "entry quality",
-      "status": "rejected-with-data",
       "risk": "low"
     }
   ],
   "config_changes_applied": [],
-  "disposition_changes": [
-    {
-      "id": "exitstack-day-kpi-1114",
-      "action": "open -> done",
-      "result": "BAR MET: trailing-30 avg_loser -0.0687 (bar <= -0.070) PASS + 14d unarmed -9.63 vs -13.81 baseline PASS (both OR-legs); no revert flag"
-    },
-    {
-      "id": "amplify-jup-short-high-cell",
-      "action": "open -> done",
-      "result": "NO-SHIP: sign-flip 14d -0.28 / 7d -0.06 vs 30d +0.09"
-    },
-    {
-      "id": "hl-copy-plus-shadow",
-      "action": "evidence appended",
-      "result": "freq-ratio 3.73x + arm-axis p=0.185 context for 11-30 adjudication"
-    }
-  ],
   "changes_from_last_run": [
     {
-      "change": "#270 exposure KPI in watchdog.json",
-      "verified": "PASS — exposure{hours:24, in_market_pct:11.8, trades:12} present at 20:38Z (was 32.8% at 12:51; exposure dropped as market went quiet)"
+      "change": "exitstack-day-kpi-1114 DONE BAR MET",
+      "verify": "RECHECK PASS: trailing-30 post-11-14 avg loser -0.0687 vs bar -0.070 still holds"
     },
     {
-      "change": "#270 COPY-STALE <5s guard in close_paper_position",
-      "verified": "PASS — 3/3 post-fix <5s phantoms logged (17:44, 18:27, 18:29Z, all ZRO hl_copy) exactly as designed; log-only, zero behavior; phantoms netted +0.05"
+      "change": "amplify-jup-short-high-cell NO-SHIP closed",
+      "verify": "no reopen; jup HIGH SHORT cell not re-proposed"
     },
     {
-      "change": "#270 entry_feature_split selfcheck sample-shrink drift",
-      "verified": "still open (carried)"
+      "change": "freq-orphan MED retracted",
+      "verify": "error_alerts.md still flowing (consumer chain intact)"
     },
     {
-      "change": "#270 'stop-tighten-slippage-column OVERDUE 14th' HIGH side-find",
-      "verified": "RESOLVED by main-session 11-16: trades.exit_slippage_pct GENERATED column live, atr_sl_hit 30d avg 0.1093% n=110 reproduces disposition note exactly"
+      "change": "exposure KPI added",
+      "verify": "PASS present: watchdog.json exposure {24h, 10.9% in-market, 11 trades}"
     }
   ],
-  "watchdog_steers": [
-    {
-      "id": "steer-001",
-      "title": "ai-trader-pending 3 consecutive losses, net -0.18 over 20",
-      "action": "REPORTED, not executed — CEO manual pending orders (all 48h losses are manual_sl_hit). 14d 34T 32.4% but NET +0.14 (one +0.72 manual_tp). auto_1hr: 14d NORMAL 27T 40.7% +1.12 wins -> keep. CEO domain."
-    }
-  ],
-  "losing_autopsy": {
-    "method": "recovery_replay adverse-first, --selfcheck exit=0",
-    "window_48h": "n=20 losers = 3 never-adverse / 14 recovered-after-adverse / 3 NEVER (HYPE jup SHORT -0.12, ALGO atr-trend- -0.11, ZRO hl_copy -0.01) = 15.0% structural",
-    "verdict": "WRONG-SIDE REFUTED 122nd consecutive run (#61 opposite-side p=0.116, #84 forward-return t=-0.04)",
-    "giveback_note": "13/20 recovered = exit-side, not entry-side; hl_copy armed givebacks (mfe 2.5-3.7% -> hard_max_loss) already owned by amplify-xmirror-giveback due 11-18"
-  },
-  "signal_deep_dive": {
-    "sub_50_n_ge_15_14d": [
-      {
-        "signal": "hl_copy_trader",
-        "n": 15,
-        "wr": 26.7,
-        "net": -0.3,
-        "arm": 33.3,
-        "verdict": "HOLD — CEO hl-copy-plus-shadow live since 11-16; arm-axis fisher p=0.185 fails bar; 3/15 are <5s phantoms; cells n<20"
-      },
-      {
-        "signal": "ai-trader-pending",
-        "n": 34,
-        "wr": 32.4,
-        "net": 0.14,
-        "verdict": "CEO domain, net positive"
-      }
-    ],
-    "new_kill_candidates": 0
-  },
   "amplify_weekly": {
+    "screen": "30d n>=10 net>0 cells: ai-trader NORMAL SHORT / bb-squeeze+ NORMAL / vb- HIGH / pc- NORMAL LONG / atr-trend- NORMAL / jup HIGH — ALL already carry open amplify entries",
     "new_proposals": 0,
-    "why_not": "all 6 n>=10 net>0 30d cells already carry open amplify entries (ai-trader-pending NORMAL SHORT, bb-squeeze+ NORMAL LONG, vb- HIGH SHORT, pc- NORMAL LONG via watch-contrarian-live, atr-trend- NORMAL SHORT, jup HIGH SHORT); early n=5-9 cells covered (pcv6, warrior-sr, r2v2-long3, jup FLAT LONG) or below +0.10 (continuum+ +0.08, hl_copy EXTREME +0.07, continuum-trend+ +0.01). One entry SERVED this run: amplify-jup-short-high-cell closed NO-SHIP with sign-flip data.",
-    "flip_kpi": "0 shadow->live conversions 11-10..11-16. Why: the 3 candidate shadows (long-rsi-floor30, hl-copy-plus, hotset-pin) all SHIPPED 11-16 with deadlines 11-20/11-30 = too early; exitstack KPI (due 11-17) closed PASS this run; fade-ctx-exempt converted 11-09 20:55Z = 7d1h before now, just outside the window.",
-    "cells_screened": "30d n>=10 net>0: 6/6 covered | n>=5 early: 8, 4 covered 4 below bar"
-  },
-  "readiness": {
-    "open_trades": 0,
-    "regime": "watchdog 20:38Z: btc_15m NEUTRAL / btc_4h SHORT_BIAS / continuum ABOVE / vol LOW / zscore POS / velocity SLOW / market_phase DECLINING / trend_quality STRONG_UP — mixed, chop pin stands",
-    "stance": "FLAT is correct. No fresh counter-trend entries; trail-family first; size 1.0x (vacation_size_reduce absent = 1.0x). LONGs only on sustained 15-30m reclaim WITH volume; SHORTs only under EMA300 with 4h aligned.",
-    "last_trade": "ZORA bb-squeeze+ LONG #16950 closed 20:44:34Z profit-monster-trail +0.02, mfe 0.551 armed, held 13.4m — trail family won again"
+    "why_not": "every qualifying cell covered by in-flight entry (deadlines 11-18..11-22); early n=5-9 cells covered (warrior, r2v2) or rejected (pc- SHORT contradicts live 64.6% fade); jup HIGH closed NO-SHIP #271",
+    "flip_kpi": 0,
+    "flip_kpi_why": "no shadow cleared a ship bar this week (13-deadline batch all failed/default); fade-ctx-exempt converted 11-09 = 7d3h ago just outside trailing-7d"
   },
   "next_actions": [
-    "11-17: jup batch (atr_sl owns 15T -1.99 of #1 bleed) + 12 due-11-17 shadow dispositions (jup-trail, jup-atrsl, short-regime-exempt, flip1-bear-reshadow, bear-single-source, volgate-short-exempt, maxxed-short-exempt, long-bypass-regime, jup-cluster-gate, jup-anti-chase, jup-pro-selection, btc-standalone-deny, setup-recall)",
-    "11-18: watch-contrarian-live + amplify-xmirror-giveback + amplify-jup-long-flat-cell + amplify-grind-breakout-underdeploy + amplify-pcfade-windowfix",
-    "11-19/20/21/22 batches unchanged",
-    "11-30: hl-copy-plus-shadow adjudication — report freq-ratio 3.73x alongside WR (context appended this run)",
-    "CEO: slippage BUILD #1 CLOSED (shipped 11-16) — no longer owed | LONG arm tripwire (7d 49-52% borderline) still CEO-flagged from #266/#269 | NET-KPI pending"
+    "11-18: watch-contrarian-live + xmirror-giveback + jup-long-flat + grind-breakout-underdeploy + pcfade-windowfix dispositions",
+    "11-19/20/21/22 batches (storm-confl-waiver, vb-high, warrior, compaction-stale, hotset-pin, bbsqueeze-rsi-reband, cell-conf-tilt, jup-short-walk, pcv6, prearm-breakeven, r2v2-clonehunt, short-rsi-ceiling-85, slope-jup, structure-flip, atrtrail-clip-12, ai-trader-cell)",
+    "CEO escalations: (1) jup-atrsl write-path sync (db!=fix 59/70, extended 12-01) (2) jup-pro-selection margin>=$1k zero trades selection gap (3) flip1 NO-GO supersedes early-read GO — stay blocked",
+    "main-session: none — 0 config changes this run"
   ]
 }
