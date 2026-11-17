@@ -28506,3 +28506,31 @@ BY: auto_1hr
 - Unarmed WR 44% negative vs armed 100% — stall stack owns fix
 - storm-confl-waiver bar 0/3 with deadline 2026-11-19
 BY: auto_1hr
+
+## 2026-11-17 12:52 Hourly Analysis
+
+**Trades:** 1 closed (1 wins, 0 losses), 1 open (ZORA bb-squeeze+ LONG)
+**PnL:** $0.04 (hour) | 24h 17T 70.6% $0.39 GREEN | 7d 110T 49.1% $0.01 FLAT — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** no storm — window-min +0.17% / at-run +0.22% (both inside gate)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 1 close (SOL bb-squeeze+ LONG trail_arm_timeout '+0.04' '+0.99%'), 1 open
+- Kill check: no 0%/3+T signal (1h n=1 max; ai-trader-pending 24h 1T 0% n<3 but 14d 34T 32.4% '+0.14' with NORMAL 27T 40.7% '+1.12' wins -> keep)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 0/17 = 0% of 24h closes (<40%); exits trail 7 / trader_exit 4 / hard_max_loss 2 / mfe_exit 2 / manual_sl_hit 1 / trail_arm_timeout 1 — tpsl_utils deployed
+- Boost: none eligible — no signal n>=5 in 24h (max hl_copy_trader 4T 50% '+0.03', atr-trend- 4T 50% '-0.07')
+- Arm rate: unarmed 9/17 = 52.9% (below 70%) WR 44.4% '-0.12' NEGATIVE vs armed 8/8 100% '+0.51' — report only, stall stack owns fix, no new gate
+- Neg streak: 09h +0.04, 11h +0.06, 12h +0.04 — no negative hours in 6h -> no size cut
+- Frequency: 1 close/hr — well under 20
+- Winners |exit-entry| 0.344% avg / 0.954% max 24h — entry quality OK
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d $0.01 FLAT vs 24h $0.39 GREEN — chop, edge thin
+- Unarmed WR 44% negative vs armed 100% — stall stack owns fix
+- storm-confl-waiver bar 0/3 with deadline 2026-11-19
+BY: auto_1hr
