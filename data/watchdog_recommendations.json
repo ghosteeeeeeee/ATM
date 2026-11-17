@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-16T20:38:36.765118+00:00",
+  "timestamp": "2026-11-17T07:08:41.405540+00:00",
   "steers": [
     {
       "severity": "warning",
@@ -12,18 +12,22 @@
   ],
   "portfolio_health": "good",
   "regime": {
-    "btc_15m": "LONG_BIAS",
-    "btc_4h": "SHORT_BIAS",
-    "continuum": "ABOVE",
+    "btc_15m": "SHORT_BIAS",
+    "btc_4h": "LONG_BIAS",
+    "continuum": "BELOW",
     "volatility": "LOW",
     "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
     "acceleration_state": "NEGATIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.75,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "RECOVERY",
-    "trend_quality": "UP"
+    "linreg_alignment": 0.5,
+    "wyckoff_phase": "MARKDOWN",
+    "market_phase": "DECLINING",
+    "trend_quality": "STRONG_UP"
   },
-  "open_count": 1
+  "open_count": 0,
+  "deep_analysis": "Market: BTC 64.3k trading BELOW continuum EMA300 for 58 consecutive minutes (zscore -2.9 STRONG_NEG, trend_quality STRONG_DOWN), yet 4h regime says LONG_BIAS and market_phase=RECOVERY \u2014 sources disagree; 15m aggregate is SHORT_BIAS (54 short / 7 long / 66 neutral) and auto_trader scores CHOP. BTC 15m direction flipped 28x in 24h (>=26 = p95 unusually unstable tape); aggregate 19 flips is normal (p50). Any direction-flavored steer must re-test its condition next cycle \u2014 snapshot prose is cheap on this tape.\n\nOpen trades: ZERO. The 1 position in this snapshot (CFX SHORT, atr-trend-, entered 05:27 at meta_rsi 65.7) closed at 06:41 via profit-monster-trail for +$0.11 with MFE 1.24% \u2014 the trail family working exactly as designed. Book is flat; regime alignment check: N/A with no exposure, and flat is the correct posture in a CHOP/unstable tape. No 2%+ / 5%+ / 8h+ open-trade rules apply this cycle.\n\nChop-bleed share KPI (dollar-share measure, NULL mfe = 0 in all windows): 7d 83.3% (43 of 50 loser-dollars from never-armed entries, net -$0.22), 14d 88.0% (92/105, -$1.41), 30d 90.8% (259/299, -$5.14) vs 2026-10-25 baseline 84.1/85.6/80.6 \u2014 the 30d share has climbed 10.2pt and is approaching the 92% entry-quality tripwire. Same-day arm rate 0.0% (0 of 4 closes; companion reading only, not a forecast). Ownership is still ENTRY (never-armed chop entries), not exit giveback \u2014 if 7d crosses 92%, route to entry-quality gates for the brain auditor, not to trail/exit tuning.\n\n24h loss pattern (5 losers): STX + ALGO atr-trend- SHORTs opened 03:12, both hard_max_loss at 03:28 with MFE <0.10 (never armed), meta_rsi 63.2/63.6 \u2014 entered mid-chop with zero follow-through, stopped in 16 minutes. BTC ai-trader-pending picks at RSI extremes all manual_sl_hit (LONG@84.6 overbought, SHORT@30.9/30.8 oversold). The WINNING side in the same window: atr-trend- shorts WITH follow-through (CFX zscore 1.90 rode -1.24% MFE to trail exit; AIXBT RSI 58.3; MNT RSI 61.7) and mid-band longs (SOL jup_yolo RSI 47-54). Same RSI band ~63 \u2014 the difference between STX/ALGO and CFX was momentum at entry (zscore/velocity), not RSI. We were on the wrong side of STX/ALGO because we shorted into a tape that immediately bounced against us; the winning side was long-the-dip / stand aside.\n\nSteer-001 (ai-trader-pending 3-loss streak) stands: 34T 32.4% WR, +$0.14 lifetime \u2014 losers cluster at RSI>80 longs and RSI<35 shorts. AI_TRADER_ENABLED=False since 2026-10-19, so no new automated exposure; condition for re-issue: only arm picks with pick-RSI in the 45-60 band.",
+  "agent_timestamp": "2026-11-17T06:46:10.549994+00:00",
+  "regime_context": "Regime sources DISAGREE this cycle \u2014 quote the source with any direction call: 15m aggregate SHORT_BIAS (54S/7L), BTC 15m SHORT_BIAS, BTC 4h LONG_BIAS, continuum BELOW EMA300 (58m run), market_phase RECOVERY, auto_trader CHOP (score long -40 / short 0 -> BRACKET). Flip-rate: aggregate 19/24h (normal, p50~19-20), BTC 28/24h (>=26 = p95 unusually unstable). Default wording is condition-based: any long/short bias steer must state its trigger (e.g. 'while BTC 1m holds below continuum EMA300') and be re-tested next cycle. Flat book + unstable tape = stand aside or precheck-passing setups only; no regime-flavored urgency this cycle.",
+  "pattern_alerts": "VERIFIED (PostgreSQL, this cycle):\n\n1) atr-trend- SHORT never-armed bleed \u2014 14d: 33T, 60.6% WR, -$0.42; ALL 12 losers had mfe_pct<0.40 (12/12 never armed). Today: STX + ALGO, both hard_max_loss in 16min at meta_rsi ~63, MFE ~0.09. n=2 today, family live (ATR_TREND_ACCEL_MINUS_ENABLED=True, traffic >0 in 7d \u2014 NOT a dead signal). WINNING side: same signal WITH entry momentum (CFX zscore 1.90 -> +1.24% MFE trail exit +$0.11). Why we were on the wrong side of STX/ALGO: shorts fired into a bounce with no velocity follow-through \u2014 chop entry, not a trend short. Action: require zscore/velocity confirmation before counting atr-trend- shorts as setups; do NOT disable the family (its winners are the trail family).\n\n2) ai-trader-pending RSI-extreme wrong-side entries \u2014 LONG@RSI 84.6 (-3.5%), SHORT@RSI 30.9/30.8 (-3.3%/-2.9%) all manual_sl_hit; mid-band entries historically carry the +$0.14 lifetime. n=3 extreme-RSI losers in 24h. WINNING side: BTC mean-reversion / the opposite direction of the extreme pick. AI_TRADER_ENABLED=False (CEO 2026-10-19) \u2014 watchlist-only path, no kill proposal; steer-001 already covers the streak.\n\n3) Chop-bleed 30d dollar-share 90.8% vs 80.6 baseline (2026-10-25) \u2014 trending toward the 92% entry-quality tripwire. 7d 83.3% / 14d 88.0%, NULL mfe 0 everywhere, same-day arm 0% (companion only). This is an ENTRY-quality drift, not an exit problem \u2014 hold for brain auditor only if 7d crosses 92%."
 }

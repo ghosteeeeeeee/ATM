@@ -376,6 +376,23 @@ def validate_levels(side: str, entry: float, sl, target, signal: str = None) -> 
                          f"0/None is only an ATR-deferral sentinel for "
                          f"non-managed adds")
 
+def _fill_time_rsi(token: str):
+    """Fill-time rsi_14 for the SHORT money gate when the caller attested nothing.
+
+    brain_auditor #273 (2026-11-17): trade_watchdog's pending fills pass no
+    --signal-rsi-14 / --signal-metadata-json, so the floor check ran with
+    _rsi_chk=None and skipped — while #117's backfill (which stamps the RSI)
+    runs AFTER the check. Measured leak: 21/21 knife-zone (<35) SHORT fills
+    in 30d are ai-trader-pending, all meta_source=brain_add_entry_backfill,
+    net -$0.57 (BANANA lesson unenforced on this path). Fail-open on error
+    (same behavior as pre-fix when enrichment is unavailable)."""
+    try:
+        from signal_schema import _enrich_indicators
+        rsi = (_enrich_indicators(token) or {}).get('rsi_14')
+        return float(rsi) if rsi is not None else None
+    except Exception:
+        return None
+
 def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float,
                exchange: str = "Hyperliquid", strategy: str = None, paper: bool = False,
                stop_loss: float = None, target: float = None, server: str = "Hermes",
@@ -458,6 +475,17 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                         signal_metadata = None
                 if isinstance(signal_metadata, dict):
                     _rsi_chk = signal_metadata.get('rsi_14', signal_metadata.get('rsi'))
+            if _rsi_chk is None:
+                # #273: un-attested fill (pending/manual pass nothing) — enrich
+                # fill-time RSI so knife/floor apply on EVERY path. Stored
+                # metadata is untouched here (#117 backfill below still owns it).
+                _rsi_chk = _fill_time_rsi(token)
+                if _rsi_chk is None:
+                    # bug_hunter #273 MEDIUM: enrichment miss (sparse candles)
+                    # fails open — make the hole visible instead of silent.
+                    print(f"[brain.py] ⚠️ {token} SHORT money gate: no RSI "
+                          f"(caller+metadata empty, enrichment empty) — "
+                          f"gate SKIPPED fail-open")
             if _rsi_chk is not None and float(_rsi_chk) < _floor:
                 _rsi_chk = float(_rsi_chk)
                 if _rsi_chk < OVERSOLD_SHORT_RSI_MAX:
@@ -1399,6 +1427,18 @@ if __name__ == "__main__":
         _clu = _src.index('_cluster_size = 1')
         assert _floor < _bf < _clu, \
             f'backfill out of order: floor={_floor} backfill={_bf} cluster={_clu}'
+        # #273: un-attested-fill enrichment must feed the knife comparison
+        # (runs after RSI resolution, before the < _floor test) — the exact
+        # gap that let 21 knife-zone pending SHORTs through in 30d. Exact
+        # assignment literal (bug_hunter MEDIUM): a discarded `_ = ...` call
+        # would keep index order true while leaving the gate bypassed.
+        assert '_rsi_chk = _fill_time_rsi(token)' in _src, \
+            '#273 enrichment not assigned into _rsi_chk — gate dataflow broken'
+        _enr_call = _src.index('_fill_time_rsi(token)')
+        _knife = _src.index('float(_rsi_chk) < _floor')
+        assert _floor < _enr_call < _knife, \
+            f'#273 gate enrichment out of order: floor={_floor} enr={_enr_call} knife={_knife}'
+        assert _fill_time_rsi('BTC') is not None, '_fill_time_rsi(BTC) gave no rsi'
         _blk = _src[_bf:_src.index('Step 1: Pre-flight checks', _bf)]
         # strip comments first — the block comment legitimately names both keys
         _blk_code = '\n'.join(l.split('#', 1)[0] for l in _blk.splitlines())
