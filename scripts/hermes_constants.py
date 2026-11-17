@@ -290,7 +290,9 @@ BROAD_MARKET_TOKENS = {'SOL', 'BTC', 'ETH', 'DOGE', 'XRP', 'ADA', 'AVAX', 'DOT',
 # Proven performers — high WR + profitable + decent sample.
 # Cross-check: no token in SHORT_BLACKLIST or LONG_BLACKLIST.
 # AUTO-UPDATED daily by favorites_updater.py.
-FAVORITES_LONG = set()
+FAVORITES_LONG = {
+    'ZRO'
+}
 FAVORITES_SHORT = {
     'CC', 'BANANA', 'SAND', 'AVNT', 'PUMP'
 }

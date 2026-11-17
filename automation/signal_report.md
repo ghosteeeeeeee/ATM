@@ -1,9 +1,9 @@
 # Signal Performance Report
-**Generated:** 2026-11-17 01:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-17 19:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,842 | **WR:** 51.3% | **PnL:** -119.65%
-- **Date range:** 2026-07-29 → 2026-11-16
+- **Total trades (all time):** 3,858 | **WR:** 51.3% | **PnL:** -120.49%
+- **Date range:** 2026-07-29 → 2026-11-17
 
 ---
 
@@ -21,7 +21,11 @@ None found.
 
 ## MARGINAL (30-50% WR)
 
-None found.
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| atr-trend- | SHORT | 4 | 50.0% | -0.61 | ❓ | Needs more data |
+| jup_yolo_mirrored | LONG | 2 | 50.0% | -0.58 | ❓ | Needs more data |
+| r2v2-long3 | LONG | 2 | 50.0% | -0.24 | ❓ | Needs more data |
 
 ---
 
@@ -39,6 +43,9 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
+1. **[WATCH] atr-trend- SHORT** — WR=50.0%, PnL=-0.61% over 4 trades. Monitor next cycle.
+2. **[WATCH] jup_yolo_mirrored LONG** — WR=50.0%, PnL=-0.58% over 2 trades. Monitor next cycle.
+3. **[WATCH] r2v2-long3 LONG** — WR=50.0%, PnL=-0.24% over 2 trades. Monitor next cycle.
 
 ---
 
@@ -57,6 +64,5 @@ None found. Top performers are already enabled.
 | 2026-11-13 | 114711f | SL placement fix (CEO 2026-11-13): structure-widened guardia... |
 | 2026-11-13 | 919f4d5 | scripts: brain_auditor #257 — DEMOTE contrarian pc- fade (CO... |
 | 2026-11-13 | 6034708 | scripts: fire winner-cell size REVERT 1.25->1.0 (registered ... |
-| 2026-11-10 | b4b7322 | memory: hourly analysis 2026-11-10 17:22 — storm packet (win... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

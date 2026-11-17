@@ -1450,3 +1450,28 @@ Rotating Q (idx 10 = "new signals this week?"): 0 SHIPPED (matches 15381Z run), 
 ### Numbers: 24h 15T 0.00 53.3% | 7d 111T -0.24 48.6%
 ### Findings: clean — disk 85% WARN (repeated), 8 decision items due ≤24h (11-18 batch); proactive Q "best signal": jup_yolo_mirrored LONG 6T +0.63 100% / ai-trader-pending SHORT 26T +0.52 42.3% (net-positive despite low WR); 7d flat at -0.24
 ### Recommendation: none — status run only; disk cleanup + slippage-column BUILD #1 still overdue
+
+## CEO Status — 20261117T073819Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 15T 0.18 60.0% | 7d 108T -0.11 48.1%
+### Findings: clean — disk 85% WARN (repeated, 3rd alert today); 8 decision items due 11-18 (T-1 batch); proactive Q "which signal is best" (17%14=3): jup_yolo_mirrored 19T +0.27 68.4% tops 7d pnl, then ai-trader-pending 28T +0.21 (35.7% WR, net-positive); 7d essentially flat at -0.11
+### Recommendation: none — status run only; disk cleanup + slippage-column BUILD #1 still overdue
+
+## CEO Status — 20261117T113819Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 16T +0.35 68.8% | 7d 109T -0.03 48.6%
+### Findings: clean (alerts only: disk 85% WARN, 2x mirror_open OI-cap rejects — both non-blocking). Proactive Q "which signal is best?" (17 mod 14=3): 7d best by PnL = ai-trader-pending SHORT 24T +0.48 (WR 37.5% = payoff-driven, already in amplify queue due 11-22); top WR = jup_yolo_mirrored LONG 5T +0.58 100%.
+### Recommendation: none — exitstack formal read due today per queue; disk at 85% worth a cleanup check this week.
+
+## CEO Status — 20261117T153819Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 20T +0.43 65.0% | 7d 112T +0.44 49.1%
+### Findings: clean — 7d flipped back to flat-positive (-0.03 at 11:38Z → +0.44 now); alerts are warnings only (freq-dev bb-squeeze+, BTC-level/momentum blocks, 2x OI-cap mirror reject). Control tower: 0 overdue, 8 due≤24h (all 11-18). Proactive Q "which signal is best?" (17 mod 14=3): 7d best by PnL = ai-trader-pending +0.53 (n=26, WR 34.6% = payoff-driven, not a WR finding; amplify cell due 11-22); best WR = jup_yolo_mirrored 66.7% n=18 +0.20.
+### Recommendation: none — exitstack formal read due today per queue; disk 85% WARN from 11:38Z still worth a cleanup check this week.
+
+## CEO Status — 20261117T193820Z
+### Health: pipeline=active (timer oneshot, running 19:39Z) guardian=active open_pos=0
+### Numbers: 24h 19T +0.04 57.9% | 7d 114T -0.01 47.4%
+### Findings: clean — errors are all expected momentum-block/hard-floor/override lines, no tracebacks; 0 open positions, flat is correct per chop-pin regime.
+### Proactive (rotating: best signal, 17%14=3): 7d best by PnL among n>=5 = ai-trader-pending SHORT 21T +0.75 (38.1% WR, payoff-positive — WR alone misleading) and jup_yolo_mirrored LONG 6T +0.42 (83.3% WR). Worst = atr-trend- SHORT 29T -0.63 — already owned by registered dispositions, no action.
+### Recommendation: none

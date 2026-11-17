@@ -23,7 +23,7 @@
       "notes": "Do NOT cite raw shadow n without dedup (#239 pseudo-replication). Signal uses atr exit management (:2357)."
     }
   ],
-  "updated": "2026-11-17T00:50:04Z",
+  "updated": "2026-11-17T16:50:00Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -776,15 +776,15 @@
       "id": "watch-contrarian-live",
       "stream": "CONTRARIAN-LIVE pump-chain- fade real-trade watch — PostgreSQL brain trades (pc- LONG opens since started)",
       "kind": "watch",
-      "disposition": "EXTEND 7d to 2026-11-18 — deadline adjudicated 2026-11-11 (brain_auditor #246): kill gate NOT triggered, promote gate still unmet on fees",
+      "disposition": "EXTEND 7d to 2026-11-25 — adjudicated 2026-11-17T16:50:00Z (brain_auditor #273): kill gate NOT triggered (38 REAL pc- LONG fills since 10-27, WR 39.5%, gross $0.000); promote gate still unmet on fees (fees json net -$0.209 over 38T, fee_total $0.395 = structurally fee-negative at $11.10 notional). Z-FLIP check remains near-vacuous (BUG-078).",
       "status": "open",
       "started": "2026-10-27",
-      "deadline": "2026-11-18T00:00:00Z",
+      "deadline": "2026-11-25T00:00:00Z",
       "threshold": "bar: >= 1 REAL fade trade (pc- LONG open since started) + Z-FLIP conversion check at the 11-03 dispo",
       "progress_eval": "contrarian_live",
       "default_action": "report-only: if still 0 real trades at deadline, either extend watch 7d with evidence or disable CONTRARIAN_LIVE_PREFIXES (CEO) — do NOT leave it drifting unwatched",
       "owner": "main-session",
-      "evidence": "fresh 2026-11-04 (registry progress_eval SQL): n=32 real pc- LONG fills, gross +$0.130, fees $0.335, NET -$0.205, WR 45.2% (14W/17L/1fl) vs pre-fade baseline 13T 38.5% (+6.7pp directional). Conversion: 178 CONTRARIAN-LIVE approvals (33 tokens) -> 22/33 tokens filled = 66.7%; 0 Z-FLIP skips BUT that check is near-vacuous (96.6% of pc- signals carry z<0, LONG branch needs z>0 — see BUG-078). Promote gate (NET>=0) unmet: avg gross +$0.0041/trade < fee $0.0108/trade = structurally fee-negative at current size -> fade-size/fee review at 11-10/11-11. Kill gate (0 fills) not triggered. NOTE: prior evidence_20261103 (n=33/NET-0.37/baseline 27.3% n=22) did NOT reproduce — superseded by these numbers.",
+      "evidence": "fresh 2026-11-17T16:50:00Z: PG signal LIKE pump-chain-% AND direction=LONG AND open_time>=2026-10-27 => n=38, WR 39.5%, gross pnl_usdt 0.000, fees net -0.209. Contrarian join 16:31Z: pc- flip-WR 66.7% n=102 STABLE (fade edge holds in shadow). Prior evidence 11-11 (n=32, NET -0.205).",
       "notes": "migrated from brain/trial_tracking_dashboard.md (archived 2026-10-31). Pairs with done entry flip-contrarian-pc (its notes carry the same 11-03 watch). | progress_eval 'contrarian_live' counts PG pc- LONG opens since 'started' (review HIGH-1: old log-grep path logs/decider*.log never existed; logs rotate, approved != executed). | 16:30Z refresh: fade cooled to +0.07 (22T) — still positive; 11-03 disposition judges (extend-to-11-10 rec stands). | 11-11 deadline adjudicated: EXTEND to 11-18 (brain_auditor #246). | #263 2026-11-14T20:52:56Z: pc- overall flip 55.7% (196/352) still <58 re-promote bar; NEW tape-split pre-registered — pc-|BTC-BELOW 62.0% n=213 vs AT 43.2% n=111 vs ABOVE 57.1% n=28 (join by_regime); overall swing 49.0->54.3->55.7 in 8h = tape-compositional. Re-promote review MUST inspect the tape split (and per-token heterogeneity chi2 p=0.0032) alongside the overall >=58 bar. Token heterogeneity: per-token never blanket. | #266 2026-11-15T16:45Z: JOIN WINDOW BUG FIXED — contrarian_outcome_join.classify() read retention-floor candles for any row older than candles.db 30d retention (first-candle gap 2.5h-71h), so outcomes rewrote themselves every time the floor slid. 246/352 pc- decided rows were contaminated TODAY. Clean re-read with WINDOW_SLACK_S=1800 guard: pc- flip-WR 65.1% (69/106), halves 67.3%/63.2% = ABOVE the 58 re-promote bar; pc-|BTC-BELOW 80.6% n=62 / AT 37.5% n=40 / ABOVE 100% n=4. Prior reads 64.6% (Oct-27..Nov-11) were CLEAN (floor predated pc- start); the 11-13 demote read (52.9%) and #263 'tape-compositional' swing happened exactly as the floor crossed the Oct-13..16 rows = CONTAMINATION not tape composition. 11-18 review MUST use the fixed script. NOTHING auto-changes: re-promote still needs CEO/T sign-off AND the fee hurdle is unchanged (live fade NET -0.245 at $11.69 notional).",
       "evidence_20261101": {
         "pc_long_since_1027": "9T +0.31 WR 44.4% (cooled from 11T +0.45)",
@@ -1218,14 +1218,15 @@
       "stream": "T1 exact-mirror giveback ceiling — position_manager skips ALL engines for is_exact_mirror_trade (position_manager.py:3037-3074), so +MFE round-trips to the -0.80% catastrophic floor are allowed by design",
       "kind": "amplify",
       "proposal_type": "(a) param-widen/ceiling counterfactual on a measured behavior (shadow-first, T/CEO sign-off required — T directive 2026-10-31 'their exits are our exits' is the standing constraint)",
-      "status": "open",
+      "status": "done",
       "created_at": "2026-11-04T04:50:00Z",
       "deadline": "2026-11-18T00:00:00Z",
       "owner": "brain_auditor weekly AMPLIFY run #219",
-      "evidence": "2026-11-04 autopsy: 3/11 hl_copy 14d trades are T1 exact-mirror (stop_loss/target NULL by PM clear) — FARTCOIN mfe_pct +3.64 -> hard_max_loss -3.71% pnl, XPL +3.68 -> -2.90%, ETH +0.39 -> -4.19%; all 3 exited 'exact-mirror catastrophic floor pnl<=-0.80%'. Every other signal 14d: 0/417 NULL SL. The giveback ceiling is the only lever that does not touch the pro-exit race. jup HML bleed context: 22T -$3.20 all born post-10-30 (separate lever, STOP_TIGHTEN scope already covers jup).",
+      "evidence": "closed 2026-11-17T16:50:00Z. grep XMIRROR-GIVEBACK-SHADOW scripts/*.py = 0; logs/pipeline.log = 0. Reopen only if T/CEO explicitly requests the ceiling leg (then build collector first).",
       "threshold": "SHADOW ONLY first: log [XMIRROR-GIVEBACK-SHADOW] when peak MFE >= +1.50% price then gives back to <= +0.50% (i.e. locked-in giveback >= 1.00%) while is_exact_mirror_trade — count would-exit vs hold-to-floor outcome on the SAME candles (units guard: price-move% x notional, never pnl_pct). SHIP bar: n>=15 shadow events AND would-exit net > hold-to-floor net by >= +$0.50/14d AND T directive re-affirm (T/CEO sign-off — this overrides 'their exits are our exits' for the ceiling leg only).",
       "default_action": "NO CHANGE — T1 mirror stays floor-only; report why-not if n<15 at deadline",
-      "measurement": "shadow counterfactual in position_manager T1 branch (log-only, zero behavior), joined to PG trades mfe_pct/exit"
+      "measurement": "shadow counterfactual in position_manager T1 branch (log-only, zero behavior), joined to PG trades mfe_pct/exit",
+      "disposition": "CLOSED NO-CHANGE 2026-11-17T16:50:00Z (brain_auditor #273): why-not = [XMIRROR-GIVEBACK-SHADOW] collector NEVER BUILT (grep scripts/ = 0 hits, pipeline.log = 0 lines), so n=0 at deadline. Event class also structurally rare: #219 autopsy showed only 3/11 hl_copy 14d trades are T1 exact-mirror (2 with MFE>=1.50) and 0/417 other signals => est ~2-3 events/14d, bar n>=15 unreachable in <2 months. Ship also requires T directive re-affirm regardless (overrides their-exits-are-ours). Default honored: T1 mirror stays floor-only."
     },
     {
       "id": "daily-fill-cap-brake",
@@ -1582,13 +1583,14 @@
       "id": "hml-vol-atr-mult-shadow",
       "stream": "HML_VOL_ATR_MULT 0.5→0.35 (HML price threshold vs ATR) — SHADOW/log-only first",
       "kind": "shadow",
-      "status": "open",
+      "status": "done",
       "started": "2026-11-08",
       "deadline": "2026-11-18T00:00:00Z",
       "threshold": "HML_VOL_ATR_MULT 0.5→0.35 SHADOW/log-only first: HML cut price 0.88→0.60 for vol-tier trades; ship if HML $ over 14d drops ≥30% with fk<20% (HML fires on losers only — cannot block winners, but earlier cut = less loss per hit)",
       "default_action": "keep 0.5",
       "owner": "CEO",
-      "evidence": "CEO 20261108T180116Z: +$0.05/day estimate"
+      "evidence": "2026-11-17T16:50:00Z: PG exit_reason=hard_max_loss 14d 33T -$3.58 vs prior14d 39T -$5.29 (-32.3%); HML_VOL_ATR_MULT still 0.5 in hermes_constants.py:822; position_manager.py:4201 uses live constant, no shadow branch.",
+      "disposition": "CLOSED keep-0.5 2026-11-17T16:50:00Z (brain_auditor #273): why-not = the 0.5->0.35 variant shadow collector was NEVER BUILT (the live [HML-SHADOW] lines are the ATR_SL_MIN floor shadow from CEO 2026-10-18, a different feature; code reads HML_VOL_ATR_MULT=0.5 live with no 0.35 counterfactual). HML $ DID drop 32% (14d hard_max_loss -$3.58 vs prior14d -$5.29) but that is confounded by stop-tighten/exitstack landing in the window — cannot attribute to a mult that never shadowed. fk limb conceptually ~0 (HML fires on losers only) but unmeasurable without collector. Owner=CEO: reopen only with collector shipped."
     },
     {
       "id": "amplify-atr-trend-short-cell-watch",
@@ -1645,21 +1647,22 @@
       "stream": "atr-trend- SHORT blocked-setups clone-hunt (cell: 8T 87.5% WR +0.30, 75% arm, 14d; live since 2026-11-06)",
       "kind": "amplify",
       "proposal_type": "(c) clone-hunt: mine gate_shadow for BLOCKED atr-trend- SHORT setups + counterfactual-walk candles",
-      "status": "open",
+      "status": "done",
       "started": "2026-11-11",
       "deadline": "2026-11-18T00:00:00Z",
       "owner": "brain_auditor weekly AMPLIFY run #246",
-      "evidence": "Audit #246 screen. gate_shadow 30d: atr-trend- SHORT blocked 42 raw events, 42/42 would_win (100%), avg would_pnl +0.076, sum +3.18 — BUT token-day dedup collapses to n=5 (ETC/BABY/HYPER/BCH/WLFI, same-day multi-gate stacking: BTC-CHOP-GATE 9, SHORT-REGIME-GATE 7, CONTINUUM-BULL 6, CONFLUENCE 6). n=5 deduped << house bar n>=15. Sibling grind-breakout- SHORT CONFLUENCE-GATE-BLOCK 10 raw dedups to 2. Control: hh-hl+ blocked 0/21 would-win and continuum-trend+ blocked sum -10.51 = those gates correctly bleeding losers (do NOT exempt).",
+      "evidence": "2026-11-17T16:50:00Z: brain/gate_shadow.db 30d window, outcome_signal LIKE atr-trend-%, GROUP BY token|substr(blocked_at,1,10). Prior art #246 (n=5 aggressive dedup) and #272 (all cells in-flight) — this closes the 11-18 entry.",
       "threshold": "SHIP only if ALL: (i) gate_shadow token-day dedup (token|YYYYMMDD) blocked n>=15; (ii) would-win >=70% on deduped set; (iii) 30d 1m-candle walk on exempted events net >= +$0.50 pnl_usdt (UNITS GUARD: derive entry/exit x amount_usdt, never mix with pnl_pct); (iv) fk of would-be-loser share among exempted <20%; (v) live cell atr-trend- NORMAL SHORT 30d net stays >0 at read. Default NO SHIP — collection-only until (i) met.",
       "default_action": "NO SHIP — keep all gates global; report n at 11-18",
       "measurement": "python3 - sqlite brain/gate_shadow.db events WHERE outcome_signal='atr-trend-' AND direction='SHORT' AND blocked_at>=30d AND would_win IS NOT NULL; dedup GROUP BY token, date(blocked_at,'unixepoch'); then 1m walk via existing clone-hunt pattern (see amplify-vb-high-short-clonehunt)",
       "not_a_duplicate_of": "amplify-atr-trend-short-cell-watch (#243, due 11-16) = winner-cell promotion on LIVE fills; this = blocked-setups clone-hunt on gate_shadow. Different data source, different lever.",
-      "risk": "low (collection-only, zero behavior)"
+      "risk": "low (collection-only, zero behavior)",
+      "disposition": "NO SHIP 2026-11-17T16:50:00Z (brain_auditor #273) — 3 of 5 limbs FAIL: (i) gate_shadow 30d token|day dedup n=52 >=15 PASS (raw 295; correct dedup = GROUP BY token|day — row-level DISTINCT inflates, see creative) | (ii) would-win 36/52=69.2% (MAX-basis) / 35/52=67.3% (earliest-row) both <70% FAIL | (iii) deduped would_pnl sum +0.17 (earliest +0.06) << +$0.50 FAIL (units: would_pnl is price-move-derived shadow pnl) | (iv) fk 30.8% > 20% FAIL | (v) live cell atr-trend- NORMAL SHORT 30d +0.22 PASS. Top blocking gates: CONTINUUM-BULL 12, SHORT-RSI-HARD-FLOOR 9, PUMP-CHAIN-SHORT-HIGH 4. Keep all gates global."
     },
     {
       "id": "amplify-ugb-bypass-armgap",
       "kind": "amplify",
-      "status": "open",
+      "status": "done",
       "deadline": "2026-11-18T00:00:00Z",
       "created_by": "brain_auditor #247",
       "created_at": "2026-11-11T04:48:43.024055+00:00",
@@ -1668,31 +1671,35 @@
       "measurement": "PG: status=closed AND exit_reason='atr_sl_hit' AND COALESCE(mfe_pct,0)>=0.40 AND signal ~ any(PROFIT_MONSTER_BYPASS_SIGNALS) over 30d; 1m candle walk from mfe_price applying UGB-PT exit rule (exit when price gives back UGB_PT_DISTANCE_PCT from running peak, unarmed half only); compare realized atr_sl pnl_usdt vs walk pnl_usdt.",
       "default_action": "NO SHIP — collection + candle-walk only; report at 11-18",
       "rationale": "30d: 34 arm-gap atr_sl (MFE>=0.40, trailing_activated=False) net -$2.17; 14d atr_sl_hit overall 59T 0%WR -$6.49 is #1 bleed exit. Bypass signals (pump-chain±, ai-trader±, r2-trend, continuum-osc, hl_copy) never arm PM trail so UGB-PT excludes them by design — but they still hit +0.40% and give it all back to ATR SL. UGB-PT's +85pp/30d candle result was measured on the NON-bypass unarmed half; bypass half unmeasured.",
-      "notes": " | POOL-SIZE (brain_auditor #248, 2026-11-11T08:52Z, brain/analysis/stall_decomposition.py --selfcheck PASS): the armgap pool is the SMALL side of the two-exit bleed — 14d atr_sl_hit+hard_max_loss 103T -11.95 = stall(mfe<0.40) 96T -11.26 vs armgap(mfe>=0.40 never armed) 7T -0.69 vs armed 0T; 30d 216T -22.78 vs 37T -2.29. So this amplify can address at most ~6.8% (14d) / 16.6% (30d) of the bleed — the stall side is owned by mfe-cut/prearm-breakeven/stop-tighten/tat-neverarmed (all due 11-14) + structure-flip (11-21), and 52% of 14d stall is jup_yolo_mirrored 43T -5.91 (7 open jup evals 11-14..11-19). Adjudicate the candle-walk with this ceiling in mind: a PASS here is a narrow win, not a bleed fix."
+      "notes": " | POOL-SIZE (brain_auditor #248, 2026-11-11T08:52Z, brain/analysis/stall_decomposition.py --selfcheck PASS): the armgap pool is the SMALL side of the two-exit bleed — 14d atr_sl_hit+hard_max_loss 103T -11.95 = stall(mfe<0.40) 96T -11.26 vs armgap(mfe>=0.40 never armed) 7T -0.69 vs armed 0T; 30d 216T -22.78 vs 37T -2.29. So this amplify can address at most ~6.8% (14d) / 16.6% (30d) of the bleed — the stall side is owned by mfe-cut/prearm-breakeven/stop-tighten/tat-neverarmed (all due 11-14) + structure-flip (11-21), and 52% of 14d stall is jup_yolo_mirrored 43T -5.91 (7 open jup evals 11-14..11-19). Adjudicate the candle-walk with this ceiling in mind: a PASS here is a narrow win, not a bleed fix.",
+      "disposition": "CLOSED NO SHIP 2026-11-17T16:50:00Z (brain_auditor #273): cohort structurally below bar — 30d arm-gap atr_sl on PROFIT_MONSTER_BYPASS signals n=6 (net -$0.33, all 4 signal families) vs bar n>=20; 14d n=0. The estimated n=34 at creation (#247) does not reproduce on the literal measurement (likely counted non-bypass or pre-stop-tighten window). Candle-walk pointless at n=6/0. Keep UGB-PT design as-is.",
+      "evidence": "2026-11-17T16:50:00Z: PG exit_reason=atr_sl_hit AND mfe>=0.40 AND signal=ANY(bypass 41-signal tuple) => 30d n=6 (pump-chain+ 3, ai-trader+ 1, pump-chain- 1, hl_copy 1) net -0.33; 14d n=0."
     },
     {
       "id": "amplify-jup-long-flat-cell",
       "kind": "amplify",
-      "status": "open",
+      "status": "done",
       "due_at": "2026-11-18T00:00:00Z",
       "desc": "Early cell watch: jup_yolo_mirrored LONG FLAT 30d 8T 87.5% net +0.10 arm 2/8 — n<10 EARLY label per AMPLIFY rule",
-      "evidence": "PG 2026-11-11: signal=jup_yolo_mirrored direction=LONG volatility_regime=FLAT close_time>now-30d => n=8 net=+0.10 WR=87.5% trailing_activated=2. Sibling cells bleed (HIGH 42T -0.70, NORMAL 41T -0.41) so cell must stay regime-scoped. Prior art: jup evals due 11-17 cover cluster/anti-chase/pro-selection — this is the FLAT positive cell only, not a duplicate entry filter.",
+      "evidence": "2026-11-17T16:50:00Z: PG jup_yolo_mirrored LONG FLAT close_time>now-30d => n=8 net +0.10 WR 87.5% arm 62.5%; 14d n=2 net -0.10.",
       "threshold": "Promote to WINNER_CELLS_VALIDATED candidate only if n>=15 AND net>0 AND 30d same-sign AND arm% >= 50. If net<=0 or n<10 at deadline, close as noise. Units guard: pnl_usdt only.",
       "measurement": "PG: signal='jup_yolo_mirrored' AND direction='LONG' AND volatility_regime='FLAT' trailing 30d — n/WR/net/arm%",
       "notes": "brain_auditor #249 AMPLIFY weekly type early-cell. Due 11-18 to allow sample growth from current n=8. | DEADLINE SET 2026-11-12 (brain_auditor #252): was None — undated opens never fire a packet (tower section + root cause of 11-12 render fail class). Notes already said Due 11-18.",
-      "deadline": "2026-11-18T00:00:00Z"
+      "deadline": "2026-11-18T00:00:00Z",
+      "disposition": "CLOSED as noise 2026-11-17T16:50:00Z (brain_auditor #273): n=8 at 30d < 10 close-limb (threshold: if net<=0 or n<10 at deadline, close as noise). net +0.10 / WR 87.5% / arm 62.5% unchanged from creation — zero sample growth in 6d. 14d n=2 net -0.10 also fails promote same-sign. No WINNER_CELLS_VALIDATED candidacy."
     },
     {
       "id": "amplify-grind-breakout-underdeploy",
       "kind": "amplify",
-      "status": "open",
+      "status": "done",
       "due_at": "2026-11-20T00:00:00Z",
       "desc": "Clone-hunt/type-c: grind-breakout- shadow n=32 WR 93.8% avg +1.41 vs live all-time only 7T — underdeployment audit",
-      "evidence": "shadow_trader --report 2026-11-11 20:35Z: grind-breakout- n=32 WR=93.8% avg_pnl=+1.41 (top source). Live PG all-time: 7 closed net +0.86 WR 71.4% (30d: 3T). signals_runner includes grind_breakout/grind_breakout_v2. Pattern matches solo-bypass conversion watch (#142) and amplify-ema300-underdeploy (open).",
+      "evidence": "2026-11-17T16:50:00Z: brain/gate_shadow.db outcome_signal LIKE grind-breakout% AND blocked_at>=30d => raw 10, dedup(token|day) 2. shadow_trader --report 16:46Z: grind-breakout- n=36 WR 94.4% avg +1.29 (top source).",
       "threshold": "SHIP only if: (i) gate_shadow/log blocked-matchable n>=15 token-day deduped; (ii) would-win >=70%; (iii) 30d 1m-candle walk net >= +$0.50 pnl_usdt units guard; (iv) live fills after any exempt reach n>=10 with net>0. Else CLOSE as shadow-noise.",
       "measurement": "gate_shadow.db WHERE outcome_signal LIKE 'grind-breakout%' AND blocked_at>=30d; join signals runtime; live PG count for signal LIKE 'grind-breakout%'",
       "notes": "brain_auditor #249 AMPLIFY weekly type (c) clone-hunt/underdeploy. Not a duplicate of ema300-underdeploy (different signal). | DEADLINE SET 2026-11-12 (brain_auditor #252): was None — paired with amplify-jup-long-flat-cell same registration batch #249; 11-18 aligns with contrarian/clone-hunt reads.",
-      "deadline": "2026-11-18T00:00:00Z"
+      "deadline": "2026-11-18T00:00:00Z",
+      "disposition": "CLOSED as shadow-noise 2026-11-17T16:50:00Z (brain_auditor #273): gate_shadow 30d raw n=10, token|day dedup n=2 << bar n>=15 (threshold Else CLOSE). would-win 100% and sum +7.50 on the tiny set is not actionable. NOTE: shadow_trader source quality still top-ranked (n=36 WR 94.4% avg +1.29 this run) but the BLOCKED set that clone-hunt needs barely exists — underdeployment hypothesis unsupported by gate data. Live PG all-time 7T stands."
     },
     {
       "id": "pc-plus-weight-monitor",
@@ -1906,10 +1913,10 @@
       "proposal_type": "(a) conditional re-promote counterfactual on a validated shadow cell (tape-scoped, not blanket)",
       "status": "open",
       "started": "2026-11-15",
-      "deadline": "2026-11-18T00:00:00Z",
+      "deadline": "2026-11-25T00:00:00Z",
       "owner": "brain_auditor weekly AMPLIFY + CEO/T sign-off (CONTRARIAN_LIVE is a live flag)",
       "created_by": "brain_auditor #266",
-      "evidence": "WINDOW-FIXED join 2026-11-15T16:44Z (analysis/contrarian_outcome_join.py WINDOW_SLACK_S guard, --selfcheck PASS): pc- flip-WR 65.1% = 69/106, halves 67.3% (n=49) / 63.2% (n=57) same-sign, binomial vs 50% z=3.11 p~0.002. Tape split (clean): BTC-BELOW 80.6% n=62 / AT 37.5% n=40 / ABOVE n=4 noise. Control: btc-pump-rider+ 41.0% n=1524 = do-NOT-flip stands. The pre-fix readings (45.2% today, 52.9% at the 11-13 demote) were retention-contaminated: 246/352 pc- decided rows had their 'post-signal' window read from candles 2.5-71h later. Live control: real fade cohort since 10-27 = 37T +0.09 gross / -0.245 net (fees) — fee gate unchanged.",
+      "evidence": "join RE-RAN 16:31Z mandate: overall 46.1% n=1830 | pc- 66.7% n=102 | rider 44.7% do-NOT | het chi2 p=6e-35 per-signal only | halves computed via cjo.classify re-run 16:45Z. Cit: [calwndar 2026-10-31] fade conversion arc end-to-end, CEO labeled approval-alone null.",
       "threshold": "ALL bars before ANY live action: (i) corrected pc- overall flip-WR >=58 at the 11-18 read AND both halves same-sign; (ii) pc-|BTC-BELOW >=65% with n>=50 (the scoped cell — do NOT promote an unscoped fade given AT=37.5%); (iii) live fee gate: fade cohort NET >= 0 at $11.10-11.69 notional (currently NET -0.245 = still structurally fee-negative) OR CEO accepts fade-size/min-expected-move>2x-fee filter; (iv) CEO/T sign-off to flip CONTRARIAN_LIVE_ENABLED back to True. NO-SHIP default, shadow stays as-is until all four hold.",
       "units_guard": "flip-WR is a count ratio; live gate uses pnl_usdt vs pnl_usdt (never leveraged pnl_pct #193)",
       "impact_on_winners": "n/a — re-promote restores a demoted shadow edge, does not block any current winner; kill/remains-default is the safe branch",
@@ -1917,7 +1924,8 @@
       "not_a_duplicate_of": "watch-contrarian-live (that is the real-trade/fee watch) and watch-pc-flip-demote-55 (done: the demote itself) — this is the offense-side re-promote path on corrected data",
       "prior_art": "session-brain query 'have we tried flipping pump-chain contrarian direction before demote re-promote' -> hits are the demote/flip trail [watch-pc-flip-demote-55 2026-11-13, 'DEMOTE EXECUTED ... bar breached on any-read basis'] = this entry supersedes that metric basis, not a re-proposal of shipped work",
       "status_note": "AMPLIFY weekly emit #266 (satisfies >=1 proposal/run mandate)",
-      "caveat": "Per-token heterogeneity is UNTESTABLE at corrected n (pc- now only 2 tokens with n>=10, chi2 null) — pre-fix 'p=0.0001 HETEROGENEOUS' came from contaminated rows. Bar (ii) tape-split (BELOW n=62) is therefore the ONLY scoping test available; do not widen to unscoped pc- fade on this evidence."
+      "caveat": "Per-token heterogeneity is UNTESTABLE at corrected n (pc- now only 2 tokens with n>=10, chi2 null) — pre-fix 'p=0.0001 HETEROGENEOUS' came from contaminated rows. Bar (ii) tape-split (BELOW n=62) is therefore the ONLY scoping test available; do not widen to unscoped pc- fade on this evidence.",
+      "disposition": "NO-RE-PROMOTE at 11-18 read, EXTEND to 2026-11-25 2026-11-17T16:50:00Z (brain_auditor #273): bars (i) PASS — corrected pc- flip-WR 66.7% (68W/34L n=102, z=3.37) >=58, time-halves same-sign older 82.4% n=51 / newer 51.0% n=51 (newer half DECAYING toward 50 vs 63.2% at the 11-15 read — see demote-tripwire creative); (ii) PASS — pc-|BTC-BELOW 77.3% n=66 >=65% n>=50 (AT 40.6% n=32 stays unscoped-blocked); (iii) FAIL — live fade cohort 38T gross $0.000 NET -$0.209 (fees $0.395) still structurally fee-negative; (iv) CEO/T sign-off absent. All four required → shadow stays as-is, CONTRARIAN_LIVE unchanged. Re-read 11-25 or on CEO fade-size/min-expected-move>2x-fee decision, whichever first."
     },
     {
       "id": "long-rsi-floor30-shadow",
@@ -1960,5 +1968,5 @@
       "notes": "pin ships INERT: HOTSET_PIN_APPROVED=False (default) = fell-out UPDATE SQL byte-identical + hotset_final untouched (probe: rotation identical with flag off). HOTSET_PIN_SHADOW=True logs the fell-out cohort (dedup token|direction,site,hour)."
     }
   ],
-  "updated_at": "2026-11-17T00:50:04Z"
+  "updated_at": "2026-11-17T16:50:00Z"
 }

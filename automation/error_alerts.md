@@ -4477,3 +4477,64 @@
 
 ## Error Alerts — 2026-11-17 06:53 UTC
 - **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-17 07:38 UTC
+- **REPEATED** (13x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-17 07:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+- **[WARN]** (health_monitor): `logs`: compressed 1 old logs, freed 0.0MB (disk 85%)
+
+## Error Alerts — 2026-11-17 08:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-17 09:38 UTC
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — TOK+CONTAGION+BTC_LEVEL`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: TOK,CONTAGION,BTC_LEVEL | vol=N.3x eth_div=+N.N% | BTC_LEVEL: TOK blocked (-N.N% from high)`
+
+## Error Alerts — 2026-11-17 10:00 UTC
+- **[WARN]** (freq_deviation_shadow): `ai-trader-pending`: FREQ DEVIATION UNDER source=ai-trader-pending baseline=0.101/h current=0.042/h ratio=0.41 n_base=34 n_cur=1
+
+## Error Alerts — 2026-11-17 10:38 UTC
+- **REPEATED** (10x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-17 11:38 UTC
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **NEW** (2x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: , total_sz=None, notional_usdt=None, entry_price=None`
+- **NEW** (2x): `Nov N N:N:N python3[TOK]: TS   [brain.py] ❌ mirror_open TOK for TOK: Cannot increase position when open interest is at cap. asset=N | .1s total, retrying (throttled: N line/60s)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3567s left, N failures)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS TOK: TOK TOK in hotset failure cooldown — TOK in cooldown (3506s left, N failures)`
+
+## Error Alerts — 2026-11-17 13:00 UTC
+- **[WARN]** (freq_deviation_shadow): `bb-squeeze+`: FREQ DEVIATION OVER source=bb-squeeze+ baseline=0.057/h current=0.125/h ratio=2.21 n_base=19 n_cur=3
+
+## Error Alerts — 2026-11-17 14:38 UTC
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-11-17 15:38 UTC
+- **REPEATED** (12x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   pending_order_monitor: TOK in N.2s (rc=N)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   [TS] [TOK] TOK-TOK pending order btc-auto-ladder-N ❌ TOK (rc=N): [brain.py] ❌ REJECTED: TOK TOK — TOK TOK N.N < knife N (TOK lesson — no bearish override ever)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   pending_order_monitor: TOK — PENDING TOK btc-auto-ladder-N: TOK TOK @ N ({'timestamp': 'N-N-17T15:N:N.N+N:N', 'type': 'pending_order', 'order_id': 'btc-auto-ladder-N', '`
+
+## Error Alerts — 2026-11-17 16:38 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-11-17 17:38 UTC
+- **REPEATED** (7x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-11-17 18:38 UTC
+- **REPEATED** (8x): `Nov N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **REPEATED** (8x): `Nov N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (8x): `Nov N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK hard floor: N.N < N`
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK hard floor: N.N < N`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **REPEATED** (8x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-17 19:38 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
