@@ -11636,5 +11636,32 @@
     "category": "observability",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-17T16:52:33Z",
+    "idea": "pcfade demote-tripwire: if newer-half pc- flip-WR <55% at any weekly read, demote CONTRARIAN_LIVE to shadow-only pending CEO",
+    "rationale": "newer half decayed 63.2% (11-15 read) -> 51.0% (this read) while overall stays 66.7% — the aggregate hides the decay; pre-registered demote avoids riding a dead fade",
+    "expected_impact": "prevents fee-negative live fade from bleeding past edge death",
+    "category": "exit sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-17T16:52:33Z",
+    "idea": "gate_shadow screen dedup contract: every clonehunt screen must GROUP BY token|day explicitly — row-level DISTINCT on (token,day,would_win,...) inflates n (atr-trend- screen read 295 vs true 52 this run, 5.7x)",
+    "rationale": "my own screen bug this run; #246 read n=5 with a different aggressive dedup — three numbers for one question means no reproducible bar",
+    "expected_impact": "reproducible clonehunt limbs",
+    "category": "meta",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-17T16:52:33Z",
+    "idea": "HML $ drop attribution: 14d hard_max_loss -32% vs prior14d but confounded by stop-tighten/exitstack — if hml shadow ever ships, use a difference-in-differences window (pre/post x shadow-on/off)",
+    "rationale": "confounded windows produced false ships before (split-half FAIL #231)",
+    "expected_impact": "clean attribution",
+    "category": "meta",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

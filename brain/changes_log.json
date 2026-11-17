@@ -4387,5 +4387,16 @@
     "after": "12 done (all NO-SHIP/STAY-DEFAULT with evidence), jup-atrsl-shadow-parity open->12-01 KEEP+ESCALATE write-path sync",
     "rationale": "Pre-registered deadline bars read: flip1 tape-split sign flip OVERTURNS early GO; bear ex-best-day -$0.55<+1.00; long-bypass stay LIVE (-$10.09 blocked cohort); all others fail a limb or are under-powered",
     "impact": "Zero behavior change; governance close-out of the largest deadline batch this quarter; CEO escalations registered"
+  },
+  {
+    "timestamp": "2026-11-17T16:52:33Z",
+    "agent": "brain_auditor",
+    "change": "Audit #273: 8 due-11-18 shadow_disposition entries adjudicated (2 EXTEND, 5 CLOSED/NO-SHIP, 1 NO-RE-PROMOTE), 0 trading-constant changes",
+    "type": "disposition",
+    "file": "data/shadow_disposition.json",
+    "before": "8 entries open due 2026-11-18",
+    "after": "watch-contrarian + pcfade open due 11-25; xmirror/hml/clonehunt/ugb/jup-flat/grind done",
+    "rationale": "deadline batch adjudicated with fresh measurements; all bars failed or pending CEO",
+    "impact": "zero trading behavior change; queue cleaned"
   }
 ]
