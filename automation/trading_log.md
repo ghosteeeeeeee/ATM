@@ -28674,3 +28674,32 @@ BY: auto_1hr
 - 7d $0.19 (48.2%) — edge thin outside last 24h
 - storm-confl-waiver bar 0/3 with deadline 2026-11-19 (last storm counterfactual negative)
 BY: auto_1hr
+
+## [2026-11-17 18:52] Hourly Analysis
+
+**Trades:** 2 closed (0 wins, 2 losses)
+**PnL:** $-0.20 (hour) | 24h 19T 57.9% $0.04 BARELY GREEN | 7d 114T 47.4% $-0.01 FLAT — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** no storm — window-min -0.40% / at-run -0.31% (both inside gate)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 2 closes (GRASS pump-chain+ LONG atr_sl_hit -0.10 / GMT r2v2-long3 LONG atr_sl_hit -0.10), 0 open — both unarmed trail_arm_timeout-style ATR SLs
+- Kill check: no 0%/3+T signal (last hour n=2 total; 24h hl_copy_trader 2T 0% n<3, pump-chain+ 1T 0% n<3, ai-trader-pending 1T 0% n<3 -> keep all)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/19 = 15.8% of 24h closes (<40%); exits profit-monster-trail 8 / atr_sl_hit 3 / mfe_exit 2 / hard_max_loss 2 / trader_exit 2 / trail_arm_timeout 1 / manual_sl_hit 1 — tpsl_utils deployed
+- Boost: none eligible — no signal meets WR>55% + n>=5 + net>$0.05 (bb-squeeze+ 3T 100% $0.18 n<5; atr-trend- 4T 50% fails WR; jup_yolo_mirrored 3T 66.7% net -$0.06 fails PnL)
+- Arm rate: unarmed 10/19 = 52.6% (below 70%) WR 20.0% '-0.52' NEGATIVE vs armed 9/9 100% '+0.56' — report only, stall stack owns fix, no new gate
+- Neg streak: 14h -0.05, 15h -0.09, 16h/17h no closes (breaks streak), 18h -0.20 — not 3 consecutive; regime EXTREME/HIGH/NORMAL not NEUTRAL -> no size cut
+- Frequency: 2 close/hr — under 20
+- Winners |exit-entry| 0.452% avg / 1.116% max 24h — entry quality OK
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- Unarmed WR 20% (-0.52) vs armed 100% (+0.56) — gap widening; stall stack owns fix
+- 24h PnL collapsed to $0.04 from $0.27 earlier today — watch next hour
+- 7d -$0.01 (47.4%) — edge thin
+- storm-confl-waiver bar 0/3 with deadline 2026-11-19
+BY: auto_1hr
