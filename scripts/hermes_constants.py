@@ -2153,6 +2153,19 @@ MFE_EXIT_ARM_PCT = 0.004       # ARMED 0.40% price — SHIPPED after the no-arm
                                # Re-measure protocol + p/CI caveats:
                                # brain/verdicts/2026-10-31_mfe-exit-sim-independent-verify.md
 MFE_EXIT_SIGNALS = ('jup_yolo',)  # substring scope — mirror book first
+# ── WIN-CAPTURE-SHADOW (registry data/shadow_disposition.json entry
+# win-side-capture-shadow; CEO verdict 20261118T224556Z "BUILD now or it
+# fails-closed") ──────────────────────────────────────────────────────────────
+# LOG-ONLY counterfactual: what additional winners would the MFE-giveback exit
+# have captured at WIN_CAPTURE_SHADOW_GIVEBACK (0.20) vs live
+# MFE_EXIT_GIVEBACK_PCT (0.30)?
+# POLARITY: True = emit [WIN-CAPTURE-SHADOW] log lines ONLY. This flag NEVER
+# touches MFE_EXIT_GIVEBACK_PCT (stays 0.30) and NEVER touches PM_TRAIL_*
+# (CEO_PROTECTED — PM_TRAIL block "DO NOT WIDEN — ATR SL beats wider trails").
+# Ship bar (registry): capture 0.57 -> 0.70, net30 >= +$0.10/day, fk<20%.
+# Registry read/deadline: 2026-11-22. Revert: WIN_CAPTURE_SHADOW = False.
+WIN_CAPTURE_SHADOW = True          # LOG-ONLY shadow switch. Revert: False.
+WIN_CAPTURE_SHADOW_GIVEBACK = 0.20  # ANALYSIS-ONLY what-if giveback — never applied to any live exit.
 # ARM-BE-STOP SHADOW — armed-then-breakeven exit collector (brain_auditor 2026-10-18).
 # Verdict PASS 2026-10-17 (brain/verdicts/2026-10-17_arm-breakeven-stop.md):
 # 30d candle OOS, UNIVERSE fk 16.5% net +$5.94; non-EXTREME fk 9.7% net +$3.46;

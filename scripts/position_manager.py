@@ -125,6 +125,7 @@ from hermes_constants import (
     VB_TRAIL_ARM_TIMEOUT_SHADOW, VB_TRAIL_ARM_TIMEOUT_MIN,
     MFE_CUT_SHADOW_ENABLED, MFE_CUT_SHADOW_MIN, MFE_CUT_SHADOW_MFE_MAX,
     MFE_EXIT_ENABLED, MFE_EXIT_GIVEBACK_PCT, MFE_EXIT_ARM_PCT, MFE_EXIT_SIGNALS,
+    WIN_CAPTURE_SHADOW, WIN_CAPTURE_SHADOW_GIVEBACK,
     JUP_YOLO_ATRSL_SHADOW_ENABLED,
     PM_TRAIL_ACTIVATE_PCT,
     ARM_BE_SHADOW_ENABLED,
@@ -162,6 +163,7 @@ _arm_be_shadow_logged = set()  # trade_ids that have logged an ARM-BE would-fire
 _ugb_be_logged = set()         # trade_ids that have logged a UGB-BE would-fire (unarmed giveback)
 _ugb_pt_logged = set()         # trade_ids that have logged a UGB-PT would-fire (unarmed giveback)
 _prearm_lock_logged = set()    # trade_ids that have logged a PREARM-LOCK would-fire (dedup per process)
+_win_capture_shadow_logged = set()  # trade_ids that have logged a WIN-CAPTURE-SHADOW line (dedup per process)
 
 # EXT #44 peak-trail distance (off the running peak). Lives here, not in
 # hermes_constants, so vacation rule no_constants_change keeps a zero git diff.
@@ -4679,6 +4681,36 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                     if (_mfe_fav is not None and _mfe_fav > 0
                             and _mfe_fav >= _mfe_arm):
                         _mfe_thr = _mfe_fav * (1.0 - float(MFE_EXIT_GIVEBACK_PCT))
+                        # ── WIN-CAPTURE-SHADOW (registry win-side-capture-shadow,
+                        # CEO 20261118T224556Z BUILD) — LOG-ONLY counterfactual for
+                        # giveback 0.30 -> 0.20. Logs ONE line per trade on the live
+                        # 0.30 exit OR on the 0.20 what-if touch alone (the
+                        # "additional capture" cohort). Zero behavior change: no
+                        # exit, no state write, dedup by trade_id, double-guarded
+                        # (inner try + the site's outer try) so a logging failure
+                        # can never move the exit. NEVER touches MFE_EXIT_GIVEBACK_
+                        # PCT or PM_TRAIL_* (CEO_PROTECTED).
+                        if WIN_CAPTURE_SHADOW:
+                            try:
+                                _wc_thr = _mfe_fav * (1.0 - float(WIN_CAPTURE_SHADOW_GIVEBACK))
+                                if ((live_pnl <= _mfe_thr or live_pnl <= _wc_thr)
+                                        and trade_id not in _win_capture_shadow_logged):
+                                    _win_capture_shadow_logged.add(trade_id)
+                                    _wc_cap = "YES" if live_pnl <= _wc_thr else "NO"
+                                    log(f"[WIN-CAPTURE-SHADOW] {token} {direction} "
+                                        f"{trade_id}: peak_mfe={_mfe_fav:.2f}% "
+                                        f"giveback={MFE_EXIT_GIVEBACK_PCT:.0%} "
+                                        f"(what-if {WIN_CAPTURE_SHADOW_GIVEBACK:.0%}) "
+                                        f"— would-capture={_wc_cap} — counterfactual only")
+                            except Exception as _wc_e:
+                                # observability without risk: surface the shadow
+                                # failure, but guard the error-log too so NOTHING
+                                # from this block can ever reach the exit path.
+                                try:
+                                    log(f"  [WIN-CAPTURE-SHADOW-ERROR] {token} "
+                                        f"{trade_id}: {type(_wc_e).__name__}: {_wc_e}")
+                                except Exception:
+                                    pass
                         if live_pnl <= _mfe_thr:
                             close_paper_position(
                                 trade_id, "mfe_exit",
