@@ -23,7 +23,7 @@
    "notes": "Do NOT cite raw shadow n without dedup (#239 pseudo-replication). Signal uses atr exit management (:2357)."
   }
  ],
- "updated": "2026-11-18T23:10:00Z",
+ "updated": "2026-11-18T23:25:00Z",
  "entries": [
   {
    "id": "flip-contrarian-pc",
@@ -1735,15 +1735,17 @@
    "id": "compaction-stale-trend-band-eval",
    "stream": "compaction_stale_10min deaths (signals_hermes_runtime decision_reason)",
    "kind": "eval",
-   "disposition": "EVAL",
-   "status": "open",
+   "disposition": "NO CHANGE (CEO 20261118T224556Z eval run 2026-11-18T23:00Z) \u2014 carve-out FAILS net limb by a wide margin; staleness does NOT only lose in chop",
+   "status": "done",
    "started": "2026-11-13",
    "deadline": "2026-11-20T00:00:00Z",
    "threshold": "Carve-out test (ruling HOLDS no-relax until proven): admit a compaction_stale single-type signal ONLY when (BTC 1h <= -1.5 per STORM_BTC_1H_MOVE_PCT OR trend=STRONG_DOWN) AND age<30min. Ship iff 14d token-day n>=200 AND live-exit-engine 1m walk AND net-of-fees >= +$1.00 AND both halves same sign. Default = NO CHANGE (7d evidence -$31.55 stands).",
    "default_action": "no change \u2014 staleness=move-already-happened=chase stays blocked",
    "owner": "CEO",
-   "evidence": "CEO 20261113T040327Z: crash-only read +$6.90/70tokdays (87.1% WR) vs the 7d -$31.55 range-bound ban \u2014 different population plausible NOT proven; trend band is the named hypothesis (THE PATTERN #5: no regime gets an exception from one selected window).",
-   "notes": "root-cause question: does staleness only lose in chop? test answers it with n>=200. | EVAL ORDERED 2026-11-18 (CEO): run the carve-out join+walk NOW \u2014 4,041 compaction_stale_14d deaths makes n>=200 feasible; deadline 11-20 is tight; default NO CHANGE stands unless net-of-fees >= +$1.00 AND both halves same-sign."
+   "evidence": "CEO 20261113T040327Z: crash-only read +$6.90/70tokdays (87.1% WR) vs the 7d -$31.55 range-bound ban \u2014 different population plausible NOT proven; trend band is the named hypothesis (THE PATTERN #5: no regime gets an exception from one selected window). | RUN 2026-11-18: all3 limbs reported (n PASS / walk PASS / net FAIL -$6.02); walk simplification disclosed (no RR/TAT/ARM-BE/UGB/8h-close \u2014 nets if anything optimistic); 82/760 no-candles (K-wrapped etc, raw fwd +$0.91 \u2014 doesn't flip); caveats + per-day table in /tmp/cstb/report.txt",
+   "notes": "root-cause question: does staleness only lose in chop? test answers it with n>=200. | EVAL ORDERED 2026-11-18 (CEO): run the carve-out join+walk NOW \u2014 4,041 compaction_stale_14d deaths makes n>=200 feasible; deadline 11-20 is tight; default NO CHANGE stands unless net-of-fees >= +$1.00 AND both halves same-sign.",
+   "done_at": "2026-11-18",
+   "action_taken": "run 14d (2026-11-04\u219211-18), token-day dedup, live-exit-engine 1m walk (stack mode): cohort single-type+age<30min+trend-band n=668 walk-joinable (bar n>=200 PASS) | net-of-fee -$6.02 (gross +$2.06 \u2212 fee $8.08;0.106% sensitivity -$7.46) vs bar >=+$1.00 FAIL | halves -$1.35/-$4.67 same-sign-but-both-negative (raw fwd halves OPPOSITE sign: -$19.76/+$4.00) | trend-only cell -$5.69 dominates (storm_only=1 token-day \u2014 every storm row was also STRONG_DOWN, so carve-out = trend band in practice) | carve-out WORSE than full book (all-pop stack net -$2.42) | age limb non-binding (sweep guarantees >=10min; <30min drops only 3/4040) | fees decisive: gross +$2.06 cannot pay $8.08 at n=668; WR 57.5% p=0.0001 but avg +0.023% = payoff asymmetry not direction | only positive cells: atr_trend_accel_short 79 +$0.25, ema_reclaim_long 35 +$0.32 | scratch reproducible: /tmp/cstb/eval.py --selfcheck 20 asserts + byte-identical fixed-window reruns"
   },
   {
    "id": "exitstack-day-kpi-1114",
