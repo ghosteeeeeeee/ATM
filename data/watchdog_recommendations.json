@@ -1,20 +1,33 @@
 {
-  "timestamp": "2026-11-17T19:38:46.592396+00:00",
-  "steers": [],
+  "timestamp": "2026-11-18T03:38:49.998176+00:00",
+  "steers": [
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: SOL + IOTA",
+      "detail": "Both opened within 2 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-001"
+    }
+  ],
   "portfolio_health": "good",
   "regime": {
-    "btc_15m": "NEUTRAL",
-    "btc_4h": "SHORT_BIAS",
-    "continuum": "BELOW",
+    "btc_15m": "SHORT_BIAS",
+    "btc_4h": "LONG_BIAS",
+    "continuum": "AT",
     "volatility": "LOW",
-    "zscore_tier": "NEUTRAL",
+    "zscore_tier": "POS",
     "velocity_state": "SLOW",
-    "acceleration_state": "POSITIVE",
+    "acceleration_state": "FLAT",
     "volume_regime": "LOW",
     "linreg_alignment": 0.5,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "market_phase": "DECLINING",
+    "trend_quality": "STRONG_UP"
   },
-  "open_count": 0
+  "open_count": 2,
+  "deep_analysis": "BTC is pinned AT the continuum EMA300 (~120m+), volatility LOW, velocity SLOW, auto_trader scoring CHOP/BRACKET \u2014 this is a chop tape, and chop is where our losses come from: 7d no-trail cohort 71T 25.4% WR -$2.10 vs trail cohort 36T 94.4% WR +$2.50. Both open trades (SOL #16969 long +0.4%, IOTA #16970 long flat, both 25min old) were opened mid-band (meta_rsi 52.2 / 57.1) during the pin \u2014 exactly the never-armed-entry cohort that carries 81.4% of 7d gross loss.\n\nWould I open them fresh right now? SOL: borderline \u2014 jup_yolo_mirrored is the healthiest live family (7d 18T 66.7% WR +$0.13) and SOL is NEUTRAL not bearish, but the EMA300 chop-pin says mid-band longs have no edge. IOTA: no \u2014 r2v2-long3 is 7d 3T 33% WR -$0.12 (all-window 7T 42.9% -$0.30), weakest live long family, and IOTA regime is NEUTRAL conf 43.5 with zero trend. SLs (-0.73% / -0.75% from entry) are sane for current ATR; neither is up 2% so no BE stop is due yet.\n\nWrong-side check on the 24h losers (6 trades, ALL LONG, ALL mid-band meta_rsi 33-59): the clearest wrong-side call is GRASS #16967 LONG pump-chain+ while GRASS 15m regime was SHORT_BIAS conf 86.8 and falling -2.51%/16 candles. The winning side was SHORT that coin \u2014 we bought a falling knife because a pump signal fired against a strong bearish regime. GMT/SOL/WLD longs were mid-band entries into the same pin: not wrong-direction so much as no-trend \u2014 they never reached +0.40% to arm trail, then ATR-SL took them.\n\nSteers (condition-keyed, re-test next cycle):\n- \ud83d\udfe1 Exit SOL #16969 and IOTA #16970 if neither reaches +0.40% MFE by ~05:15 UTC (2h after open) while BTC 1m still closes AT/around continuum EMA300 \u2014 never-armed chop-pin entries are the 81.4% bleed cohort (7d dollar share). If BTC resolves and holds clearly above EMA300 with the longs armed (+0.40% MFE), hold and let trail work.\n- \ud83d\udfe1 IOTA is the weaker of the two (dead family, neutral regime): close IOTA first if the pair must be de-risked to one.\n- \ud83d\udfe2 No 2%/5% BE-or-trail steers due \u2014 max open gain is +0.47%. No trade open 8h+.\n\nAI Trader: NOT fired this cycle. AI_TRADER_ENABLED=False (watchlist-only anyway) and every precheck candidate failed on substance: ASTER no price data, PENGU short-blacklisted, APT SHORT R:R 0.38 hard-blocked, GRASS SHORT passes gates but sits in the 45-55 death zone (7d 15-22% WR) under the same EMA300 chop-pin advisory \u2014 writing it would be recommending the exact chop entry this watchdog exists to stop. Prior pick NEAR LONG 00:14Z still within watchlist reference window.",
+  "regime_context": "Sources disagree \u2014 always cited: aggregate 15m scanner (regime_5m.json 03:30Z) = SHORT_BIAS (17 short / 7 long / 103 neutral of 127); watchdog btc_15m = SHORT_BIAS; btc_4h = LONG_BIAS; continuum 1m = AT EMA300, linreg LEAN_BULL, trend_quality STRONG_UP; auto_trader regime = CHOP (BRACKET decision, last 6 cycles all CHOP). Flip-rate check: aggregate 19 flips/24h, BTC 23 flips/24h \u2014 both inside the normal band (p50 20, p95 26; \u226526 = unusually unstable, neither is), so direction state survives ~1h and snapshot directional prose must stay condition-keyed. Practical read: 1m structure leans bull, 15m aggregate leans short, and price is pinned on the EMA300 line \u2014 no trustworthy trend to be long or short with size. Positioning: 2/2 open trades are LONG against the aggregate short bias but aligned with the 1m lean-bull; 48h realized longs are the winning side (LONG 20T 55% WR +$0.19 vs SHORT 8T 50% WR -$0.09), so the longs are not categorically wrong \u2014 they are early/untrended. Regime resolution trigger to watch: BTC 1m holding above vs below continuum EMA300; that decides whether these longs have a trend to ride.",
+  "pattern_alerts": "VERIFIED from PostgreSQL this cycle (dollar share unless stated):\n\n1. CHOP-BLEED SHARE (never reached +0.40% MFE): 7d 81.4% ($ of gross loss from 41 of 49 losers), 14d 87.4% (81 of 93), 30d 90.9% (259 of 299). Count share 7d = 83.7% (41/49) \u2014 dollar share is the KPI. NULL mfe_pct losers = 0 in all three windows (no backfill distortion). Baseline (2026-10-25) was 84.1/85.6/80.6 \u2014 30d has risen +10.3pt toward the \u226592 entry-quality tripwire; not breached, but the trend is deterioration, not improvement. Same-day arm rate 100% (1 of 1 today, n=1 \u2014 meaningless, quoted per protocol). 7d LONG arm rate = 43.5% (20 of 46) \u2014 BELOW the <50 tripwire: LONG entries specifically are failing to reach trail-activation. Action class = entry quality, not exit tweaks.\n\n2. TRAIL vs NO-TRAIL 7d: trail 36T 94.4% WR +$2.50; no-trail 71T 25.4% WR -$2.10. This is the trend-vs-chop split in one table. The lever is getting entries to +0.40% (or not taking them), not exit management.\n\n3. ai-trader-pending \u2014 top loser-by-count but NOT a dead signal: 7d 25T 36.0% WR +$0.57 (13 losers -$1.52 offset by few big winners); fills come from armed pending orders auto-executed by trade_watchdog (independent of AI_TRADER_ENABLED=False), so it is live traffic with real bleed concentration. Brain-auditor territory for variance/cut-loser review \u2014 not a kill candidate on this data (net positive).\n\n4. hl_copy_trader 7d 10T 20% WR -$0.11 \u2014 HL_COPY_SIGNAL*_ENABLED all True (CEO re-enabled 2026-10-08), live traffic, bleeding now. Flag normally for auditor, not dead-signal.\n\n5. atr-trend- 7d 24T 54.2% WR -$0.54 \u2014 ATR_TREND_ACCEL_MINUS_ENABLED=True, live. STX/ALGO shorts (meta_rsi ~63) lost -4.6% each while CFX short (meta_rsi 65.7) won +4.8%: same family, opposite outcomes, n too small \u2014 watch, don't act.\n\n6. pump-chain+ 7d = 1 trade (GRASS long -$0.10, wrong-side vs 86.8 short-bias) \u2014 single bad entry, not a family pattern; do not re-flag (dead-signal check: 1 trade/7d, family enabled via PUMP_CHAIN_V6).\n\nDead-signal check performed on every flagged family: none were disabled-with-zero-traffic; no already-shipped work re-reported.",
+  "agent_timestamp": "2026-11-18T03:45:16.435315+00:00"
 }
