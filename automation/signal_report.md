@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-18 07:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-18 19:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,862 | **WR:** 51.3% | **PnL:** -119.87%
+- **Total trades (all time):** 3,868 | **WR:** 51.3% | **PnL:** -121.48%
 - **Date range:** 2026-07-29 → 2026-11-18
 
 ---
@@ -23,8 +23,7 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| jup_yolo_mirrored | LONG | 2 | 50.0% | -0.52 | ❓ | Needs more data |
-| ai-trader-pending | LONG | 2 | 50.0% | +0.22 | ❓ | Needs more data |
+| btc-pump-rider+ | LONG | 3 | 33.3% | -1.25 | ❓ | Needs more data |
 
 ---
 
@@ -42,8 +41,7 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] jup_yolo_mirrored LONG** — WR=50.0%, PnL=-0.52% over 2 trades. Monitor next cycle.
-2. **[WATCH] ai-trader-pending LONG** — WR=50.0%, PnL=+0.22% over 2 trades. Monitor next cycle.
+1. **[WATCH] btc-pump-rider+ LONG** — WR=33.3%, PnL=-1.25% over 3 trades. Monitor next cycle.
 
 ---
 

@@ -1501,3 +1501,21 @@ Rotating Q (idx 10 = "new signals this week?"): 0 SHIPPED (matches 15381Z run), 
 ### Numbers: 24h 14T -0.17 42.9% | 7d 108T +0.52 49.1%
 ### Findings: disk at 85% (health_monitor WARN, recurring); 24h WR 42.9% on flat -0.17 = chop, not signal decay; no overdue/red control-tower items
 ### Recommendation: none
+
+## CEO Status — 20261118T153821Z
+### Health: pipeline=active (timer oneshot) guardian=active open_pos=0
+### Numbers: 24h 9T -0.32 44.4% | 7d 105T +0.92 51.4%
+### Findings: rotating Q "Are SHORTs bleeding?" — NO. 7d SHORT 58T +0.51 55.2% WR beats LONG 47T +0.41 46.8%; worst SHORT cell atr-trend- 23T -0.42 (net-negative but WR 56.5% = payoff asymmetry, not direction). Non-finding: disk 86% used (>=85% warn) and hl_copy_trader freq deviation 0.000/h vs 0.033 baseline flagged 15:00Z.
+### Recommendation: disk cleanup at 86% — one-line for weekly run; investigate hl_copy_trader silence (0 copies/h) before it hits 90%.
+
+## CEO Status — 20261118T193821Z
+### Health: pipeline=active(timer/oneshot) guardian=active open_pos=1
+### Numbers: 24h 10T -0.08 60.0% | 7d 109T +0.80 51.4%
+### Findings: Proactive Q "Is the pipeline healthy?" — YES. hermes-pipeline is timer-triggered oneshot (every 1min); `is-active` reads inactive between runs — race, not a failure (status showed running at 19:39:00Z, fired 1s prior). Guardian active. Errors: disk 86% WARN (3rd+ today, persistent), rest are normal HARD_FLOOR/ME-rollback/hotset refusals. 7d PnL +0.80 recovered from #264's -1.53.
+### Recommendation: disk cleanup at 86% (repeated flag, weekly run) — else none.
+
+## CEO Status — 20261118T233821Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 11T -0.17 54.5% | 7d 108T +0.64 50.0%
+### Findings: Proactive Q "Are SHORTs bleeding?" — NO. 7d SHORT 59T +0.59 55.9% vs LONG 49T +0.05 42.9%; SHORTs are the profitable side, LONG WR is the weak leg (consistent with prior LONG-bleed tracking). Errors: disk 86% WARN (repeated today), rest are normal momentum-block/override/rollback noise.
+### Recommendation: disk cleanup at 86% (recurring WARN) — else none.

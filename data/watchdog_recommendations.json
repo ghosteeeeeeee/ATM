@@ -1,20 +1,29 @@
 {
-  "timestamp": "2026-11-18T12:38:53.769646+00:00",
-  "steers": [],
+  "timestamp": "2026-11-18T23:38:58.173390+00:00",
+  "steers": [
+    {
+      "severity": "warning",
+      "category": "health",
+      "title": "Signal 'btc-pump-rider+' losing streak: 3 consecutive losses",
+      "detail": "Net -0.24 USDT over last 20 trades (window losses: -0.31). Consider disabling or tuning this signal.",
+      "auto_executable": false,
+      "id": "steer-001"
+    }
+  ],
   "portfolio_health": "good",
   "regime": {
     "btc_15m": "LONG_BIAS",
-    "btc_4h": "LONG_BIAS",
-    "continuum": "BELOW",
+    "btc_4h": "SHORT_BIAS",
+    "continuum": "ABOVE",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_NEG",
+    "zscore_tier": "STRONG_POS",
     "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "linreg_alignment": 0.75,
+    "wyckoff_phase": "MARKUP",
+    "market_phase": "DECLINING",
+    "trend_quality": "STRONG_UP"
   },
   "open_count": 1
 }

@@ -29462,3 +29462,29 @@ BY: auto_1hr
 - Unarmed WR 28.6% (-0.41) vs armed 100% (+0.24) — stall stack owns fix
 - storm-confl-waiver bar 0/3 with deadline 2026-11-19
 BY: auto_1hr
+
+## [2026-11-18 23:52] Hourly Analysis
+
+**Trades:** 0 closed last hour (1 open: ALT atr-trend- SHORT) | 24h: 11 closed (6W 5L)
+**PnL:** $0.00 (hour) | 24h $-0.17 (WR: 54.5%) | 7d 108T 50.0% $+0.64 POSITIVE — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** 🌩️ [STORM-READINESS] window-min -0.30% / at-run +1.69% (pump gate: |at-run|>=1.5) | blocked 138 (confluence single-type 9, short-rsi-hard-floor 14, pump-chain 10, oversold-knife 2, compaction_stale_19 + hotset/merge expiry 71) | true-starvation 31 RSI>=35 | counterfactual $+1.70 (touch 13/31) | waiver: SHADOW=True ENFORCE=False — bar 1/3 positive (deadline 2026-11-19)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Kill check: no 0%/3+T signal (0 closes/hr; 24h 0% r2v2-long3 1T, warrior-sr-confirm+ 1T n<3; btc-pump-rider+ 4T 25% not 0%)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 0/11 = 0.0% (<40%); tpsl_utils deployed; hard_max_loss 3/11 = 27.3% expected
+- Boost: none eligible — no signal n>=5 + net>$0.05 (max n=4 btc-pump-rider+ 25% -0.24)
+- Arm rate: unarmed 7/11 = 63.6% (below 70%) WR 28.6% -$0.41 vs armed 4/4 100% +$0.24 — report only, stall stack owns fix
+- Neg streak: closes 18/19/20 negative then 0 since; regimes EXTREME/HIGH/NORMAL not NEUTRAL -> no size cut
+- Frequency: 0 close/hr — under 20
+- Winners |exit-entry| 0.447% avg / 0.648% max — entry quality OK
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- Storm counterfactual +$1.70 positive = 1/3 bar for storm-confl-waiver enforce (deadline 2026-11-19)
+- 24h -0.17 red at 54.5% WR; 7d +0.64 positive — edge thin but 7d green
+BY: auto_1hr
