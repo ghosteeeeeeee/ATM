@@ -29213,3 +29213,32 @@ BY: auto_1hr
 - Unarmed share crossed 70% (76.9%) with WR 20% (-0.51) — stall stack owns fix
 - storm-confl-waiver bar 0/3 with deadline 2026-11-19
 BY: auto_1hr
+
+## [2026-11-18 14:55] Hourly Analysis
+
+**Trades:** 0 closed last hour (0 open) | 24h: 11 closed (5 wins, 6 losses)
+**PnL:** $0.00 (hour) | 24h $-0.27 (WR: 45.5%) | 7d 106T 50.9% $+0.77 POSITIVE — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** no storm — window-min -1.13% / at-run -1.13% (both inside gate)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 open
+- Kill check: no 0%/3+T signal (0 closes/hr; 24h 0% signals r2v2-long3 2T, hl_copy_trader 1T, pump-chain+ 1T, warrior-sr-confirm+ 1T all n<3 -> keep)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/11 = 27.3% of 24h closes (<40%); exits atr_sl_hit 3 / mfe_exit 2 / profit-monster-trail 2 — tpsl_utils deployed
+- Boost: none eligible — no signal meets n>=5 + net>$0.05 (max n=3 jup_yolo_mirrored 66.7% net -0.07)
+- Arm rate: unarmed 8/11 = 72.7% (**>70% — chop entries dominating**) WR 25.0% -$0.48 NEGATIVE vs armed 3/3 100% +$0.21 — report only, stall stack owns fix, no new gate
+- Neg streak: hourly closes 3h +0.06, 5h -0.10, 7h +0.07, 10h -0.09, 13h +0.03 — not 3 consecutive negative hours -> no size cut
+- Frequency: 0 close/hr — well under 20
+- Winners |exit-entry| 0.495% avg / 0.648% max 24h — entry quality OK
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h -0.27 red, 45.5% WR; 7d +0.77 positive (50.9%) — edge thin but 7d green
+- Unarmed share 72.7% (>70%) with WR 25% (-0.48) vs armed 100% (+0.21) — stall stack owns fix
+- BTC rolling-60m -1.13% and falling — inside storm gate (-1.5 threshold) but watch next run
+- storm-confl-waiver bar 0/3 with deadline 2026-11-19
+BY: auto_1hr
