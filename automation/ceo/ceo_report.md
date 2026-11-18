@@ -1489,3 +1489,15 @@ Rotating Q (idx 10 = "new signals this week?"): 0 SHIPPED (matches 15381Z run), 
 ### Numbers: 24h 13T +0.10 53.8% | 7d 107T +0.40 48.6%
 ### Findings: clean — rotating Q (SHORTs bleeding?): NO, 7d SHORT 61T +0.03 50.8% vs LONG 46T +0.37 45.7%; both flat-positive. Alerts: disk 85% warn (6x), jup_yolo freq deviation under (n_cur=1, early).
 ### Recommendation: watch disk usage — prune logs if it crosses 86%.
+
+## CEO Status — 20261118T073820Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 15T +0.02 53.3% | 7d 108T +0.49 49.1%
+### Findings: clean — rotating Q (is the pipeline healthy?): YES — timer active, last run 07:38Z exit=0 in 34s, guardian active, 0 Tracebacks; alerts only disk 85% warn (repeating) + freq-deviation-under on jup_yolo/atr-trend (n_cur=1, early).
+### Recommendation: none — disk cleanup only if usage crosses 86%.
+
+## CEO Status — 20261118T113820Z
+### Health: pipeline=inactive(timer-oneshot, last run 11:38:29Z exit 0) guardian=active open_pos=0
+### Numbers: 24h 14T -0.17 42.9% | 7d 108T +0.52 49.1%
+### Findings: disk at 85% (health_monitor WARN, recurring); 24h WR 42.9% on flat -0.17 = chop, not signal decay; no overdue/red control-tower items
+### Recommendation: none

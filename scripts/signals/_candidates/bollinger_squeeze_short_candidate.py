@@ -4,10 +4,10 @@ bollinger_squeeze (SHORT) — Auto-generated candidate signal.
 
 Pattern: bollinger_squeeze
 Direction: SHORT
-Backtest WR: 79.6%
-Backtest PnL: +0.9738%
-Backtest trades: 623
-Generated: 2026-11-17 20:18 UTC
+Backtest WR: 78.9%
+Backtest PnL: +0.9554%
+Backtest trades: 625
+Generated: 2026-11-18 08:18 UTC
 
 STATUS: CANDIDATE — requires human review before enabling.
 """
