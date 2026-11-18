@@ -29270,3 +29270,31 @@ BY: auto_1hr
 - Unarmed share 75.0% (>70%) with WR 33% (-0.30) vs armed 100% (+0.14) — stall stack owns fix
 - storm-confl-waiver bar 0/3 with deadline 2026-11-19
 BY: auto_1hr
+
+## [2026-11-18 16:54] Hourly Analysis
+
+**Trades:** 0 closed last hour (0 open) | 24h: 8 closed (4 wins, 4 losses)
+**PnL:** $0.00 (hour) | 24h $-0.16 (WR: 50.0%) | 7d 105T 51.4% $+0.92 POSITIVE — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** 🌩️ [STORM-READINESS] window-min -1.62% / at-run -1.03% | blocked 133 (combo_key-stale 31, compaction_stale_10min 26, short-rsi-hard-floor 18, long-*gates 16, confluence single-type 10, pump-chain-* 10, pump-chain-short-high 7, expired-hotset 5, short-*gates 4, vol-gate-override-0.0 3, other 3) | true-starvation 42 RSI>=35 (133 raw, deduped first-fire-per-token 42; 41 walked, 1 missing candle) | counterfactual $-2.15 (touch 37/41) | waiver: SHADOW=True ENFORCE=False — counterfactual NEGATIVE -> **streak stays 0/3** (deadline 2026-11-19); split: blocked LONGs $-3.97 (29) = gates correctly kept dump LONG losers out, blocked SHORTs $+1.82 (12) = gates suppressed dump SHORT winners
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 open
+- Kill check: no 0%/3+T signal (0 closes/hr; 24h 0% signals r2v2-long3 2T, pump-chain+ 1T, warrior-sr-confirm+ 1T all n<3 -> keep)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/8 = 25.0% of 24h closes (<40%); tpsl_utils deployed
+- Boost: none eligible — no signal meets n>=5 + net>$0.05 (max n=2 jup_yolo_mirrored 100% net +0.09)
+- Arm rate: unarmed 6/8 = 75.0% (**>70% — chop entries dominating**) WR 33.3% -$0.30 NEGATIVE vs armed 2/2 100% +$0.14 — report only, stall stack owns fix, no new gate
+- Neg streak: hourly closes 3h +0.06, 5h -0.10, 7h +0.07, 10h -0.09, 13h +0.03 — not 3 consecutive negative hours -> no size cut
+- Frequency: 0 close/hr — well under 20
+- Winners |exit-entry| 0.457% avg / 0.648% max 24h — entry quality OK
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h -0.16 red at 50% WR; 7d +0.92 positive (51.4%) — edge thin but 7d green
+- Unarmed share 75.0% (>70%) with WR 33% (-0.30) vs armed 100% (+0.14) — stall stack owns fix
+- storm-confl-waiver bar 0/3 (counterfactual negative again) with deadline 2026-11-19
+BY: auto_1hr
