@@ -240,12 +240,16 @@ def get_recent_pro_trades(minutes: int = None) -> list:
     try:
         cutoff = int(time.time() * 1000) - (minutes * 60 * 1000)
 
-        # Get all trades from pro traders
+        # Get OPEN fills only from pro traders.
+        # FIX (brain_auditor #274, pre-registered #267/#268 gate decision):
+        # is_open=0 (Close) fills were winning the coin+side dedup and being
+        # mirrored as entries — every 7d phantom (8/8, hold<5s) was triggered
+        # by a close fill. Copy entries, not exits; check_trader_exits owns exits.
         trades = conn.execute("""
             SELECT f.*, t.score
             FROM trader_fills f
             JOIN traders t ON f.wallet = t.wallet
-            WHERE f.time > ? AND t.score >= ?
+            WHERE f.time > ? AND t.score >= ? AND f.is_open = 1
             ORDER BY f.time DESC
         """, (cutoff, HL_COPY_SIGNAL_MIN_SCORE)).fetchall()
 

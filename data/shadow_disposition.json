@@ -452,16 +452,17 @@
       "id": "storm-confl-waiver",
       "stream": "STORM_CONFLUENCE_WAIVER (shadow -> enforce): single-type SHORT + storm conditions",
       "kind": "flip",
-      "disposition": "EXTEND 2026-11-12 (audit #250 deadline read): bar NOT met at deadline — streak RESET to 0/3 (11-10 packet cf -$8.02 neg, was 3/3 MET 11-08). CEO already ruled NO-CONVERT 2026-11-08 (bottleneck = short-rsi-hard-floor, not single-type confluence) so enforce stays shadow regardless. Extension = keep collecting storm-bar evidence for the floor-side work (linreg-fade band); 6 packets total, mechanism live. Default unchanged: KEEP shadow (do not enforce).",
+      "disposition": "EXTEND 2026-11-12 (audit #250 deadline read): bar NOT met at deadline — streak RESET to 0/3 (11-10 packet cf -$8.02 neg, was 3/3 MET 11-08). CEO already ruled NO-CONVERT 2026-11-08 (bottleneck = short-rsi-hard-floor, not single-type confluence) so enforce stays shadow regardless. Extension = keep collecting storm-bar evidence for the floor-side work (linreg-fade band); 6 packets total, mechanism live. Default unchanged: KEEP shadow (do not enforce). | EXTEND 2026-11-18 (audit #274 deadline read): bar still 2/3 (no new positive STORM-READINESS packet since 11-05 retro; 11-15 WOULD-PASS lines are shadow mechanism evidence, not counterfactual packets). CEO NO-CONVERT 2026-11-08 stands; default KEEP shadow unchanged. One more storm cycle to 11-26 for floor-side (linreg-fade band) evidence.",
       "status": "open",
       "started": "2026-10-29",
-      "deadline": "2026-11-19T00:00:00Z",
+      "deadline": "2026-11-26T00:00:00Z",
       "evidence": "CEO consult 20261029T2130Z: gate-interaction starvation on the 10-29 dump. Honest replay (RSI>=35 cohort only, first-fire, walk-to-21:06 @$11): 13 blocked shorts = +$8.31 (12W1L), 13/13 touch +0.40% (CONFL 7/+$5.72, HIGH 5/+$2.59) vs 24h PnL -$0.31. 25 RSI<35 siblings correctly knife-killed at exec, NOT counted. HIGH-block carve-out REJECTED (14d 20%WR beats one dump). | VERIFIED (CEO 20261108T230547Z): 0 true fillable storm shorts; WOULD-PASS lines = confluence-stage only, same signal died at short-rsi-hard-floor within 1s (SYRUP RSI26.7, SAGA RSI33.3 <45); storm-short census = 100% floor-blocked (28/28 tokens, 435/435 block lines); the 16.6:1 (92.5 vs 5.6 short-rescue) and +$3.23 came from floor-PASSING shorts — rescued by the ALREADY-LIVE ceiling65-75 relief (33 hits), not the waiver; flip would have produced zero fills (log-noise) plus default-fire breach risk if11-05 cf(0.99) is read as same storm family as11-08(2.92):0/3 positive → default 'keep shadow, NO CONVERSION'.",
       "threshold": ">=3 CONSECUTIVE storms (auto_1hr [STORM-READINESS] packets with |BTC 1h|>=1.5%) each showing positive counterfactual; shadow logs [STORM-CONFL-WAIVER-SHADOW] would-pass. Conditions all-of: BTC 1h<=-1.5%, RSI>=45 (corrected 2026-11-08 per CEO 20261108T230547Z — was >=35; floor stays 45 so the 35-45 leg was dead text), sibling approval-blocked<=30min.",
       "default_action": "KEEP shadow (do not enforce)",
       "owner": "CEO label + T sign-off 2026-10-29 ('All three')",
       "notes": "BAR STATUS: packet #1/3 = 10-30 00:44 (STORM-READINESS, cf +$19.58/2h census); packet #2/3 = RETRO for 10-29 armed window 20:41-21:14 (min rolling -2.95%, strict-window replay +$1.18, positive — CEO retro-count ruling 20261030T0030Z; logged in ceo_kanban). ONE MORE positive storm flips the enforce bar (~11-01); deadline 11-12 unchanged. ENFORCE-NOW REJECTED by CEO (tonight's strict armed cf +$0.03 n=2 = thin; pre-arm blocks correctly excluded; BUG-068-class shortcut warning). FIXES SHIPPED 10-30: (a) FAIL(i/ii/iii) debug at every helper exit under shadow; (b) window-peak packet rule (min rolling over prior 60min — instant-sample missed 10-29's window); (c) REACHABILITY HOIST above neutral-relax split (the autopsy find: NEUTRAL/NULL regime_4h fallback tokens never reached the waiver). | BUG-HUNTER FINAL: SAFE TO DEPART (83a7407a, 19/19 + AST 7/7-branch enforce proof + live reachability 51 singles). Pre-flight LOW FIXED same session: gate_msg overwrite guards at neutral-else/final-else (PASS line would print the block reason at enforce). FLIP CHECKLIST ADDITIONS: (4) SHORT_NEUTRAL hard-block continue fires BEFORE the hoisted waiver and writes no tombstone — outside waiver reach by design (condition iii needs rows it can't create); next storm autopsy must check whether armed-window SHORT_NEUTRAL hard blocks exist (0 in the 10-29 window); scope = CEO. (5) ALL-3 PASS log line not SHADOW-gated (pre-existing, decide at flip). | BAR CORRECTION (CEO 20261030T0640Z): bar counts **1/3 not 2/3** — only packet #1 (10-30 00:44, cf +$19.58, touch 25/28) is an emitted packet; the RETRO entry needs re-derivation to CEO's packet format before counting. Enforce HOLD on cadence (act-early pattern explicitly rejected). All later auto_1hr runs = 'no storm'. | stale-text fixed 2026-11-08: line now distinguishes pending vs bar-met-awaiting-signoff | RSI-clause correction (CEO 20261108T230547Z): registered condition corrected >=35 -> >=45 (floor stays 45; the 35-45 leg was dead text — those signals died at short-rsi-hard-floor <1s later). Code limb (ii) still reads STORM_MIN_RSI=35 (constants stay ADD-only this run; ENFORCE=NO-CONVERT so limb (ii) can never admit) — one-line STORM_MIN_RSI=45 edit available if CEO wants code parity. | BAR STATUS UPDATE 2026-11-08: streak reached 3/3 POSITIVE at 22:22Z (auto_1hr packet, ceo_kanban) — the 10-30 '1/3' paragraph above is historical; conversion still NO-CONVERT (floor is the bottleneck). | DEADLINE READ 2026-11-12 #250: EXTEND to 11-19, streak 0/3, CEO no-convert stands.",
-      "revert": "hermes_constants STORM_CONFLUENCE_WAIVER_ENFORCE stays False / SHADOW=False to stop logging"
+      "revert": "hermes_constants STORM_CONFLUENCE_WAIVER_ENFORCE stays False / SHADOW=False to stop logging",
+      "due_at": "2026-11-26T00:00:00Z"
     },
     {
       "id": "linreg-fade-storm-admission-shadow",
@@ -1293,7 +1294,7 @@
       "stream": "ema300-breakthrough± under-deployment clone-hunt (enabled flags True, live 0T/30d, positive deduped shadow)",
       "kind": "amplify",
       "proposal_type": "(c) clone-hunt: mine BLOCKED/dying setups against shadow winner profile + counterfactual-walk candles",
-      "status": "open",
+      "status": "done",
       "created": "2026-11-05T20:50:00Z",
       "deadline": "2026-11-19T00:00:00Z",
       "owner": "brain_auditor weekly AMPLIFY run #226",
@@ -1301,7 +1302,10 @@
       "threshold": "SHIP only if ALL: (i) counterfactual walk of the compaction_stale_10min cohort from DETECTION time with live exit engine gives n>=10 decided AND net>0 (pnl_usdt, units guard — never raw price-move vs pnl_pct); (ii) 7d/14d/30d same-sign on the walked book; (iii) fk <20% of LONG winners in same windows; (iv) if (i)-(iii) pass, ALSO show a non-colliding latency fix (compaction approval SLA) OR an explicit gate-exempt path — no bypass of short-rsi-hard-floor / long-midband (those knife guards stay global).",
       "default_action": "NO CHANGE — walk stays analysis-only; log why-not in kanban at deadline (status quo is the default).",
       "measurement": "shadow_trades.db rows for source LIKE 'ema300-breakthrough%' joined to candles; report decided n, net pnl_usdt, WR per window; runtime-DB decision_reason distribution re-counted at deadline.",
-      "notes": "AMPLIFY weekly mandate #226: all 6 n>=10 30d winner cells are already in-flight (pump-chain+ EXTREME / bb-squeeze+ NORMAL / volume-buildup- HIGH / jup SHORT HIGH / pc-v6 EXTREME SHORT dormant 0T14d / pc- NORMAL LONG = contrarian flip watch) — this under-deployment hunt is the run's new proposal. Dedupe lesson from amplify-grind-breakout-deploy applied UP FRONT (deduped before proposing)."
+      "notes": "AMPLIFY weekly mandate #226: all 6 n>=10 30d winner cells are already in-flight (pump-chain+ EXTREME / bb-squeeze+ NORMAL / volume-buildup- HIGH / jup SHORT HIGH / pc-v6 EXTREME SHORT dormant 0T14d / pc- NORMAL LONG = contrarian flip watch) — this under-deployment hunt is the run's new proposal. Dedupe lesson from amplify-grind-breakout-deploy applied UP FRONT (deduped before proposing).",
+      "due_at": "2026-11-19T00:00:00Z",
+      "disposition": "CLOSED NO-SHIP 2026-11-18 (audit #274 deadline read): bar (i) FAIL — shadow_trades.db ema300-breakthrough% compaction_stale cohort n=20 (19 with net), sum net_pnl_pct -6.19 (leveraged %, sign-only read: clearly negative; units guard: not vs pnl_usdt). Dedup token|day n=18 sum -6.90, 4 pos / 14 neg. Bar (ii) same-sign impossible on negative book. Friction reconfirmed: runtime decisions = compaction_stale 6 + short-rsi-hard-floor 3 + rr-engine 1. Default NO CHANGE stands — detection->approval latency still kills the cell; re-queue only if compaction SLA ships.",
+      "closed_at": "2026-11-18T00:50:00Z"
     },
     {
       "id": "amplify-bbsqueeze-chop-exempt",
@@ -1966,6 +1970,21 @@
       "default_action": "stay pinned-off",
       "evidence": "CEO 20261116T153048Z: single highest-quality layer —55 longs died post-approval (42 fell-out+13 EXEC-BLOCK) in24h; zero gates touched by the fix",
       "notes": "pin ships INERT: HOTSET_PIN_APPROVED=False (default) = fell-out UPDATE SQL byte-identical + hotset_final untouched (probe: rotation identical with flag off). HOTSET_PIN_SHADOW=True logs the fell-out cohort (dedup token|direction,site,hour)."
+    },
+    {
+      "id": "amplify-pumpchain-normal-short-early",
+      "stream": "pump-chain- NORMAL SHORT early winner cell — 30d 5T net +0.13 WR 20% (one big trail winner; labeled EARLY n=5<10)",
+      "kind": "amplify",
+      "proposal_type": "(c) clone-hunt / early-cell monitor: mine blocked pump-chain- SHORT setups in NORMAL vol against the 5T winner profile; no size change until bar met",
+      "status": "open",
+      "created": "2026-11-18T01:05:00Z",
+      "deadline": "2026-12-02T00:00:00Z",
+      "owner": "brain_auditor weekly AMPLIFY run #274",
+      "evidence": "PG 30d closed: pump-chain- NORMAL SHORT n=5 net +0.13 WR 20% (early, n<10). Distinct from amplify-pcv6-extreme-short-cell (EXTREME only) and pc-plus-weight (pump-chain+ LONG). 7d same cell n=0. Not in WINNER_CELLS_VALIDATED. Session prior-art: no dedicated NORMAL-SHORT cell amplify found (queries 2026-11-18).",
+      "threshold": "SHIP only if ALL: (i) PG cell n>=10 decided AND net pnl_usdt > 0 (units guard); (ii) 7d/14d/30d same-sign; (iii) fk <20% of NORMAL SHORT winners same windows; (iv) not colliding with PUMP_CHAIN_SHORT_RSI_MIN=45 / SHORT_RSI_HARD_FLOOR / SHORT_RSI_HARD_CEILING (knife guards stay global).",
+      "default_action": "NO CHANGE — early monitor only; log why-not at deadline if n stays <10",
+      "measurement": "PG trades WHERE signal LIKE 'pump-chain-%' AND direction='SHORT' AND volatility_regime='NORMAL' — report n, net pnl_usdt, WR, arm rate per window at deadline",
+      "notes": "AMPLIFY weekly mandate #274: all 6 n>=10 net>0 30d cells already carry open amplify entries (ai-trader-pending NORMAL SHORT, bb-squeeze+ NORMAL LONG, volume-buildup- HIGH SHORT, jup HIGH SHORT, atr-trend- NORMAL SHORT via atrtrail/accel shadows + 7d decay blocks new size, pump-chain- NORMAL LONG thin +0.10). This early n=5 cell is the run's new proposal."
     }
   ],
   "updated_at": "2026-11-17T16:50:00Z"

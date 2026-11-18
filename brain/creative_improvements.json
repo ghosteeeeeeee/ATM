@@ -11663,5 +11663,32 @@
     "category": "meta",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-18T01:05:00Z",
+    "idea": "Dual-read exitstack KPI: report trailing-30 avg loser BOTH all-trades AND excluding signal-not-ai-trader + manual_sl_hit, so CEO manual BTC SLs cannot false-fail an exit-stack bar",
+    "rationale": "#274: -0.1007 FAIL is driven by 3 CEO manual losses (-0.93 combined) inside the window; signal-only cohort still needs separate read",
+    "expected_impact": "prevents false revert of exitstack legs",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-18T01:05:00Z",
+    "idea": "Meta-vs-continuum tape stamp audit: join _signal_metadata.btc_trend_quality to continuum_states at open_time — STX meta STRONG_UP vs continuum BELOW/STRONG_DOWN same minute",
+    "rationale": "every arm/wrong-side census using meta tape fields may be reading a stale or mis-ordered stamp",
+    "expected_impact": "validates or kills meta-based tape features",
+    "category": "debug",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-18T01:05:00Z",
+    "idea": "pump-chain- fade (when live) split-WR tripwire by BTC ema300_position: pre-register demote if BELOW-cohort flip-WR <60% (now 77.3% n=66) — aggregate 66.7% hides AT-cell 40.6%",
+    "rationale": "pcfade newer-half decay lesson (#273): aggregates hide regime splits; join already has by_regime",
+    "expected_impact": "catches fade decay before fee-negative re-promote",
+    "category": "tripwire",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
