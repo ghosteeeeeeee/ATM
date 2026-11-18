@@ -11,6 +11,9 @@ from psycopg2.extras import RealDictCursor
 import sys
 import os
 import paths  # noqa: F401 — single source of truth for paths
+from paths import HERMES_DATA  # brain_auditor #277: bare HERMES_DATA at :687/:748
+# raised NameError inside `except Exception: pass` — the guardian marker write
+# and the vacation size-reduce read were both silently dead on this path.
 import subprocess
 import time as _time
 import random
@@ -554,6 +557,40 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         except Exception as _meta_bf_e:
             print(f'[brain.py] ⚠️ {token} {direction} metadata backfill skipped: '
                   f'{type(_meta_bf_e).__name__}: {_meta_bf_e}')
+
+    # brain_auditor #277: stamp BTC tape state on this path (zero-behavior —
+    # write-only, no gate reads these keys; same source as decider_run #191).
+    # Pending fills (trade_watchdog -> brain.py trade add) pass no
+    # --signal-metadata-json, so the #117 rsi-only backfill left btc_ema300_*
+    # absent on 38/192 (20%) of 14d closes — all ai-trader-pending — blinding
+    # the tape-at-long re-measure (due 2026-11-29) to a fifth of the book.
+    if not (isinstance(signal_metadata, dict)
+            and 'btc_ema300_position' in signal_metadata):
+        try:
+            import sqlite3 as _sq3
+            _tape_c = _sq3.connect(
+                os.path.join(paths.HERMES_DATA, 'continuum.db'), timeout=3)
+            try:
+                _tape_row = _tape_c.execute(
+                    "SELECT price, ema300, ema300_position, ema300_duration, "
+                    "trend_quality, ts FROM continuum_states WHERE token='BTC' "
+                    "AND timeframe='1m' ORDER BY ts DESC LIMIT 1").fetchone()
+            finally:
+                _tape_c.close()
+            if _tape_row and _tape_row[5] and (_time.time() - _tape_row[5]) < 600:
+                _tbase = signal_metadata if isinstance(signal_metadata, dict) else {}
+                if _tape_row[1] and _tape_row[0] is not None:
+                    _tbase['btc_ema300_dist_pct'] = round(
+                        (float(_tape_row[0]) - float(_tape_row[1]))
+                        / float(_tape_row[1]) * 100, 4)
+                _tbase['btc_ema300_position'] = _tape_row[2]
+                _tbase['btc_ema300_duration'] = _tape_row[3]
+                _tbase['btc_trend_quality'] = _tape_row[4]
+                _tbase.setdefault('meta_source', 'brain_add_entry_backfill')
+                signal_metadata = _tbase
+        except Exception as _tape_e:
+            print(f'[brain.py] ⚠️ {token} {direction} tape stamp skipped: '
+                  f'{type(_tape_e).__name__}: {_tape_e}')
 
     # ── Step 1: Pre-flight checks ───────────────────────────────────────
 

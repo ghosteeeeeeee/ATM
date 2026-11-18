@@ -4464,5 +4464,27 @@
     "after": "rejected-with-data, logged in creative_improvements",
     "rationale": "Step 5c verify-before-shipping: OOS + fk bars both fail",
     "impact": "no config change; prevents re-propose"
+  },
+  {
+    "timestamp": "2026-11-18T20:57:49Z",
+    "agent": "brain_auditor",
+    "change": "brain.py: added `from paths import HERMES_DATA` — bare HERMES_DATA at guardian-marker write and vacation size-reduce read raised NameError inside except:pass, both silently dead on add_trade path",
+    "type": "bug",
+    "file": "scripts/brain.py",
+    "before": "import paths only; bare HERMES_DATA unresolved (NameError swallowed)",
+    "after": "from paths import HERMES_DATA — both sites resolve; py_compile PASS, selfcheck-meta-backfill PASS",
+    "rationale": "root-cause fix: size-reduce multiplier was never applied on brain's fallback-size branch and the guardian race-marker was never written for non-decider fills (ai-trader-pending, manual skill)",
+    "impact": "zero behavior today (size-reduce file absent = 1.0x); correct behavior when T re-enables size-reduce; guardian marker now written pre-mirror_open for pending fills"
+  },
+  {
+    "timestamp": "2026-11-18T20:57:49Z",
+    "agent": "brain_auditor",
+    "change": "brain.py add_trade: BTC tape-state stamp (btc_ema300_dist_pct/position/duration, btc_trend_quality) from continuum.db when key absent — write-only, mirrors decider_run #191",
+    "type": "zero-behavior",
+    "file": "scripts/brain.py",
+    "before": "btc_ema300_* present on 154/192 14d closes (80%) — 38 missing, all ai-trader-pending",
+    "after": "coverage ~191/192; guard skips when key already present (no clobber of decider-stamped rows incl. streak)",
+    "rationale": "pending fills pass no --signal-metadata-json; #117 backfill stamps rsi_14 only; tape-at-long re-measure (due 11-29) was blind to 20% of the book",
+    "impact": "no gate reads these keys (verified repo-wide) = zero trading behavior; eval n power +25%"
   }
 ]

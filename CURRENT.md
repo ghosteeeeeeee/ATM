@@ -1,48 +1,47 @@
-# Current State — brain_auditor #276 2026-11-18 08:55 UTC
-**Last Updated: 2026-11-18 08:55 UTC**
-**Updated by: brain_auditor #276. Prior: #275 2026-11-18 04:55 UTC (preserved in git history).**
+# Current State — brain_auditor #277 2026-11-18 20:57 UTC
+**Last Updated: 2026-11-18 20:57 UTC**
+**Updated by: brain_auditor #277. Prior: #276 2026-11-18 08:55 UTC (preserved in git history).**
 
-## HEADLINE — ARM-CONSISTENCY CENSUS: ARM-GAP FIXED, BLEED IS NOW PURE NEVER-MOMENTUM CHOP
+## HEADLINE — ROOT-CAUSE BUG: bare `HERMES_DATA` in brain.py was silently killing two live paths
 
-1. **4-way arm census (14d n=198):** BOTH_ARMED 67T 95.5% **+4.05** | MFE_ARM_PM_NO 35T 68.6% **+2.39** (was the -$3.26 giveback cohort pre-UGB-PT; exits now mfe_exit 13T +0.80 / manual_tp 6T +1.95) | PM_ONLY 8T +0.12 | **NEITHER 88T 5.7% -7.83 = >100% of the 14d net bleed (-1.27)**. The bleed is no longer giveback-on-unarmed — it is entries that never reached +0.40% at all.
-2. **AMPLIFY why-not (rule 3, measured):** all 6 n>=10 net>0 30d winner cells covered (5 open entries + WINNER_CELLS_VALIDATED 3/3). Only uncovered cell **atr-trend-|NORMAL|SHORT FAILS 7d same-sign** (7d 11T -0.10 vs 30d +0.22; +0.22 entirely d1-15, d16-30 n=0). No new proposal; Flip-KPI 0 this week.
-3. **REJECTED-WITH-DATA: entry_slope_4h filter** — 14d pooled p=0.0077 (under Bonferroni 0.0083) but 30d split-half refutes (LONG slope<=0: +0.80 / -1.48 / -0.94 sign-flip; SHORT slope>=0 fk 25.9% > 20%). Never re-propose.
-4. **MED side-find:** gate_shadow would_pnl marks 20 gates +EV (EXEC-BLOCK +3.95, SHORT-REGIME-GATE +2.04 dedup) while shadow_trader's replay marks every gate -EV. Opposite signs — no gate widened until reconciled.
+1. **The bug:** `brain.py` only did `import paths` — never the name `HERMES_DATA`. Two sites used the bare name inside `try/except Exception: pass`: the **guardian race-marker write** before `mirror_open` (dead for every non-decider fill = ai-trader-pending + manual skill trades; the decider path wrote the same file itself, hiding the gap) and the **vacation size-reduce read** on the fallback-size branch (the 2026-10-21 bug_hunter HIGH fix was inert; no live impact only because the file is currently absent = 1.0x). Fixed with one import line.
+2. **Second ship:** BTC tape-state stamp in `add_trade` — `btc_ema300_*` coverage was 154/192 (80%) of 14d closes; the 38 missing are **100% ai-trader-pending** (trade_watchdog passes no `--signal-metadata-json`; #117 backfill stamps rsi_14 only). This blinded the pre-registered **tape-at-long re-measure (due 11-29)** to a fifth of the book. Now ~99%, write-only (no gate reads these keys, repo-verified), guard skips when decider already stamped. bug_hunter verdict **SHIP** (0 HIGH / 0 MED / 3 LOW).
+3. **AMPLIFY why-not (rule 3):** all 6 n>=10 net>0 30d winner cells covered by open entries or WINNER_CELLS_VALIDATED 3/3 → no new proposal; Flip-KPI 0 this week (chase = mult-150 CEO label since 11-04).
 
 ### 1. FINDINGS THIS RUN
 | Item | Result |
 |---|---|
-| 24h / 7d / 30d | 15T 53.3% **+0.02** / 108T 49.1% +0.49 / 656T 50.8% -4.90 |
-| 7d chop-bleed dollar | **98.0%** (48/49, -4.83/-4.88) |
-| 14d exit families | TRAIL/FAM 89T 93.3% **+5.01** vs CHOP/STOP 77T 0% **-8.49** |
-| LONG arm rate (mfe) 7d | **44.7%** (21/47) — tripwire 5th cycle; SHORT 55.7% also >55 |
-| 24h losers | **7/7 LONG**, 6/7 never reached +0.40 MFE, n=7 < 20 = monitor |
-| kill screen 14d n>=15 sub-50 net<0 | **ZERO rows** (hl_copy bare 11T 18.2% -0.21 n<15 = MONITOR) |
+| 24h / 7d / 14d / 30d | 11T 54.5% **-0.17** / 109T 50.5% **+0.66** / 192T 49.0% -1.38 / 657T 51.0% -4.71 |
+| 7d chop-bleed dollar | **98.0%** (48/49, -4.74/-4.79) |
+| 14d exit families | TRAIL/FAM 83T 95.2% **+4.83** vs CHOP/STOP 63T 1.6% **-6.80** |
+| mfe-arm 7d | LONG **42.9%** (<50) / SHORT **61.7%** (>55) — tripwire BOTH LEGS **6th cycle**, CEO flag |
+| kill screen 14d n>=15 sub-50 net<0 | **ZERO rows** |
+| watchdog steer-001 | rider 3-loss streak → **MONITOR** (n=8<15; never-armed chop cluster; auto-kill prior art reverted twice) |
 
-### 2. AUTOPSY (24h cluster + recovery_replay adverse-first)
-- recovery_replay selfcheck PASS: 48h n=12 = 1 never-adverse / 9 recovered / **2 NEVER** → WRONG-SIDE REFUTED **127th** (#61 p=0.116, #84 t=-0.04).
-- 24h losers all LONG with no momentum (IOTA r2v2 mfe 0.27 · GRASS pc+ 0.18 entered against STRONG_DOWN · GMT 0.32 · SOL jup 0.16 · WLD hl_copy 0.00/0.02 · BTC ai-trader 0.44 = ARM-GAP class).
-- Direction was right (regime LONG_BIAS/STRONG_UP); the entries were chop.
+### 2. AUTOPSY (48h, recovery_replay adverse-first, selfcheck PASS)
+- n=13 = 1 never-adverse / 9 recovered / **3 NEVER** (ALGO atr-trend- · RENDER warrior+ · WLD hl_copy) → **WRONG-SIDE REFUTED 128th** (#61 p=0.116, #84 t=-0.04).
 
-### 3. SHADOW (3/6 answerable)
+### 3. SHADOW (3/6, all fresh this run)
 | Source | Status |
 |---|---|
-| contrarian join | **RE-RAN 08:30Z** (mandate) — overall flip 46.0% n=1900; pc- 66.7% n=102 LIVE; rider 44.9% do-NOT |
-| floor join | **RE-RAN 08:33Z** (20h stale) — p=0.0927; pre-reg 11-15 NO-SHIP verdict stands, not reopened |
-| shadow_trader --report | gates all block <=53% would-win negative-EV; exit A/B pm_trail +17,710 vs hard_max -22,881 |
+| contrarian join | **RE-RAN 20:30Z** (mandate) — overall flip 46.3% n=1919; pc- **63.0% LIVE**; rider 45.5% do-NOT (chi2 p=2.4e-36 HETEROGENEOUS) |
+| floor join | fresh 12:31Z — p=0.0927 COLLECT, 11-15 NO-SHIP stands |
+| shadow_trader --report | 20:33Z — gates all block negative-EV cohorts; exit A/B pm_trail +17,929 vs hard_max -23,173 |
 | oscillator / wyckoff / rr | archived / retired / orphaned |
 
-### 4. LAST-RUN VERIFY (#275) — ALL PASS
-recovery selfcheck exit=0 · hl_copy is_open fix 0 sub-5s fills since commit (2 sub-5s rows are 11-17 14:34/14:55 = pre-fix) · IOTA #16970 05:15Z checkpoint MOOT (closed 05:01:43Z hard_sl -0.10) · shadow_disp selfcheck PASS · gate_shadow_health selfcheck PASS 36 gates · checkpoint_registry 0 pending · 0 Tracebacks · constants EMPTY · lock absent · size-reduce 1.0x.
+### 4. REJECTED-WITH-DATA (never re-propose)
+- **TRANSITIONING-long block** — 30d fisher **p=0.905**, split-half sign-flip (+0.10 → -0.98).
+- **momentum_state=falling-long block** — #191 prior art p=0.55; 30d 48.2% vs 48.9% no separation.
+- **ema300-BELOW-long block** — 30d p=0.896; AT leg already under eval tape-at-long-remeasure-1129 (11-29).
 
-### 5. DRIFT / SIDE-FINDs
-- **MED (new):** gate_shadow vs shadow_trader gate-EV sign disagreement (provenance: would_pnl = follow-on trade pnl_usdt, ~13% coverage).
-- **LOW (new):** `data/gate_shadow.db` is a 0-byte orphan — real DB is `brain/gate_shadow.db`.
-- **MED (carried):** outcome joins producer-less · exitstack KPI dual-read (trailing-30 avg loser -0.0990 vs bar -0.070 still FAIL) · wyckoff join unbuilt · freq_deviation orphan.
-- **NEW creative:** ARM-CONSISTENCY 4-way census as watchdog metric · slope rejected-with-data ledger · gate-EV reconciliation.
+### 5. LAST-RUN VERIFY (#276) + DRIFT
+- #276: 0 config changes → nothing to verify; slope ledger standing; hl_copy fix holding; constants EMPTY; lock absent; checkpoint_registry 0 pending.
+- **FIXED this run:** brain.py bare-HERMES_DATA (above) · tape stamp coverage 80% → ~99%.
+- **LOW:** cascade_flip(_v2) read `os.environ.get('HERMES_DATA')` — different var than paths' `HERMES_DATA_DIR`, defaults match so no live bug · data/gate_shadow.db 0-byte orphan (carried).
+- **MED carried:** gate_shadow vs shadow_trader gate-EV sign disagreement · session_brain dup 18th.
 
-### 6. READINESS (2026-11-18 08:55 UTC)
-**0 open / 0 steers / portfolio good.** Regime LONG_BIAS 15m+4h, continuum ABOVE, vol LOW, wyckoff MARKUP, trend STRONG_UP — but 7d LONG arm only 44.7% and all 24h LONGs never-armed = low-participation advance. **FLAT/trail-family first: no mid-band chasing, no counter-trend shorts into the markup, size 1.0x.**
+### 6. READINESS (2026-11-18 20:57 UTC)
+**0 open / 1 steer dispositioned (monitor) / portfolio good.** Regime SHORT_BIAS 15m+4h, continuum **BELOW**, tape **BELOW EMA300 dist -0.77% STRONG_DOWN** (~1306 duration), wyckoff MARKDOWN, market_phase CALM. **FLAT is correct: no fresh counter-trend LONGs into the below-tape; trail-family first; SHORTs only with 4h aligned; size 1.0x (size-reduce file absent).**
 
-**Queue:** **11-20** compaction-stale + hotset-pin + warrior (n=6<10) → **11-21** batch of 12 (jup-short-walk, atrtrail-clip-12, reentry-study, prearm-BE, cell-conf-tilt, bbsqueeze-module, structure-flip, slope-jup, r2v2-clonehunt, pcv6, ceiling-85, short-rsi-hard-floor) → **11-22** ai-trader NORMAL SHORT cell (7d +1.53 accelerating, pre-measure) → **11-30** hl-copy-plus.
-CEO: **LONG arm 5th-cycle flag** · exitstack dual-read · **mult-150 label (since 11-04)** · slippage BUILD #1 (14th).
+**Queue:** **11-20** compaction-stale + hotset-pin + warrior (n=6<10) → **11-21** batch of 12 (jup-short-walk, atrtrail-clip-12, reentry-study, prearm-BE, cell-conf-tilt, bbsqueeze-module, structure-flip, slope-jup, r2v2-clonehunt, pcv6, ceiling-85, short-rsi-hard-floor) → **11-22** ai-trader NORMAL SHORT cell (7d +1.53) → **11-25** watch-contrarian + pcfade re-read → **11-29** tape-at-long-remeasure (now ~99% coverage) → **11-30** hl-copy-plus.
+CEO: **LONG arm tripwire 6th cycle** · exitstack dual-read · **mult-150 label (since 11-04)** · slippage BUILD #1 (14th).

@@ -11744,5 +11744,32 @@
     "category": "measurement",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-18T20:57:49Z",
+    "idea": "Silent-NameError class guard: AST scope-check selfcheck over scripts/*.py for bare module-level names that don't resolve (brain.py HERMES_DATA was dead for weeks inside except:pass)",
+    "rationale": "Found only by hand-tracing the metadata path this run; two live sites (guardian marker write, size-reduce read) were silently no-op. 0 other real hits after filtering string literals.",
+    "expected_impact": "catches dead-code-in-try/except before it costs a trade",
+    "category": "audit tooling",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-18T20:57:49Z",
+    "idea": "Rejected-with-data ledger +3: TRANSITIONING-long block (30d p=0.905), momentum_state=falling-long block (#191 p=0.55), ema300-BELOW-long block (p=0.896)",
+    "rationale": "All three look shippable at 14d, all three die at 30d. Ledger prevents re-proposal.",
+    "expected_impact": "0 code; prevents wasted runs",
+    "category": "process",
+    "status": "logged",
+    "risk": "none"
+  },
+  {
+    "date": "2026-11-18T20:57:49Z",
+    "idea": "Watchdog metric: exec-meta stamp coverage % per signal (keys present / closes) — the 20% ai-trader-pending gap was invisible until manually census'd",
+    "rationale": "Every counterfactual silently drops unstamped rows; coverage number makes the blind spot loud.",
+    "expected_impact": "makes stamp gaps visible where steers already live",
+    "category": "observability",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
