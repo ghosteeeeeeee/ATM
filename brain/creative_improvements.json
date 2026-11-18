@@ -11717,5 +11717,32 @@
     "category": "kpi",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-18T08:53:38Z",
+    "idea": "ARM-CONSISTENCY 4-WAY CENSUS (BOTH / MFE-only / PM-only / NEITHER) as standing watchdog metric",
+    "rationale": "14d n=198: BOTH_ARMED 67T 95.5% +4.05 | MFE_ARM_PM_NO 35T 68.6% +2.39 (arm-gap FIXED by UGB-PT, exits now mfe_exit/manual_tp) | PM_ONLY 8T +0.12 | NEITHER 88T 5.7% -7.83 = >100% of net bleed. Separates solved giveback from unsolved never-momentum chop.",
+    "expected_impact": "one number = chop-entry share; replaces ambiguous trailing_activated-only arm rate",
+    "category": "observability",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-18T08:53:38Z",
+    "idea": "REJECTED-WITH-DATA: entry_slope_4h entry filter",
+    "rationale": "14d pooled p=0.0077 (just under Bonferroni 0.0083) looked shippable; 30d split-half refutes — LONG slope<=0 net +0.80/-1.48/-0.94 (sign flip d1-7/d8-14/d15-30); SHORT slope>=0 blocked fk=25.9% > 20% bar. Logged so it is never re-proposed.",
+    "expected_impact": "blocks a false-pattern re-propose",
+    "category": "verification",
+    "status": "rejected-with-data",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-11-18T08:53:38Z",
+    "idea": "Reconcile gate_shadow would_pnl (+EV on 20 gates, follow-on-trade join) vs shadow_trader gate replay (all gates -EV) before any gate widen",
+    "rationale": "SHORT-REGIME-GATE = +2.04 token-day-dedup sum in gate_ev_dedup but negative in shadow_trader --report. Opposite signs for the same gate; widening on either number alone is unauditable. Provenance: would_pnl = real follow-on trade pnl_usdt within 24h, ~13% coverage, outcome_signal often != blocked signal.",
+    "expected_impact": "unblocks the gate-widen amplify class",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

@@ -4442,5 +4442,27 @@
     "after": "status=done disposition=NO CHANGE (quality filters, negative would_pnl)",
     "rationale": "Major vb- SHORT blockers all negative would_pnl; cell healthy 20T +0.49; underdeploy is fire-rate not plumbing; default action = report and close",
     "impact": "Queue -1 open amplify entry; no trading behavior change"
+  },
+  {
+    "timestamp": "2026-11-18T08:53:48Z",
+    "agent": "brain_auditor",
+    "change": "Audit #276 AMPLIFY why-not: all 6 n>=10 net>0 30d winner cells covered by open entries; uncovered cell atr-trend-|NORMAL|SHORT FAILS 7d same-sign (7d 11T -0.10 vs 30d +0.22, d16-30 n=0). 0 config changes.",
+    "type": "disposition",
+    "file": "brain/audit_recommendations.json",
+    "before": "amplify queue without #276 screen",
+    "after": "why-not logged, Flip-KPI 0 this week",
+    "rationale": "AMPLIFY rule 3 — a run that proposes nothing must say why with data",
+    "impact": "no trading behavior change"
+  },
+  {
+    "timestamp": "2026-11-18T08:53:48Z",
+    "agent": "brain_auditor",
+    "change": "entry_slope_4h entry-filter candidate tested and REJECTED-WITH-DATA (14d p=0.0077 but 30d split-half sign-flip LONG, SHORT fk 25.9%>20%)",
+    "type": "kill",
+    "file": "brain/audit_recommendations.json",
+    "before": "untested",
+    "after": "rejected-with-data, logged in creative_improvements",
+    "rationale": "Step 5c verify-before-shipping: OOS + fk bars both fail",
+    "impact": "no config change; prevents re-propose"
   }
 ]
