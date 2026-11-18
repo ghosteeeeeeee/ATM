@@ -4616,3 +4616,9 @@
 
 ## Error Alerts — 2026-11-18 10:53 UTC
 - **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-18 11:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 86% used (>= 85%)
+
+## Error Alerts — 2026-11-18 12:00 UTC
+- **[WARN]** (freq_deviation_shadow): `bb-squeeze+`: FREQ DEVIATION UNDER source=bb-squeeze+ baseline=0.048/h current=0.000/h ratio=0.00 n_base=16 n_cur=0
