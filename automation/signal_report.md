@@ -1,9 +1,9 @@
 # Signal Performance Report
-**Generated:** 2026-11-17 19:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-18 01:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,858 | **WR:** 51.3% | **PnL:** -120.49%
-- **Date range:** 2026-07-29 → 2026-11-17
+- **Total trades (all time):** 3,859 | **WR:** 51.3% | **PnL:** -119.96%
+- **Date range:** 2026-07-29 → 2026-11-18
 
 ---
 
@@ -25,7 +25,7 @@ None found.
 |--------|-----|-------|--------|---------|--------|------|
 | atr-trend- | SHORT | 4 | 50.0% | -0.61 | ❓ | Needs more data |
 | jup_yolo_mirrored | LONG | 2 | 50.0% | -0.58 | ❓ | Needs more data |
-| r2v2-long3 | LONG | 2 | 50.0% | -0.24 | ❓ | Needs more data |
+| ai-trader-pending | LONG | 2 | 50.0% | +0.22 | ❓ | Needs more data |
 
 ---
 
@@ -45,7 +45,7 @@ None found. Top performers are already enabled.
 
 1. **[WATCH] atr-trend- SHORT** — WR=50.0%, PnL=-0.61% over 4 trades. Monitor next cycle.
 2. **[WATCH] jup_yolo_mirrored LONG** — WR=50.0%, PnL=-0.58% over 2 trades. Monitor next cycle.
-3. **[WATCH] r2v2-long3 LONG** — WR=50.0%, PnL=-0.24% over 2 trades. Monitor next cycle.
+3. **[WATCH] ai-trader-pending LONG** — WR=50.0%, PnL=+0.22% over 2 trades. Monitor next cycle.
 
 ---
 
@@ -57,6 +57,7 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-11-17 | afa915d | auto_1hr: hourly analysis 2026-11-17 19:52 — no changes (0 c... |
 | 2026-11-16 | 08412fc | scripts: pump-long-push 20261116T153048Z — 3 log-only shadow... |
 | 2026-11-14 | 99cffce | verifier 0090d750 closures: stale_exit structure-gate (F-2) ... |
 | 2026-11-14 | b99cf4e | watchdog: trade-watchdog analysis 2026-11-14 04:56 — trail-s... |

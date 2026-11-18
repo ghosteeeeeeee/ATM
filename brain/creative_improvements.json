@@ -11690,5 +11690,32 @@
     "category": "tripwire",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-18T04:55:00Z",
+    "idea": "PM highest_price vs candle-high MFE reconciliation on open trades",
+    "rationale": "IOTA #16970: candle MFE +0.60% but highest_price +0.27% and trailing_activated=False — trail arm and watchdog steers may use disagreeing sources",
+    "expected_impact": "Prevents false exit-steers; catches PM feed lag",
+    "category": "telemetry",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-18T04:55:00Z",
+    "idea": "Wire freq_deviation_shadow over-fire as watchdog steer (hl_copy 3.82x)",
+    "rationale": "Orphan producer from #270; is_open fixed phantoms but not over-fire; 14d WR 18.2% n=11",
+    "expected_impact": "Leading indicator before bleed hits 7d KPIs",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-18T04:55:00Z",
+    "idea": "LONG-specific arm-rate leaderboard by signal (weekly rotation tracker)",
+    "rationale": "Tripwire aggregate hides rotating leaders (ai-trader/rider/r2v2 this run)",
+    "expected_impact": "Targets entry-quality at actual bleeding signal",
+    "category": "kpi",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

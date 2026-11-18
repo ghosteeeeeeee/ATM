@@ -28933,3 +28933,31 @@ BY: auto_1hr
 - Unarmed WR 11.1% (-$0.57) vs armed 100% (+$0.52) — gap wide; stall stack owns fix
 - storm-confl-waiver bar 0/3 with deadline 2026-11-19
 BY: auto_1hr
+
+## [2026-11-18 04:52] Hourly Analysis
+
+**Trades:** 0 closed
+**PnL:** $0.00 (hour) | 24h 14T 57.1% $+0.16 GREEN | 7d 108T 49.1% $+0.46 FLAT — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** no storm — window-min -0.26% / at-run -0.24% (both inside gate)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes, 1 open (IOTA r2v2-long3 LONG since 03:17)
+- Kill check: no 0%/3+T signal (0 closes/hr; 24h all 0% signals n<3 -> keep all)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/14 = 21.4% of 24h closes (<40%); exits profit-monster-trail 4 / atr_sl_hit 3 / mfe_exit 2 / trader_exit 2 — tpsl_utils deployed
+- Boost: none eligible — no signal meets n>=5 + net>$0.05 (max n=2 bb-squeeze+ 100% $0.16)
+- Arm rate: unarmed 8/14 = 57.1% (below 70%) WR 25.0% -$0.31 NEGATIVE vs armed 6/6 100% +$0.47 — report only, stall stack owns fix, no new gate
+- Neg streak: only 2 closes in last 8h (1h +0.07, 3h +0.06, both green) -> not 3 consecutive negative hours -> no size cut
+- Frequency: 0 close/hr — well under 20
+- Winners |exit-entry| 0.553% avg / 1.116% max 24h — entry quality OK
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h +$0.16 GREEN but only 14 closes; 7d +$0.46 flat-positive — edge thin
+- Unarmed WR 25.0% (-$0.31) vs armed 100% (+$0.47) — gap wide; stall stack owns fix
+- storm-confl-waiver bar 0/3 with deadline 2026-11-19
+BY: auto_1hr

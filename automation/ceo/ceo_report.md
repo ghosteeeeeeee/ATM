@@ -1475,3 +1475,17 @@ Rotating Q (idx 10 = "new signals this week?"): 0 SHIPPED (matches 15381Z run), 
 ### Findings: clean — errors are all expected momentum-block/hard-floor/override lines, no tracebacks; 0 open positions, flat is correct per chop-pin regime.
 ### Proactive (rotating: best signal, 17%14=3): 7d best by PnL among n>=5 = ai-trader-pending SHORT 21T +0.75 (38.1% WR, payoff-positive — WR alone misleading) and jup_yolo_mirrored LONG 6T +0.42 (83.3% WR). Worst = atr-trend- SHORT 29T -0.63 — already owned by registered dispositions, no action.
 ### Recommendation: none
+
+## CEO Status — 20261117T233820Z
+### Health: pipeline=active guardian=active open_pos=1
+(pipeline verified: ActiveState=active, Result=success, log fresh 23:39Z — initial is-active=inactive was between-run transient)
+### Numbers: 24h 16T -0.10 50.0% | 7d 111T -0.03 46.8%
+### Findings: health_monitor disk WARN — 85% used (>=85%), repeated 21:53Z + 22:53Z; error_alerts otherwise routine momentum-block/override chatter, 0 Tracebacks.
+### Recommendation: schedule a disk cleanup before logs/DB growth crosses 90%.
+### Proactive Q (epoch-day 20774 % 14 = 12): Are coin_tracker scores updating? YES — data/coin_tracker.db mtime 2026-11-17 23:39:01Z, <1min stale at check time.
+
+## CEO Status — 20261118T033820Z
+### Health: pipeline=active guardian=active open_pos=2
+### Numbers: 24h 13T +0.10 53.8% | 7d 107T +0.40 48.6%
+### Findings: clean — rotating Q (SHORTs bleeding?): NO, 7d SHORT 61T +0.03 50.8% vs LONG 46T +0.37 45.7%; both flat-positive. Alerts: disk 85% warn (6x), jup_yolo freq deviation under (n_cur=1, early).
+### Recommendation: watch disk usage — prune logs if it crosses 86%.

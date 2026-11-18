@@ -1766,7 +1766,7 @@
       "stream": "volume-buildup- HIGH SHORT underdeployment — validated cell (WINNER_CELLS_VALIDATED) fires 19/30d but 0/7d — clone-hunt block source",
       "kind": "amplify",
       "proposal_type": "(c) clone-hunt: mine blocked setups against winner profile, counterfactual-walk candles",
-      "status": "open",
+      "status": "done",
       "created": "2026-11-13T08:50:00Z",
       "deadline": "2026-11-20T00:00:00Z",
       "owner": "brain_auditor weekly AMPLIFY run #255",
@@ -1774,7 +1774,9 @@
       "threshold": "identify block source (confluence/ctx/regime/hotset/exec) for the 30d setup gap; counterfactual-walk 30d blocked setups in pnl_usdt units (never pnl_pct — #193 landmine); if recoverable net >= +$0.30/30d at n>=15 AND fk <20% → propose gate exempt for CEO/T; else NO CHANGE",
       "default_action": "NO CHANGE — if block is a quality filter (not plumbing), report and close",
       "risk": "low",
-      "requires": "CEO label + T sign-off before any gate change"
+      "requires": "CEO label + T sign-off before any gate change",
+      "done_at": "2026-11-18T04:56:55.964569+00:00",
+      "disposition": "NO CHANGE (closed early 2026-11-18, evidence conclusive before 11-20 deadline): gate_shadow 30d block-source read — major vb- SHORT blockers all have NEGATIVE would_pnl (SHORT-RSI-HARD-FLOOR n=151 would_pnl=-6.59, CONFLUENCE n=143 -1.87, VOL-GATE-BYPASS n=118 -8.89, SHORT-CONTINUUM n=88 -2.54) = quality filters correctly bleeding losers, NOT plumbing starving winners. Positive-would_pnl residual too small (CTX-GATE +0.14 n=19, EXEC-RSI-FLOOR +0.19 n=9) << +$0.30/30d bar. Cell itself healthy: 30d n=20 +0.49 WR 80% arm 80% — underdeployment is signal fire-rate, not gate block. Default action per threshold: 'if block is a quality filter (not plumbing), report and close'."
     },
     {
       "id": "amplify-warrior-sr-normal-long",
@@ -1789,7 +1791,8 @@
       "threshold": "SHIP only if: (i) cell reaches n>=10/30d with net>0 same-sign at 7d+14d; OR blocked-matchable n>=15 token-day deduped with would-win >=70%; (ii) 30d 1m-candle walk net >= +$0.50 pnl_usdt UNITS GUARD (never pnl_pct #193); (iii) fk <20%. Default NO SHIP if n stays <10.",
       "default_action": "NO SHIP — close as early-cell noise if n<10 at deadline",
       "risk": "low",
-      "requires": "CEO label + T sign-off before any gate/size change"
+      "requires": "CEO label + T sign-off before any gate/size change",
+      "notes": " | PRE-READ 2026-11-18: cell still n=6/30d (+0.28, 66.7% WR) <10 bar with 2 days to deadline — default NO SHIP unless n reaches 10 by 11-20."
     },
     {
       "id": "watch-pc-flip-demote-55",
@@ -1987,5 +1990,5 @@
       "notes": "AMPLIFY weekly mandate #274: all 6 n>=10 net>0 30d cells already carry open amplify entries (ai-trader-pending NORMAL SHORT, bb-squeeze+ NORMAL LONG, volume-buildup- HIGH SHORT, jup HIGH SHORT, atr-trend- NORMAL SHORT via atrtrail/accel shadows + 7d decay blocks new size, pump-chain- NORMAL LONG thin +0.10). This early n=5 cell is the run's new proposal."
     }
   ],
-  "updated_at": "2026-11-17T16:50:00Z"
+  "updated_at": "2026-11-18T04:56:55.964569+00:00"
 }

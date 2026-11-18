@@ -4538,3 +4538,45 @@
 ## Error Alerts — 2026-11-17 19:38 UTC
 - **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
 - **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-11-17 20:38 UTC
+- **REPEATED** (9x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-17 21:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-17 22:38 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-17 22:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-17 23:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-18 00:38 UTC
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-11-18 00:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-18 01:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-18 02:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-18 03:00 UTC
+- **[WARN]** (freq_deviation_shadow): `jup_yolo_mirrored`: FREQ DEVIATION UNDER source=jup_yolo_mirrored baseline=0.122/h current=0.042/h ratio=0.34 n_base=41 n_cur=1
+
+## Error Alerts — 2026-11-18 03:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+- **[WARN]** (health_monitor): `logs`: compressed 1 old logs, freed 0.0MB (disk 85%)
+
+## Error Alerts — 2026-11-18 04:00 UTC
+- **[WARN]** (freq_deviation_shadow): `atr-trend-`: FREQ DEVIATION UNDER source=atr-trend- baseline=0.101/h current=0.042/h ratio=0.41 n_base=34 n_cur=1
+
+## Error Alerts — 2026-11-18 04:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
