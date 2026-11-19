@@ -11798,5 +11798,54 @@
     "category": "data quality",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-19T09:08:12Z",
+    "idea": "Per-token rider contrarian flip registry — 8 tokens n>=20 flip>=60% vs 13 <40%, chi2 p=1.6e-34",
+    "rationale": "Signal-level 'do NOT flip rider' (45.5%) hides token tails; #188 shipped per-SIGNAL registry, token-level is one deeper. Sessions: no prior art found.",
+    "expected_impact": "if OOS holds: capture 60%+ flip WR on ~250 rows/30d currently left flat",
+    "category": "contrarian offense",
+    "status": "suggested-pre-registered",
+    "risk": "medium (selection-on-outcome; multiple comparisons across 54 tokens)",
+    "bars": "token list derived d1-15 validated d16-30 (split-sample), OOS same-sign, n>=15/token, Bonferroni p<0.05/54, shadow-only first, units=pnl_usdt"
+  },
+  {
+    "date": "2026-11-19T09:08:12Z",
+    "idea": "Storm-deadline single source of truth (SHIPPED — prompt reads registry)",
+    "rationale": "Three sources disagreed (prompt 11-12 / kanban echoes 11-19 / registry 11-26); auto_1hr false-alarmed 'deadline TODAY' all day",
+    "expected_impact": "zero-behavior; eliminates false deadline reports",
+    "category": "ops hygiene",
+    "status": "shipped",
+    "risk": "none"
+  },
+  {
+    "date": "2026-11-19T09:08:12Z",
+    "idea": "LONG HIGH regime dampen",
+    "rationale": "30d 98T 43.9% -2.61, split-half both negative",
+    "expected_impact": "would save ~$2.61/30d",
+    "category": "entry filter",
+    "status": "rejected-with-data",
+    "risk": "n/a",
+    "rejection": "fisher p=0.25 vs other LONG (not significant) + winners-blocked 43/215 = 20.0% exactly AT the 20% bar + vol-gate HIGH admission lists already per-signal (blanket block collides with bb-squeeze/hh-hl/warrior intentionally in HIGH)"
+  },
+  {
+    "date": "2026-11-19T21:03:34Z",
+    "idea": "Prearm-BE 11-21 walk reports savings BY HOLD BUCKET (>60m never-armed 14d = 33T -3.58 = 42% of never-armed bleed)",
+    "rationale": "#278 MFE-band ceiling is the entry-quality axis; hold-time axis shows bleed is long-hold no-momentum, not fast chop-outs; scopes which families a TAT can touch (#193 family-scoped rule)",
+    "expected_impact": "sharpens 11-21 decision, zero behavior",
+    "category": "measurement",
+    "status": "pre-registered",
+    "risk": "low",
+    "agent": "brain_auditor #279"
+  },
+  {
+    "date": "2026-11-19T21:03:34Z",
+    "idea": "Armed-giveback counter in watchdog (losers with mfe>=0.40 then negative exit: 14d 15T -1.78; 3 of 8 24h losers)",
+    "rationale": "separates entry-chop class from exit-giveback class so the right lever gets blamed; pairs with win-side-capture shadow collector",
+    "expected_impact": "telemetry only",
+    "category": "telemetry",
+    "status": "suggested",
+    "risk": "low",
+    "agent": "brain_auditor #279"
   }
 ]

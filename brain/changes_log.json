@@ -4486,5 +4486,38 @@
     "after": "coverage ~191/192; guard skips when key already present (no clobber of decider-stamped rows incl. streak)",
     "rationale": "pending fills pass no --signal-metadata-json; #117 backfill stamps rsi_14 only; tape-at-long re-measure (due 11-29) was blind to 20% of the book",
     "impact": "no gate reads these keys (verified repo-wide) = zero trading behavior; eval n power +25%"
+  },
+  {
+    "timestamp": "2026-11-19T09:08:12Z",
+    "agent": "brain_auditor",
+    "change": "auto_1hr storm-confl-waiver deadline: hardcoded 2026-11-12 -> read from shadow_disposition.json registry (currently 2026-11-26); fixes false deadline-TODAY reports",
+    "type": "config",
+    "file": "automation/auto_1hr_prompt.md",
+    "before": "deadline 2026-11-12 hardcoded in prompt",
+    "after": "deadline = registry field, read every run",
+    "rationale": "three sources disagreed (11-12/11-19/11-26); auto_1hr false-alarmed all day",
+    "impact": "zero-behavior ops hygiene; no trading code touched"
+  },
+  {
+    "timestamp": "2026-11-19T21:03:34Z",
+    "agent": "brain_auditor",
+    "change": "Audit #279: amended amplify-prearm-breakeven-lock threshold with hold-bucket split requirement (never-armed 14d loser buckets >60m/30-60m/10-30m/<10m)",
+    "type": "tweak",
+    "file": "data/shadow_disposition.json",
+    "before": "walk reports single net delta + fk",
+    "after": "walk also reports savings by hold bucket so any timeout variant is family-scoped per #193",
+    "rationale": "#278 ceiling covers MFE bands; hold-time axis shows 42% of never-armed bleed sits in >60m holds",
+    "impact": "measurement only, zero trading behavior"
+  },
+  {
+    "timestamp": "2026-11-19T21:03:34Z",
+    "agent": "brain_auditor",
+    "change": "Audit #279: adopted orphaned BTC_PUMP_RIDER_FADE_BLOCK_MODE shadow guard (uncommitted since 16:53Z, self-labeled audit #280, no kanban/changes_log entry) — verified RIDER-FADE selfcheck PASS mode=shadow, committed",
+    "type": "shadow",
+    "file": "scripts/hermes_constants.py + scripts/signals/btc_pump_rider.py",
+    "before": "uncommitted working-tree diff, zero-behavior shadow mode",
+    "after": "committed as shadow (log-only) with adoption note",
+    "rationale": "orphaned mid-run work would have been lost or double-worked; selfcheck PASS, mode=shadow cannot block a trade",
+    "impact": "0 trading behavior; fade-entry guard starts logging [BTC-PUMP-RIDER-FADE-SHADOW] reads"
   }
 ]

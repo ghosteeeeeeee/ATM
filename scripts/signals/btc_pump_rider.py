@@ -63,6 +63,8 @@ from hermes_constants import (
     BTC_PUMP_RIDER_GRADUAL_ALT_MIN_BETA,
     BTC_PUMP_RIDER_GRADUAL_ALT_RSI_MAX,
     BTC_PUMP_RIDER_GRADUAL_MAX_ALTS,
+    BTC_PUMP_RIDER_FADE_BLOCK_MODE,
+    BTC_PUMP_RIDER_FADE_MIN_DRIFT_PCT,
 )
 
 SIGNAL_TYPE_LONG = 'btc_pump_rider_long'
@@ -421,8 +423,45 @@ def find_lagging_alts(btc_info: dict) -> list:
     return candidates[:5]  # top 5 (limit concentrated risk)
 
 
+def _fade_pre15_drift(candles: list) -> float | None:
+    """Pre-entry 15m drift % from oldest-first (ts, o, h, l, close, vol) rows."""
+    if len(candles) < 16 or candles[-16][4] <= 0:
+        return None
+    return (candles[-1][4] / candles[-16][4] - 1) * 100
+
+
+def _selfcheck_fade() -> int:
+    """Verify constants + drift math used by the fade-entry guard."""
+    assert BTC_PUMP_RIDER_FADE_BLOCK_MODE in ('off', 'shadow', 'enforce'), \
+        BTC_PUMP_RIDER_FADE_BLOCK_MODE
+    assert 0 <= BTC_PUMP_RIDER_FADE_MIN_DRIFT_PCT < 5, BTC_PUMP_RIDER_FADE_MIN_DRIFT_PCT
+    flat_then_up = [(0, 0, 0, 0, 100.0, 0)] * 15 + [(0, 0, 0, 0, 101.5, 0)]
+    flat_then_dn = [(0, 0, 0, 0, 100.0, 0)] * 15 + [(0, 0, 0, 0, 99.5, 0)]
+    assert _fade_pre15_drift(flat_then_up) > BTC_PUMP_RIDER_FADE_MIN_DRIFT_PCT
+    assert _fade_pre15_drift(flat_then_dn) < BTC_PUMP_RIDER_FADE_MIN_DRIFT_PCT
+    assert _fade_pre15_drift([(0, 0, 0, 0, 100.0, 0)] * 3) is None
+    print(f"RIDER-FADE selfcheck PASS mode={BTC_PUMP_RIDER_FADE_BLOCK_MODE} "
+          f"min_drift={BTC_PUMP_RIDER_FADE_MIN_DRIFT_PCT}")
+    return 0
+
+
 def fire_signal(token: str, price: float, btc_info: dict, beta: float, rsi: float) -> bool:
     """Fire a btc_pump_rider_long signal."""
+    # Fade-entry guard (audit #280): pre-entry 15m drift check — shadow logs
+    # would-blocks, enforce skips. Zero behavior in 'shadow' mode.
+    if BTC_PUMP_RIDER_FADE_BLOCK_MODE in ('shadow', 'enforce'):
+        try:
+            _drift15 = _fade_pre15_drift(_get_candles(token, 'candles_1m', 20))
+            if _drift15 is not None and _drift15 < BTC_PUMP_RIDER_FADE_MIN_DRIFT_PCT:
+                if BTC_PUMP_RIDER_FADE_BLOCK_MODE == 'enforce':
+                    _log(f"  🚫 [RIDER-FADE-BLOCK] {token} LONG pre15={_drift15:+.2f}% "
+                         f"< {BTC_PUMP_RIDER_FADE_MIN_DRIFT_PCT}% — skipped")
+                    return False
+                _log(f"  👁 [RIDER-FADE-SHADOW] would-block {token} LONG "
+                     f"pre15={_drift15:+.2f}%")
+        except Exception as _e:
+            _log(f"  ⚠️ [RIDER-FADE] check error {token}: {_e}")
+
     # Compute confidence
     conf = BTC_PUMP_RIDER_CONF_BASE
     conf += min(10, int((btc_info['btc_vol_ratio'] - BTC_PUMP_RIDER_BREAKOUT_VOL_MULT) * BTC_PUMP_RIDER_CONF_VOLUME_BOOST))
@@ -494,6 +533,9 @@ def run() -> int:
 
 
 if __name__ == '__main__':
+    if '--selfcheck' in sys.argv:
+        sys.exit(_selfcheck_fade())
+
     print("=== BTC Pump Rider — Diagnostic ===\n")
 
     btc_info = detect_btc_breakout()

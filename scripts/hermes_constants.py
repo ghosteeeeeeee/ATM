@@ -1649,6 +1649,21 @@ BTC_PUMP_RIDER_CONF_CAP = 92              # max confidence (system ceiling)
 BTC_PUMP_RIDER_CONF_BETA_BOOST = 3        # extra conf per 0.1 beta above minimum
 BTC_PUMP_RIDER_COOLDOWN_MINUTES = 15      # cooldown between signals per token
 
+# ── BTC Pump Rider — Fade-Entry Guard (audit #280, 2026-11-19) ───────────────
+# LONG entries while the alt is flat/falling in the 15m BEFORE entry lose:
+# shadow n=1392 pre15>+0.10% WR 62.0% avg_net +0.034% vs <=+0.10 WR 54.6%
+# avg_net -0.132% (Fisher p=0.008, blocked-cohort t=-6.08); APPROVED/EXECUTED
+# n=83: 55.2% vs 29.6% p=0.033; OOS split-halves same-sign both populations;
+# live 10T filter blocks 6, 0 winners (all 4 winners pre15>+0.10).
+# MODE: 'off' | 'shadow' (log-only, signals fire normally) | 'enforce' (skip).
+# Enforce flip bar (shadow_first rule): >=15 live would-blocks logged AND
+# blocked-cohort net stays negative AND 0 would-blocked live winners AND
+# review-queue sign-off. FK note: blocked cohort holds 61% of shadow winners
+# (base WR ~55%) but its NET is negative every window — net-EV governs, fk
+# reported not gating (same rationale as cohort-net judgments #141/#194).
+BTC_PUMP_RIDER_FADE_BLOCK_MODE = 'shadow'
+BTC_PUMP_RIDER_FADE_MIN_DRIFT_PCT = 0.10   # min pre-entry 15m drift % for LONG
+
 # ── BTC Pump Rider — Gradual Rally Mode (2026-09-11) ────────────────────────
 # Detects slow, steady BTC rallies (vs explosive breakouts).
 # Catches alts that lag BTC by 5-10 minutes during gradual moves.
