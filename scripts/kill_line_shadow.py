@@ -287,6 +287,13 @@ def monitor(window_days: int) -> None:
         return
 
     rows = fetch_trades(window_days)
+    if not rows:
+        # bug_hunter F1: DB-up-but-0-rows must not read as an all-clear —
+        # empty result is a data/query failure, never "everything healthy"
+        log(f'ERROR fetch_trades returned 0 rows (window={window_days}d) — '
+            'NOT an all-clear: table missing/renamed or query failure. '
+            'Investigate DB before trusting next run.')
+        return
     groups = by_source(rows)
     cur_dd = {s: max_drawdown(p) for s, p in groups.items()}
     recent_alerts = load_recent_alerts(ALERT_DEDUP_HOURS)

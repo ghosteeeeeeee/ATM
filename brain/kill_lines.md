@@ -142,3 +142,20 @@ python3 scripts/kill_line_shadow.py --window-days 7 # shorter measurement window
 
 Rollback: `systemctl disable --now hermes-kill-line-shadow.timer`, delete script +
 units + registry — log-only, no DB or trading-path state was ever written.
+
+## Known limitations (bug_hunter D4, 2026-11-19 — read before the 12-03 enforce review)
+
+1. **Composite attribution gap (F2):** both line and drawdown use exact label match.
+   Composite confluence rows (`a,b,c`) never count toward their members' drawdown —
+   a source migrating to composite labels reads `n_window=0 status=OK` forever
+   (90d measured: r2_trend_short 20 exact vs 14 composite trades; r2_trend_long 19/9;
+   tl_break_short 16/7 — r2_trend_short traded via composites while showing fake-OK).
+   **Mitigation options for the 12-03 review:** member-split attribution at next
+   `--derive`, or treat composite trades as belonging to their first member.
+   Until then, OK status on a source that has gone quiet via composites is NOT evidence
+   of low drawdown.
+2. **0-rows guard (F1, fixed 2026-11-19):** a DB-up-but-empty fetch now logs an ERROR
+   line and returns instead of reporting a false all-clear.
+3. **Thin-line noise:** lines in 0.42–0.52 USDT (n_train=10) CROSS on day-one variance
+   (r2v2-long3 hit 143.5% immediately). CROSS events on thin lines need n_line context
+   before being read as decay.
