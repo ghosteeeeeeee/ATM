@@ -11771,5 +11771,32 @@
     "category": "observability",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-19T04:45:00Z",
+    "idea": "MFE-band chop-bleed structure pre-read for prearm-BE eval (due 11-21): 14d losers split a(<0.10) 37T -3.59 / b(0.10-0.20) 17T -1.73 / c(0.20-0.30) 11T -1.14 / d(0.30-0.40) 18T -1.87 / armed 12T -1.12. a+b = 56% of loser $ never reached any lock level = ceiling for a 0.25 lock is c+d = ~$3.01/14d; armed losers only -1.12 = trail works once armed",
+    "rationale": "Sharpens the 11-21 prearm-BE expectation BEFORE the eval runs; prevents claiming more save than the band structure allows",
+    "expected_impact": "pre-registers ceiling ~$3.01/14d; a+b majority confirms no exit lever exists for 56% of bleed",
+    "category": "exit science",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-19T04:45:00Z",
+    "idea": "Burst-cluster decluster hypothesis TESTED AND REFUTED: same-signal+dir opens >=3 within 5min (30d) n=10 = 70.0% WR -0.11 arm 60.0% vs solo n=650 = 50.8% -4.73 arm 52.5%",
+    "rationale": "MON/ACE/ETC 17:39-17:42Z cluster looked like a decluster target; measurement shows bursts are BETTER than solo — never propose signal-declustering on this pattern",
+    "expected_impact": "prevents a future bad ship",
+    "category": "rejected-with-data",
+    "status": "logged",
+    "risk": "none"
+  },
+  {
+    "date": "2026-11-19T04:45:00Z",
+    "idea": "gate_shadow join-basis split: would_win joins only ~23% structurally (30-45d-old events still 86.7% null — NOT a lag; fwd_4h joins 96.6%). New clone-hunt entries already default fwd_4h (amplify-r2v2-long3-clonehunt convention); carry basis+coverage note into every remaining would_win-based threshold",
+    "rationale": "Screens on a structural minority subset risk selection bias; fwd_4h is near-complete",
+    "expected_impact": "methodology hygiene for 11-21 batch clone-hunts",
+    "category": "data quality",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
