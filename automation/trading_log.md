@@ -29782,3 +29782,29 @@ BY: auto_1hr
 - 24h -0.41 red at 42.9% WR; 7d +0.52 positive (48.6%) — edge thin but 7d green
 - Unarmed WR 20.0% (-$0.59) vs armed 100% (+$0.18) — stall stack still owns the fix
 BY: auto_1hr
+
+## [2026-11-19 12:55] Hourly Analysis
+
+**Trades:** 2 closed last hour (1W 1L), 0 open | 24h: 16 closed (7W 9L)
+**PnL:** $-0.04 (hour: SOL jup_yolo_mirrored profit-monster-trail +0.04, HBAR bb-squeeze+ atr_sl_hit -0.08) | 24h $-0.45 (WR: 43.8%) | 7d 110T 49.1% $+0.48 POSITIVE — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** no storm — window-min -0.35% / at-run -0.07% (both inside gate)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Kill check: 2 closes last hour, no signal at 0% with 3+ trades; 24h 0%-WR signals all n<3 (bb-squeeze+ 1T, continuum-osc- 1T, ai-trader-pending 1T); btc-pump-rider+ 5T 20% not 0% — 14d regime check not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/16 = 18.8% (<40%); tpsl_utils deployed; hard_max_loss 3/16 = 18.8% largest loser bucket but expected at 3-5x leverage
+- Boost: none eligible — jup_yolo_mirrored 4T 100% +$0.20 needs 5+ trades; btc-pump-rider+ 5T 20% -$0.37
+- Arm rate: unarmed 11/16 = 68.8% BELOW 70% threshold, WR 18.2% -$0.67 vs armed 5/5 100% +$0.22 — unarmed share just under line but WR still ~0 vs armed; stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly 05 -0.01, 12 -0.04 (gap), not 3 consecutive -> no size cut; regime not checked (streak not met)
+- Frequency: 2 close/hr — under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- storm-confl-waiver deadline 2026-11-26 (shadow_disposition.json is truth) — default KEEP shadow; no storm today
+- 24h -0.45 red at 43.8% WR; 7d +0.48 positive (49.1%) — edge thin but 7d green
+- Unarmed WR 18.2% (-$0.67) vs armed 100% (+$0.22) — stall stack still owns the fix
+BY: auto_1hr
