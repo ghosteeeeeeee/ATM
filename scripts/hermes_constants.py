@@ -4703,6 +4703,47 @@ ATR_TREND_ACCEL_CONF_FLOOR = 50           # floor
 ATR_TREND_ACCEL_CROSS_LOOKBACK_MIN = 10   # minutes of 1m history scanned for the cross
 ATR_TREND_ACCEL_CONF_BONUS_MULT = 1.5     # ATR% >= thr*1.5 at the cross earns CONF_BONUS
 
+# ── ATR-Trend Exit Trial — ride_it wiring, SHIPPED OFF ─────────────────────────
+# Flag sits with its atr_trend_accel family; the conditional wiring block below
+# runs AFTER PROFIT_MONSTER_BYPASS_SIGNALS (line 2262) and SIGNAL_EXIT_CONFIG
+# (line 2352) — both already defined at this point.
+#
+# CEO pre-authorization: deep run 20261119T225832Z decision checkpoint
+# (automation/ceo/checkpoints/20261119T225832Z-decision.md) pre-authorizes the
+# flip to True. Line 2 of this file says ask T before changing values — that
+# checkpoint + the run's report are the ask. Flip ONLY at/after the 2026-12-06
+# atr-trend reckoning AND only if ALL of:
+#   (a) the fresh shadow ride_it-vs-pm_trail edge still holds on post-11-19 rows,
+#   (b) bug_hunter ON-path verification passes,
+#   (c) T has been notified (this checkpoint/report is the notification).
+# If the 12-06 bar KILLs on the ENTRY limbs (n/WR), the flip is moot — exits
+# don't fix entries; it matters only when entries pass and the net limb fails.
+# False (shipped) = zero behavior change: byte-identical values for every
+# existing name; only this flag and the inert conditional block are new.
+ATR_TREND_EXIT_TRIAL_ENABLED = False
+
+if ATR_TREND_EXIT_TRIAL_ENABLED:
+    # (1) Bypass PM trail + cut_loser for atr-trend. Every reader (profit_monster,
+    # cut_loser, position_manager UGB-PT, shadow_trader) imports this tuple from
+    # hermes_constants, so this module-load-time append covers them all.
+    PROFIT_MONSTER_BYPASS_SIGNALS = PROFIT_MONSTER_BYPASS_SIGNALS + (
+        'atr-trend', 'atr-trend+', 'atr-trend-',
+        'atr_trend_accel_long', 'atr_trend_accel_short',
+    )
+    # (2) Map all five variant strings to the ride_it exit engine — EXPLICIT
+    # direction keys mandatory (v5/v6 lesson): _match_exit_config does not map
+    # 'atr-trend+' from a bare 'atr-trend' key. Mirrors the existing ride_it
+    # entries ('trend-ride+', 'trend_ride_long', 'volume-breakout+', bare +
+    # underscore variants). use_ride_it (position_manager) keys off
+    # _match_exit_config(...) == 'ride_it', so mapping is sufficient.
+    SIGNAL_EXIT_CONFIG.update({
+        'atr-trend': 'ride_it',
+        'atr-trend+': 'ride_it',
+        'atr-trend-': 'ride_it',
+        'atr_trend_accel_long': 'ride_it',
+        'atr_trend_accel_short': 'ride_it',
+    })
+
 # ── ATR-SL CORRECTED-VALUE SHADOW (CEO verdict 2026-11-02, item (d)) ─────────
 # Root cause (verified by execution 2026-11-01): get_atr_pct returns PERCENT
 # but _atr_tier thresholds are FRACTIONS (ATR_PCT_LOW/HIGH = 0.01/0.015) →

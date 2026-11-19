@@ -4054,6 +4054,14 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
             'volume-breakout', 'volume_breakout',
             'mover-',  # mover- maps to ride_it; mover+ was removed (own-conclusions 2026-10-06)
         )) and 'linreg-fade' not in _pos_signal and 'linreg_fade' not in _pos_signal  # linreg-fade always gets the 8h close (V8)
+        # atr-trend exit trial (CEO deep run 20261119T225832Z): when the flag
+        # is True, atr-trend rides are exempt from the 8h universal hold too
+        # (sim assumed 24h). Flag False = no-op, identical to today. The
+        # linreg-fade exclusion is preserved (V8 always gets the 8h close).
+        from hermes_constants import ATR_TREND_EXIT_TRIAL_ENABLED
+        if ATR_TREND_EXIT_TRIAL_ENABLED and ('atr-trend' in _pos_signal or 'atr_trend' in _pos_signal) \
+                and 'linreg-fade' not in _pos_signal and 'linreg_fade' not in _pos_signal:
+            _is_ride_it = True
         _mh_exempt = structure_governed(_pos_signal, pos.get('stop_loss'))
         if UNIVERSAL_MAX_HOLD_MINUTES > 0 and open_time and not _is_ride_it \
                 and not _mh_exempt:
