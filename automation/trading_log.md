@@ -29542,3 +29542,30 @@ BY: auto_1hr
 - btc-pump-rider+ 5T 20% -$0.34 worst signal 24h but wins in 14d EXTREME/HIGH regimes — regime kill not warranted
 - 24h -0.37 red at 45.4% WR; 7d +0.51 positive — edge thin but 7d green
 BY: auto_1hr
+
+## [2026-11-19 02:52] Hourly Analysis
+
+**Trades:** 0 closed last hour | 1 open (BTC continuum-osc- SHORT) | 24h: 13 closed (6W 7L)
+**PnL:** $0.00 (hour) | 24h $-0.37 (WR: 46.2%) | 7d 110T 50.0% $+0.66 POSITIVE — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** no storm — window-min -0.70% / at-run -0.21% (both inside gate)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Kill check: no 0%/3+T signal (btc-pump-rider+ 5T 20% not 0%, 14d EXTREME/HIGH 50% win; r2v2-long3 1T, warrior-sr-confirm+ 1T n<3)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/13 = 7.7% of 24h closes (<40%); tpsl_utils deployed; hard_max_loss 4/13 = 30.8% dominant but expected at 3-5x leverage
+- Boost: none eligible — jup_yolo_mirrored 4T 100% +$0.22 needs 5+ trades (n=4, one short)
+- Arm rate: **unarmed 10/13 = 76.9% OVER 70%** WR 30.0% -$0.54 vs armed 3/3 100% +$0.17 — chop entries dominating; stall stack owns fix, no new gate
+- Neg streak: 00 -0.11, 01 -0.02 = 2 consecutive not 3; regimes EXTREME/HIGH/NORMAL not NEUTRAL -> no size cut
+- Frequency: 0 close/hr — under 20
+- Winners |exit-entry| 0.407% avg / 0.645% max — entry quality OK
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- Unarmed WR 30% (-$0.54) vs armed 100% (+$0.17) — 76.9% unarmed share over 70% threshold, stall stack owns fix
+- 24h -0.37 red at 46.2% WR; 7d +0.66 positive (50.0%) — edge thin but 7d green
+- storm-confl-waiver bar 1/3 positive, deadline 2026-11-19 (TODAY — check if bar expired)
+BY: auto_1hr
