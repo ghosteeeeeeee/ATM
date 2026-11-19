@@ -245,7 +245,7 @@ When the storm gate fires (window-min <= −1.5 OR |at-run| >= 1.5):
 2. **Counterfactual replay (honest cohort):** keep only rows with signal-metadata RSI >= 35 (`_signal_metadata` json field `rsi_14` — note the underscore prefix) — RSI<35 siblings would die at the exec knife anyway (do NOT count them, no double-count). Dedupe first-fire-per-token. For each, walk `data/candles.db` `candles_5m` from the signal `price` to now: `ret = (price - close)/price*100` for SHORT; `$ = 11 * ret/100`. Also touch-rule (low <= price*0.996 within 30x5m).
 3. **Emit the packet (log + kanban, one table):**
    `🌩️ [STORM-READINESS] window-min {m:+.2f}% / at-run {r:+.2f}% | blocked {n} ({gate counts}) | true-starvation {k} RSI>=35 | counterfactual ${x:+.2f} (touch {t}/{k}) | waiver: SHADOW={STORM_CONFLUENCE_WAIVER_SHADOW} ENFORCE={STORM_CONFLUENCE_WAIVER_ENFORCE}` (review F2: BOTH numbers are part of the template, not optional prose)
-4. **Bar tracking:** the `storm-confl-waiver` enforce flip needs **>=3 consecutive storms** with positive counterfactual (deadline 2026-11-12, registry entry). Each packet is one auditable entry — append a dated line to the kanban so "3 consecutive" is countable.
+4. **Bar tracking:** the `storm-confl-waiver` enforce flip needs **>=3 consecutive storms** with positive counterfactual. **Deadline = the `deadline` field of the `storm-confl-waiver` entry in `data/shadow_disposition.json` (read it every run — it was extended to 2026-11-26 by audit #274; hardcoded dates in this prompt and "deadline TODAY" echoes from old kanban lines are STALE, do not trust them).** Each packet is one auditable entry — append a dated line to the kanban so "3 consecutive" is countable.
 
 ## Key File Paths
 - Trades: PostgreSQL at `/var/run/postgresql/brain`

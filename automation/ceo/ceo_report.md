@@ -1531,3 +1531,9 @@ Rotating Q (idx 10 = "new signals this week?"): 0 SHIPPED (matches 15381Z run), 
 ### Numbers: 24h 15T -0.50 40.0% | 7d 115T +0.56 49.6%
 ### Findings: disk 86% used WARN repeating hourly since 03:53Z; is-active shows inactive only between timer ticks (service confirmed running); no overdue control-tower items
 ### Recommendation: clean up disk before it hits 90% — one-line ops task for the weekly deep run.
+
+## CEO Status — 20261119T113823Z
+### Health: pipeline=inactive(oneshot OK, timer active, last run 11:39 rc=0) guardian=active open_pos=1
+### Numbers: 24h 14T -0.41 42.9% | 7d 109T +0.52 48.6%
+### Findings: 24h red but 7d nets +0.52 — near breakeven; disk 86% WARN repeated (9 alerts/4h), freq_deviation btc-pump-rider+ 8.4x; control tower 17 items due ≤7d (11 on 11-21)
+### Recommendation: watch disk (86%) before it trips pipeline writes; run the 11-21 amplify batch on schedule — none urgent.

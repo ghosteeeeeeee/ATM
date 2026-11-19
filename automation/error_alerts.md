@@ -4786,3 +4786,21 @@
 
 ## Error Alerts — 2026-11-19 07:53 UTC
 - **[WARN]** (health_monitor): `disk`: disk 86% used (>= 85%)
+
+## Error Alerts — 2026-11-19 08:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 86% used (>= 85%)
+
+## Error Alerts — 2026-11-19 12:38 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (7x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+AT, allowing despite TOK filter`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-11-19 13:38 UTC
+- **REPEATED** (7x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-11-19 14:38 UTC
+- **REPEATED** (7x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+NEUTRAL+TOK, allowing despite TOK filter`
+- **REPEATED** (8x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
