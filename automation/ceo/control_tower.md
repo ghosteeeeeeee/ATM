@@ -1,6 +1,6 @@
 # CONTROL TOWER — shadows, trials, decision calendar
-generated 2026-11-19T14:04:37.852317+00:00 by scripts/shadow_disposition.py (daily 08:15 + on any registry change via hermes-shadow-disposition.path) — REGENERATED FILE, do not hand-edit (edit data/shadow_disposition.json)
-27 open / 96 done / 123 registry entries
+generated 2026-11-19T21:40:27.899390+00:00 by scripts/shadow_disposition.py (daily 08:15 + on any registry change via hermes-shadow-disposition.path) — REGENERATED FILE, do not hand-edit (edit data/shadow_disposition.json)
+28 open / 96 done / 124 registry entries
 
 ## 🟡 DUE ≤7d (17)
 - 2026-11-21 [T-2] `amplify-jup-short-walk` (owner: brain_auditor weekly AMPLIFY run)
@@ -72,7 +72,7 @@ generated 2026-11-19T14:04:37.852317+00:00 by scripts/shadow_disposition.py (dai
   - progress: —
   - if silent: KEEP shadow (do not enforce)
 
-## 📅 DUE 8–14d (8)
+## 📅 DUE 8–14d (9)
 - 2026-11-27 [T-8] `pc-plus-weight-monitor` (owner: brain_auditor)
   - bar: 14d BOTH-regimes-negative with n>=40 -> kill 1.4 weight; else KEEP with rationale. Cell-scoped: 30d EXTREME net<=0 tw...
   - progress: —
@@ -105,12 +105,16 @@ generated 2026-11-19T14:04:37.852317+00:00 by scripts/shadow_disposition.py (dai
   - bar: SHIP only if ALL: (i) PG cell n>=10 decided AND net pnl_usdt > 0 (units guard); (ii) 7d/14d/30d same-sign; (iii) fk <...
   - progress: —
   - if silent: NO CHANGE — early monitor only; log why-not at deadline if n stays <10
+- 2026-12-03 [T-14] `kill-line-shadow-enforce` (owner: CEO)
+  - bar: ENFORCE (auto-disable of ONE signal source) ONLY if ALL: (a) actual kill line CROSS (pct_consumed >=1.00 in data/kill...
+  - progress: —
+  - if silent: KEEP SHADOW log-only — no disable, no trading-path change; re-derive lines only via committed --derive refresh if a b...
 
 ## LATER (>14d) (2)
 - 2026-12-06 [T-17] `atr-trend-accel-shadow` (owner: CEO)
-  - bar: >= 30 CLOSED atr-trend trades AND WR >= 52% -> KEEP; either limb unmet at deadline -> disable (CEO WR-based rule 2026...
+  - bar: KEEP at deadline (2026-12-06) requires n >= 30 AND WR >= 52% AND net PnL >= $0; any limb unmet -> KILL. PnL limb is a...
   - progress: —
-  - if silent: KILL: set ATR_TREND_ACCEL_ENABLED=False (PLUS/MINUS too) — WR-based bar unmet; 24h CEO clock on the kanban packet
+  - if silent: KILL: set ATR_TREND_ACCEL_ENABLED=False (PLUS/MINUS too) — any limb unmet; 24h CEO clock on the kanban packet
 - 2026-12-15 [T-26] `amplify-ugb-bypass-hole` (owner: brain_auditor weekly AMPLIFY run #222)
   - bar: SHIP only if DISTINCT trade ids >=20 in the widened cohort AND cf net delta >= +$0.15/30d AND killed-winners = 0 AND ...
   - progress: —
@@ -131,6 +135,7 @@ generated 2026-11-19T14:04:37.852317+00:00 by scripts/shadow_disposition.py (dai
 - 2026-11-30 [T-11]: long-rsi-floor30-shadow, hl-copy-plus-shadow
 - 2026-12-01 [T-12]: linreg-fade-storm-admission-shadow, jup-atrsl-shadow-parity
 - 2026-12-02 [T-13]: amplify-pumpchain-normal-short-early
+- 2026-12-03 [T-14]: kill-line-shadow-enforce
 - 2026-12-06 [T-17]: atr-trend-accel-shadow
 - 2026-12-15 [T-26]: amplify-ugb-bypass-hole
 
@@ -138,4 +143,4 @@ generated 2026-11-19T14:04:37.852317+00:00 by scripts/shadow_disposition.py (dai
 flip-contrarian-pc, trial-coupled-cutsloser-sl, eval-midband-long-4564, gate-shadow, shadow-trader-bypass, expiry-t5-shadow, mfe-cut-arm-be, relative-regime, rr-engine-shadow, chase-ratio, ichimoku-dampen-flooradmit, volmom-volbreak, tc-temporal-confluence, mom-filter-shadow, acceleration-threshold, wyckoff-shadow, ai-trader-extreme-shadow, oscillator-shadow, bb-tat-shadow, db-mirror-0byte, escalation-17, ugb-pt-045, disposition-cadence-revert, fade-ctx-exempt, winner-cell-size-125, bb-squeeze-hml-entry-profile, amplify-weekly-mandate, fade-volgate-split-analysis, fade-btc-crash-postflip, storm-readiness-packet, signal-zombie-purge, momentum-cache-regime-coverage, pump-detect-ceiling-mismatch, override-vs-ceiling-contradiction, ichimoku-short-solo-counterfactual, jup-yolo-regime-review, amplify-winner-cell-mult-150, chase-move-shadow, conf-filter-parity-split, ichimoku-bypass-lowjoin-ticket, stop-asymmetry-highwr, short-relax-shadow-study, pump-chain-plus-weight-kill-review, trial-wider-sl, trial-extended-time, gate-shadow-capture-coverage-fix, candle-collector-coverage-audit, stop-tighten-enforce-eval, amplify-grind-breakout-deploy, amplify-pc-fade-cell-split, amplify-stop-tighten-probe-080, jup-hml-shadow-065-050, jup-trail-shadow-1xatr, short-regime-exempt-shadow, flip1-bear-override-reshadow, ichimoku-short-pause, rsi-ceiling-75-live, bear-single-source-shadow, volgate-short-exempt-shadow, maxxed-short-exempt-shadow, gate-shadow-dedup-convention, long-bypass-regime-shadow, short-shadow-join-builder, timer-cadence-recheck, harvest-ship-2026-11-04, amplify-xmirror-giveback, daily-fill-cap-brake, amplify-vb-high-short-clonehunt, amplify-jup-short-high-cell, amplify-ema300-underdeploy, amplify-bbsqueeze-chop-exempt, jup-cluster-gate, jup-anti-chase, jup-pro-selection, btc-standalone-deny-shadow, setup-recall-shadow, linreg-fade-fill-funnel, amplify-bbsqueeze-warrior-uninert, amplify-bbsqueeze-neutral-exempt, dailyfillcap-identity-verify, amplify-stoptighten-scope-widen, amplify-winner-cell-drop-pcplus, stop-tighten-slippage-column, hml-vol-atr-mult-shadow, amplify-atr-trend-short-cell-watch, amplify-tat-neverarmed-age-widen, amplify-atr-trend-short-clonehunt, amplify-ugb-bypass-armgap, amplify-jup-long-flat-cell, amplify-grind-breakout-underdeploy, compaction-stale-trend-band-eval, exitstack-day-kpi-1114, amplify-vb-high-short-underdeploy, amplify-warrior-sr-normal-long, watch-pc-flip-demote-55, floor-admit-same-sign-verdict
 
 ---
-freshness: FRESH | registry mtime: 2026-11-19T14:04:37+00:00 | prev tower render: 2026-11-19T08:15:00+00:00 | last run: 0 packet(s), 0 entry error(s)
+freshness: FRESH | registry mtime: 2026-11-19T21:40:27+00:00 | prev tower render: 2026-11-19T21:08:58+00:00 | last run: 0 packet(s), 0 entry error(s)

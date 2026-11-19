@@ -4804,3 +4804,54 @@
 - **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+NEUTRAL+TOK, allowing despite TOK filter`
 - **REPEATED** (8x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
 - **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-11-19 14:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+- **[WARN]** (health_monitor): `logs`: compressed 1 old logs, freed 0.0MB (disk 85%)
+
+## Error Alerts — 2026-11-19 14:55 UTC
+- **[WARN]** (kill_line_shadow): `r2v2-long3`: KILL LINE CROSS source=r2v2-long3 consumed=143.5% of line (dd=0.6600 line=0.4600, window=30d, n=26) — SHADOW log-only, no disable; enforce needs line CROSS + next-10-trade negative PnL + explicit CEO approval
+
+## Error Alerts — 2026-11-19 15:38 UTC
+- **REPEATED** (21x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   pending_order_monitor: TOK — PENDING TOK btc-auto-ladder-N: TOK TOK @ N ({'timestamp': 'N-N-19T15:N:N.N+N:N', 'type': 'pending_order', 'order_id': 'btc-auto-ladder-N', '`
+
+## Error Alerts — 2026-11-19 15:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 85% used (>= 85%)
+
+## Error Alerts — 2026-11-19 16:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 86% used (>= 85%)
+
+## Error Alerts — 2026-11-19 17:38 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: CONTAGION,TOK,BTC_LEVEL | vol=N.8x eth_div=+N.N% | BTC_LEVEL: TOK blocked (-N.N% from high)`
+
+## Error Alerts — 2026-11-19 17:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 86% used (>= 85%)
+
+## Error Alerts — 2026-11-19 18:38 UTC
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+
+## Error Alerts — 2026-11-19 18:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 86% used (>= 85%)
+
+## Error Alerts — 2026-11-19 19:38 UTC
+- **REPEATED** (8x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK knife floor (detect): N.N < N`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK knife floor (detect): N.N < N`
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+TOK+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-19 19:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 86% used (>= 85%)
+
+## Error Alerts — 2026-11-19 20:38 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   pending_order_monitor: TOK — PENDING TOK btc-auto-ladder-N: TOK TOK @ N ({'timestamp': 'N-N-19T20:N:N.N+N:N', 'type': 'pending_order', 'order_id': 'btc-auto-ladder-N', '`
+
+## Error Alerts — 2026-11-19 20:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 86% used (>= 85%)
+
+## Error Alerts — 2026-11-19 21:38 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+- **REPEATED** (7x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   pending_order_monitor: TOK — PENDING TOK btc-auto-ladder-N: TOK TOK @ N ({'timestamp': 'N-N-19T21:N:N.N+N:N', 'type': 'pending_order', 'order_id': 'btc-auto-ladder-N', '`

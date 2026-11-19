@@ -2369,3 +2369,5 @@
 [2026-11-19 13:43 UTC]   🟡 WARNING: btc-pump-rider+: 5 trades, 20.0% WR, PnL=-3.28
 [2026-11-19 13:43 UTC] Done. Rapid-disabled 0 signals.
 [2026-11-19 13:43 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-11-19 19:43 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-11-19 19:43 UTC] No signals with sufficient trades in 24h window

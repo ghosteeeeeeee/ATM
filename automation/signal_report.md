@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-19 13:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-19 19:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,879 | **WR:** 51.3% | **PnL:** -125.14%
+- **Total trades (all time):** 3,882 | **WR:** 51.3% | **PnL:** -126.70%
 - **Date range:** 2026-07-29 → 2026-11-19
 
 ---
@@ -15,9 +15,7 @@ None found.
 
 ## LOSERS (WR < 30%, PnL < -2%)
 
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status | Rec |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|-----|
-| btc-pump-rider+ | LONG | — | —% | — | 5 | 20.0% | -3.28 | ❓ | **DISABLE** |
+None found.
 
 ---
 
@@ -25,7 +23,7 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| atr-trend- | SHORT | 3 | 33.3% | -1.63 | ❓ | Needs more data |
+| btc-pump-rider+ | LONG | 3 | 33.3% | -1.28 | ❓ | Needs more data |
 
 ---
 
@@ -43,8 +41,7 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[DISABLE] btc-pump-rider+ LONG** — WR=20.0%, PnL=-3.28% over 5 trades (24h).
-2. **[WATCH] atr-trend- SHORT** — WR=33.3%, PnL=-1.63% over 3 trades. Monitor next cycle.
+1. **[WATCH] btc-pump-rider+ LONG** — WR=33.3%, PnL=-1.28% over 3 trades. Monitor next cycle.
 
 ---
 

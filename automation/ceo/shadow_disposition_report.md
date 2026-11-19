@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-19T14:04:37.852317+00:00
-registry: 123 entries (open=27)
+# Shadow disposition report — 2026-11-19T21:40:27.899390+00:00
+registry: 124 entries (open=28)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -124,3 +124,4 @@ registry: 123 entries (open=27)
 - OPEN hl-copy-plus-shadow: deadline=2026-11-30T00:00:00Z | (no parseable source)
 - OPEN hotset-pin-approved-shadow: deadline=2026-11-25T00:00:00Z | (no parseable source)
 - OPEN amplify-pumpchain-normal-short-early: deadline=2026-12-02T00:00:00Z | (no parseable source)
+- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 528 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 0.3d

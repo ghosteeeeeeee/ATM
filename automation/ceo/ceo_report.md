@@ -1537,3 +1537,40 @@ Rotating Q (idx 10 = "new signals this week?"): 0 SHIPPED (matches 15381Z run), 
 ### Numbers: 24h 14T -0.41 42.9% | 7d 109T +0.52 48.6%
 ### Findings: 24h red but 7d nets +0.52 — near breakeven; disk 86% WARN repeated (9 alerts/4h), freq_deviation btc-pump-rider+ 8.4x; control tower 17 items due ≤7d (11 on 11-21)
 ### Recommendation: watch disk (86%) before it trips pipeline writes; run the 11-21 amplify batch on schedule — none urgent.
+
+## CEO Deep Run 20261119T141548Z — Wallace/mining integration (incomplete rc=124; completed by orchestrator dispatches)
+
+**Operator directive:** integrate 5-video mining; biggest winners LIVE now; stagger rest via shadow/automatic-implementation; bug_hunter last.
+
+| Item | Outcome |
+|------|---------|
+| D1 S1 streak analysis | ✅ SHIPPED `a2b11456` — Wallace "odds improve after losses" REJECTED (all ΔWR<0, OOS holds); LOSS_COOLDOWN no-change (indeterminate at its key, p=0.088–0.374); KILL_MAX_CONSEC direction strongly supported (WR −13..−21pp after losses, p<0.001, OOS-stable); rubber-band MFE null; Martingale do-not-adopt. Independent bucket/Fisher recomputation in-file. |
+| D2 cold verify of ATR_SL_MIN 0.017 | ❌ **FAIL → D3 NOT applied** `9a33686f` — B's headline [+6.12,+6.44] refuted (actual [+4.80,+5.73]); OOS 11-08→11-19 sign flip (−0.41, n_swung=24); era-matched fresh window: 0.017 = WEAKEST grid point (+1.33 vs 0.013 +2.06, 0.019 +3.29); +$6 ≈ 2/3 era-mix artifact; candle-DB rotation broke cross-time reproducibility. Re-test gate: OOS d_lo@0.017 ≥0 @ n_swung≥100, same-day reproduce, in-era peak. ATR_SL_MIN stays 0.015. Coupling audit + 6-flag conditional edit list recorded for future override. Tuner conflict: NONE (self_learner padded-line defect means it can never read ATR_SL_MIN — latent defect flagged). |
+| D3 live constants edit | ⛔ NOT RUN (gated on D2, which failed) — operator authorization unused; hermes_constants.py untouched this round. |
+| D5 I kill-lines shadow | ✅ SHIPPED `b8bec94c` — log-only monitor + 45-line registry (2× train realized DD, provisional provenance) + hourly timer (enabled, 15:00 UTC first fire clean) + automatic-implementation wiring, enforce review **2026-12-03** (bar: line CROSS + next-10 negative + CEO approval, never unattended). First reading: r2v2-long3 CROSS 143.5% (logged, not disabled). Limitation: 45 dynamic combo-label sources UNREGISTERED (n_train<10). |
+| D4 bug_hunter | run as final step (result-4). |
+
+**Sideswales from D2:** STOP_TIGHTEN (live 11-04) clamps SL≤0.75% for 8 sources → confounds kill-line registry eval due 11-21; PARAM_CONFIG['ATR_TP_MIN'].max=0.015 < proposed 0.017 (latent, protected by same padding defect); sweep numbers are candle-time-dependent — future verifies same-day.
+**Queued:** S2 event-completion exits analysis, S3 null test (check winrate-calculator first), kill-lines for dynamic combo labels, H bar review 11-22, stop-tighten eval 11-21.
+
+## CEO Status — 20261119T153823Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 15T -0.48 40.0% | 7d 107T +0.32 47.7%
+### Findings: 24h slightly red (40% WR) but 7d nets +0.32 — flat, within noise; disk 85% WARN (health_monitor), r2v2-long3 kill-line cross 143.5% (shadow log-only by design), NEW btc-auto-ladder pending order; control tower 0 overdue (11 items due 11-21)
+### Recommendation: watch disk 85% (write path risk) — none urgent.
+
+## CEO Deep Run — 20261119T163642Z (post-timeout adoption; run incomplete rc=124 at closeout)
+
+**Rulings (FINAL decision checkpoint, written pre-dispatch):**
+1. **Remainder = complete:** S2 ✅this run, S3 (status-run skill check), D exposure tracker (own slot), J (gated on D), F ATR(20)×2 benchmark (never in hand), combo-label kill lines (own deep slot before 12-03). Date gates: stop-tighten eval **11-21** (rides next 4h status run), H bar **11-22**, kill-line enforce **12-03**.
+2. **D2 line:** FAIL closes the 0.017 candidate permanently as proposed; ATR_SL_MIN stays open under its re-test gate — **re-verify 2026-12-22** (n_swung≈2.2/day → ~100 by then; extend weekly if short). State adopted as-is incl. F1–F3 fixes; 12-03 agenda += F2 composite options + combo-label gap + r2v2-long3 next-10.
+3. **Priority:** 1) 11-21 eval prep (status run), 2) S2 (dispatched, done), 3) S3 (status run), 4) combo-label lines (deep slot), 5) D, 6) J after D.
+4. **Profitability:** highest-EV was S2 → **result: REFUTED** (Δ −0.0071pp, CI [−0.078,+0.064] — outside the +0.10pp bar; inert on 49% censored; significant results point against; MR cohort 0 closes since 11-01 → DROP, no shadow, no code). **Redirect (S2-adjacent):** 146/391 (37.3%) MR entries were already past the 15m mean at entry (bb_position 0.69/0.85, z +0.76 on LONG, is_stale true) — sign 57/89 p=0.010 against being in them. Entry-quality problem, upstream of and larger than the exit question.
+
+**Closeout by orchestrator (run died at report/memory steps):** checkpoint files committed (-f), this append, OpenMemory. **Stale-filter pre-check done:** existing gates = SIGNAL_STALENESS_PRICE_PCT=0.25 (bb_bounce-specific, hermes_constants:3864), SIGNAL_STALENESS_MAX_AGE_MIN=5 (:3865), per-signal data-age mins (OVERSOLD_BOUNCE 10min etc.), decider is_stale soft-penalty only when z contradicts regime (decider_run:4277) — the 146 stale entries PASSED all of them → follow-up dispatch must test whether these gates measure age/price-move but not position-in-band at entry.
+
+## CEO Status — 20261119T193823Z
+### Health: pipeline=active guardian=active open_pos=2
+### Numbers: 24h 14T -0.51 35.7% | 7d 107T 0.25 47.7%
+### Findings: Proactive Q (PnL): 24h slightly red (-0.51, WR 35.7%) but 7d net positive (+0.25) — noise-scale, not a bleed. Disk at 86% (recurring WARN); 2 open positions.
+### Recommendation: None — monitor disk usage; clean up in the weekly deep run if it hits 90%.
