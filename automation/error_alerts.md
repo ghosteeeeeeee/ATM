@@ -4855,3 +4855,12 @@
 - **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
 - **REPEATED** (7x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
 - **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   pending_order_monitor: TOK — PENDING TOK btc-auto-ladder-N: TOK TOK @ N ({'timestamp': 'N-N-19T21:N:N.N+N:N', 'type': 'pending_order', 'order_id': 'btc-auto-ladder-N', '`
+
+## Error Alerts — 2026-11-19 21:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 86% used (>= 85%)
+
+## Error Alerts — 2026-11-19 22:38 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: +N.N% | layers: CONTAGION,TOK,BTC_LEVEL | vol=N.5x eth_div=+N.N% | BTC_LEVEL: TOK blocked (-N.N% from high)`
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] IO TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] IO TOK — continuum says DECLINING+NEUTRAL+TOK, allowing despite TOK filter`

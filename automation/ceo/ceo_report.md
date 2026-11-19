@@ -1574,3 +1574,31 @@ Rotating Q (idx 10 = "new signals this week?"): 0 SHIPPED (matches 15381Z run), 
 ### Numbers: 24h 14T -0.51 35.7% | 7d 107T 0.25 47.7%
 ### Findings: Proactive Q (PnL): 24h slightly red (-0.51, WR 35.7%) but 7d net positive (+0.25) — noise-scale, not a bleed. Disk at 86% (recurring WARN); 2 open positions.
 ### Recommendation: None — monitor disk usage; clean up in the weekly deep run if it hits 90%.
+
+### S2-adjacent follow-up — result-2 (orchestrator dispatch after rc=124, `9c884db3`)
+
+**Stale-entry measurement: phenomenon real, harm null, gates dead.**
+- (a) **Detection-side:** 121/140 (86.4%) of entered-past-mean trades fired already past the mean at DETECTION (99/140 wrong-signed z at 1m); only 19/140 decayed detect→execute (median 1.12min, 0.105%). Bug lives in detection logic, not execution.
+- (b) **Gate-gap:** `SIGNAL_STALENESS_PRICE_PCT` is DEAD CODE (drift≡0 by construction, decider:4996→5054; 0 [DRIFT] firings vs 10,548 [STALE-WARN]); age gate warn-only since 09-04; is_stale penalty dead (`_get_token_zscore()` hard-returns 0.0, signal_gen gone). Even all-working union catches only 32/146 — **114/146 pass everything**. Nothing measures position-in-band.
+- (c) **Outcome NULL:** past 59.6% −$0.0010 vs clean 56.7% −$0.0023 (Fisher p=0.598, Welch p=0.907); cluster-bootstrap CI [−0.022,+0.025] ∋ 0; last-30d flip (p=0.045) sign-unstable vs adjacent slice, n=19, MR pool 0 closes since 11-01 → not extendable. **Correction to result-1:** its p=0.010 gloss read the minority side — 61% of past-mean trades were gross winners; between-group test (right one) is null.
+- (d) **37.3% prevalence = floor** (algebraic identity across defs; det-1m def = 54.7%) but null under every definition (det-1m: p=0.918).
+- **Verdicts:** NO filter built (no supported harm). **Open ruling for a CEO run:** three written-but-dead gates → fix to measure position-in-band-at-detection, or delete (currently false security). **Sideways question:** entire MR family 0 closes since 2026-11-01 — regime or block? worth a status-run check.
+
+## CEO Deep Run — 20261119T210516Z (incomplete rc=124 at closeout; decision checkpoint survived by design; dispatches completed by orchestrator)
+
+**Directed brief:** `brief-atr-trend-reckoning-20261109.md` — atr_trend_accel shadow: disposition amendment vs stop-cluster fix.
+
+**Rulings (checkpoint written pre-dispatch):**
+- **A = option 1:** KEEP at deadline (2026-12-06) requires `n ≥ 30 AND WR ≥ 52% AND net PnL ≥ $0`; any limb unmet → KILL. PnL limb additive (WR-only rule had a payoff hole).
+- **B = option 1:** stop-cluster study FIRST; NO exit/constant changes this run (any value change needs T sign-off regardless).
+- **C = yes:** keep collecting as-is until 2026-12-06; deadline is the natural decision point.
+- **Regime note recorded:** bleed sits in HIGH SHORT (19T −$0.32) and EXTREME SHORT (4T −$0.48); NORMAL SHORT (17T 76.5% +$0.26) wins → deadline adjudication MAY consider a regime-scoped keep instead of blanket kill if only the PnL limb fails. No regime gate built now.
+
+**result-1 ✅ `d3c8dd55`** — `atr-trend-accel-shadow` entry amended (threshold/disposition/default_action/notes only; backup `.bak-20261119`). Validation: entry-by-entry diff vs backup clean (4 fields, one entry), `shadow_disposition.py --selfcheck` PASS (38 checks incl live PG), live path-unit re-render 0 entry errors, committed blob re-parsed exact. Note: registry now holds **124 entries** (87 was index).
+
+**result-2 ✅ `e119bf14`** — stop-cluster counterfactual study (`brain/analysis/atr_trend_stop_cluster_20261109.py`, report checkpoint result-2). Verdict: **stops are ~2.5× the median winner (realized stops median −3.51% margin vs winners +1.37%) and stop width explains essentially the entire bleed — but NO width robustly profits, so no constant change.** Sweep: only S∈[2.0,2.25]% crosses zero (+$0.04–0.05 = breakeven, knife-edge — 2/3 killed winners touched within 0.09–0.21pp), **half-2 negative at every width**, and at S=2.0 WR falls to 51.1% (below the new 52% limb). Winner-cap side: censored all-to-MFE bound ≈ +$0.73 (harder to capture than stop lever +$0.68); only 7/26 winners had MFE>+3%. Caveats: pnl_usdt gross of fees (net baseline ≈ −$1.10, constant across S), 2 rows notional-basis pnl_pct, MAE-touch approximation. Prescription if T wants the lever: shadow counterfactual ledger (regime-scoped) adjudicated at deadline.
+
+**Evidence baseline (PG, verified by run + both subagents):** 47 closed, 27W/19L/1, WR 57.4%, sum pnl_usdt −$0.63 (≈ −$1.10 net of fees), payoff 0.45 (avgW +1.61% / avgL −3.61%), median hold 41.9m, all 18 losing exits stop-side (PM-trail +$1.12 vs stops −$1.97).
+
+**NOT touched:** hermes_constants values, exit code, signal flags, live gates.
+**Commits (local, no push):** `d3c8dd55` (registry + result-1 md), `e119bf14` (study + result-2 md).
