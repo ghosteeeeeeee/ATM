@@ -4779,3 +4779,10 @@
 
 ## Error Alerts — 2026-11-19 06:53 UTC
 - **[WARN]** (health_monitor): `disk`: disk 86% used (>= 85%)
+
+## Error Alerts — 2026-11-19 07:38 UTC
+- **REPEATED** (9x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
+- **NEW** (2x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] 0G TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-11-19 07:53 UTC
+- **[WARN]** (health_monitor): `disk`: disk 86% used (>= 85%)
