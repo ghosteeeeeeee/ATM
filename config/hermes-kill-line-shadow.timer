@@ -1,0 +1,11 @@
+[Unit]
+Description=Hermes Kill-Line Shadow Timer — hourly
+# CEO deep run 20261108T023937Z item I (built 20261119T141548Z, D5).
+# Hourly shadow evaluation of per-source drawdown vs pre-committed kill lines.
+# Enable: systemctl daemon-reload && systemctl enable --now hermes-kill-line-shadow.timer
+[Timer]
+OnCalendar=hourly
+Persistent=true
+
+[Install]
+WantedBy=timers.target

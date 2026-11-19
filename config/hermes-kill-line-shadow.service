@@ -1,0 +1,15 @@
+[Unit]
+Description=Hermes Kill-Line Shadow Monitor — log-only
+# CEO deep run 20261108T023937Z item I (automatic-implementation Phase 1).
+# SHADOW: computes each signal source's current drawdown vs its pre-committed
+# kill line (brain/kill_line_registry.json), logs distance to JSONL, ALERTs at
+# >=80% of line consumed. Read-only on brain (SELECT only), writes only JSONL
+# state + stdout + error_alerts.md. Zero trading-path touch — never disables,
+# never blocks. ENFORCE limb pre-registered: auto-disable only on line CROSS
+# + next-10-trade negative PnL + explicit CEO approval, never unattended —
+# the review surfaces automatically 2026-12-03. See brain/kill_lines.md.
+[Service]
+Type=oneshot
+WorkingDirectory=/root/.hermes
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/kill_line_shadow.py
+TimeoutStartSec=120
