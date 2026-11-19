@@ -1452,15 +1452,15 @@
       "id": "atr-trend-accel-shadow",
       "stream": "atr_trend_accel signal (signals/atr_trend_accel.py) — ATR(14,1m) Wilder cross-up 0.076% + hysteresis 0.9 decluster + direction = completed 15m AND 4h EMA20/50 agreement; PENDING signals -> normal compactor/decider -> PM-managed exits",
       "kind": "shadow",
-      "disposition": "PROMOTE (keep live + sizing review) if bar met, else KILL",
+      "disposition": "PROMOTE if all three limbs met, else KILL",
       "status": "open",
       "started": "2026-11-06",
       "deadline": "2026-12-06T00:00:00Z",
-      "threshold": ">= 30 CLOSED atr-trend trades AND WR >= 52% -> KEEP; either limb unmet at deadline -> disable (CEO WR-based rule 2026-11-06)",
-      "default_action": "KILL: set ATR_TREND_ACCEL_ENABLED=False (PLUS/MINUS too) — WR-based bar unmet; 24h CEO clock on the kanban packet",
+      "threshold": "KEEP at deadline (2026-12-06) requires n >= 30 AND WR >= 52% AND net PnL >= $0; any limb unmet -> KILL. PnL limb is additive (CEO A=1, 2026-11-09). Measure basis: sum(pnl_usdt) over closed trades WHERE signal LIKE 'atr-trend%' (PostgreSQL brain — same basis as the checkpoint evidence: 47 closed, WR 57.4%, sum pnl_usdt -0.63 as of 2026-11-09).",
+      "default_action": "KILL: set ATR_TREND_ACCEL_ENABLED=False (PLUS/MINUS too) — any limb unmet; 24h CEO clock on the kanban packet",
       "join_rate": "PostgreSQL brain trades WHERE signal LIKE 'atr-trend%' (open_time >= started); n and WR limbs both from closed rows",
       "owner": "CEO",
-      "notes": "Backtest 30d x 12 coins: 24h direction-aligned WR 58.8% mean +0.72%, ev-state +0.77 (day-block p=0.007-0.015), verified by audit #2 + own-conclusions; audit #2 sizing rule: >=30 forward days day-blocked CI before ANY size — this reckoning gates KEEP vs KILL, not sizing. OPEN bug BUG-096: 38/176 tokens have 15m data >30min stale -> trend check skips, coverage ~78% (upstream 15m writer). Entry latency up to 10min post-cross (CROSS_LOOKBACK_MIN, 100% event capture). Spec: plans/atr60-momentum-spec-2026-11-06.md"
+      "notes": "Backtest 30d x 12 coins: 24h direction-aligned WR 58.8% mean +0.72%, ev-state +0.77 (day-block p=0.007-0.015), verified by audit #2 + own-conclusions; audit #2 sizing rule: >=30 forward days day-blocked CI before ANY size — this reckoning gates KEEP vs KILL, not sizing. OPEN bug BUG-096: 38/176 tokens have 15m data >30min stale -> trend check skips, coverage ~78% (upstream 15m writer). Entry latency up to 10min post-cross (CROSS_LOOKBACK_MIN, 100% event capture). Spec: plans/atr60-momentum-spec-2026-11-06.md | DECISION 2026-11-19 deep run (A1/B1/C1): PnL limb added to threshold; stop-cluster study commissioned (no exit/constant changes now); collection continues as-is to 12-06. Regime evidence for the deadline adjudication: winning cell = atr-trend- NORMAL SHORT 17T 76.5% WR +$0.26; bleed = HIGH SHORT 19T -$0.32 and EXTREME SHORT 4T -$0.48 — if only the PnL limb fails at deadline, consider a regime-scoped keep of the NORMAL SHORT cell instead of a blanket kill (kanban packet 24h CEO clock). Conf>=78 cohort n=11 -$0.59 vs conf<78 n=36 -$0.04 (confidence raise cohort worse, n small, no action). CEO deep 20261119T210516Z: B=stop-cluster study commissioned first (no exit/constant changes until study + T sign-off); C=keep collecting as-is until deadline. Regime cells (closed, PG): atr-trend- NORMAL SHORT 17T 76.5% WR +$0.26 (winning) | HIGH SHORT 19T 57.9% -$0.32 | EXTREME SHORT 4T 0% -$0.48 — deadline adjudication MAY consider a regime-scoped keep instead of blanket kill if only the PnL limb fails; no regime gate built now."
     },
     {
       "id": "amplify-prearm-breakeven-lock",
