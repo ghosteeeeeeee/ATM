@@ -20,75 +20,76 @@ GATE USEFULNESS DEEP DIVE — window 2026-10-04 → 11-19 (46 days)
   frequency: 47.0/day (Sep 7 wk) → 13.2/day (current wk) = 72% decline — CLAIM CONFIRMED
 
 ── 1. EVENT FRAME ──────────────────────────────────────────────────────────────────────────────────
-  total events: 107002  (reparse Oct30→Nov19 ground truth: 55992; db-only Oct4→Oct30: 51010)
-  window: 10-04 11:07 → 11-19 21:40 UTC
+  total events: 107040  (reparse Oct30→Nov19 ground truth: 56030; db-only Oct4→Oct30: 51010)
+  window: 10-04 11:07 → 11-19 22:01 UTC
   capture audit (overlap Oct30→now, reparse = ground truth):
-    lowest-capture gates: PUMP-CHAIN-SHORT-HIGH=99%; LONG-NEUTRAL=99%; SHORT-RSI-HARD-FLOOR=100%; LONG-NEUTRAL-CHOP=100%; OVERSOLD-SHORT=100%; PUMP-CHAIN-HIGH=100%; LONG-RSI-BLOCK=100%; SHORT-RSI-CEILING=100%
+    lowest-capture gates: PUMP-CHAIN-VEL=99%; SHORT-RSI-CEILING=100%; LONG-NEUTRAL=100%; SHORT-BB-DEAD-ZONE=100%; PUMP-CHAIN-SHORT-HIGH=100%; BTC-CHOP-GATE=100%; SHORT-RSI-HARD-FLOOR=100%; VOL-GATE-BYPASS=100%
     gates ≥90% capture: 39/39
 
-── 2. ENRICHED: 106357 events with forward data ───────────────────────────────────────────────────────
+── 2. ENRICHED: 81707 events with forward data ───────────────────────────────────────────────────────
+  dropped for pre-history (entry precedes candle-data start — candles_5m has ~29d rolling retention; mass prune at 21:55 on 2026-11-19): 24699
 
 ── 3. WEEKLY FUNNEL (blocked episodes vs executed trades) ───────────────────────────────────────────────
-  episodes (60min coalesce): 45310
+  episodes (60min coalesce): 33812
   week       blocked_eps trades block:trade
-  2026-09-28         422     36        11.7
-  2026-10-05        5478    127        43.1
-  2026-10-12        4285    201        21.3
-  2026-10-19        6387    128        49.9
+  2026-09-28           0     36         0.0
+  2026-10-05           0    127         0.0
+  2026-10-12           0    201         0.0
+  2026-10-19        5053    128        39.5
   2026-10-26        9389    242        38.8
   2026-11-02        7119    149        47.8
   2026-11-09        7662    111        69.0
-  2026-11-16        4568     53        86.2
+  2026-11-16        4589     53        86.6
 
-── 4. PER-GATE USEFULNESS (60min eps; Bonferroni p<0.0010; cluster = token|day t-tests) — 51 gates ──────────
+── 4. PER-GATE USEFULNESS (60min eps; Bonferroni p<0.0011; cluster = token|day t-tests) — 47 gates ──────────
 gate                       first   eps │     ex4h     p_w   p_tok   p_day │  kill5   own5 │ kill10  own10
 ─────────────────────────────────────────────────────────────────────────────────────────────────────────
-CONFLUENCE-GATE-BLOCK      10-04  5661 │   -0.063  0.0086  0.0221  0.0414 │   2.3%   3.4% │   0.3%   0.3%
-CONTINUUM-BLOCK            10-09  3574 │   +0.014  0.6372  0.8430  0.8239 │   2.4%   2.4% │   0.4%   0.3%
-CONTINUUM-BULL             10-09  3063 │   -0.034  0.3773  0.0833  0.6181 │   0.7%   3.5% │   0.0%   0.3%
-LONG-NEUTRAL               10-04  2689 │   +0.023  0.8361  0.3391  0.7285 │   2.3%   2.4% │   0.1%   0.3%
-SHORT-CONTINUUM            10-04  2450 │   +0.003  0.0033  0.3416  0.8532 │   0.5%   3.7% │   0.0%   0.3%
-SHORT-NEUTRAL              10-04  2408 │   -0.039  0.6799  0.1605  0.7558 │   1.3%   3.5% │   0.1%   0.3%
-LONG-NEUTRAL-CHOP          10-12  2328 │   +0.057  0.3739  0.5222  0.0960 │   3.2%   2.6% │   0.4%   0.3%
-SHORT-RSI-HARD-FLOOR       10-22  2189 │   -0.004  0.8527  0.3282  0.7121 │   4.6%   3.6% │   0.5%   0.3%
-CTX-GATE                   10-04  1886 │   -0.050  0.1316  0.9575  0.5902 │   4.6%   3.9% │   0.3%   0.5%
-PUMP-CHAIN-SHORT-HIGH      10-07  1856 │   +0.030  0.3860  0.6832  0.3623 │   3.9%   3.8% │   0.3%   0.4%
-PUMP-CHAIN-RSI-MAX         10-04  1678 │   -0.189  0.0000  0.0092  0.0047 │   6.9%   4.1% │   1.0%   0.5%
-VOL-GATE-BYPASS            10-09  1582 │   +0.120  0.3335  0.2057  0.0111 │   6.4%   4.7% │   1.2%   0.7%
-OVERSOLD-SHORT             10-22  1441 │   +0.036  0.1029  0.8656  0.2793 │   3.1%   3.0% │   0.4%   0.3%
-BTC-CHOP-GATE              10-04  1108 │   +0.048  0.3700  0.3346  0.0379 │   1.5%   3.0% │   0.1%   0.3%
-LONG-RSI-CEILING           10-22   986 │   -0.191  0.0002  0.0439  0.0685 │   4.5%   3.3% │   0.6%   0.4%
-PUMP-CHAIN-HIGH            10-21   962 │   -0.001  0.0950  0.7987  0.4839 │   3.2%   2.7% │   0.7%   0.4%
-SHORT-REGIME-GATE          10-05   915 │   +0.043  0.0879  0.6293  0.6098 │   0.9%   2.7% │   0.0%   0.2%
-LONG-RSI-BLOCK             10-22   913 │   +0.065  0.7398  0.4908  0.0620 │   2.6%   2.2% │   0.7%   0.4%
+CONFLUENCE-GATE-BLOCK      10-20  3426 │   -0.063  0.0091  0.0225  0.0418 │   3.2%   3.5% │   0.4%   0.4%
+CONTINUUM-BLOCK            10-20  2817 │   +0.015  0.6551  0.8537  0.8399 │   2.6%   2.4% │   0.5%   0.3%
+CONTINUUM-BULL             10-20  2362 │   -0.034  0.3773  0.0833  0.6181 │   0.8%   3.5% │   0.0%   0.3%
+SHORT-RSI-HARD-FLOOR       10-22  2190 │   -0.005  0.8758  0.3261  0.6818 │   4.6%   3.7% │   0.5%   0.4%
+LONG-NEUTRAL-CHOP          10-20  1904 │   +0.059  0.3459  0.5014  0.0772 │   3.3%   2.7% │   0.5%   0.3%
+LONG-NEUTRAL               10-20  1784 │   +0.022  0.8559  0.3528  0.8372 │   2.7%   2.4% │   0.2%   0.3%
+SHORT-NEUTRAL              10-20  1634 │   -0.039  0.6650  0.1601  0.6628 │   2.0%   3.5% │   0.2%   0.3%
+OVERSOLD-SHORT             10-22  1442 │   +0.034  0.1125  0.8561  0.3132 │   3.1%   3.1% │   0.4%   0.3%
+VOL-GATE-BYPASS            10-20  1237 │   +0.121  0.3307  0.2059  0.0100 │   7.8%   4.7% │   1.5%   0.7%
+PUMP-CHAIN-SHORT-HIGH      10-20  1236 │   +0.030  0.4052  0.6982  0.4711 │   5.9%   3.9% │   0.4%   0.4%
+CTX-GATE                   10-20  1109 │   -0.052  0.1213  0.9834  0.4668 │   6.9%   4.2% │   0.5%   0.5%
+SHORT-CONTINUUM            10-20  1103 │   +0.003  0.0039  0.3419  0.8869 │   1.1%   3.7% │   0.1%   0.3%
+PUMP-CHAIN-RSI-MAX         10-20  1028 │   -0.195  0.0000  0.0083  0.0027 │   8.2%   5.0% │   1.6%   0.6%
+LONG-RSI-CEILING           10-22   988 │   -0.188  0.0003  0.0485  0.0725 │   4.5%   3.3% │   0.6%   0.4%
+PUMP-CHAIN-HIGH            10-21   962 │   -0.001  0.0949  0.7994  0.4820 │   3.2%   2.8% │   0.7%   0.4%
+LONG-RSI-BLOCK             10-22   913 │   +0.065  0.7393  0.4912  0.0619 │   2.6%   2.2% │   0.7%   0.3%
 SPIKE-FILTER               10-22   876 │   -0.157  0.0053  0.0080  0.1078 │   6.5%   3.9% │   0.7%   0.5%
-EXEC-BLOCK                 10-04   754 │   -0.009  0.3319  0.3117  0.7834 │   2.0%   2.0% │   0.3%   0.2%
-SLOPE-FILTER               10-09   588 │   +0.130  0.1133  0.5947  0.0909 │   7.0%   5.2% │   1.5%   0.6%
-SHORT-BB-DEAD-ZONE2        10-22   578 │   +0.018  0.5993  0.9246  0.8185 │   4.8%   2.7% │   0.9%   0.2%
-LONG-MIDBAND               10-22   577 │   +0.021  0.6035  0.6912  0.6573 │   1.2%   1.0% │   0.5%   0.1%
-SHORT-BB-DEAD-ZONE         10-22   519 │   +0.021  0.2018  0.4048  0.9520 │   3.9%   2.8% │   0.2%   0.3%
-LONG-HIGH-70               10-23   491 │   -0.107  0.0011  0.1094  0.3225 │   1.0%   2.0% │   0.2%   0.2%
-SHORT-RSI-CEILING          10-22   488 │   +0.066  0.0794  0.6320  0.4223 │   3.7%   3.3% │   0.0%   0.3%
-PRESERVE-SPIKE-BLOCK       10-05   259 │   -0.111  0.6390  0.2892  0.3133 │   2.3%   4.3% │   0.4%   0.4%
-EXEC-RSI-HARD-FLOOR        10-05   211 │   +0.090  0.7979  0.3999  0.8455 │   5.2%   3.7% │   0.5%   0.4%
-HOT-SET                    10-04   209 │   +0.043  0.7403  0.1055  0.9024 │   1.9%   3.6% │   0.0%   0.4%
-EXEC-RSI-DETECT-FLOOR      10-13   200 │   +0.130  0.0509  0.0960  0.0535 │   3.0%   3.8% │   0.0%   0.4%
-CHOP                       10-04   172 │   -0.116  0.4528  0.7918  0.3996 │   0.6%   2.7% │   0.0%   0.3%
-PUMP-CHAIN-VEL             10-22   164 │   -0.347  0.0331  0.3983  0.0446 │   9.8%   5.3% │   0.0%   0.7%
-SHORT-MIDBAND              10-16    95 │   +0.156  0.3312  0.4816  0.4611 │   5.3%   4.0% │   0.0%   0.4%
+BTC-CHOP-GATE              10-21   868 │   +0.048  0.3700  0.3346  0.0379 │   1.7%   3.1% │   0.1%   0.3%
+SHORT-REGIME-GATE          10-20   835 │   +0.042  0.0896  0.6283  0.6095 │   1.0%   2.7% │   0.0%   0.2%
+EXEC-BLOCK                 10-21   707 │   -0.014  0.2764  0.2593  0.8129 │   1.8%   2.0% │   0.3%   0.2%
+SHORT-BB-DEAD-ZONE2        10-22   578 │   +0.018  0.6019  0.9247  0.8205 │   4.8%   2.8% │   0.9%   0.2%
+LONG-MIDBAND               10-22   578 │   +0.020  0.6423  0.6905  0.6745 │   1.2%   1.0% │   0.5%   0.1%
+SHORT-BB-DEAD-ZONE         10-22   520 │   +0.017  0.2263  0.4058  0.9871 │   3.8%   2.9% │   0.2%   0.3%
+LONG-HIGH-70               10-23   491 │   -0.108  0.0011  0.1093  0.3221 │   1.0%   1.9% │   0.2%   0.2%
+SHORT-RSI-CEILING          10-22   489 │   +0.067  0.0725  0.5863  0.4101 │   3.7%   3.3% │   0.0%   0.3%
+SLOPE-FILTER               10-20   465 │   +0.122  0.1446  0.7132  0.1010 │   8.8%   5.3% │   1.9%   0.7%
+PUMP-CHAIN-VEL             10-22   164 │   -0.347  0.0331  0.3983  0.0446 │   9.8%   5.5% │   0.0%   0.7%
+EXEC-RSI-DETECT-FLOOR      10-21   142 │   +0.130  0.0509  0.0960  0.0535 │   4.2%   3.8% │   0.0%   0.4%
+EXEC-RSI-HARD-FLOOR        10-21   138 │   +0.090  0.7979  0.3999  0.8455 │   8.0%   3.5% │   0.7%   0.3%
+HOT-SET                    10-21   119 │   +0.043  0.7403  0.1055  0.9024 │   3.4%   3.3% │   0.0%   0.3%
+CHOP                       10-21   115 │   -0.116  0.4528  0.7918  0.3996 │   0.9%   2.7% │   0.0%   0.3%
+SHORT-MIDBAND              10-21    90 │   +0.156  0.3312  0.4816  0.4611 │   5.6%   4.1% │   0.0%   0.4%
+PRESERVE-SPIKE-BLOCK       10-21    79 │   -0.111  0.6390  0.2892  0.3133 │   7.6%   3.7% │   1.3%   0.3%
 VEL-FILTER                 10-24    77 │   +0.087  0.2968  0.1874  0.9412 │   3.9%   2.4% │   0.0%   0.1%
-PUMP-CHAIN-RSI-MIN         10-05    72 │   -0.080  0.5879  0.8362  0.9385 │   8.3%   3.1% │   1.4%   0.4%
-LONG-BYPASS-SHORT-BIAS-BLOCK 11-04    67 │   +0.073  0.8710  0.3773  0.1093 │   7.5%   3.0% │   0.0%   0.3%
-MAXXED-BLOCK               10-12    65 │   +0.237  0.8840  0.9085  0.4361 │  30.8%   7.4% │   7.7%   2.1%
+LONG-BYPASS-SHORT-BIAS-BLOCK 11-04    67 │   +0.073  0.8710  0.3773  0.1093 │   7.5%   3.1% │   0.0%   0.3%
 PUMP-CHAIN-RISE1M-SHORT    10-22    55 │   +0.152  0.1359  0.6279  0.8348 │   5.5%   3.1% │   0.0%   0.2%
 LONG-RSI-FLOOR             10-23    55 │   +0.182  0.8669  0.2460  0.3265 │   5.5%   1.9% │   0.0%   0.2%
-PUMP-CHAIN-VEL-SHORT       10-23    45 │   +0.120  0.4668  0.2554  0.7272 │   8.9%   5.1% │   2.2%   0.7%
-SHORT-RSI-FLOOR            10-30    43 │   -0.111  0.4689  0.9137     n/a │   2.3%   3.5% │   0.0%   0.4%
-HARD-BLOCK                 10-06    32 │   -1.535     n/a     n/a     n/a │   0.0%   4.2% │   0.0%   0.5%
-EXEC-RSI-CEILING           10-04    25 │   +0.188  0.4238  0.2692  0.3366 │   4.0%   2.4% │   0.0%   0.3%
-BB-SQUEEZE-EXTREME         10-06    13 │   -0.082     n/a     n/a     n/a │   0.0%   3.6% │   0.0%   0.5%
-V2-RECHECK                 10-10     9 │   +0.184     n/a  0.3285     n/a │   0.0%   1.6% │   0.0%   0.2%
-EXEC-RSI-FLOOR             10-05     5 │   -0.054     n/a     n/a     n/a │   0.0%   3.4% │   0.0%   0.6%
+PUMP-CHAIN-VEL-SHORT       10-23    45 │   +0.120  0.4668  0.2554  0.7272 │   8.9%   5.2% │   2.2%   0.7%
+MAXXED-BLOCK               10-21    44 │   +0.237  0.8840  0.9085  0.4361 │  45.5%   8.7% │  11.4%   2.5%
+SHORT-RSI-FLOOR            10-30    43 │   -0.111  0.4689  0.9137     n/a │   2.3%   3.6% │   0.0%   0.4%
+PUMP-CHAIN-RSI-MIN         10-21    13 │   -0.080  0.5879  0.8362  0.9385 │  23.1%   6.0% │   7.7%   1.0%
+EXEC-RSI-CEILING           10-23    12 │   +0.188  0.4238  0.2692  0.3366 │   8.3%   1.8% │   0.0%   0.2%
+V2-RECHECK                 10-21     5 │   +0.184     n/a  0.3285     n/a │   0.0%   2.0% │   0.0%   0.3%
+BB-SQUEEZE-EXTREME         10-25     4 │   -0.082     n/a     n/a     n/a │   0.0%   4.5% │   0.0%   0.3%
+HARD-BLOCK                 10-21     1 │   -1.535     n/a     n/a     n/a │   0.0%   3.2% │   0.0%   0.0%
+EXEC-RSI-FLOOR             10-28     1 │   -0.054     n/a     n/a     n/a │   0.0%   0.1% │   0.0%   0.0%
 EXEC-RSI-DETECT-CEILING    11-04     1 │   +0.061     n/a     n/a     n/a │   0.0%   0.3% │   0.0%   0.0%
   kill5/own5 = share of blocked episodes printing dir-MFE>=5% vs the gate's OWN tokens'
   unconditional share (same threshold) — differential >0 means the gate kills big moves
@@ -102,64 +103,64 @@ EXEC-RSI-DETECT-CEILING    11-04     1 │   +0.061     n/a     n/a     n/a │ 
   MIXED/NS: everything else (nominal or cluster-ns)
 
   WORKS (2):
-    PUMP-CHAIN-RSI-MAX         n= 1678 ex4h=-0.189 p_w=0.0000 p_tok=0.009 p_day=0.005 kill5=7% vs own 4%
-    LONG-RSI-CEILING           n=  986 ex4h=-0.191 p_w=0.0002 p_tok=0.044 p_day=0.069 kill5=4% vs own 3%
+    PUMP-CHAIN-RSI-MAX         n= 1028 ex4h=-0.195 p_w=0.0000 p_tok=0.008 p_day=0.003 kill5=8% vs own 5%
+    LONG-RSI-CEILING           n=  988 ex4h=-0.188 p_w=0.0003 p_tok=0.048 p_day=0.072 kill5=4% vs own 3%
 
   BLOCKS-SETUPS (0):
 
-  NO-EDGE (25):
-    CONFLUENCE-GATE-BLOCK      n= 5661 ex4h=-0.063 p_w=0.0086 p_tok=0.022 p_day=0.041 kill5=2% vs own 3%
-    CONTINUUM-BLOCK            n= 3574 ex4h=+0.014 p_w=0.6372 p_tok=0.843 p_day=0.824 kill5=2% vs own 2%
-    CONTINUUM-BULL             n= 3063 ex4h=-0.034 p_w=0.3773 p_tok=0.083 p_day=0.618 kill5=1% vs own 3%
-    LONG-NEUTRAL               n= 2689 ex4h=+0.023 p_w=0.8361 p_tok=0.339 p_day=0.728 kill5=2% vs own 2%
-    SHORT-CONTINUUM            n= 2450 ex4h=+0.003 p_w=0.0033 p_tok=0.342 p_day=0.853 kill5=0% vs own 4%
-    SHORT-NEUTRAL              n= 2408 ex4h=-0.039 p_w=0.6799 p_tok=0.160 p_day=0.756 kill5=1% vs own 3%
-    LONG-NEUTRAL-CHOP          n= 2328 ex4h=+0.057 p_w=0.3739 p_tok=0.522 p_day=0.096 kill5=3% vs own 3%
-    SHORT-RSI-HARD-FLOOR       n= 2189 ex4h=-0.004 p_w=0.8527 p_tok=0.328 p_day=0.712 kill5=5% vs own 4%
-    CTX-GATE                   n= 1886 ex4h=-0.050 p_w=0.1316 p_tok=0.958 p_day=0.590 kill5=5% vs own 4%
-    PUMP-CHAIN-SHORT-HIGH      n= 1856 ex4h=+0.030 p_w=0.3860 p_tok=0.683 p_day=0.362 kill5=4% vs own 4%
-    OVERSOLD-SHORT             n= 1441 ex4h=+0.036 p_w=0.1029 p_tok=0.866 p_day=0.279 kill5=3% vs own 3%
-    BTC-CHOP-GATE              n= 1108 ex4h=+0.048 p_w=0.3700 p_tok=0.335 p_day=0.038 kill5=2% vs own 3%
-    PUMP-CHAIN-HIGH            n=  962 ex4h=-0.001 p_w=0.0950 p_tok=0.799 p_day=0.484 kill5=3% vs own 3%
-    SHORT-REGIME-GATE          n=  915 ex4h=+0.043 p_w=0.0879 p_tok=0.629 p_day=0.610 kill5=1% vs own 3%
-    LONG-RSI-BLOCK             n=  913 ex4h=+0.065 p_w=0.7398 p_tok=0.491 p_day=0.062 kill5=3% vs own 2%
-    EXEC-BLOCK                 n=  754 ex4h=-0.009 p_w=0.3319 p_tok=0.312 p_day=0.783 kill5=2% vs own 2%
-    SHORT-BB-DEAD-ZONE2        n=  578 ex4h=+0.018 p_w=0.5993 p_tok=0.925 p_day=0.819 kill5=5% vs own 3%
-    LONG-MIDBAND               n=  577 ex4h=+0.021 p_w=0.6035 p_tok=0.691 p_day=0.657 kill5=1% vs own 1%
-    SHORT-BB-DEAD-ZONE         n=  519 ex4h=+0.021 p_w=0.2018 p_tok=0.405 p_day=0.952 kill5=4% vs own 3%
-    SHORT-RSI-CEILING          n=  488 ex4h=+0.066 p_w=0.0794 p_tok=0.632 p_day=0.422 kill5=4% vs own 3%
-    EXEC-RSI-HARD-FLOOR        n=  211 ex4h=+0.090 p_w=0.7979 p_tok=0.400 p_day=0.846 kill5=5% vs own 4%
-    HOT-SET                    n=  209 ex4h=+0.043 p_w=0.7403 p_tok=0.105 p_day=0.902 kill5=2% vs own 4%
+  NO-EDGE (24):
+    CONFLUENCE-GATE-BLOCK      n= 3426 ex4h=-0.063 p_w=0.0091 p_tok=0.022 p_day=0.042 kill5=3% vs own 3%
+    CONTINUUM-BLOCK            n= 2817 ex4h=+0.015 p_w=0.6551 p_tok=0.854 p_day=0.840 kill5=3% vs own 2%
+    CONTINUUM-BULL             n= 2362 ex4h=-0.034 p_w=0.3773 p_tok=0.083 p_day=0.618 kill5=1% vs own 4%
+    SHORT-RSI-HARD-FLOOR       n= 2190 ex4h=-0.005 p_w=0.8758 p_tok=0.326 p_day=0.682 kill5=5% vs own 4%
+    LONG-NEUTRAL-CHOP          n= 1904 ex4h=+0.059 p_w=0.3459 p_tok=0.501 p_day=0.077 kill5=3% vs own 3%
+    LONG-NEUTRAL               n= 1784 ex4h=+0.022 p_w=0.8559 p_tok=0.353 p_day=0.837 kill5=3% vs own 2%
+    SHORT-NEUTRAL              n= 1634 ex4h=-0.039 p_w=0.6650 p_tok=0.160 p_day=0.663 kill5=2% vs own 4%
+    OVERSOLD-SHORT             n= 1442 ex4h=+0.034 p_w=0.1125 p_tok=0.856 p_day=0.313 kill5=3% vs own 3%
+    PUMP-CHAIN-SHORT-HIGH      n= 1236 ex4h=+0.030 p_w=0.4052 p_tok=0.698 p_day=0.471 kill5=6% vs own 4%
+    CTX-GATE                   n= 1109 ex4h=-0.052 p_w=0.1213 p_tok=0.983 p_day=0.467 kill5=7% vs own 4%
+    SHORT-CONTINUUM            n= 1103 ex4h=+0.003 p_w=0.0039 p_tok=0.342 p_day=0.887 kill5=1% vs own 4%
+    PUMP-CHAIN-HIGH            n=  962 ex4h=-0.001 p_w=0.0949 p_tok=0.799 p_day=0.482 kill5=3% vs own 3%
+    LONG-RSI-BLOCK             n=  913 ex4h=+0.065 p_w=0.7393 p_tok=0.491 p_day=0.062 kill5=3% vs own 2%
+    BTC-CHOP-GATE              n=  868 ex4h=+0.048 p_w=0.3700 p_tok=0.335 p_day=0.038 kill5=2% vs own 3%
+    SHORT-REGIME-GATE          n=  835 ex4h=+0.042 p_w=0.0896 p_tok=0.628 p_day=0.609 kill5=1% vs own 3%
+    EXEC-BLOCK                 n=  707 ex4h=-0.014 p_w=0.2764 p_tok=0.259 p_day=0.813 kill5=2% vs own 2%
+    SHORT-BB-DEAD-ZONE2        n=  578 ex4h=+0.018 p_w=0.6019 p_tok=0.925 p_day=0.820 kill5=5% vs own 3%
+    LONG-MIDBAND               n=  578 ex4h=+0.020 p_w=0.6423 p_tok=0.690 p_day=0.674 kill5=1% vs own 1%
+    SHORT-BB-DEAD-ZONE         n=  520 ex4h=+0.017 p_w=0.2263 p_tok=0.406 p_day=0.987 kill5=4% vs own 3%
+    SHORT-RSI-CEILING          n=  489 ex4h=+0.067 p_w=0.0725 p_tok=0.586 p_day=0.410 kill5=4% vs own 3%
+    EXEC-RSI-HARD-FLOOR        n=  138 ex4h=+0.090 p_w=0.7979 p_tok=0.400 p_day=0.846 kill5=8% vs own 3%
+    HOT-SET                    n=  119 ex4h=+0.043 p_w=0.7403 p_tok=0.105 p_day=0.902 kill5=3% vs own 3%
     VEL-FILTER                 n=   77 ex4h=+0.087 p_w=0.2968 p_tok=0.187 p_day=0.941 kill5=4% vs own 2%
-    PUMP-CHAIN-RSI-MIN         n=   72 ex4h=-0.080 p_w=0.5879 p_tok=0.836 p_day=0.938 kill5=8% vs own 3%
     LONG-BYPASS-SHORT-BIAS-BLOCK n=   67 ex4h=+0.073 p_w=0.8710 p_tok=0.377 p_day=0.109 kill5=7% vs own 3%
 
-  MIXED/NS (15):
-    VOL-GATE-BYPASS            n= 1582 ex4h=+0.120 p_w=0.3335 p_tok=0.206 p_day=0.011 kill5=6% vs own 5%
+  MIXED/NS (14):
+    VOL-GATE-BYPASS            n= 1237 ex4h=+0.121 p_w=0.3307 p_tok=0.206 p_day=0.010 kill5=8% vs own 5%
     SPIKE-FILTER               n=  876 ex4h=-0.157 p_w=0.0053 p_tok=0.008 p_day=0.108 kill5=7% vs own 4%
-    SLOPE-FILTER               n=  588 ex4h=+0.130 p_w=0.1133 p_tok=0.595 p_day=0.091 kill5=7% vs own 5%
-    LONG-HIGH-70               n=  491 ex4h=-0.107 p_w=0.0011 p_tok=0.109 p_day=0.323 kill5=1% vs own 2%
-    PRESERVE-SPIKE-BLOCK       n=  259 ex4h=-0.111 p_w=0.6390 p_tok=0.289 p_day=0.313 kill5=2% vs own 4%
-    EXEC-RSI-DETECT-FLOOR      n=  200 ex4h=+0.130 p_w=0.0509 p_tok=0.096 p_day=0.053 kill5=3% vs own 4%
-    CHOP                       n=  172 ex4h=-0.116 p_w=0.4528 p_tok=0.792 p_day=0.400 kill5=1% vs own 3%
-    PUMP-CHAIN-VEL             n=  164 ex4h=-0.347 p_w=0.0331 p_tok=0.398 p_day=0.045 kill5=10% vs own 5%
-    SHORT-MIDBAND              n=   95 ex4h=+0.156 p_w=0.3312 p_tok=0.482 p_day=0.461 kill5=5% vs own 4%
-    MAXXED-BLOCK               n=   65 ex4h=+0.237 p_w=0.8840 p_tok=0.908 p_day=0.436 kill5=31% vs own 7%
+    LONG-HIGH-70               n=  491 ex4h=-0.108 p_w=0.0011 p_tok=0.109 p_day=0.322 kill5=1% vs own 2%
+    SLOPE-FILTER               n=  465 ex4h=+0.122 p_w=0.1446 p_tok=0.713 p_day=0.101 kill5=9% vs own 5%
+    PUMP-CHAIN-VEL             n=  164 ex4h=-0.347 p_w=0.0331 p_tok=0.398 p_day=0.045 kill5=10% vs own 6%
+    EXEC-RSI-DETECT-FLOOR      n=  142 ex4h=+0.130 p_w=0.0509 p_tok=0.096 p_day=0.053 kill5=4% vs own 4%
+    CHOP                       n=  115 ex4h=-0.116 p_w=0.4528 p_tok=0.792 p_day=0.400 kill5=1% vs own 3%
+    SHORT-MIDBAND              n=   90 ex4h=+0.156 p_w=0.3312 p_tok=0.482 p_day=0.461 kill5=6% vs own 4%
+    PRESERVE-SPIKE-BLOCK       n=   79 ex4h=-0.111 p_w=0.6390 p_tok=0.289 p_day=0.313 kill5=8% vs own 4%
     PUMP-CHAIN-RISE1M-SHORT    n=   55 ex4h=+0.152 p_w=0.1359 p_tok=0.628 p_day=0.835 kill5=5% vs own 3%
     LONG-RSI-FLOOR             n=   55 ex4h=+0.182 p_w=0.8669 p_tok=0.246 p_day=0.327 kill5=5% vs own 2%
     PUMP-CHAIN-VEL-SHORT       n=   45 ex4h=+0.120 p_w=0.4668 p_tok=0.255 p_day=0.727 kill5=9% vs own 5%
+    MAXXED-BLOCK               n=   44 ex4h=+0.237 p_w=0.8840 p_tok=0.908 p_day=0.436 kill5=45% vs own 9%
     SHORT-RSI-FLOOR            n=   43 ex4h=-0.111 p_w=0.4689 p_tok=0.914 p_day=nan kill5=2% vs own 4%
-    EXEC-RSI-CEILING           n=   25 ex4h=+0.188 p_w=0.4238 p_tok=0.269 p_day=0.337 kill5=4% vs own 2%
 
-  INSUFFICIENT (5):
-    HARD-BLOCK                 n=   32 ex4h=-1.535 p_w=nan p_tok=nan p_day=nan kill5=0% vs own 4%
-    BB-SQUEEZE-EXTREME         n=   13 ex4h=-0.082 p_w=nan p_tok=nan p_day=nan kill5=0% vs own 4%
-    V2-RECHECK                 n=    9 ex4h=+0.184 p_w=nan p_tok=0.329 p_day=nan kill5=0% vs own 2%
-    EXEC-RSI-FLOOR             n=    5 ex4h=-0.054 p_w=nan p_tok=nan p_day=nan kill5=0% vs own 3%
+  INSUFFICIENT (7):
+    PUMP-CHAIN-RSI-MIN         n=   13 ex4h=-0.080 p_w=0.5879 p_tok=0.836 p_day=0.938 kill5=23% vs own 6%
+    EXEC-RSI-CEILING           n=   12 ex4h=+0.188 p_w=0.4238 p_tok=0.269 p_day=0.337 kill5=8% vs own 2%
+    V2-RECHECK                 n=    5 ex4h=+0.184 p_w=nan p_tok=0.329 p_day=nan kill5=0% vs own 2%
+    BB-SQUEEZE-EXTREME         n=    4 ex4h=-0.082 p_w=nan p_tok=nan p_day=nan kill5=0% vs own 4%
+    HARD-BLOCK                 n=    1 ex4h=-1.535 p_w=nan p_tok=nan p_day=nan kill5=0% vs own 3%
+    EXEC-RSI-FLOOR             n=    1 ex4h=-0.054 p_w=nan p_tok=nan p_day=nan kill5=0% vs own 0%
     EXEC-RSI-DETECT-CEILING    n=    1 ex4h=+0.061 p_w=nan p_tok=nan p_day=nan kill5=0% vs own 0%
 
 ── 6. MISSING BIG MOVES (C-3): blocked episodes with dir-MFE>=10% ────────────────────────────────────
-  total blocked episodes printing dir-MFE>=10% in 4h: 164 (0.4% of 45310)
+  total blocked episodes printing dir-MFE>=10% in 4h: 164 (0.5% of 33812)
   date   gate                     token    dir     MFE%  fwd4h%   ex4h%
   10-30 VOL-GATE-BYPASS          SOPH     LONG    37.9  +33.33  +32.76
   10-30 CONTINUUM-BLOCK          BLUR     LONG    32.9  +24.63  +24.49
@@ -187,43 +188,43 @@ EXEC-RSI-DETECT-CEILING    11-04     1 │   +0.061     n/a     n/a     n/a │ 
   11-17 PUMP-CHAIN-HIGH          BLUR     LONG    20.4   -1.56   +0.42
   11-16 EXEC-BLOCK               CASHCAT  LONG    20.2  +18.03  +18.16
   per-gate big-move kill differential (kill10 - own10, pp):
-    MAXXED-BLOCK               kill10=7.7% vs own 2.1% = +5.6pp (n=65)
+    MAXXED-BLOCK               kill10=11.4% vs own 2.5% = +8.9pp (n=44)
     PUMP-CHAIN-VEL-SHORT       kill10=2.2% vs own 0.7% = +1.5pp (n=45)
-    PUMP-CHAIN-RSI-MIN         kill10=1.4% vs own 0.4% = +1.0pp (n=72)
-    SLOPE-FILTER               kill10=1.5% vs own 0.6% = +0.9pp (n=588)
-    SHORT-BB-DEAD-ZONE2        kill10=0.9% vs own 0.2% = +0.7pp (n=578)
-    VOL-GATE-BYPASS            kill10=1.2% vs own 0.7% = +0.5pp (n=1582)
-    PUMP-CHAIN-RSI-MAX         kill10=1.0% vs own 0.5% = +0.4pp (n=1678)
-    LONG-MIDBAND               kill10=0.5% vs own 0.1% = +0.4pp (n=577)
+    SLOPE-FILTER               kill10=1.9% vs own 0.7% = +1.3pp (n=465)
+    PUMP-CHAIN-RSI-MAX         kill10=1.6% vs own 0.6% = +1.0pp (n=1028)
+    PRESERVE-SPIKE-BLOCK       kill10=1.3% vs own 0.3% = +0.9pp (n=79)
+    VOL-GATE-BYPASS            kill10=1.5% vs own 0.7% = +0.8pp (n=1237)
+    SHORT-BB-DEAD-ZONE2        kill10=0.9% vs own 0.2% = +0.6pp (n=578)
+    LONG-MIDBAND               kill10=0.5% vs own 0.1% = +0.4pp (n=578)
+    EXEC-RSI-HARD-FLOOR        kill10=0.7% vs own 0.3% = +0.4pp (n=138)
     PUMP-CHAIN-HIGH            kill10=0.7% vs own 0.4% = +0.4pp (n=962)
-    LONG-RSI-BLOCK             kill10=0.7% vs own 0.4% = +0.3pp (n=913)
-    LONG-RSI-CEILING           kill10=0.6% vs own 0.4% = +0.2pp (n=986)
-    SPIKE-FILTER               kill10=0.7% vs own 0.5% = +0.2pp (n=876)
+    LONG-RSI-BLOCK             kill10=0.7% vs own 0.3% = +0.3pp (n=913)
+    LONG-RSI-CEILING           kill10=0.6% vs own 0.4% = +0.2pp (n=988)
 
 ── 7. ROBUSTNESS ──────────────────────────────────────────────────────────────────────────────────
-  coalescing 30min: sign flips vs 60min among top-20 gates: 2 ['SHORT-CONTINUUM', 'SHORT-RSI-HARD-FLOOR']
+  coalescing 30min: sign flips vs 60min among top-20 gates: 2 ['SHORT-RSI-HARD-FLOOR', 'SHORT-CONTINUUM']
   coalescing 120min: sign flips vs 60min among top-20 gates: 1 ['PUMP-CHAIN-HIGH']
   OOS (Oct4→Nov1 vs Nov1→Nov19):
-    CONFLUENCE-GATE-BLOCK      n1=1816  -0.039  n2=1609  -0.091  same=YES
-    CONTINUUM-BLOCK            n1= 981  -0.040  n2=1835  +0.043  same=NO
+    CONFLUENCE-GATE-BLOCK      n1=1816  -0.039  n2=1610  -0.090  same=YES
+    CONTINUUM-BLOCK            n1= 981  -0.040  n2=1836  +0.044  same=NO
     CONTINUUM-BULL             n1=1043  +0.071  n2=1319  -0.117  same=NO
-    LONG-NEUTRAL               n1= 622  -0.068  n2=1162  +0.071  same=NO
-    SHORT-CONTINUUM            n1= 621  +0.075  n2= 487  -0.089  same=NO
-    SHORT-NEUTRAL              n1= 770  +0.003  n2= 865  -0.077  same=NO
-    LONG-NEUTRAL-CHOP          n1= 746  +0.030  n2=1154  +0.074  same=YES
-    SHORT-RSI-HARD-FLOOR       n1= 836  -0.010  n2=1353  -0.000  same=YES
-    CTX-GATE                   n1= 641  -0.082  n2= 471  -0.007  same=YES
-    PUMP-CHAIN-SHORT-HIGH      n1= 647  +0.065  n2= 591  -0.007  same=NO
-    PUMP-CHAIN-RSI-MAX         n1= 408  -0.283  n2= 617  -0.126  same=YES
-    VOL-GATE-BYPASS            n1= 692  +0.047  n2= 547  +0.214  same=YES
-    OVERSOLD-SHORT             n1= 482  +0.106  n2= 959  +0.000  same=YES
-    BTC-CHOP-GATE              n1= 235  +0.149  n2= 633  +0.010  same=YES
-    LONG-RSI-CEILING           n1= 329  -0.299  n2= 657  -0.136  same=YES
+    SHORT-RSI-HARD-FLOOR       n1= 836  -0.010  n2=1354  -0.002  same=YES
+    LONG-NEUTRAL-CHOP          n1= 746  +0.030  n2=1158  +0.077  same=YES
+    LONG-NEUTRAL               n1= 621  -0.069  n2=1162  +0.071  same=NO
+    SHORT-NEUTRAL              n1= 769  +0.003  n2= 865  -0.077  same=NO
+    OVERSOLD-SHORT             n1= 482  +0.106  n2= 960  -0.002  same=NO
+    VOL-GATE-BYPASS            n1= 690  +0.048  n2= 547  +0.214  same=YES
+    PUMP-CHAIN-SHORT-HIGH      n1= 645  +0.064  n2= 591  -0.007  same=NO
+    CTX-GATE                   n1= 638  -0.085  n2= 471  -0.007  same=YES
+    SHORT-CONTINUUM            n1= 616  +0.076  n2= 487  -0.089  same=NO
+    PUMP-CHAIN-RSI-MAX         n1= 408  -0.283  n2= 620  -0.137  same=YES
+    LONG-RSI-CEILING           n1= 329  -0.299  n2= 659  -0.133  same=YES
     PUMP-CHAIN-HIGH            n1= 378  -0.063  n2= 584  +0.040  same=NO
-    SHORT-REGIME-GATE          n1=  52  +0.272  n2= 782  +0.027  same=YES
     LONG-RSI-BLOCK             n1= 224  +0.100  n2= 689  +0.053  same=YES
     SPIKE-FILTER               n1= 296  -0.212  n2= 580  -0.129  same=YES
-    EXEC-BLOCK                 n1=  95  +0.026  n2= 610  -0.015  same=NO
-  OOS sign flips among listed gates: 8
+    BTC-CHOP-GATE              n1= 235  +0.149  n2= 633  +0.010  same=YES
+    SHORT-REGIME-GATE          n1=  52  +0.272  n2= 783  +0.027  same=YES
+    EXEC-BLOCK                 n1=  95  +0.026  n2= 612  -0.020  same=NO
+  OOS sign flips among listed gates: 9
 
 exports: /root/.hermes/analysis/exports/nov19_gate_events.tsv, nov19_gate_summary.tsv, nov19_weekly_funnel.tsv, nov19_bigmisses.tsv

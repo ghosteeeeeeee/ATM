@@ -176,6 +176,12 @@ def fwd_metrics(rows, entry_ts, direction):
     i = lo
     if i + 48 >= len(rows):
         return None
+    # GUARD (2026-11-19, found by self-audit A2): if the entry precedes the
+    # first available candle (candles_5m has ~29d rolling retention; a mass
+    # prune fired 21:55 today), computing from rows[i=0] is LOOKAHEAD — a
+    # forward return measured from a candle days after the event. Return None.
+    if rows[0][0] > entry_ts + 300:
+        return None
     _, o, c, h, l = rows[i]
     sgn = 1 if direction == 'LONG' else -1
     res = {'f30': sgn * (rows[i + 6][2] / o - 1) * 100.0,
@@ -338,8 +344,11 @@ def main():
 
     # ── 2. enrich ────────────────────────────────────────────────────────────
     enriched = []
+    dropped_prehist = 0
     for ts, gate, tok, d, prov in frame:
         rows = candles(tok)
+        if rows and rows[0][0] > ts + 300:
+            dropped_prehist += 1
         fm = fwd_metrics(rows, ts, d) if rows else None
         if fm is None:
             continue
@@ -350,6 +359,8 @@ def main():
                          exc, fm['mfe'], btc_vel30(ts)))
     P()
     P(f"── 2. ENRICHED: {len(enriched)} events with forward data " + "─" * 55)
+    P(f"  dropped for pre-history (entry precedes candle-data start — candles_5m "
+      f"has ~29d rolling retention; mass prune at 21:55 on 2026-11-19): {dropped_prehist}")
 
     # ── 3. weekly funnel: blocks vs trades ───────────────────────────────────
     P()

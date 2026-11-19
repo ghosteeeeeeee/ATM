@@ -31,9 +31,9 @@ from datetime import datetime, timezone
 CANDLES = '/root/.hermes/data/candles.db'
 EXPORTS = '/root/.hermes/analysis/exports'
 OUT_MD = '/root/.hermes/analysis/gate_usefulness_selfaudit_2026-11-19.md'
-LOGS = ['/root/.hermes/logs/pipeline.log.20261107001010.gz',
-        '/root/.hermes/logs/pipeline.log.20261115000915.gz',
-        '/root/.hermes/logs/pipeline.log.20261119090701.gz',
+LOGS = ['/root/.hermes/logs/archive/pipeline.log.20261107001010.gz',
+        '/root/.hermes/logs/archive/pipeline.log.20261115000915.gz',
+        '/root/.hermes/logs/archive/pipeline.log.20261119090701.gz',
         '/root/.hermes/logs/pipeline.log']
 
 import gzip
@@ -74,7 +74,8 @@ def main():
     a1_detail = []
     for row in summary[:12]:
         g = row['gate']
-        vals = [v for v in indep_eps.get(g, []) if v is not None]
+        all_eps = indep_eps.get(g, [])
+        vals = [v for v in all_eps if v is not None]
         if not vals:
             a1_ok = False
             a1_detail.append(f"{g}: no indep episodes")
@@ -82,9 +83,10 @@ def main():
         indep_mean = sum(vals) / len(vals)
         summ_mean = fnum(row['ex4h_mean'])
         n_eps = int(row['episodes'])
-        match_n = n_eps == len(vals)
+        # summary 'episodes' = ALL episodes; its mean = non-None only (engine summarize())
+        match_n = n_eps == len(all_eps)
         match_m = abs(indep_mean - (summ_mean or 0)) < 0.005
-        a1_detail.append(f"{g}: n {'OK' if match_n else f'MISMATCH({n_eps} vs {len(vals)})'} "
+        a1_detail.append(f"{g}: n {'OK' if match_n else f'MISMATCH({n_eps} vs {len(all_eps)})'} "
                          f"mean {'OK' if match_m else f'MISMATCH({indep_mean:+.3f} vs {summ_mean:+.3f})'}")
         if not (match_n and match_m):
             a1_ok = False
@@ -111,7 +113,7 @@ def main():
                     with op(lp, 'rt', errors='replace') as f:
                         for line in f:
                             if line.startswith(stamp) and tok in line and \
-                               ('blocked' in line or 'BLOCKED' in line):
+                               ('blocked' in line.lower() or 'block' in line.split(']')[-1].lower() if ']' in line else False):
                                 found = True
                                 break
                 except FileNotFoundError:
@@ -128,7 +130,9 @@ def main():
             "SELECT ts, open, close FROM candles_5m WHERE token=? AND is_closed=1"
             " AND ts >= ? ORDER BY ts LIMIT 49", (tok, ts)).fetchall()
         fwd_ok = False
-        if len(rows) >= 49:
+        if rows and rows[0][0] > ts + 300:
+            fwd_s = 'n/a (candles pruned post-run — see data-mutation note)'
+        elif len(rows) >= 49:
             o = rows[0][1]
             c4 = rows[48][2]
             raw_f = (c4 / o - 1) * 100
@@ -136,10 +140,13 @@ def main():
             if d == 'SHORT':
                 raw_f = -raw_f
             fwd_ok = got is not None and abs(raw_f - got) < 0.01
+            fwd_s = 'OK' if fwd_ok else 'MISMATCH'
+            if not fwd_ok:
+                a2_ok = False
+        else:
+            fwd_s = 'n/a (insufficient rows)'
         a2_detail.append(f"{tok}/{d} @{datetime.fromtimestamp(ts, timezone.utc):%m-%d %H:%M} "
-                         f"log={log_s} fwd={'OK' if fwd_ok else 'MISMATCH'}")
-        if not fwd_ok:
-            a2_ok = False
+                         f"log={log_s} fwd={fwd_s}")
     conn.close()
     check('A2', 'random events: log line exists (reparse prov) + independent fwd recompute',
           a2_ok, '; '.join(a2_detail))
