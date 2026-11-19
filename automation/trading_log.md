@@ -29730,3 +29730,29 @@ BY: auto_1hr
 - 24h -0.50 red at 40.0% WR; 7d +0.56 positive (49.6%) — edge thin but 7d green
 - Unarmed WR 18.2% (-$0.68) vs armed 100% (+$0.18) — stall stack still owns the fix
 BY: auto_1hr
+
+## [2026-11-19 10:52] Hourly Analysis
+
+**Trades:** 0 closed last hour (0W 0L), 0 open | 24h: 14 closed (6W 8L)
+**PnL:** $0.00 (hour) | 24h $-0.41 (WR: 42.9%) | 7d 112T 49.1% $+0.52 POSITIVE — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** no storm — window-min -0.07% / at-run +0.13% (both inside gate)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Kill check: 0 closes last hour; 0%-WR signals all n<3 (ai-trader-pending 1T, continuum-osc- 1T); btc-pump-rider+ 5T 20% not 0% — 14d regime check not triggered
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/14 = 14.3% (<40%); tpsl_utils deployed; hard_max_loss 3/14 = 21.4% largest loser bucket but expected at 3-5x leverage
+- Boost: none eligible — jup_yolo_mirrored 3T 100% +$0.16 needs 5+ trades; btc-pump-rider+ 5T 20% -$0.37
+- Arm rate: unarmed 10/14 = 71.4% OVER 70% threshold, WR 20.0% -$0.59 vs armed 4/4 100% +$0.18 — chop entries dominating, stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 0 closes last hour -> no consecutive-hour streak; no size cut
+- Frequency: 0 close/hr — under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- storm-confl-waiver deadline 2026-11-26 (shadow_disposition.json is truth; older "TODAY 11-19" log echoes are stale) — default KEEP shadow; no storm today
+- 24h -0.41 red at 42.9% WR; 7d +0.52 positive (49.1%) — edge thin but 7d green
+- Unarmed WR 20.0% (-$0.59) vs armed 100% (+$0.18) — stall stack still owns the fix
+BY: auto_1hr
