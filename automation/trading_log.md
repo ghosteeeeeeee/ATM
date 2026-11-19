@@ -29941,3 +29941,30 @@ BY: auto_1hr
 - 24h -0.42 red at 43.8% WR; 7d +0.37 positive (48.1%) — edge thin but 7d green
 - Unarmed WR 18.2% (-$0.64) vs armed 100% (+$0.22) — stall stack still owns the fix
 BY: auto_1hr
+
+## [2026-11-19 19:52] Hourly Analysis
+
+**Trades:** 1 closed (0W 1L), 2 open (HYPER/COMP atr-trend- SHORT) | 24h: 14 closed (5W 9L)
+**PnL:** $-0.12 (hour) | 24h $-0.51 (WR: 35.7%) | 7d 107T 47.7% $+0.25 POSITIVE — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** no storm — window-min -0.87% / at-run -0.87% (both inside gate)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Entry quality: winners pnl_pct avg 1.69% (min 1.02) — healthy
+- Kill check: 0 closes 0%-WR with 3+ trades in last hour — none; atr-trend- 24h 3T 0% -$0.36: 14d regime split EXTREME 0% (n=4) / HIGH 55.6% / NORMAL 75% → wins in HIGH+NORMAL → keep alive per regime policy (EXTREME n=4 too thin to gate, and signal is all-regime by design since 11-06)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/14 = 21.4% (<40%); tpsl_utils deployed; hard_max_loss 2/14 = -$0.19 — expected at 3-5x leverage
+- Boost: none eligible — jup_yolo_mirrored 3T 100% +$0.21 needs 5+ trades (and single-token SOL)
+- Arm rate: **unarmed 11/14 = 78.6% OVER 70%** WR 18.2% -$0.63 vs armed 3/3 100% +$0.12 — chop entries dominating; stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 12:00 (-0.04), 18:00 (-0.03), 19:00 (-0.12) not 3 consecutive hours → no size cut
+- Frequency: 1 close/hr — under 20
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- storm-confl-waiver deadline 2026-11-26 (shadow_disposition.json is truth) — default KEEP shadow; no storm today
+- 24h -0.51 red at 35.7% WR (worst 24h window this week); 7d +0.25 still positive but eroding
+- Unarmed WR 18.2% (-$0.63) vs armed 100% (+$0.12) — stall stack still owns the fix
+BY: auto_1hr
