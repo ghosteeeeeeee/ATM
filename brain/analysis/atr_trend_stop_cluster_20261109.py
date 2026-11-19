@@ -114,11 +114,11 @@ def exit_anatomy(rows):
         usd = sum(float(r["pnl_usdt"]) for r in g)
         pct = sum(float(r["pnl_pct"]) for r in g)
         out.append([reason, len(g), w, f"{w / len(g) * 100:.1f}%", f"{usd:+.2f}",
-                    f"{pct:+.2f}", f"{usd / absflow * 100:+.1f}%", f"{usd / total * 100 if total else 0:+.0f}%"])
+                    f"{pct:+.2f}", f"{usd / absflow * 100:+.1f}%"])
     out.append(["TOTAL", len(rows), sum(1 for r in rows if r["pnl_usdt"] > 0),
                 f"{sum(1 for r in rows if r['pnl_usdt'] > 0) / len(rows) * 100:.1f}%",
                 f"{total:+.2f}", f"{sum(float(r['pnl_pct']) for r in rows):+.2f}",
-                "100.0%", "—"])
+                "100.0%"])
     return out
 
 
@@ -152,10 +152,12 @@ def unit_checks(rows):
     # mfe sanity: MFE must be >= favorable exit move for winners
     bad = [r["id"] for r in rows
            if r["raw_loss"] > 0 and float(r["mfe_pct"]) + 1e-9 < r["raw_loss"]]
-    print(f"mfe_pct < favorable exit move (impossible if raw): {bad or 'none'} -> mfe_pct is raw price %")
+    print(f"recorded MFE below favorable exit move (snapshot missed final move): "
+          f"{bad or 'none'} -> MFE floored at exit move in winner-cap table")
     wick_vs_mae = [(r["id"], round(r["worst_A"] - float(r["mae_pct"]), 4))
-                   for r in rows if abs(r["worst_A"] - float(r["mae_pct"])) > 1e-9]
-    print(f"rows where wick extreme != mae_pct (use max of both): {wick_vs_mae or 'none'}")
+                   for r in rows if abs(r["worst_A"] - float(r["mae_pct"])) > 1e-3]
+    print(f"rows where wick extreme > mae_pct by >=0.001pp (float32 noise <1e-4 ignored): "
+          f"{wick_vs_mae or 'none'}")
 
 
 def sweep(rows, variant, widths=WIDTHS):
@@ -230,17 +232,18 @@ def main():
           f"pnl_usdt is GROSS of fees (checkpoint basis kept)")
     print("\n== EXIT ANATOMY ==")
     table(["exit_reason", "n", "W", "WR", "sum pnl_usdt", "sum pnl_pct",
-           "% |flow|", "% of net"], exit_anatomy(rows))
+           "% |flow|"], exit_anatomy(rows))
 
     unit_checks(rows)
 
     # stop-cluster realized widths
-    print("\n== STOP CLUSTER REALIZED WIDTHS (18 exits, pnl_pct = margin %) ==")
+    print("\n== STOP CLUSTER REALIZED WIDTHS (18 exits) ==")
     sw = sorted(float(r["pnl_pct"]) for r in stops)
-    table(["stat", "pnl_pct %", "raw %"],
-          [["min", f"{sw[0]:+.2f}", f"{sw[0] / 5:+.3f}~"],
-           ["median", f"{statistics.median(sw):+.2f}", ""],
-           ["max (widest loss)", f"{sw[-1]:+.2f}", ""],
+    sw_raw = sorted(float(r["pnl_pct"]) / float(r["leverage"]) for r in stops)
+    table(["stat", "pnl_pct (margin) %", "raw price %"],
+          [["min (deepest)", f"{sw[0]:+.2f}", f"{sw_raw[0]:+.3f}"],
+           ["median", f"{statistics.median(sw):+.2f}", f"{statistics.median(sw_raw):+.3f}"],
+           ["max (shallowest)", f"{sw[-1]:+.2f}", f"{sw_raw[-1]:+.3f}"],
            ["n beyond -4%", sum(1 for x in sw if x <= -4), ""],
            ["n beyond -3%", sum(1 for x in sw if x <= -3), ""]])
 
@@ -248,6 +251,7 @@ def main():
     resB = sweep(rows, "B")
     print_sweep("SWEEP variant A: path-worst = max(mae_pct, wick extreme)", resA)
     print_sweep("SWEEP variant B (primary): path-worst = A + realized loss floor", resB)
+    print_sweep("FINE SWEEP around the peak (variant B)", sweep(rows, "B", widths=[1.75, 2.25]))
 
     best = max(resB, key=lambda r: r["net"])
     print(f"\n== DETAIL at best S={best['S']:.2f}% (variant B): {best['touched']} touched ==")
@@ -257,8 +261,10 @@ def main():
     # winner-cap side
     print("\n== WINNER-CAP SIDE: MFE of profit-monster-trail winners ==")
     wm = [r for r in pm if r["pnl_usdt"] > 0]
-    mfe_raw = [float(r["mfe_pct"]) for r in wm]
-    mfe_mar = [float(r["mfe_pct"]) * float(r["leverage"]) for r in wm]
+    # recorded MFE is a snapshot that can miss the final exit move (2 winners exited
+    # beyond recorded MFE) -> floor it at the favorable exit move, same as worst_B
+    mfe_raw = [max(float(r["mfe_pct"]), max(r["raw_loss"], 0.0)) for r in wm]
+    mfe_mar = [m * float(r["leverage"]) for m, r in zip(mfe_raw, wm)]
     real = [float(r["pnl_pct"]) for r in wm]
     table(["stat", "realized pnl_pct %", "MFE raw %", "MFE margin % (raw x lev)"],
           [["n", len(wm), len(mfe_raw), len(mfe_mar)],
@@ -272,9 +278,12 @@ def main():
           f"> +3%: {sum(1 for x in mfe_mar if x > 3)}/{len(wm)}; "
           f"> +5%: {sum(1 for x in mfe_mar if x > 5)}/{len(wm)}")
     uncapped = sum(m - r for m, r in zip(mfe_mar, real))
+    uncapped_usd = sum((m - rr) / 100.0 * float(r["amount_usdt"]) / float(r["leverage"])
+                       for r, m, rr in zip(wm, mfe_mar, real))
     print(f"censored upper bound of extra capture if every winner held to its MFE: "
-          f"{uncapped:+.2f} pct-points total ({uncapped / len(wm):+.2f}% per winner) — "
-          f"NOT realizable without a different exit; MFE-after-exit is observable, not attainable")
+          f"{uncapped:+.2f} margin-pct-points total ({uncapped / len(wm):+.2f}% per winner, "
+          f"~{uncapped_usd:+.2f} $ at notional 11.10) — NOT realizable without a different "
+          f"exit; MFE-after-exit is observable, not attainable")
 
     # regime cells
     print("\n== REGIME CELLS: volatility_regime x direction ==")
