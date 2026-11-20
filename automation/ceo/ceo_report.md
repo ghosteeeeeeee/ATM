@@ -1672,3 +1672,46 @@ gate_shadow's recorder silently dropped any block line whose REASON TEXT contain
 result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny branches byte-for-byte). result-4: `git checkout -- scripts/price_collector.py scripts/gate_shadow.py`. result-2/3: delete analysis doc / `git checkout -- brain/gate_registry.md`.
 
 — lead agent (completing CEO deep run 20261120T050846Z under its pre-dispatch checkpoint)
+
+## CEO Status — 20261120T073824Z
+### Health: pipeline=active guardian=active open_pos=2
+### Numbers: 24h 14T +0.22 64.3% | 7d 110T +0.63 50.0%
+### Findings: Rotating Q (errors): no crashes/tracebacks today — WARNs only: disk 87% (≥85% twice, 05:54/06:54), atr-trend- freq deviation 0.292/h vs 0.131 baseline (2.23x, n_cur=7), gate_shadow capture ratio 0.61. Control tower: 11 items due ≤24h (all 11-21), 0 overdue/red.
+### Recommendation: Disk at 87% — schedule log/DB prune before it hits 90%.
+
+## CEO Status — 20261120T113824Z
+### Health: pipeline=inactive(timer OK, last run exit 0 at 11:38:34) guardian=active open_pos=0
+### Numbers: 24h 17T +0.11 58.8% | 7d 111T +0.54 49.5%
+### Findings: Rotating Q (new errors): no tracebacks in pipeline.log; only WARN disk 87% used (≥85%, repeated) + routine TOK block/override log noise. Control tower: 11 due ≤24h (all 11-21), 0 overdue.
+### Recommendation: Disk at 87% — schedule log/DB prune before it hits 90%.
+
+## CEO Deep Run — 20261120T141947Z (probability-matrix gate call) — run rc=124; parent completed steps 4-5
+
+**Ruling (decision checkpoint, written pre-dispatch):** B — ITERATE, B3 ONLY (coarser family cells via existing `market_phase_gate.signal_family`, `--cells family` opt-in), single bounded iteration, bars UNCHANGED, stopping rule: 4/4 → P1 candidate; else C = archive, no revisit. P2 scope recorded (admission-gate only, shadow→CEO flip; "go live now" does not apply). Sequenced parallel to 11-21/11-22/12-03 evals.
+
+**Execution:** dispatch 1 built+ran family mode (commit `3219541f`, result-1: no deviations; default mode byte-identical A/B); dispatch 2 bug_hunter **SHIP** (result-2: zero defects, every number independently reproduced, denominators verified — 36.3% Other excluded-and-counted, never dropped).
+
+**FINAL GATE: STOP (2/4)** — family cells, 2771 window trades, 5 folds, G=5/6 (small-G indicative):
+- (a) FAIL — top-2 53.7% vs bottom-2 27.3%, Δ+26.5pp (shape survives both runs) but p=0.254
+- **(b) PASS** — intersection 32.7% ≥ floor; Brier(p)=0.2456 vs Brier(conf)=0.3939, CI [−0.1529,−0.1438], p<0.001 → *proves final_confidence-as-probability is far worse than a coin; does NOT prove p is useful*
+- (c) FAIL — Brier(p)=0.2517 vs 0.2500 coin, p=0.598 → **p ≈ coin OOS — the decisive failure**
+- (d) PASS — worst fold 36.6%
+
+**Per stopping rule → decision C executed:** spec header marked CLOSED EXPERIMENT (`brain/plans/probability-matrix-spec.md`), tool retained read-only, P1/P2 never shipped, hermes_constants untouched, no revisit scheduled; revival requires NEW spec + NEW pre-registered bars + explicit CEO ruling.
+**Durable findings kept:** (1) confidence-as-probability is miscalibrated far worse than 0.5 (0.39 Brier) — existing known landmine, now quantified; (2) cell/family WR does not predict OOS outcomes at 90d with G≤6 — the honest negative; (3) churn structural: 206 labels appear exactly once in 90d, combo labels never mature.
+
+## CEO Status — 20261120T153825Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 15T +0.15 60.0% | 7d 107T +0.43 49.5%
+### Findings: Rotating Q "new errors?" — no crashes/tracebacks; alerts are disk 87% WARN (3x, >=85 threshold) + routine token BTC_LEVEL/level entry BLOCKS (gate working). Control tower: 0 overdue, 11 due ≤24h (11-21 amplifies).
+### Recommendation: Schedule disk cleanup for the 87% volume before it hits the 90% critical threshold.
+
+## CEO Deep Run — 20261120T145718Z (post-matrix rulings + E) — run rc=124; parent completed dispatch chain + steps 5-6
+
+**Rulings:** 1) matrix closeout RATIFIED (independently re-verified) · 2) confidence-Brier 0.39 finding = RECORD-ONLY + landmine cleanup queued as piggyback ticket (SCORE_WEIGHTS 1-liner queued; SIGNAL_QUALITY_* deletion T-gated — needs T; effective_confidence DO NOT DROP — 3 live readers; new study REJECTED; nothing closed reopens) · 3) sequencing: E dispatched this run, then capacity queue S3→D→G→S2→F one-at-a-time; stop-tighten eval 11-21 (registry gap flagged), H bar 11-22, kill-line 12-03 ride their dates · 4) KILL: K decision-stream dashboard (control_tower covers it).
+
+**E chain (all sequential, all PASS):** builder `73aa8a85` (1 clean agent failure pre-launch, relaunch clean) → review `806d6c8a` PASS-WITH-FIXES (2 MED applied: G1 footnote, byte-claim corrected `dd11413a`) → **bug_hunter `4105937f` PASS** (independent join + raw-PG recomputation matched: G1 186/48.9%/−1.38 identical; G0–G3 sums = window; momentum split +$0.63/83 reproduced exact; qty-leg surrogate fallback fired 0×; fail-open clean; report prescriptive-language check clean) → post-hunt MED-M1 fixed: `render()` now EMITS the G1 join-quality footnote (regeneration-safe; selfcheck 4220 PASS, footnote verified in regenerated report with identical numbers).
+
+**E findings (30d, 630 trades, pnl_usdt):** G0 clean 19 (36.8%, −$0.59) · G1 join-age≥10m 186 (48.9%, −$1.38) — ⚠️ join-quality footnote: 97% discordant vs staleness stamp, trust the STAMP view (G1=1); G2 sign-flip 2 (+$0.03); G3 missing 423 (54.6%, −$2.23, 419 predate signals-table era). Descriptive drift: momentum-flip trades +$0.63 (n=83) vs non-flip −$4.14 (n=475) — no filter recommendations per §E-SPEC.
+
+**Metric checkpoint:** 7d = 108T / +$0.34 / 49.1% WR (this run's baseline, re-query next run) · E report+bug_hunter recorded ✅ (deadline 11-27, met early) · `hermes_constants.py` diff = EMPTY attributable to this run ✅.
