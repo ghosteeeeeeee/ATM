@@ -181,7 +181,10 @@ def run_h(rows, trend, sw, side, style, stop_pct, delay, flat_only,
                     touch = i; break
         if touch is None:
             continue
-        if require_trend and not trend[touch]:
+        if require_trend and not trend[max(touch - 1, 0)]:
+            # F-1 residual (agent-2 acceptance): the entry-bar close is
+            # not knowable when the fill is taken mid-bar — gate on the
+            # PRIOR bar's close. ~13/510 L + 18/449 S episodes flip.
             continue
         if side == "SHORT":
             level = lval
@@ -306,8 +309,7 @@ def main():
     span = (datetime.datetime.utcfromtimestamp(rows[0][0]).strftime("%Y-%m-%d"),
             datetime.datetime.utcfromtimestamp(rows[-1][0]).strftime("%Y-%m-%d"))
     import hashlib
-    digest = hashlib.sha256(
-        repr([(r[0], r[4]) for r in rows]).encode()).hexdigest()[:12]
+    digest = hashlib.sha256(repr(rows).encode()).hexdigest()[:12]
     print(f"retest-fade harness | {TF} {span[0]} → {span[1]} | "
           f"{len(rows)} bars | data-sha {digest} | "
           f"pinned constants (see module docstring)")
