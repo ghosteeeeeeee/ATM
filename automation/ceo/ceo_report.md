@@ -1627,3 +1627,48 @@ Rotating Q (idx 10 = "new signals this week?"): 0 SHIPPED (matches 15381Z run), 
 
 **NOT touched:** any existing constants value, stop/exit constants, signal flags, shadow_disposition.json (12-06 3-limb bar stands).
 **Commits (local, no push):** `a037e7a0` (wiring), `1c29e4ac` (audit + fixes).
+
+## CEO Status — 20261120T033824Z
+### Health: pipeline=active (timer fired 03:39Z, ran 10s ago) guardian=active open_pos=0
+### Numbers: 24h 16T +0.04 56.3% | 7d 109T +0.33 48.6%
+### Findings: Disk 86% used (WARN threshold 85%) recurring in error_alerts; else clean — 7d back to green (+0.33), 0 open positions, no Tracebacks.
+### Recommendation: Schedule disk cleanup/log rotation before disk hits 90%.
+
+---
+
+## CEO Deep Run — 20261120T050846Z (timed out mid-dispatch; completed by lead agent under pre-dispatch checkpoint)
+
+**Brief:** Gate Usefulness Deep Dive (T: "THIS IS VERY IMPORTANT") — D1–D7 rulings. **0 trading config changes.** hermes_constants.py untouched; CEO_PROTECTED/RESEARCH flags intact; no gate removed except the CEO-ruled shadow-first pair (reversible, logged).
+
+### Decision (from checkpoint 20261120T050846Z-decision.md, written pre-dispatch)
+
+| Item | Ruling |
+|------|--------|
+| D1 External hand-off | **GO** — corrected package (§10 ledger, 8/8 defects), self-audit 6/6, fit-after-corrections. Ship as-is. |
+| D2 Nov-6 removal queue | **GO(a) shadow-first: CONTINUUM-BLOCK + CONTINUUM-BULL only** (standalone-bypass leg; confluence≥2 ungated per #265). **HOLD PRESERVE-SPIKE-BLOCK** (MIXED/NS, n=79, −0.111 helping direction). Review **2026-12-04**: revert if admitted cohort underperforms. |
+| D3 Frequency-collapse root cause | **GO — COMPLETED (result-2).** Headline: **the −70% is NOT the gates** — ~77% = Nov-4 execution capital brakes (DailyFillCap+Cap C, commit e41faad2; 43.0→13.7/day step at first SKIP line 2026-11-04 17:51; emissions ROSE +25% across the boundary, conversion halved 1.84%→0.71%); ~15% = signal-generator attrition (MEDIUM); ~4% unexplained Sep23–Oct11 dip; **gates = 0 contribution (wrong sign: blocks/day ROSE 783→1,305; CONFLUENCE blocks FELL −77%); CONF-FLOOR n=0; SKIPPED n=39/12,121.** Full: analysis/2026-11-20_frequency-collapse-rootcause.md. |
+| D4 Registry ratification | **GO — DONE (result-3):** brain/gate_registry.md ratified (WORKS/no-edge/monitor classes from run-4 TSV + D7 statement + queue dispositions); subagent spot-checked its own numbers vs TSV — MATCH. |
+| D5 Harm candidates / R1 | **Monitor-only** (SLOPE-FILTER cluster-ns; VOL-GATE-BYPASS period-dependent; MAXXED n=44). **R1 extended closer QUEUED for next deep run 2026-11-27** — not built this run (D3 + D2 data took precedence). |
+| D6 Data retention | **GO — DONE (result-4):** price_collector prune 30d→90d (covers BOTH DELETE stmts; no other prune path repo-wide; +240MB on 16G free) + gate_shadow emoji/marker port (4→10 emojis, token W, colon-glued, classification). |
+| D7 Detection-limit | **ACCEPTED as operating statement** (registry): BLOCKS-SETUPS=0 = "no harm ≥0.23%/block detectable at n≥400" — detection-limited, NOT proof of absence; never blocks shadow-first removals, always bars kill/harm claims. |
+
+### Verification (mandatory bug_hunter — all three code diffs)
+
+- **result-1 signal_compactor: APPROVE.** Exactly 2 hunks; `_btc_mom_ok_for_bypass` consumers traced (confluence≥2 short-circuits before flag; blast radius = standalone single-source NEUTRAL leg only); live proof: deny lines 94→0, shadow lines emitting (79 first 40min), 41 cycles 0 errors. **Correction applied to risk wording:** LONG admits only when `_btc_in_trend or _ln_coin_mom` — else still blocked as LONG-NEUTRAL-CHOP.
+- **result-4a price_collector: APPROVE-WITH-NITS** → stale comments fixed (both prune stmts verified covered; no other candles_5m prune path exists).
+- **result-4b gate_shadow: REJECT (1 BLOCKER) → FIXED → re-census PASS.** Blocker: bare `would` exclusion dropped real blocks whose reason text contained the word "would" (17,269 events in 7.2M-line census, 100% SHORT-RSI-HARD-FLOOR, frozen live at 04:52). Fix = bug_hunter's own prescription (word-exclusions apply only when no hard marker). Post-fix: 9/9 battery PASS (incl. the exact failing line shape; TIDE/RR-PENALTY/OPP-PENALTY/WOULD-telemetry still excluded); **re-census: 0 marker-line regressions across 448,768 shape-matched lines**; offset-rewind backfill recovered the consumed window (1 token = 2 buckets; MAX 04:52→05:50).
+- NITS recorded not touched: ai_trader_precheck mirror predicate (advisory, outside mandate files); TIMING-GUARD logs only to trade-watchdog.log (gate_shadow cannot see it).
+
+### Bug found by the result-4 process (fixed in-run)
+gate_shadow's recorder silently dropped any block line whose REASON TEXT contained a telemetry word — the same silent-observability class as the Oct-10 rotation bug. Now marker-first; census-tested.
+
+### Metric checkpoints
+- **2026-12-04:** CONTINUUM shadow-first review — admitted-cohort vs base (revert if underperforms); registry disposition update.
+- **2026-11-27:** R1 extended closer deep run (dollar counterfactuals; unlocks tail/removal decisions).
+- **D3 follow-up (needs T/CEO approval — live-config class):** 48h `DAILY_FILL_CAP_ENABLED=False` shadow run at matched emissions to convert the 77% capital-brake attribution from temporal+magnitude evidence into a controlled one.
+- gate_shadow capture ratio ≥0.90 daily (health metric live); recorder now sees 10 gate families it previously missed (BTC-CRASH +14,168 lines etc.).
+
+### Rollback
+result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny branches byte-for-byte). result-4: `git checkout -- scripts/price_collector.py scripts/gate_shadow.py`. result-2/3: delete analysis doc / `git checkout -- brain/gate_registry.md`.
+
+— lead agent (completing CEO deep run 20261120T050846Z under its pre-dispatch checkpoint)

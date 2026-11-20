@@ -144,9 +144,16 @@ def log_sources(log_path=PIPELINE_LOG, since=None):
 #     colon after token — FIX code-review b6d1b071 2026-10-22: the optional `:?`
 #     makes approval-layer kills recordable; previously ZERO compactor block lines
 #     matched, so the highest-volume gates never reached gate_shadow.db)
+# CEO D6 result-4 (2026-11-20): emoji/marker port of the self-audited
+# deep-dive parser. Was 4 emojis + baked-in 'blocked' requirement -> 12 gates
+# invisible (db=0): BTC-CRASH (2,639 reparse lines), TIMING-GUARD,
+# PHANTOM-WRITE, CONF-FILTER-PRESERVE, CONFLICT-RESCUE-BLOCK, LOSERS-BLOCK...
+# Shape-match the block emoji class; classification + WOULD/shadow exclusion
+# happen at the call site in record(). The target emoji stays with RR_BLOCK_RE.
 BLOCK_RE = re.compile(
-    r'(?:🚫|🔒|🚧|🌊)\s+\[([A-Za-z0-9_-]+)\]\s+([A-Za-z0-9]+):?\s+(LONG|SHORT)\b'
-    r'.*?(?:blocked|BLOCKED)',
+    r'(?:🚫|🔒|🚧|🌊|⏱️|🛡️|🚨|⚠️|🔄|🗑️)'
+    r'\s+\[([A-Za-z0-9_-]+)\]\s+'
+    r'([A-Z0-9]{1,12})(?::\s*|\s+)(LONG|SHORT)\b',
     re.IGNORECASE,
 )
 # FIX 2026-10-04 (bug-hunter F1 HIGH): CONFLUENCE-GATE-BLOCK lines have NO
@@ -290,6 +297,26 @@ def record(since_hours):
             for line in f:
                 m = BLOCK_RE.search(line)
                 if m:
+                    # port (CEO D6 result-4, 2026-11-20): classify — a
+                    # shape-matched line is a BLOCK iff the gate name contains
+                    # BLOCK or the line carries a block marker; WOULD/shadow/
+                    # allowed lines are pass/shadow telemetry, never events.
+                    # Fail-silent by construction (unparsable -> continue).
+                    ll = line.lower()
+                    # bug_hunter BLOCKER fix 2026-11-20: bare-word exclusions
+                    # dropped real blocks whose REASON TEXT contains 'would'
+                    # (e.g. "floor would reject anyway" — 17,269 events, all
+                    # SHORT-RSI-HARD-FLOOR). Exclusions now apply only when the
+                    # line carries no hard marker; telemetry lines (shadow/would)
+                    # have no marker and stay excluded.
+                    _has_marker = any(
+                        k in ll for k in ('blocked', 'hard block', 'denied'))
+                    if (not _has_marker and any(
+                            w in ll for w in ('would', 'shadow', 'skipped', 'allowed'))):
+                        continue
+                    _g = m.group(1).upper()
+                    if 'BLOCK' not in _g and not _has_marker and 'skip' not in ll:
+                        continue
                     gate, token, direction = m.group(1), m.group(2).upper(), m.group(3).upper()
                 else:
                     # SCOPE+ (registry gate-shadow-capture-coverage-fix): rr-engine

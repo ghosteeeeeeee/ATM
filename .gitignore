@@ -189,3 +189,4 @@ scripts/candle_predictor_sweep.yaml
 scripts/dashboard.sh
 scripts/start-litellm.sh
 scripts/migrate_add_workflow_state.sql
+analysis/.freq_*.pkl

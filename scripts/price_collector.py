@@ -788,10 +788,12 @@ def _aggregate_tf(ph_conn, candle_conn, tf_seconds: int, table: str):
             VALUES (?, ?, ?, ?, ?, ?, 0, 0)
         """, (token, current_window, open_px, high, low, close_px))
 
-    # Prune old candles to prevent table bloat (keep 30d — FIX 2026-10-04: was 72h)
-    # 30d ≈ 1.4M rows — trivial for SQLite. Enables 5m-based audits/backtests.
+    # Prune old candles to prevent table bloat (keep 90d (was 30d — D6 2026-11-20) — FIX 2026-10-04: was 72h)
+    # 90d ≈ 4.2M rows (was 30d ≈ 1.4M) — trivial for SQLite. Enables 5m-based audits/backtests.
     if table == 'candles_5m':
-        _prune_window = 2592000  # 30 days in seconds
+        _prune_window = 7776000  # 90 days in seconds (CEO D6 result-4 2026-11-20:
+        #   was 30d — older analyses became unverifiable; aligns with
+        #   15m/1h/4h = 90d policy; +≈240MB on 16G free, disk-checked)
         # Prune old closed candles
         candle_cur.execute(f"""
             DELETE FROM {table} WHERE is_closed = 1 AND ts < ?
@@ -847,7 +849,7 @@ def main():
             except Exception as e:
                 print(f'  {table}: aggregation error: {e}')
 
-        # Retention: 1m = 30d (same policy as candles_5m, see _aggregate_tf);
+        # Retention: 1m = 30d (candles_5m now 90d per D6 2026-11-20 — 1m stays 30d as source), see _aggregate_tf);
         # 15m/1h/4h = 90d. 1m was never pruned: 20.5M rows / Feb-2024→now /
         # 3.1G file drove disk to 85% — 15m/1h/4h had the same unpruned Feb-2024
         # history (2.07M rows >90d). 90d not 30d because coin_tracker reads

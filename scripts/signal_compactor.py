@@ -3305,13 +3305,14 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 _btc_mom_ok_for_bypass = True
                                 log(f"  ✅ [CONTINUUM-OVERRIDE] {token} LONG — BTC bearish BUT coin rising (vel={_vel2:+.2f}%, above SMA), allowing")
                             else:
-                                _btc_mom_ok_for_bypass = False
+                                # CEO D2 GO(a) 2026-11-20 shadow-first removal — checkpoint automation/ceo/checkpoints/20261120T050846Z-decision.md; 46d NO-EDGE (nov19_gate_summary.tsv); review 2026-12-04 (revert if admitted cohort underperforms)
+                                _btc_mom_ok_for_bypass = True
                                 # log-honesty fix brain_auditor #265: this flag only scopes the
                                 # standalone-bypass leg of the NEUTRAL gates — confluence>=2
                                 # signals still execute (ZRO #16920 block->EXEC 7s, and the
                                 # #138 re-eval at n=103 closed shows the leak cohort is
                                 # statistically identical to base LONG, z=0.13, no enforcement).
-                                log(f"  🚫 [CONTINUUM-BLOCK] {token} LONG BLOCKED — BTC bearish structure (bypass leg only — confluence>=2 not gated here)")
+                                log(f"  📊 [CONTINUUM-BLOCK-SHADOW-REMOVAL] {token} LONG WOULD-BLOCK (BTC bearish structure) — gate removed shadow-first 2026-11-20, standalone-bypass allowed; review 2026-12-04")
                         elif direction.upper() == 'LONG' and _cont_bullish:
                             _btc_mom_ok_for_bypass = True
                             log(f"  ✅ [CONTINUUM-BULL] {token} LONG — BTC bullish structure ({_continuum_phase}+{_cont_row_data.get('linreg_direction')}+{_cont_row_data.get('ema300_position')}), bypass allowed")
@@ -3341,8 +3342,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                 _btc_mom_ok_for_bypass = True
                                 log(f"  ✅ [CONTINUUM-OVERRIDE] {token} SHORT — BTC bullish BUT coin dumping (vel={_vel3:+.2f}%, below SMA), allowing")
                             else:
-                                _btc_mom_ok_for_bypass = False
-                                log(f"  🚫 [CONTINUUM-BULL] {token} SHORT BLOCKED — BTC bullish structure ({_continuum_phase}+{_cont_row_data.get('linreg_direction')}+{_cont_row_data.get('ema300_position')}), SHORT bypass denied")
+                                # CEO D2 GO(a) 2026-11-20 shadow-first removal — checkpoint automation/ceo/checkpoints/20261120T050846Z-decision.md; 46d NO-EDGE (nov19_gate_summary.tsv); review 2026-12-04 (revert if admitted cohort underperforms)
+                                _btc_mom_ok_for_bypass = True
+                                log(f"  📊 [CONTINUUM-BULL-SHADOW-REMOVAL] {token} SHORT WOULD-BLOCK (BTC bullish structure) — gate removed shadow-first 2026-11-20, standalone-bypass allowed; review 2026-12-04")
                         else:
                             # Fallback to velocity check
                             _btc_mom_ok_for_bypass = _vel_ok
