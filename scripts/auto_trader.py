@@ -739,8 +739,12 @@ def _ladder_keeper(decision, summary):
                                  f"— treating as empty (fail-ready)")
 
         def _unfired(o):
+            # 'rejected' (no-burn) = waiting for its trigger reclaim, NOT
+            # a live threat — excluded so the keeper keeps deriving fresh
+            # rungs at new floors instead of going dark behind a queue
+            # of rejected rungs (the reach-gap's sibling).
             return (pstate.get(o.get('id')) or {}).get('status') \
-                not in ('fired', 'error')
+                not in ('fired', 'error', 'rejected')
 
         def _side_mult(side):
             """CEO 2026-11-13 position sizing: ADD ON WINNERS, REMOVE FROM

@@ -1486,6 +1486,21 @@ def _monitor_pending_orders_impl(btc_price):
             seen_ids.add(oid)
             crossed = (px >= trigger_price) if trigger == "above" \
                 else (px <= trigger_price)
+            # no-burn re-cross-wait (CEO 2026-11-20): a gate-rejected
+            # rung never opened a position, so it is never consumed.
+            # While price is still beyond the trigger (the extreme-RSI
+            # zone that vetoes it) it only waits; once price reclaims
+            # the trigger the state is deleted and the rung re-arms
+            # fresh — firing on the NEXT cross with RSI recovered (§11).
+            _st_prev = state.get(oid)
+            if isinstance(_st_prev, dict) and _st_prev.get("status") == "rejected":
+                if crossed:
+                    continue
+                del state[oid]
+                changed = True
+                log(f"pending order {oid}: gate-rejected rung re-armed "
+                    f"after trigger reclaim (no-burn)")
+                continue
             if crossed and (str(oid).startswith("btc-auto-")
                             or order.get("serial") is True):
                 # Same-coin stacking guard (CEO lesson 2026-11-10: two AUTO
@@ -1625,7 +1640,7 @@ def _execute_pending_order_impl(order):
                 "auto_executed": False,
                 "hl_result": "error: one-shot state corrupt"}
     _prev = _pre_state.get(oid)
-    if isinstance(_prev, dict) and _prev.get("status") in ("fired", "error"):
+    if isinstance(_prev, dict) and _prev.get("status") in ("fired", "error", "rejected"):
         log(f"AUTO-EXEC {oid}: already {_prev.get('status')} — one-shot "
             f"re-entry refused", "WARN")
         return {"type": "pending_order", "order_id": oid,
@@ -1669,11 +1684,22 @@ def _execute_pending_order_impl(order):
         m = _re.search(r"trade #(\d+)", out)
         if m:
             trade_ref = f"#{m.group(1)}"
-        # Update state: fired or error — never re-fire either way (one-shot).
+        # Update state: fired / rejected / error.
+        # no-burn (CEO 2026-11-20 — five rungs burned through the 61500
+        # break: 62017/62003/61700/61367/61212 all REJECTED by BANANA
+        # knife-35/HARD_FLOOR-45 and consumed as terminal 'error'):
+        # brain's explicit REJECTED = the entry gate vetoed and NOTHING
+        # opened — that is not an execution failure. Status 'rejected'
+        # keeps the rung alive; the monitor re-arms it once price
+        # reclaims the trigger (the §11 re-cross with RSI recovered).
+        # Real failures (timeout, API error, non-zero without the
+        # REJECTED marker) keep terminal 'error' — no double-fire.
         # Reuses `state` loaded at claim time — same lock hold, no reload
         # (F1: interleaved reloads were the race window).
+        _rejected = "REJECTED" in out
         state[oid] = {
-            "status": "fired" if success else "error",
+            "status": ("fired" if success
+                       else ("rejected" if _rejected else "error")),
             "price": order.get("trigger_price"),
             "ts": time.time(),
             "trade": trade_ref,
