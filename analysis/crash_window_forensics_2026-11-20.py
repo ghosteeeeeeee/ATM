@@ -60,8 +60,11 @@ def candles(tok):
 
 def fwd_metrics(rows, entry_ts, direction, want=(12, 48)):
     """Entry = OPEN of first 5m candle with ts >= entry_ts (no lookahead).
-    Guard: entry must precede candle history start (29d retention) else None.
-    Returns dict of direction-signed raw fwd at horizons + mfe/mae (max horizon)."""
+    Guard: entry must not precede candle history start (29d retention) else None.
+    AUDIT FIX (own-conclusions K3): horizons are now INDEPENDENT — an event with
+    only 1h of forward data returns f12 and no f48, instead of being dropped
+    entirely (the old max(want) guard censored 94% of rows at the 4h horizon).
+    mfe/mae computed over the longest available window (48 if present else 12)."""
     lo, hi = 0, len(rows)
     while lo < hi:
         mid = (lo + hi) // 2
@@ -70,18 +73,21 @@ def fwd_metrics(rows, entry_ts, direction, want=(12, 48)):
         else:
             hi = mid
     i = lo
-    need = max(want)
     if rows and rows[0][0] > entry_ts + 300:
         return None
-    if i + need >= len(rows):
+    if i >= len(rows):
         return None
     _, o, c, h, l = rows[i]
     sgn = 1 if direction == 'LONG' else -1
     res = {}
     for n in want:
-        res[f'f{n}'] = sgn * (rows[i + n][2] / o - 1) * 100.0
-    highs = [r[3] for r in rows[i:i + need + 1]]
-    lows = [r[4] for r in rows[i:i + need + 1]]
+        if i + n < len(rows):
+            res[f'f{n}'] = sgn * (rows[i + n][2] / o - 1) * 100.0
+    mfe_n = 48 if (i + 48 < len(rows)) else (12 if (i + 12 < len(rows)) else None)
+    if mfe_n is None:
+        return None
+    highs = [r[3] for r in rows[i:i + mfe_n + 1]]
+    lows = [r[4] for r in rows[i:i + mfe_n + 1]]
     if direction == 'LONG':
         res['mfe'] = (max(highs) / o - 1.0) * 100.0
         res['mae'] = (min(lows) / o - 1.0) * 100.0
@@ -223,12 +229,23 @@ def main():
     for d, reason, n, c in deaths:
         P(f"    {d:6} n={n:3} conf={c or 0:5} :: {classify_cause(reason)}")
 
+    # ── SNAPSHOT (AUDIT FIX K2/K6): the signals table is purged hourly and
+    # gate_shadow records on an hourly service — every count below is
+    # timestamped so later readers know what was true WHEN. ────────────────
+    P()
+    P(f"SNAPSHOT @ {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')} UTC "
+      f"(signals table purged hourly; gate_shadow hourly recorder — max blocked_at below lags the window end)")
+
     # ── 2. gate_shadow blocks ───────────────────────────────────────────────
     gb = sqlite3.connect(os.path.join(BRAIN, 'gate_shadow.db'))
     grows = gb.execute(
         "SELECT gate, token, direction, blocked_at FROM events WHERE blocked_at >= '2026-11-20 12:00'"
     ).fetchall()
+    gb_max = gb.execute("SELECT MAX(blocked_at) FROM events").fetchone()[0]
     gb.close()
+    P(f"  gate_shadow max(blocked_at) = {gb_max}  "
+      f"(hourly recorder — window tail after this is missed by the DB; "
+      f"counted from log lines instead where needed)")
     P()
     P("── 2. GATE SHADOW BLOCK EVENTS (window) " + "─" * 58)
     gc = Counter(g[0] for g in grows)
@@ -240,13 +257,15 @@ def main():
     # ── 3. decider SKIP lines (DailyFillCap / Cap C / conf floor) ───────────
     P()
     P("── 3. DECIDER SKIP LINES (window, pipeline.log) " + "─" * 49)
+    # AUDIT FIX (K2): comma-conjunction signals (e.g. 'pump-chain+,v6+') were
+    # dropped by [a-z0-9_+-]+ — all 572 DailyFillCap lines carry the suffix.
     skip_re = re.compile(
         r'^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*?SKIP:?\s*(DailyFillCap|Cap C|'
         r'CONF-FLOOR|No signals above \d+)'
-        r'(?:.*?\[blocked ([A-Z0-9]{1,12}) (LONG|SHORT) ([a-z0-9_+-]+)\])?')
+        r'(?:.*?\[blocked ([A-Z0-9]{1,12}) (LONG|SHORT) ([a-z0-9_+, -]+?)\])?')
     cap_events = []
     skip_counts = Counter()
-    no_signal_cycles = 0
+    no_signal_secs = set()   # AUDIT FIX (K2): count distinct seconds, not echo lines
     with open(PIPELINE_LOG, 'r', errors='replace') as f:
         for line in f:
             ts_m = re.match(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})', line)
@@ -257,8 +276,8 @@ def main():
             if ts < WINDOW_START:
                 continue
             if 'No signals above' in line:
-                no_signal_cycles += 1
-                skip_counts['no-signal-above-floor(cycle)'] += 1
+                no_signal_secs.add(int(ts))
+                skip_counts['no-signal-above-floor(line)'] += 1
                 continue
             m = skip_re.search(line)
             if m:
@@ -266,8 +285,9 @@ def main():
                 skip_counts[kind] += 1
                 if m.group(3):
                     cap_events.append((ts, kind, m.group(3), m.group(4), m.group(5)))
-    P(f"  skip lines by kind: {dict(skip_counts)}")
-    P(f"  'No signals above <floor>' cycles: {no_signal_cycles}")
+    P(f"  skip LINES by kind: {dict(skip_counts)}  (log echoes ~2x — lines != events)")
+    P(f"  'No signals above <floor>': {len(no_signal_secs)} distinct-second events "
+      f"({skip_counts.get('no-signal-above-floor(line)',0)} lines)")
     P(f"  ready-candidate blocks with [blocked tok dir signal]: {len(cap_events)}")
     cc = Counter((k, d, s) for _, k, _, d, s in cap_events)
     for (k, d, s), v in cc.most_common(12):
@@ -353,6 +373,70 @@ def main():
           f"{pos} ({pos/len(exv)*100:.0f}%) beat the market in the next hour")
         P(f"  mean ex1h = {sum(exv)/len(exv):+.2f}%")
 
+    # ── 4b. SUCCESSOR PROBE (AUDIT FIX K4): did expired signals convert later?
+    P()
+    P("── 4b. SUCCESSOR PROBE — did expired signals convert to trades later? " + "─" * 24)
+    P("  (successor = same token+direction signal row created ≤10min after death,")
+    P("   not itself EXPIRED; trade = any trade on token+direction within 60min)")
+    try:
+        import psycopg2
+        from _secrets import BRAIN_DB_DICT
+        pgc = psycopg2.connect(**BRAIN_DB_DICT)
+        curc = pgc.cursor()
+        curc.execute("""SELECT token, direction, EXTRACT(EPOCH FROM open_time) FROM trades
+        WHERE open_time >= '2026-11-20 12:00:00+00'""")
+        tidx = defaultdict(list)
+        for tok, d, ets in curc.fetchall():
+            tidx[(tok, d)].append(float(ets))
+        pgc.close()
+        srows = sg.execute("""
+            SELECT token, direction, decision, decision_reason, created_at, updated_at
+            FROM signals WHERE created_at >= '2026-11-20 12:00'""").fetchall()
+        def _p(ts):
+            try:
+                return datetime.strptime(ts, '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc).timestamp()
+            except (ValueError, TypeError):
+                try:
+                    return datetime.fromisoformat(ts).timestamp()
+                except Exception:
+                    return None
+        sidx = defaultdict(list)
+        for tok, d, dec, reason, cat, uat in srows:
+            cts = _p(cat)
+            if cts is not None:
+                sidx[(tok, d)].append((cts, dec, reason or ''))
+        for k in sidx:
+            sidx[k].sort()
+        succ = defaultdict(lambda: [0, 0, 0])   # cause -> [n, succ_signal, trade60]
+        for tok, d, dec, reason, cat, uat in srows:
+            if dec != 'EXPIRED':
+                continue
+            dts = _p(uat) or _p(cat)
+            if dts is None:
+                continue
+            r = reason or ''
+            cause = ('combo-stale' if 'combo_key' in r else
+                     'blocked@approval' if 'blocked@approval' in r else
+                     'fell-out-of-hotset' if 'fell out of hotset' in r else
+                     'stale10' if 'compaction_stale' in r else 'other')
+            succ[cause][0] += 1
+            if any(t > dts and t <= dts + 600 and dd != 'EXPIRED'
+                   for t, dd, _ in sidx.get((tok, d), [])):
+                succ[cause][1] += 1
+            if any(t > dts and t <= dts + 3600 for t in tidx.get((tok, d), [])):
+                succ[cause][2] += 1
+        P(f"  {'cause':22} {'n':>4} {'succ-signal':>14} {'trade-60m':>14}")
+        for c, (n, ss, tt) in sorted(succ.items(), key=lambda x: -x[1][0]):
+            P(f"  {c:22} {n:4} {ss:6} ({ss/n*100:3.0f}%) {tt:6} ({tt/n*100:3.0f}%)")
+        tot = sum(v[0] for v in succ.values())
+        totr = sum(v[2] for v in succ.values())
+        P(f"  TOTAL: {tot} expired, {totr} ({totr/tot*100:.1f}%) converted to a "
+          f"trade within 60min — the funnel is a ONE-WAY VALVE (audit K4 correction:")
+        P(f"  approvals DID occur — 47 'fell out of hotset' rows prove it; zero")
+        P(f"  automated trades is fully explained by DailyFillCap engaged 12:07:46→end)")
+    except Exception as e:
+        P(f"  successor probe failed: {e}")
+
     # ── 5. trades actually taken ────────────────────────────────────────────
     P()
     P("── 5. EXECUTED (window) " + "─" * 74)
@@ -363,13 +447,19 @@ def main():
 
     # ── caveats ─────────────────────────────────────────────────────────────
     P()
-    P("CAVEATS: during a -5% crash hour raw fwd is market-beta — read ex1h/ex4h")
-    P("(direction-signed excess vs cross-sectional mean), not raw fwd. Events")
-    P("within the last 1h/4h are right-censored (no mature forward yet) — rerun")
-    P("after 18:00 for full 1h coverage. Per-cause n small; gate_shadow rows are")
-    P("per-minute re-logs (dedup applied to the misses list only); signals-table")
-    P("deaths are per-signal truth; gate_shadow capture = 10-emoji set since the")
-    P("Oct-20 port; DailyFillCap [blocked] suffix present on 507/572 lines.")
+    P("CAVEATS (audit K3 corrections applied): raw fwd is market-beta in a")
+    P("crash — read ex1h/ex4h (direction-signed excess vs cross-sectional mean).")
+    P("Horizons are now independent: 1h coverage matures ~60min after each event;")
+    P("4h coverage matures ~4h after (events after ~12:25 lack fwd4h until ~20:30).")
+    P("The earliest window (12:00-13:30) is a FLAT pre-crash regime (BTC -0.10%)")
+    P("vs the crash leg 15:00-16:36 (-3.41%) — matured early events are NOT")
+    P("representative of the crash leg; the auditor's 1h-only extended test on the")
+    P("crash leg (n=189 dedup) found blocked shorts -0.045% mean, 48% beat market")
+    P("— blocked ≈ market holds INTO the crash leg. Per-cause n small; gate_shadow")
+    P("rows are per-minute re-logs (hourly recorder — DB lags window tail by up")
+    P("to 1h; see SNAPSHOT header); signals-table deaths are purged hourly")
+    P("(counts drift — see SNAPSHOT); DailyFillCap line counts echo ~2x — report")
+    P("distinct events; comma-conjunction signals now parsed (audit K2 fix).")
 
     # ── exports ─────────────────────────────────────────────────────────────
     os.makedirs(EXPORTS, exist_ok=True)

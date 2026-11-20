@@ -1,161 +1,186 @@
 ====================================================================================================
-CRASH-WINDOW FUNNEL FORENSICS — 2026-11-20 12:00 → 16:38 UTC
+CRASH-WINDOW FUNNEL FORENSICS — 2026-11-20 12:00 → 17:07 UTC
 ====================================================================================================
-BTC last 6h: high=62,273 low=58,960 drawdown=-5.32% last=59,166
-trades since 12:00: 2 (open: 1) — breakdown: [('ai-trader-pending', 2, Decimal('-0.15'))]
+BTC last 6h: high=62,108 low=58,960 drawdown=-5.07% last=59,454
+trades since 12:00: 2 (open: 1) — breakdown: [('ai-trader-pending', 2, Decimal('-0.20'))]
   automated (non-ai-trader-*) = 0
 
 ── 1. EMISSIONS + PER-SIGNAL DEATH CERTIFICATES (signals table) ─────────────────────────────────
   dir    decision      n avg_conf
-  LONG   EXPIRED     153     79.2
-  LONG   SKIPPED      49     79.8
-  LONG   PENDING       9     86.5
-  SHORT  EXPIRED     167     76.3
-  SHORT  SKIPPED       5     77.6
-  SHORT  PENDING       2     80.3
+  LONG   EXPIRED     129     80.5
+  LONG   SKIPPED      37     80.9
+  LONG   PENDING       1     78.7
+  LONG   APPROVED      1     78.7
+  SHORT  EXPIRED     168     76.3
+  SHORT  PENDING       4     78.9
+  SHORT  SKIPPED       1     78.2
   death causes (EXPIRED):
-    LONG   n= 34 conf= 74.7 :: combo-stale(merge-window)
-    LONG   n= 30 conf= 76.9 :: approved-fell-out-of-hotset
-    LONG   n= 14 conf= 83.6 :: pump-chain-long-high
-    LONG   n= 13 conf= 85.9 :: long-rsi-ceiling
-    LONG   n= 11 conf= 82.6 :: pump-chain-rsi-max
-    LONG   n= 10 conf= 82.9 :: spike-filter-long
+    LONG   n= 26 conf= 75.2 :: combo-stale(merge-window)
+    LONG   n= 18 conf= 82.5 :: pump-chain-long-high
+    LONG   n= 15 conf= 86.2 :: long-rsi-ceiling
+    LONG   n= 13 conf= 83.5 :: pump-chain-rsi-max
+    LONG   n= 11 conf= 82.1 :: spike-filter-long
     LONG   n=  9 conf= 70.8 :: compaction-stale-10min
-    LONG   n=  7 conf= 83.6 :: rr-engine-hard-block
-    LONG   n=  5 conf= 88.0 :: pump-chain-vel
-    LONG   n=  5 conf= 78.1 :: confluence-single-not-bypass
+    LONG   n=  8 conf= 82.1 :: rr-engine-hard-block
+    LONG   n=  6 conf= 88.0 :: pump-chain-vel
+    LONG   n=  6 conf= 79.8 :: confluence-single-not-bypass
     LONG   n=  4 conf= 83.1 :: confluence-single-not-bypass
     LONG   n=  3 conf= 74.7 :: vol-gate-override-0
     LONG   n=  3 conf= 75.3 :: long-neutral-chop
     LONG   n=  3 conf= 82.7 :: long-midband
+    LONG   n=  2 conf= 88.0 :: approved-fell-out-of-hotset
     LONG   n=  1 conf= 81.5 :: long-rsi-floor
     LONG   n=  1 conf= 81.1 :: long-high-70
-    SHORT  n= 47 conf= 71.3 :: combo-stale(merge-window)
+    SHORT  n= 38 conf= 71.4 :: combo-stale(merge-window)
     SHORT  n= 34 conf= 79.2 :: short-rsi-hard-floor
-    SHORT  n= 32 conf= 71.3 :: compaction-stale-10min
-    SHORT  n= 17 conf= 86.9 :: vol-gate-override-0
-    SHORT  n= 14 conf= 78.1 :: approved-fell-out-of-hotset
+    SHORT  n= 33 conf= 71.5 :: compaction-stale-10min
+    SHORT  n= 19 conf= 74.9 :: approved-fell-out-of-hotset
+    SHORT  n= 19 conf= 87.0 :: vol-gate-override-0
+    SHORT  n=  7 conf= 71.7 :: short-regime-gate
     SHORT  n=  6 conf= 80.4 :: rr-engine-hard-block
-    SHORT  n=  5 conf= 71.7 :: short-regime-gate
     SHORT  n=  5 conf= 88.0 :: pump-chain-short-high
     SHORT  n=  5 conf= 77.7 :: oversold-knife
     SHORT  n=  2 conf= 86.4 :: confluence-single-not-bypass
 
+SNAPSHOT @ 2026-11-20 17:07:48 UTC (signals table purged hourly; gate_shadow hourly recorder — max blocked_at below lags the window end)
+  gate_shadow max(blocked_at) = 2026-11-20 16:59:01+00:00  (hourly recorder — window tail after this is missed by the DB; counted from log lines instead where needed)
+
 ── 2. GATE SHADOW BLOCK EVENTS (window) ──────────────────────────────────────────────────────────
-  total=454  by direction: LONG=237 SHORT=217
-    SHORT-RSI-HARD-FLOOR             69
-    RR-ENGINE                        52
-    BTC-CRASH                        35
-    VOL-GATE-BYPASS                  33
-    SHORT-REGIME-GATE                27
-    CONFLUENCE-GATE-BLOCK            23
-    SPIKE-FILTER                     23
-    PUMP-CHAIN-HIGH                  23
-    LONG-RSI-BLOCK                   16
-    LONG-RSI-CEILING                 15
-    PUMP-CHAIN-RSI-MAX               14
+  total=601  by direction: LONG=321 SHORT=280
+    SHORT-RSI-HARD-FLOOR             92
+    RR-ENGINE                        59
+    BTC-CRASH                        54
+    VOL-GATE-BYPASS                  44
+    SHORT-REGIME-GATE                33
+    LONG-RSI-CEILING                 33
+    SPIKE-FILTER                     32
+    PUMP-CHAIN-HIGH                  31
+    CONFLUENCE-GATE-BLOCK            24
+    PUMP-CHAIN-RSI-MAX               24
+    LONG-RSI-BLOCK                   19
+    OVERSOLD-SHORT                   14
+    PUMP-CHAIN-VEL                   13
+    LONG-MIDBAND                     13
     BTC-CHOP-GATE                    12
-    LONG-MIDBAND                     11
+    SHORT-RSI-CEILING                11
     SHORT-CONTINUUM                  11
-    OVERSOLD-SHORT                   10
-    LONG-NEUTRAL                     8
-    PUMP-CHAIN-SHORT-HIGH            8
-    LONG-NEUTRAL-CHOP                8
-    SHORT-BB-DEAD-ZONE               8
-    SHORT-RSI-CEILING                8
+    PUMP-CHAIN-SHORT-HIGH            10
+    EXEC-BLOCK                       10
+    SHORT-BB-DEAD-ZONE               9
 
 ── 3. DECIDER SKIP LINES (window, pipeline.log) ─────────────────────────────────────────────────
-  skip lines by kind: {'no-signal-above-floor(cycle)': 120, 'DailyFillCap': 572}
-  'No signals above <floor>' cycles: 120
-  ready-candidate blocks with [blocked tok dir signal]: 507
+  skip LINES by kind: {'no-signal-above-floor(line)': 124, 'DailyFillCap': 644}  (log echoes ~2x — lines != events)
+  'No signals above <floor>': 66 distinct-second events (124 lines)
+  ready-candidate blocks with [blocked tok dir signal]: 644
     DailyFillCap   LONG  jup_yolo_mirrored          272
-    DailyFillCap   SHORT linreg-fade-               58
+    DailyFillCap   SHORT linreg-fade-               96
+    DailyFillCap   SHORT jup_yolo_mirrored          72
     DailyFillCap   LONG  btc-pump-rider+            48
-    DailyFillCap   SHORT jup_yolo_mirrored          42
     DailyFillCap   SHORT volume-buildup-            35
+    DailyFillCap   LONG  continuum+,jup_yolo_mirrored 30
+    DailyFillCap   LONG  pump-chain+,pump-chain-v6+ 24
     DailyFillCap   SHORT atr-trend-                 20
     DailyFillCap   LONG  pump-chain-v6+             17
+    DailyFillCap   SHORT continuum-trend-,jup_yolo_mirrored 9
     DailyFillCap   LONG  continuum+                 8
-    DailyFillCap   LONG  r2v2-long6                 5
-    DailyFillCap   LONG  pump-chain+                2
+    DailyFillCap   LONG  pump-chain+                6
 
 ── 4. COUNTERFACTUAL (direction-signed excess; entry=next 5m open) ───────────────────────────────
   source          cause                             n cov1h     ex1h cov4h     ex4h
   (ex = direction-signed excess vs cross-sectional market mean at same bucket)
-  decider-skip    DailyFillCap                    507    10   +0.08%    10   -0.07%
-  signals-expired combo-stale(merge-window)        81     0      n/a     0      n/a
-  gate-shadow     SHORT-RSI-HARD-FLOOR             69    17   -0.11%    17   -0.14%
-  gate-shadow     RR-ENGINE                        52     9   +0.17%     9   +0.19%
-  signals-expired approved-fell-out-of-hotset      44     0      n/a     0      n/a
-  signals-expired compaction-stale-10min           41     0      n/a     0      n/a
-  gate-shadow     BTC-CRASH                        35     4   +0.35%     4   +0.37%
-  signals-expired short-rsi-hard-floor             34     5   -0.14%     5   -0.39%
-  gate-shadow     VOL-GATE-BYPASS                  33     1   +1.96%     1   +0.25%
-  gate-shadow     SHORT-REGIME-GATE                27     6   -0.24%     6   +0.01%
-  gate-shadow     CONFLUENCE-GATE-BLOCK            23     4   -0.19%     4   +0.14%
-  gate-shadow     SPIKE-FILTER                     23     5   +0.51%     5   -0.06%
-  gate-shadow     PUMP-CHAIN-HIGH                  23     4   -0.20%     4   -0.47%
-  signals-expired vol-gate-override-0              20     0      n/a     0      n/a
-  gate-shadow     LONG-RSI-BLOCK                   16     4   +0.31%     4   -0.33%
-  gate-shadow     LONG-RSI-CEILING                 15     0      n/a     0      n/a
-  signals-expired pump-chain-long-high             14     0      n/a     0      n/a
-  gate-shadow     PUMP-CHAIN-RSI-MAX               14     1   +0.35%     1   +0.78%
-  signals-expired rr-engine-hard-block             13     0      n/a     0      n/a
-  signals-expired long-rsi-ceiling                 13     0      n/a     0      n/a
-  gate-shadow     BTC-CHOP-GATE                    12     1   +0.39%     1   -1.46%
-  signals-expired confluence-single-not-bypass     11     0      n/a     0      n/a
-  signals-expired pump-chain-rsi-max               11     0      n/a     0      n/a
-  gate-shadow     LONG-MIDBAND                     11     1   +0.64%     1   +0.48%
-  gate-shadow     SHORT-CONTINUUM                  11     0      n/a     0      n/a
-  signals-expired spike-filter-long                10     1   +0.39%     1   -1.46%
-  gate-shadow     OVERSOLD-SHORT                   10     1   -0.07%     1   -2.36%
-  gate-shadow     LONG-NEUTRAL                      8     2   +1.11%     2   +1.03%
-  gate-shadow     PUMP-CHAIN-SHORT-HIGH             8     0      n/a     0      n/a
-  gate-shadow     LONG-NEUTRAL-CHOP                 8     0      n/a     0      n/a
-  gate-shadow     SHORT-BB-DEAD-ZONE                8     0      n/a     0      n/a
-  gate-shadow     SHORT-RSI-CEILING                 8     0      n/a     0      n/a
-  gate-shadow     PUMP-CHAIN-VEL                    7     2   +0.72%     2   -0.89%
-  gate-shadow     EXEC-BLOCK                        7     0      n/a     0      n/a
-  gate-shadow     SHORT-NEUTRAL                     6     0      n/a     0      n/a
-  signals-expired short-regime-gate                 5     0      n/a     0      n/a
-  signals-expired pump-chain-vel                    5     0      n/a     0      n/a
-  signals-expired pump-chain-short-high             5     0      n/a     0      n/a
-  signals-expired oversold-knife                    5     0      n/a     0      n/a
-  gate-shadow     LONG-RSI-FLOOR                    4     0      n/a     0      n/a
-  gate-shadow     LONG-HIGH-70                      4     0      n/a     0      n/a
-  gate-shadow     BTC-ACCEL                         4     0      n/a     0      n/a
-  gate-shadow     SHORT-BB-DEAD-ZONE2               4     0      n/a     0      n/a
-  signals-expired long-midband                      3     0      n/a     0      n/a
-  signals-expired long-neutral-chop                 3     0      n/a     0      n/a
-  gate-shadow     PRESERVE-MERGE-BLOCK              2     0      n/a     0      n/a
-  signals-expired long-high-70                      1     0      n/a     0      n/a
+  decider-skip    DailyFillCap                    644   550   +0.34%    87   +0.81%
+  gate-shadow     SHORT-RSI-HARD-FLOOR             92    67   -0.05%    21   -0.21%
+  signals-expired combo-stale(merge-window)        64    27   -0.37%     0      n/a
+  gate-shadow     RR-ENGINE                        59    51   +0.09%    17   +0.32%
+  gate-shadow     BTC-CRASH                        54    31   +0.46%     5   +0.24%
+  gate-shadow     VOL-GATE-BYPASS                  44    29   +0.20%     4   -0.10%
+  signals-expired compaction-stale-10min           42    34   -0.17%     1   +1.63%
+  signals-expired short-rsi-hard-floor             34    26   +0.12%     7   -0.46%
+  gate-shadow     SHORT-REGIME-GATE                33    27   +0.04%     7   -0.11%
+  gate-shadow     LONG-RSI-CEILING                 33    15   +1.05%     2   +8.15%
+  gate-shadow     SPIKE-FILTER                     32    19   -0.07%     7   -0.15%
+  gate-shadow     PUMP-CHAIN-HIGH                  31    23   -0.30%    10   -0.21%
+  gate-shadow     CONFLUENCE-GATE-BLOCK            24    21   +0.12%     5   +0.49%
+  gate-shadow     PUMP-CHAIN-RSI-MAX               24    14   +0.13%     2   +0.42%
+  signals-expired vol-gate-override-0              22    13   +0.17%     2   -0.19%
+  signals-expired approved-fell-out-of-hotset      21     7   -0.03%     0      n/a
+  gate-shadow     LONG-RSI-BLOCK                   19    15   -0.21%     4   -0.39%
+  signals-expired pump-chain-long-high             18    13   -0.22%     5   -0.16%
+  signals-expired long-rsi-ceiling                 15     7   +0.92%     2   +8.73%
+  signals-expired rr-engine-hard-block             14    11   -0.47%     3   -0.34%
+  gate-shadow     OVERSOLD-SHORT                   14    10   -0.59%     1   -2.30%
+  signals-expired pump-chain-rsi-max               13     7   -0.23%     1   +0.13%
+  gate-shadow     PUMP-CHAIN-VEL                   13     5   +0.03%     3   -0.92%
+  gate-shadow     LONG-MIDBAND                     13    11   +0.19%     2   +0.43%
+  signals-expired confluence-single-not-bypass     12    10   +0.21%     2   +1.11%
+  gate-shadow     BTC-CHOP-GATE                    12    12   -0.28%     2   -1.58%
+  signals-expired spike-filter-long                11     7   -0.52%     2   -1.58%
+  gate-shadow     SHORT-RSI-CEILING                11     8   +0.07%     0      n/a
+  gate-shadow     SHORT-CONTINUUM                  11    11   -0.44%     0      n/a
+  gate-shadow     PUMP-CHAIN-SHORT-HIGH            10     8   +0.25%     2   +1.19%
+  gate-shadow     EXEC-BLOCK                       10     7   -0.33%     1   +0.86%
+  gate-shadow     SHORT-BB-DEAD-ZONE                9     8   +0.53%     0      n/a
+  gate-shadow     LONG-NEUTRAL                      8     8   +0.22%     2   +0.88%
+  gate-shadow     LONG-NEUTRAL-CHOP                 8     8   +0.21%     2   +1.73%
+  signals-expired short-regime-gate                 7     5   +0.06%     1   +1.78%
+  gate-shadow     LONG-RSI-FLOOR                    7     4   -0.26%     2   +0.99%
+  signals-expired pump-chain-vel                    6     2   -0.07%     1   -1.54%
+  gate-shadow     SHORT-NEUTRAL                     6     6   +0.37%     0      n/a
+  gate-shadow     SHORT-BB-DEAD-ZONE2               6     4   -0.81%     0      n/a
+  signals-expired pump-chain-short-high             5     4   +0.23%     1   +0.95%
+  signals-expired oversold-knife                    5     3   -1.14%     0      n/a
+  gate-shadow     LONG-HIGH-70                      5     4   +0.07%     1   -1.87%
+  gate-shadow     BTC-ACCEL                         4     4   +0.34%     0      n/a
+  gate-shadow     SLOPE-FILTER                      4     0      n/a     0      n/a
+  signals-expired long-midband                      3     2   +0.60%     2   +0.32%
+  signals-expired long-neutral-chop                 3     2   +0.36%     0      n/a
+  gate-shadow     PRESERVE-MERGE-BLOCK              3     2   +0.84%     0      n/a
+  signals-expired long-high-70                      1     1   +0.67%     1   -1.87%
   signals-expired long-rsi-floor                    1     0      n/a     0      n/a
-  gate-shadow     PRESERVE-SPIKE-BLOCK              1     1   -0.07%     1   -2.36%
-  gate-shadow     VEL-FILTER                        1     0      n/a     0      n/a
+  gate-shadow     PRESERVE-SPIKE-BLOCK              1     1   -0.07%     1   -2.30%
+  gate-shadow     VEL-FILTER                        1     1   +0.16%     0      n/a
 
   biggest blocked-SHORT misses (dedup token+10min; prefer market-adjusted ex1h):
+    PURR     conf=67.0 ex1h= +3.67%  (compaction-stale-10min)
+    USELESS  conf= n/a ex1h= +2.95%  (DailyFillCap)
+    USELESS  conf=75.0 ex1h= +2.88%  (approved-fell-out-of-hotset)
     INJ      conf= n/a ex1h= +1.96%  (VOL-GATE-BYPASS)
-    SUSHI    conf=78.0 ex1h= +0.34%  (short-rsi-hard-floor)
-    BIGTIME  conf= n/a ex1h= +0.31%  (SHORT-RSI-HARD-FLOOR)
-    SUSHI    conf= n/a ex1h= +0.25%  (SHORT-RSI-HARD-FLOOR)
-    BIGTIME  conf= n/a ex1h= +0.18%  (DailyFillCap)
-    SOL      conf= n/a ex1h= +0.17%  (SHORT-RSI-HARD-FLOOR)
-    SUPER    conf= n/a ex1h= -0.03%  (SHORT-RSI-HARD-FLOOR)
-    BANANA   conf= n/a ex1h= -0.05%  (SHORT-RSI-HARD-FLOOR)
-    WLFI     conf= n/a ex1h= -0.07%  (DailyFillCap)
-    YGG      conf=78.0 ex1h= -0.14%  (short-rsi-hard-floor)
-  MARKET-ADJUSTED: 23 blocked shorts with ex1h coverage — 6 (26%) beat the market in the next hour
-  mean ex1h = -0.08%
+    ETH      conf=64.7 ex1h= +1.78%  (compaction-stale-10min)
+    ETH      conf=73.7 ex1h= +1.69%  (combo-stale(merge-window))
+    AERO     conf= n/a ex1h= +1.69%  (SHORT-RSI-HARD-FLOOR)
+    AERO     conf= n/a ex1h= +1.59%  (DailyFillCap)
+    INJ      conf=88.0 ex1h= +1.55%  (vol-gate-override-0)
+    TURBO    conf= n/a ex1h= +1.42%  (SHORT-CONTINUUM)
+  MARKET-ADJUSTED: 195 blocked shorts with ex1h coverage — 96 (49%) beat the market in the next hour
+  mean ex1h = -0.04%
+
+── 4b. SUCCESSOR PROBE — did expired signals convert to trades later? ────────────────────────
+  (successor = same token+direction signal row created ≤10min after death,
+   not itself EXPIRED; trade = any trade on token+direction within 60min)
+  cause                     n    succ-signal      trade-60m
+  blocked@approval        170      2 (  1%)      3 (  2%)
+  combo-stale              65     12 ( 18%)      5 (  8%)
+  stale10                  42      1 (  2%)      1 (  2%)
+  fell-out-of-hotset       21      7 ( 33%)      0 (  0%)
+  TOTAL: 298 expired, 9 (3.0%) converted to a trade within 60min — the funnel is a ONE-WAY VALVE (audit K4 correction:
+  approvals DID occur — 47 'fell out of hotset' rows prove it; zero
+  automated trades is fully explained by DailyFillCap engaged 12:07:46→end)
 
 ── 5. EXECUTED (window) ──────────────────────────────────────────────────────────────────────────
-    ai-trader-pending            n=2 net=-0.15  [MANUAL(CEO)]
+    ai-trader-pending            n=2 net=-0.20  [MANUAL(CEO)]
 
-CAVEATS: during a -5% crash hour raw fwd is market-beta — read ex1h/ex4h
-(direction-signed excess vs cross-sectional mean), not raw fwd. Events
-within the last 1h/4h are right-censored (no mature forward yet) — rerun
-after 18:00 for full 1h coverage. Per-cause n small; gate_shadow rows are
-per-minute re-logs (dedup applied to the misses list only); signals-table
-deaths are per-signal truth; gate_shadow capture = 10-emoji set since the
-Oct-20 port; DailyFillCap [blocked] suffix present on 507/572 lines.
+CAVEATS (audit K3 corrections applied): raw fwd is market-beta in a
+crash — read ex1h/ex4h (direction-signed excess vs cross-sectional mean).
+Horizons are now independent: 1h coverage matures ~60min after each event;
+4h coverage matures ~4h after (events after ~12:25 lack fwd4h until ~20:30).
+The earliest window (12:00-13:30) is a FLAT pre-crash regime (BTC -0.10%)
+vs the crash leg 15:00-16:36 (-3.41%) — matured early events are NOT
+representative of the crash leg; the auditor's 1h-only extended test on the
+crash leg (n=189 dedup) found blocked shorts -0.045% mean, 48% beat market
+— blocked ≈ market holds INTO the crash leg. Per-cause n small; gate_shadow
+rows are per-minute re-logs (hourly recorder — DB lags window tail by up
+to 1h; see SNAPSHOT header); signals-table deaths are purged hourly
+(counts drift — see SNAPSHOT); DailyFillCap line counts echo ~2x — report
+distinct events; comma-conjunction signals now parsed (audit K2 fix).
 
 exports: /root/.hermes/analysis/exports/crash_events.tsv, crash_funnel.tsv
