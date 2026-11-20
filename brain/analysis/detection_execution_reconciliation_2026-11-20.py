@@ -693,6 +693,22 @@ def render(a):
     chk(n == a['n_total'], f'class partition {n} != {a["n_total"]}')
     w(f'| total | | {n} | | | |')
     w('')
+    # MED-1 (review 806d6c8a): the G1 join-quality caveat MUST be emitted by the
+    # generator — a hand-edited report loses it on every regeneration.
+    ag, ja, sa = a['agree'], a['join_ages'], a['stal_ages']
+    if ag and ja and sa:
+        w('> ⚠️ **G1 footnote (join quality):** the spec-literal join ages are '
+          f'{100 - 100 * a["close_agree"] / len(ag):.0f}% discordant with the '
+          'trusted `staleness_minutes` stamp '
+          f'(only {a["close_agree"]}/{len(ag)} within ±3min; '
+          f'|Δ| P50={pct(ag, 0.5):.1f}m; join-age P50={pct(ja, 0.5):.1f}m '
+          f'vs stamp P50={pct(sa, 0.5):.1f}m) — read G1={len(a["classes"]["G1"])} as '
+          '*"spec-literal detection-join age"*, **not** as that many truly stale signals. '
+          f'On purge-immune staleness stamps almost nothing is ≥10m stale '
+          f'(sensitivity G1={len(a["sens"]["G1"])} below), and most of the window\'s '
+          'trades predate the signals-table era entirely '
+          f'(G3={len(a["classes"]["G3"])}).')
+        w('')
     w('**Sensitivity** — same rules but age from `staleness_minutes` (purge-immune; '
       'only trades carrying the stamp):')
     w('')
