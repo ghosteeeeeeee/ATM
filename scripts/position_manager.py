@@ -129,7 +129,7 @@ from hermes_constants import (
     JUP_YOLO_ATRSL_SHADOW_ENABLED,
     PM_TRAIL_ACTIVATE_PCT,
     ARM_BE_SHADOW_ENABLED,
-    PREARM_LOCK_SHADOW_ENABLED, PREARM_LOCK_THR_PCT,
+    PREARM_LOCK_SHADOW_ENABLED, PREARM_LOCK_THR_PCT, PREARM_LOCK_ENFORCE,
 )
 
 # Hyperliquid mirroring — non-blocking, failures don't stop paper trading
@@ -4579,6 +4579,19 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
                         if not _pl_armed_live:
                             _prearm_lock_logged.add(trade_id)
                             log(f"  [SHADOW] PREARM-LOCK would-fire {token} {direction} live={live_pnl:+.2f}% peak={_pl_fav:+.2f}% [thr {PREARM_LOCK_THR_PCT:.2f}% peak then back to entry, never armed {_pl_arm:.2f}%] trade={trade_id} sig={_pos_signal}")
+                            if PREARM_LOCK_ENFORCE:
+                                # PREARM-ENFORCE EXIT — CEO GO (consult 20261120T002223Z
+                                # 2026-11-20): walk A ALL BARS (n=368, net30 +$6.51, fk
+                                # 13.9%, net14 +$3.17, halves same-sign); first read
+                                # 11-21 amplify-prearm-breakeven-lock. Same condition as
+                                # the would-fire line above (unarmed [thr, arm) round
+                                # trip to entry) — exits AT breakeven. REVERT:
+                                # PREARM_LOCK_ENFORCE=False in hermes_constants.
+                                close_paper_position(trade_id, "prearm_lock",
+                                    exit_detail=f"prearm_lock peak={_pl_fav:+.2f}%,pnl={live_pnl:+.2f}%,thr={PREARM_LOCK_THR_PCT:.2f}%,armed=FALSE")
+                                closed_count += 1
+                                log(f"  PREARM-LOCK EXIT {token} {direction} {live_pnl:+.2f}% [peak={_pl_fav:+.2f}% >= thr {PREARM_LOCK_THR_PCT:.2f}% back to entry, never armed] trade={trade_id} sig={_pos_signal}")
+                                continue
             except Exception as e:
                 log(f"  [SHADOW] PREARM-LOCK error for {token}: {e}")
 

@@ -212,6 +212,19 @@ def _live_trailing_sl(trade_id, direction, entry_price, current_price, trail_act
         return round(trail_sl, 8)
 
 
+def _fee_total(fees_raw):
+    """fees is a TEXT column (JSON blob or NULL/garbage) -> fee_total float, else 0.
+
+    NET-of-fee KPI (CEO 20261120T002223Z Phase 0): net_pnl = pnl_usdt - fee_total.
+    Same expression basis as control_tower_api fee_net_24h; NULL/non-JSON fees
+    degrade to net == gross, never raise."""
+    try:
+        f = json.loads(fees_raw) if isinstance(fees_raw, str) else fees_raw
+        return float((f or {}).get('fee_total') or 0)
+    except Exception:
+        return 0.0
+
+
 def get_trades(status='open', limit=20, offset=0):
     try:
         conn = psycopg2.connect(BRAIN_DB)
@@ -220,7 +233,7 @@ def get_trades(status='open', limit=20, offset=0):
             SELECT id, token, direction, entry_price, current_price, pnl_pct, pnl_usdt,
                    stop_loss, target, exchange, open_time, close_time, status, close_reason,
                    signal, confidence, leverage, amount_usdt,
-                   trailing_activation, trailing_distance, exit_price, atr_managed
+                   trailing_activation, trailing_distance, exit_price, atr_managed, fees
             FROM trades
             WHERE status = %s
             ORDER BY
@@ -314,6 +327,9 @@ def write_trades():
             "pnl_pct": round(float(r[5]), 2) if r[5] else 0,
             # pnl_usdt from DB already includes leverage — use directly (FIX: was * leverage)
             "pnl_usdt": round(float(r[6]), 2) if r[6] else 0,
+            # NET-of-fee (CEO 20261120T002223Z Phase 0): gross − fee_total, 4dp so
+            # page-level sums stay exact. Existing fields untouched.
+            "net_pnl": round((float(r[6]) if r[6] else 0) - _fee_total(r[22]), 4),
             "exchange": r[9], "opened": str(r[10]) if r[10] else "",
             "status": r[12], "signal": r[14],
             "confidence": float(r[15]) if r[15] else 0,
@@ -381,6 +397,11 @@ def _build_open_trades(open_t):
             "current": round(current_px, 6),
             "pnl_pct": round(pnl_pct, 2),
             "pnl_usdt": round(pnl_usdt, 2),
+            # NET-of-fee (CEO 20261120T002223Z Phase 0): open rows carry no fees
+            # yet (fees written at close) → net == gross. Base on the SAME 2dp
+            # value the row displays so net can never disagree with gross on
+            # an unchanged row (rounding artifact).
+            "net_pnl": round(round(pnl_usdt, 2) - _fee_total(r[22]), 4),
             "sl": round(float(r[7]), 6) if r[7] else 0,
             "tp": round(float(r[8]), 6) if r[8] else 0,
             "exchange": r[9],

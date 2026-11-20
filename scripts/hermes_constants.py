@@ -2206,6 +2206,18 @@ ARM_BE_SHADOW_ENABLED = True  # Revert: set False.
 # Enforce path = CEO GO + independent verify (money-path change). Revert: False.
 PREARM_LOCK_SHADOW_ENABLED = True
 PREARM_LOCK_THR_PCT = 0.25  # PERCENT (not fraction — PM_TRAIL_ACTIVATE_PCT is fraction)
+# PREARM ENFORCE — CEO GO (consult 20261120T002223Z, 2026-11-20, "issue PREARM
+# enforce GO"): walk A passed ALL bars — n=368 unarmed, net30 +$6.51, fk 13.9%,
+# net14 +$3.17, both 7d halves same sign; shadow thr 0.25 already verified live
+# (first would-fire SOL #16903, 2026-11-14). POLARITY: True => the pre-arm
+# breakeven lock EXITS at entry (close_paper_position "prearm_lock") when peak
+# fav in [PREARM_LOCK_THR_PCT, PM_TRAIL_ACTIVATE) then price returns to <= entry
+# and the PM trail never armed — the [0.25,0.40) never-armed chop-bleed class.
+# False => log-only would-fire shadow (pre-GO behavior). Shadow lines keep
+# running either way; PREARM_LOCK_SHADOW_ENABLED=False kills BOTH (kill-switch
+# semantics, same as ARM_BE). First read 2026-11-21 (amplify-prearm-breakeven-
+# lock). REVERT = set this flag back to False. Money-path change — CEO GO'd.
+PREARM_LOCK_ENFORCE = True
 # AI-TRADER+ EXTREME LONG conf-demote SHADOW (brain_auditor 2026-10-18).
 # RETIRED 2026-10-19 brain_auditor: signal_reporter hard block b0a2467d (09:41,
 # 30d 15T 26.7%WR -$0.71) supersedes — 0 EXTREME trades since, shadow starved.
@@ -3635,7 +3647,12 @@ STANDALONE_BYPASS_SIGNALS = (
     # rs/rs-r/rs-s REMOVED 2026-09-29 — poor performance, requires confluence (2+ signal types)
     'breakout-pullback', 'breakout-pullback+', 'breakout-pullback-',  # breakout + pullback confirmation — standalone bypass (2026-09-25)
     'ai-trader', 'ai-trader+', 'ai-trader-',  # AI-driven signal from trade-watchdog — full market context, standalone bypass
-    'hl_copy_trader', 'hl-copy-trader',  # CEO 2026-10-09: pro trader copy signal — quality filter (75%+ WR, $10k+ PnL) already applied
+    # 'hl_copy_trader' / 'hl-copy-trader' REMOVED from bypass 2026-11-20 — CEO
+    # 20261120T002223Z Phase 1 item 3 (SPLIT ruling, APPROVED): quality filter
+    # measurably failing (30d 22T 22.7%, p=0.017) -> confluence gate (2+ sources)
+    # now applies to hl-copy fills. If still bleeding 7d at the read, flip
+    # HL_COPY_SIGNAL_PLUS/MINUS_ENABLED=False (owner self_learner, due 11-21);
+    # feeds ugb-bypass-hole12-15. HL_COPY_SIGNAL_* flags untouched here.
     'jup_yolo_long', 'jup_yolo_short', 'jup_yolo_mirrored',  # CEO 2026-10-09: JUP YOLO leaderboard mirror — proven +4000% uPnL conviction
     # 'ichimoku' REMOVED from tuple 2026-10-20 bug_hunter — direction-agnostic membership
     # loosened SHORT too. Now handled by direction-aware gate in signal_compactor.py

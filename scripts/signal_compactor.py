@@ -5930,6 +5930,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         elif _preserved_won and not dry:
                             try:
                                 _pe_ck = pe.get('combo_key') or f"{pe['token']}:{pe['direction']}:{pe_src}"
+                                _upsert_suppressed = False
                                 _cur.execute("""
                                     SELECT id, survival_rounds FROM signals
                                     WHERE token=? AND direction=? AND decision='APPROVED' AND executed=0
@@ -5950,6 +5951,23 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                         WHERE id=?
                                     """, (_new_sr, pe_src, _pe_ck, pe.get('signal_metadata'), _row[0]))
                                 else:
+                                    # FIX (CEO 20261120T002223Z Phase 1 item 2, MED→HIGH
+                                    # accepted): the SELECT above only sees executed=0 — a
+                                    # prior executed=1 row (decision EXECUTED/FAILED; terminal
+                                    # "never re-claimed", CEO 2026-10-08) for this
+                                    # token:direction MISSES it -> fresh APPROVED/0 re-INSERT =
+                                    # double-open path + 4-5x EXEC churn. Widen the check:
+                                    # any executed=1 row present -> suppress the re-INSERT
+                                    # (one log line for verification).
+                                    _cur.execute("""
+                                        SELECT id, decision FROM signals
+                                        WHERE token=? AND direction=? AND executed=1
+                                        ORDER BY id DESC LIMIT 1
+                                    """, (pe['token'], pe.get('direction','')))
+                                    _exec_row = _cur.fetchone()
+                                    if _exec_row:
+                                        _upsert_suppressed = True
+                                        log(f"  ⏭️  [PRESERVE-APPROVED-UPSERT-SUPPRESSED] {pe['token']}:{pe.get('direction')} — prior executed row id={_exec_row[0]} decision={_exec_row[1]}, skipping re-INSERT (double-open guard)")
                                     # FIX (2026-09-04): Use original entry_origin_ts as created_at
                                     # instead of CURRENT_TIMESTAMP. This prevents the zombie loop
                                     # where PRESERVE-APPROVED-UPSERT refreshes created_at every cycle,
@@ -5961,27 +5979,29 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                         _pe_created = _dt.datetime.fromtimestamp(_pe_origin_ts, tz=_dt.timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
                                     else:
                                         _pe_created = None  # fallback to DB default
-                                    _cur.execute("""
-                                        INSERT INTO signals (
-                                            token, direction, signal_type, source, confidence,
-                                            decision, executed, z_score, survival_rounds,
-                                            hot_cycle_count, combo_key, price, signal_metadata,
-                                            created_at, updated_at
-                                        ) VALUES (?, ?, ?, ?, ?, 'APPROVED', 0, ?, ?, 1, ?, ?, ?,
-                                            ?, CURRENT_TIMESTAMP)
-                                    """, (
-                                        pe['token'], pe.get('direction',''),
-                                        pe.get('signal_type','hot-set'),
-                                        pe_src,
-                                        pe.get('confidence', 50.0) or 50.0,
-                                        pe.get('z_score', 0) or 0,
-                                        int(pe.get('rounds', 1)),
-                                        _pe_ck,
-                                        pe.get('price') or 0,
-                                        pe.get('signal_metadata') or '{}',
-                                        _pe_created,
-                                    ))
-                                log(f"  ✅ [PRESERVE-APPROVED-UPSERT] {pe['token']}:{pe.get('direction')} — APPROVED row upserted for decider_run")
+                                    if not _exec_row:
+                                        _cur.execute("""
+                                            INSERT INTO signals (
+                                                token, direction, signal_type, source, confidence,
+                                                decision, executed, z_score, survival_rounds,
+                                                hot_cycle_count, combo_key, price, signal_metadata,
+                                                created_at, updated_at
+                                            ) VALUES (?, ?, ?, ?, ?, 'APPROVED', 0, ?, ?, 1, ?, ?, ?,
+                                                ?, CURRENT_TIMESTAMP)
+                                        """, (
+                                            pe['token'], pe.get('direction',''),
+                                            pe.get('signal_type','hot-set'),
+                                            pe_src,
+                                            pe.get('confidence', 50.0) or 50.0,
+                                            pe.get('z_score', 0) or 0,
+                                            int(pe.get('rounds', 1)),
+                                            _pe_ck,
+                                            pe.get('price') or 0,
+                                            pe.get('signal_metadata') or '{}',
+                                            _pe_created,
+                                        ))
+                                if not _upsert_suppressed:
+                                    log(f"  ✅ [PRESERVE-APPROVED-UPSERT] {pe['token']}:{pe.get('direction')} — APPROVED row upserted for decider_run")
                             except Exception as _e:
                                 import traceback
                                 log(f"  ⚠️  [PRESERVE-APPROVED-FAIL] {pe['token']}: {_e}")
