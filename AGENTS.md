@@ -162,6 +162,8 @@ The daily timer catches anything missed, but **immediate commits are the default
 
 Explicit memory system — no background collection. **Query at session start** (before real work: "what do we already know about this?"), **store at session end** (what was done, decisions made, files changed, lessons). This is how the system compounds instead of starting blind every session.
 
+> **Pinned design decision (T, 2026-11-20): memories stay query-driven — never auto-injected into every prompt.** No background collection, no ambient recall. Do not add memory-injection machinery unless T explicitly asks.
+
 ### Native DSH tools (preferred — installed 2026-11-20)
 
 DSH sessions have OpenMemory as first-class tools — use them, no curl needed:
