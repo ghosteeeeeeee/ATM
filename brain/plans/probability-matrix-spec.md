@@ -1,6 +1,6 @@
 # SPEC: Probability Matrix — calibrated P(win) + EV admission layer
 
-**Status**: v1.1 — incorporates own-conclusions verdict (`brain/verdicts/2026-11-19-probability-matrix-spec-verdict.md`, `10eb95ff`), all 9 required changes applied. Next: P0 build.  
+**Status**: 🔴 **CLOSED EXPERIMENT — archived 2026-11-20 per pre-registered stopping rule (no revisit scheduled).** Outcome record: P0 signal-cells run = **STOP 1/4** (`brain/analysis/probability-matrix-calibration.md`); single bounded B3 iteration (family cells, bars unchanged, CEO decision `checkpoints/20261120T141947Z-decision.md`) = **STOP 2/4** — (a) FAIL Δ+26.5pp p=0.254 G=5, (b) PASS (p 0.2456 vs conf 0.3939, CI excl. 0 — *proves confidence-as-probability is worse than a coin, not that p is good*), (c) FAIL (0.2517 vs 0.2500, p=0.598 — p still ≈ coin OOS), (d) PASS 36.6% (`...-calibration-family.md`, bug_hunter SHIP `checkpoints/20261120T141947Z-result-2.md`). Stopping rule: 4/4 required, no further data-design iterations (B1/B2 barred), no bar amendments ever. Tool `scripts/probability_matrix.py` remains available for read-only re-runs; P1/P2 never shipped; hermes_constants untouched. A future revival requires a NEW spec with NEW pre-registered bars and an explicit CEO ruling — not a re-run of this one.  
 **Date**: 2026-11-19 (v1.0 4fe2153a → v1.1)  
 **Inputs**: `brain/summaries/beat-the-market-thorp-kassouf.md`, `brain/context/probability-matrix-context.md` (`1d59afbc`)  
 **Pattern**: automatic-implementation (shadow → enforce, pre-registered bars)
