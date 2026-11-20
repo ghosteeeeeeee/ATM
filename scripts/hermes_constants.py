@@ -3408,6 +3408,13 @@ CEO_PROTECTED_FLAGS = {
     'BB_BOUNCE_PLUS_ENABLED': ('Winning LONG signal — 5/17 wins in LONG streak. Must stay enabled', '2026-08-17'),
     'R2_TREND_SHORT_ENABLED': ('SHORT signal — CEO killed 2026-08-20 (0% WR). Under review with RSI fix + threshold tightening. Only T can re-enable', '2026-08-20'),
     'TIME_BLOCK_ENABLED': ('Re-enabled 2026-08-22 as penalty (0.7x) — was hard block. CEO_PROTECTED', '2026-08-22'),
+    # F6 (bug-hunter mfe-governed 2026-11-20): the WIN-CAPTURE shadow
+    # comment claims these are CEO_PROTECTED but they were NOT in the
+    # registry — protect them for real (the giveback exit is now live on
+    # managed structural trades; values are the audited pair 0.30/0.40).
+    'MFE_EXIT_ENABLED': ('Audited peak-giveback exit (2026-10-31) — now live on structure-governed trades; only T changes the switch', '2026-11-20'),
+    'MFE_EXIT_GIVEBACK_PCT': ('Audited 30% giveback of peak (sign-p 0.00000) — DO NOT CHANGE without re-backtest', '2026-11-20'),
+    'MFE_EXIT_ARM_PCT': ('Audited 0.40% arm (no-arm run churned fee-negative micro-closes) — DO NOT CHANGE', '2026-11-20'),
 }
 
 # ── Research/Testing Flags — NOBODY CAN TOUCH ──────────────────────────────
