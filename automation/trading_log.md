@@ -30490,3 +30490,32 @@ BY: auto_1hr
 - storm-confl-waiver deadline 2026-11-26 (shadow_disposition.json is truth) — default KEEP shadow; no storm this run
 - Unarmed WR 33.3% (-$0.40) vs armed 100% (+$0.33) — stall stack still owns the fix
 BY: auto_1hr
+
+## [2026-11-20 15:56] Hourly Analysis
+
+**Trades:** 0 closed last hour | 0 open
+**PnL NET:** $0.00 (hour) | 24h NET $-0.06 (n=15, gross +0.15, fees 0.21, payoff 0.76, WR 60.0%) | 7d NET $-1.09 (n=107, WR 49.5%) — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** 🌪️ FIRED — window-min -3.20% / at-run -2.94% (gate: window-min <= -1.5). Counterfactual NEGATIVE $-3.29 → streak resets 0/3 (previous 11-20 02:56 packet was +0.43 = 1/3); waiver SHADOW=True ENFORCE=False, deadline 2026-11-26 (shadow_disposition.json is truth)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Kill check: 0 closes last hour; no 0% WR signal with n>=3 last hour → no kill
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 0/15 = 0% (<40%); tpsl_utils deployed
+- Boost: none eligible — jup_yolo_mirrored 3T 100% net +0.15 (n=3 < 5); atr-trend- 9T 66.7% net -0.03 (net negative)
+- Arm rate: unarmed 9/15 = 60.0% below 70%, WR 33.3% net -$0.40 vs armed 6/6 100% net +$0.33 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 08 -0.17, 09 -0.01 then 0 closes since — not 3 consecutive → no size cut
+- Frequency: 0 close/hr — under 20
+- Entry quality: winners avg |MAE| 0.341% < 0.5% (max 0.734) — OK
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.06 at 60.0% WR / payoff 0.76 — payoff <1, fee drag (fees 0.21 vs gross 0.15)
+- 7d NET -1.09 — fee-drag persists; 1 change/hr rule → no action
+- Storm counterfactual split: blocked LONGs $-10.71 (27, gates correct) vs blocked SHORTs $+7.42 (20, gates suppressed dump SHORT winners) — floor-side work (linreg-fade band) owns SHORT suppression, no auto action
+- storm-confl-waiver deadline 2026-11-26 (shadow_disposition.json is truth) — streak now 0/3 after this negative packet; default KEEP shadow
+- Unarmed WR 33.3% (-$0.40) vs armed 100% (+$0.33) — stall stack still owns the fix
+BY: auto_1hr
