@@ -30126,3 +30126,31 @@ BY: auto_1hr
 - storm-confl-waiver deadline 2026-11-26 (shadow_disposition.json is truth) — default KEEP shadow; no storm
 - Unarmed WR 22.2% (-$0.50) vs armed 100% (+$0.14) — stall stack still owns the fix
 BY: auto_1hr
+
+## [2026-11-20 02:56] Hourly Analysis
+
+**Trades:** 2 closed last hour, 0 open (both W: KAS/TURBO atr-trend- SHORT profit-monster-trail +0.09/+0.12 net) | 24h: 16 closed (9W 7L)
+**PnL NET:** $+0.21 (hour) | 24h NET $-0.15 (gross $+0.04, fees $0.19, payoff 0.84, WR 56.3%) | 7d NET $-1.08 (110T, gross +0.52, fees 1.60, WR 49.1%) — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** 🌪️ FIRES — window-min -1.53% / at-run +0.11% | blocked 171 | true-starvation 46 RSI>=35 | counterfactual $+0.43 (touch 32/46) | waiver SHADOW=True ENFORCE=False — POSITIVE -> **streak 1/3** (deadline 2026-11-26)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Kill check: 2 closes last hour (both wins); no 0%-WR signal with 3+ trades; atr-trend- 24h 6T 66.7% net 0.00
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/16 = 12.5% (<40%); tpsl_utils deployed
+- Boost: none eligible — jup_yolo_mirrored 3T 100% net +0.13 needs 5+ trades (single-token SOL)
+- Arm rate: unarmed 9/16 = 56.3% below 70%, WR 22.2% net -$0.50 vs armed 7/7 100% net +$0.35 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 19:00 -0.13, 20:00 +0.06 BREAK, then 00 +0.03, 01 +0.08, 02 +0.09 positive — not 3 consecutive → no size cut
+- Frequency: 2 close/hr — under 20
+- Entry quality: winners avg |MAE| 0.374% < 0.5% — OK
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.15 at 56.3% WR / payoff 0.84 — payoff <1 means avg win < avg loss; winners small (profit-monster-trail scraps), losers full-size. Watch.
+- 7d NET -1.08 (fees $1.60) — fee-drag persists; no action (1 change/hr rule)
+- storm-confl-waiver streak 1/3 POSITIVE this run; deadline 2026-11-26 (shadow_disposition.json is truth) — default KEEP shadow
+- Unarmed WR 22.2% (-$0.50) vs armed 100% (+$0.35) — stall stack still owns the fix
+BY: auto_1hr
