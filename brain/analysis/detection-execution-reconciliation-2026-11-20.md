@@ -152,6 +152,12 @@ Partition precedence: **G3** (unjoinable) > **G1** (age ≥10m) > **G2** (sign-f
 | **G3** | absent/unjoinable detection record or metadata | 423 | 54.6% | -0.01 | -2.23 |
 | total | | 630 | | | |
 
+> ⚠️ **G1 footnote (join quality):** the spec-literal join ages are 97% discordant with the
+> trusted `staleness_minutes` stamp (only 5/167 within ±3min; |Δ| P50=121.5m; join-age P50=75.6m
+> vs stamp P50=1.9m) — read G1=186 as *"spec-literal detection-join age"*, **not** as 186 truly
+> stale signals. On purge-immune staleness stamps almost nothing is ≥10m stale (sensitivity
+> G1=1 below), and most of the window's trades predate the signals-table era entirely (G3=423).
+
 **Sensitivity** — same rules but age from `staleness_minutes` (purge-immune; only trades carrying the stamp):
 
 | class | n | WR | avg pnl_usdt | total pnl_usdt |
