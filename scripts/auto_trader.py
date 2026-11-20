@@ -797,9 +797,21 @@ def _ladder_keeper(decision, summary):
             # sits at the level it broke, not the stale one.
             if not (trig and trig < price) and sl15 and atr15:
                 trig = round(sl15 - 60)
+            # FRESH-AIR (CEO 2026-11-20 'we need to catch these shorts'):
+            # in a vertical slide BOTH floors sit stale ABOVE price
+            # (sl1h 61320 / sl15 59841 vs price 59520) → every structure
+            # trigger is ITM-blocked and the short side goes dark exactly
+            # at the catch-it moment. Arm the CONTINUATION leg instead:
+            # 0.3% below live price, SL = price×1.006 reclaim — fires on
+            # the next down-tick, self-replenishes as price moves.
+            fresh_air = False
+            if not (trig and trig < price):
+                trig = round(price * 0.997)
+                fresh_air = True
             if trig and reach_lo <= trig < price:
                 sl = (round(sl1h + 0.60 * atr15) if trig == trig1h
-                      else round(sl15 + 0.60 * atr15))
+                      else (round(price * 1.006) if fresh_air
+                            else round(sl15 + 0.60 * atr15)))
                 # ponytail: TP gap fixed at arm time (3·ATR1h THEN, never
                 # moved — F-2 restated doctrine) — if ATR1h later grows
                 # past ~3.5× the gap the disaster floor erodes; top up by
@@ -819,7 +831,15 @@ def _ladder_keeper(decision, summary):
                              f"DISASTER depth AT ARM TIME (structure-break-only exits — TP is a "
                              f"circuit breaker, never a take-profit, never moved). serial + "
                              f"dynamic_sl:false.")})
-                appended.append(('ladder_keeper', oid, f"short @ {trig} (1h major floor {sl1h:.0f}, SL {sl}, TP {tp})"))
+                if fresh_air:
+                    orders[-1]['note'] += (
+                        f" | FRESH-AIR ARM: both floors stale above price "
+                        f"(sl1h {sl1h:.0f}, sl15 {sl15:.0f} > {price:.0f}) — "
+                        f"continuation leg; SL {sl} = price×1.006 reclaim, "
+                        f"fires on the next down-tick.")
+                    appended.append(('ladder_keeper', oid, f"short @ {trig} (FRESH-AIR below price {price:.0f}, SL {sl}, TP {tp})"))
+                else:
+                    appended.append(('ladder_keeper', oid, f"short @ {trig} (1h major floor {sl1h:.0f}, SL {sl}, TP {tp})"))
 
         # ── LONG side: an unfired BTC rung within reach (≤3·ATR1h) = ready.
         # The rubberband rule (CEO): stacked 72k+ rungs are the FURTHER
