@@ -1,6 +1,6 @@
 # CONTROL TOWER — shadows, trials, decision calendar
-generated 2026-11-20T00:44:42.584341+00:00 by scripts/shadow_disposition.py (daily 08:15 + on any registry change via hermes-shadow-disposition.path) — REGENERATED FILE, do not hand-edit (edit data/shadow_disposition.json)
-30 open / 96 done / 126 registry entries
+generated 2026-11-20T01:31:13.348244+00:00 by scripts/shadow_disposition.py (daily 08:15 + on any registry change via hermes-shadow-disposition.path) — REGENERATED FILE, do not hand-edit (edit data/shadow_disposition.json)
+32 open / 96 done / 128 registry entries
 
 ## 🟠 DUE ≤24h (11)
 - 2026-11-21 [T-1] `amplify-jup-short-walk` (owner: brain_auditor weekly AMPLIFY run)
@@ -48,7 +48,7 @@ generated 2026-11-20T00:44:42.584341+00:00 by scripts/shadow_disposition.py (dai
   - progress: —
   - if silent: NO-SHIP — hard ceiling stays 75 unless EVERY threshold below clears; 'oversold/bounce-risk even in bear' doctrine (bf...
 
-## 🟡 DUE ≤7d (10)
+## 🟡 DUE ≤7d (12)
 - 2026-11-22 [T-2] `win-side-capture-shadow` (owner: CEO)
   - bar: MFE_EXIT_GIVEBACK_PCT 0.30→0.20 and/or PM_TRAIL_DISTANCE_PCT 0.002→0.003 SHADOW: prove no ATR-SL race first — constan...
   - progress: —
@@ -65,6 +65,10 @@ generated 2026-11-20T00:44:42.584341+00:00 by scripts/shadow_disposition.py (dai
   - bar: SHIP only if ALL: (i) correct-key token-day n>=15 maintained (have 37); (ii) 1m/5m candle-walk of blocked LONG first-...
   - progress: —
   - if silent: NO SHIP — provenance suspect (blocked>bested vs live WR); walk only, no gate exempt until (ii)+(iv)
+- 2026-11-24 [T-4] `ai-trader-pending-tag-split` (owner: signal_analyst)
+  - bar: split tag ai-trader-pending vs -auto so the auto-ladder cohort is judged separately; gate ONLY the auto cohort if it ...
+  - progress: —
+  - if silent: no change to armed pending path
 - 2026-11-25 [T-5] `watch-contrarian-live` (owner: main-session)
   - bar: >= 1 REAL fade trade (pc- LONG open since started) + Z-FLIP conversion check at the 11-03 dispo
   - progress: 38 vs >=1 real fade trades (pc- LONG opens since started) — OK
@@ -89,6 +93,10 @@ generated 2026-11-20T00:44:42.584341+00:00 by scripts/shadow_disposition.py (dai
   - bar: ENFORCE admit 'linreg-fade-','linreg_fade_short' to REGIME_SIGNALS['NORMAL'] ONLY IF at read time: (i) killed-EXEC 30...
   - progress: —
   - if silent: NO SHIP — current read fails (i) n=26<40 and (ii) ~+$0.56<$1.00
+- 2026-11-27 [T-7] `stop-family-entry-filter-shadow` (owner: CEO)
+  - bar: shadow-block entry when direction=LONG AND ((detect-time rsi_exec in [55,70]) OR (gap_pct in [0.5,1.0])) PLUS exec-ti...
+  - progress: —
+  - if silent: NO-SHIP (bar set deliberately strict: #261 shows rsi/gap/momentum do NOT predict never-armed bleed; jup's rsi>=55 gat...
 
 ## 📅 DUE 8–14d (7)
 - 2026-11-29 [T-9] `tape-at-long-remeasure-1129` (owner: brain_auditor)
@@ -139,9 +147,10 @@ generated 2026-11-20T00:44:42.584341+00:00 by scripts/shadow_disposition.py (dai
 - 2026-11-21 [T-1]: amplify-jup-short-walk, atrtrail-clip-12, reentry-study, amplify-prearm-breakeven-lock, amplify-cell-conf-tilt-floorproof, amplify-bbsqueeze-module-rsi-reband, amplify-structure-flip-early-exit, amplify-slope-jup-short-exempt, amplify-r2v2-long3-clonehunt, amplify-pcv6-extreme-short-cell, amplify-short-rsi-hard-ceiling-85-walk
 - 2026-11-22 [T-2]: win-side-capture-shadow, amplify-ai-trader-pending-normal-short-btc-cell, amplify-rider-fade-threshold-walk
 - 2026-11-23 [T-3]: amplify-jup-long-blocked-clonehunt
+- 2026-11-24 [T-4]: ai-trader-pending-tag-split
 - 2026-11-25 [T-5]: watch-contrarian-live, amplify-pcfade-windowfix-repromote-review, hotset-pin-approved-shadow
 - 2026-11-26 [T-6]: storm-confl-waiver
-- 2026-11-27 [T-7]: pc-plus-weight-monitor, amplify-linregfade-volgate-admit
+- 2026-11-27 [T-7]: pc-plus-weight-monitor, amplify-linregfade-volgate-admit, stop-family-entry-filter-shadow
 - 2026-11-29 [T-9]: tape-at-long-remeasure-1129
 - 2026-11-30 [T-10]: long-rsi-floor30-shadow, hl-copy-plus-shadow
 - 2026-12-01 [T-11]: linreg-fade-storm-admission-shadow, jup-atrsl-shadow-parity
@@ -154,4 +163,4 @@ generated 2026-11-20T00:44:42.584341+00:00 by scripts/shadow_disposition.py (dai
 flip-contrarian-pc, trial-coupled-cutsloser-sl, eval-midband-long-4564, gate-shadow, shadow-trader-bypass, expiry-t5-shadow, mfe-cut-arm-be, relative-regime, rr-engine-shadow, chase-ratio, ichimoku-dampen-flooradmit, volmom-volbreak, tc-temporal-confluence, mom-filter-shadow, acceleration-threshold, wyckoff-shadow, ai-trader-extreme-shadow, oscillator-shadow, bb-tat-shadow, db-mirror-0byte, escalation-17, ugb-pt-045, disposition-cadence-revert, fade-ctx-exempt, winner-cell-size-125, bb-squeeze-hml-entry-profile, amplify-weekly-mandate, fade-volgate-split-analysis, fade-btc-crash-postflip, storm-readiness-packet, signal-zombie-purge, momentum-cache-regime-coverage, pump-detect-ceiling-mismatch, override-vs-ceiling-contradiction, ichimoku-short-solo-counterfactual, jup-yolo-regime-review, amplify-winner-cell-mult-150, chase-move-shadow, conf-filter-parity-split, ichimoku-bypass-lowjoin-ticket, stop-asymmetry-highwr, short-relax-shadow-study, pump-chain-plus-weight-kill-review, trial-wider-sl, trial-extended-time, gate-shadow-capture-coverage-fix, candle-collector-coverage-audit, stop-tighten-enforce-eval, amplify-grind-breakout-deploy, amplify-pc-fade-cell-split, amplify-stop-tighten-probe-080, jup-hml-shadow-065-050, jup-trail-shadow-1xatr, short-regime-exempt-shadow, flip1-bear-override-reshadow, ichimoku-short-pause, rsi-ceiling-75-live, bear-single-source-shadow, volgate-short-exempt-shadow, maxxed-short-exempt-shadow, gate-shadow-dedup-convention, long-bypass-regime-shadow, short-shadow-join-builder, timer-cadence-recheck, harvest-ship-2026-11-04, amplify-xmirror-giveback, daily-fill-cap-brake, amplify-vb-high-short-clonehunt, amplify-jup-short-high-cell, amplify-ema300-underdeploy, amplify-bbsqueeze-chop-exempt, jup-cluster-gate, jup-anti-chase, jup-pro-selection, btc-standalone-deny-shadow, setup-recall-shadow, linreg-fade-fill-funnel, amplify-bbsqueeze-warrior-uninert, amplify-bbsqueeze-neutral-exempt, dailyfillcap-identity-verify, amplify-stoptighten-scope-widen, amplify-winner-cell-drop-pcplus, stop-tighten-slippage-column, hml-vol-atr-mult-shadow, amplify-atr-trend-short-cell-watch, amplify-tat-neverarmed-age-widen, amplify-atr-trend-short-clonehunt, amplify-ugb-bypass-armgap, amplify-jup-long-flat-cell, amplify-grind-breakout-underdeploy, compaction-stale-trend-band-eval, exitstack-day-kpi-1114, amplify-vb-high-short-underdeploy, amplify-warrior-sr-normal-long, watch-pc-flip-demote-55, floor-admit-same-sign-verdict
 
 ---
-freshness: FRESH | registry mtime: 2026-11-20T00:44:42+00:00 | prev tower render: 2026-11-20T00:41:57+00:00 | last run: 0 packet(s), 0 entry error(s)
+freshness: FRESH | registry mtime: 2026-11-20T01:31:13+00:00 | prev tower render: 2026-11-20T01:30:44+00:00 | last run: 0 packet(s), 0 entry error(s)

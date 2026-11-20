@@ -1,24 +1,29 @@
 {
-  "timestamp": "2026-11-20T00:39:08.947762+00:00",
-  "steers": [],
+  "timestamp": "2026-11-20T01:39:09.176985+00:00",
+  "steers": [
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: KAS + TURBO",
+      "detail": "Both opened within 6 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-001"
+    }
+  ],
   "portfolio_health": "good",
   "regime": {
-    "btc_15m": "LONG_BIAS",
+    "btc_15m": "SHORT_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "BELOW",
+    "continuum": "AT",
     "volatility": "LOW",
-    "zscore_tier": "NEUTRAL",
+    "zscore_tier": "POS",
     "velocity_state": "SLOW",
-    "acceleration_state": "POSITIVE",
+    "acceleration_state": "NEGATIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
+    "linreg_alignment": 1.0,
     "wyckoff_phase": "UNKNOWN",
     "market_phase": "RECOVERY",
     "trend_quality": "UP"
   },
-  "open_count": 0,
-  "deep_analysis": "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 GOOD\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 1 (0 long, 1 short)\nUnrealized PnL: \u00b10.00 USDT\nRegime: bear-chop (SHORT_BIAS / BELOW EMA300) | Volatility: LOW\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udfe1 [warning] Hold SOL SHORT while BTC 1m closes hold below EMA300 \u2014 exit/re-evaluate if 1m closes above EMA300 for 15-30m (BTC flip rate 28/24h = p95 unstable; condition re-tested this cycle: still BELOW, LEAN_BEAR)\n\ud83d\udfe2 [info] No BE/trail steers \u2014 no trade up 2%+; nothing open 8h+\n\ud83d\udfe2 [info] Portfolio 1 short, 0 long \u2014 aligned with SHORT_BIAS tape; no cluster risk\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nLast 20: 9W/11L (\u2212$0.55). Losers skew LONG 7/11; winners skew SHORT 6/9 \u2014 we keep buying alts while BTC is below EMA300. Chop-bleed dollar share 7d **83.1%** / 14d **86.6%** (0 NULL mfe; count-share 84.3%=43/51 and 86.6%=84/97) \u2014 stable vs baseline 84.1/85.6, still entry-ownership. 7d LONG arm rate **43.6%** < 50 tripwire. Flip-rate companions: aggregate **23**/24h, BTC **28**/24h (\u226526 p95). Full write-up in `watchdog_recommendations.json` deep_analysis / regime_context / pattern_alerts.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Keep the SOL SHORT \u2014 regime-aligned; SL 73.68 / TP 71.57 intact; thesis dies only on 1m EMA300 reclaim (15-30m hold)\n2. Brain-auditor (not this cycle's kill): `btc-pump-rider+` LONG \u2014 ENABLED, 10T/7d, 30% WR \u2212$0.34, 5/7 losses never armed trail; long side fighting LEAN_BEAR\n3. Watch `atr-trend-` \u2014 22T/7d 50% WR \u2212$0.67, largest drag; meta_rsi does NOT split win/loss (both ~66.7) \u2014 context, not RSI\n4. AI Trader **PICK (watchlist only \u2014 AI_TRADER_ENABLED=False, will NOT execute): KAS SHORT** conf=78, rsi_at_pick=55.4, precheck PASS all gates\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n",
-  "agent_timestamp": "2026-11-20T00:16:36.906515+00:00",
-  "regime_context": "Sources disagree \u2014 quote both: regime_5m aggregate SHORT_BIAS (long 7 / short 24 / neutral 96 of 127), btc_15m and btc_4h SHORT_BIAS; continuum 1m BELOW EMA300 (duration ~1113 min), linreg LEAN_BEAR, market_phase CALM, volume LOW, velocity SLOW, acceleration NEGATIVE; but continuum trend_quality=STRONG_UP and auto_trader regime=CHOP. Standing state is a slow bear grind under EMA300 inside low-vol chop \u2014 SHORTS with the tape, LONGS fighting it.\n\nFlip-rate companion (mandatory): aggregate 23 flips/24h, BTC 28 flips/24h (last dump SHORT_BIAS 2026-11-20T00:00Z). BTC \u226526 = p95 unusually unstable direction; aggregate 23 sits in normal p50-p75 band. Any direction-flavored steer below is condition-keyed and must be re-tested next cycle \u2014 snapshot prose is cheap only when flips are low, and they are not.\n\nImplication for positions: the single open SOL SHORT is aligned. Portfolio long exposure would be the misalignment risk; we currently have 0 longs. Opportunity cost is low (1/typical slots), in-market 42.1% over 24h.",
-  "pattern_alerts": "VERIFIED (PostgreSQL, windows stated):\n\n1) LONGs vs SHORTs 7d \u2014 n=55 LONG 43.6% WR $0.00 vs n=53 SHORT 54.7% WR +$0.44. Last-20 mirror: 7/11 losers LONG, 6/9 winners SHORT. WINNING side = shorting the BELOW-EMA300 bear tape; we keep buying alt dips (btc-pump-rider+, r2v2-long*, bb-squeeze+) while BTC linreg is LEAN_BEAR. Why we weren't on it: signal families still emit longs whenever an alt shows local strength, and the trend filter only hard-blocks in some 4h cells. Action: brain-auditor territory for btc-pump-rider+ long-side selectivity \u2014 watchdog does not change params.\n\n2) btc-pump-rider+ LONG \u2014 ENABLED=True (hermes_constants.py:1636), live traffic 10T/7d. 7d 30% WR -$0.34; 14d LONG 14T 50% +$0.21 (edge decayed hard this week). 7d losers: XPL -0.10 (hard_max_loss, rsi 59.7), MON -0.09 (hard_max_loss, 48.6), ACE -0.13 (cut-loser, 50.0), ETC -0.09 (hard_max_loss, 44.4), ARB -0.08 (11-15), POL -0.01, INJ -0.13 \u2014 5/7 never armed trail (chop entries). No opposite-direction fills within 4h to measure the counterfactual directly, but regime says the winning side was not being long. NOT a dead signal \u2014 still emitting. Do not re-propose a kill from a stale window; route the long-side cell to brain auditor with this 7d sample.\n\n3) atr-trend- \u2014 ENABLED (atr_trend_accel minus path), 22T/7d, 50% WR, -$0.67 (largest signal drag 7d). Split 7d: 11 LOSS avg rsi 66.6 / 11 WIN avg rsi 66.8 \u2014 meta_rsi does NOT separate winners from losers here (both ~67). Losers include BLUR/SYRUP/ALT shorts mid-band; winners HYPER/COMP at similar RSI. Pattern is regime/chop context, not RSI level. Still live with traffic \u2014 normal flag, not dead-signal.\n\n4) ai-trader-pending \u2014 20T/7d 35% WR +$0.53 (profitable via a few big manual BTC wins despite many small SL losses). AI_TRADER_ENABLED=False since 2026-10-19; pending trades are CEO/manual path. No action on the flag (disabled by design).\n\n5) Chop-bleed dollar share: 7d 83.1% / 14d 86.6% (companions: 0 NULL mfe losers both windows; LONG arm 7d 43.6% <50 tripwire). Stable vs baseline 84.1/85.6 \u2014 still entry-quality ownership, not exit giveback. No UGB-PT/trail-distance routing this cycle.\n\nDead-signal check: none of the above flagged families have 0 trades/7d or master flag False. Measured-refuted midband steer (block LONG meta_rsi 45-64 below EMA300) remains WITHDRAWN per brain_auditor #139 \u2014 not re-issued."
+  "open_count": 2
 }

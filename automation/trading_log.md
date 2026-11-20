@@ -30099,3 +30099,30 @@ BY: auto_1hr
 - 24h -0.29 red at 50.0% WR; 7d +0.49 positive — edge thin but stable
 - Unarmed WR 27.3% (-$0.49) vs armed 100% (+$0.20) — stall stack still owns the fix
 BY: auto_1hr
+
+## [2026-11-20 01:55] Hourly Analysis
+
+**Trades:** 1 closed last hour, 2 open (KAS/TURBO atr-trend- SHORT) | 24h: 14 closed (7W 7L)
+**PnL NET:** $-0.04 (hour; XPL btc-pump-rider+ ugb_pt) | 24h NET $-0.36 (gross $-0.19, fees $0.17, payoff 0.64, WR 50.0%) | **7d NET $-1.14** (gross +0.46, fees 1.60, WR 49.1%) — size-reduce: file absent -> 1.0x
+
+**Storm Packet:** no storm — window-min -0.35% / at-run -0.35% (both inside gate)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Kill check: 1 close last hour (XPL btc-pump-rider+ -0.03); no 0%-WR signal with 3+ trades; atr-trend- 24h 4T 50% net -0.21
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/14 = 14.3% (<40%); tpsl_utils deployed
+- Boost: none eligible — jup_yolo_mirrored 3T 100% net +0.13 needs 5+ trades (single-token SOL)
+- Arm rate: unarmed 9/14 = 64.3% below 70%, WR 22.2% net -$0.50 vs armed 5/5 100% net +$0.14 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 18:00 -0.06, 19:00 -0.13, 20:00 +0.06 BREAK; 00:00 +0.03, 01:00 -0.04 — not 3 consecutive → no size cut
+- Frequency: 1 close/hr — under 20
+- Entry quality: winners avg |MAE| 0.368% < 0.5% — OK
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- **7d is NET-NEGATIVE (-$1.14) once fees applied** — earlier logs quoted +0.44/+0.49 which was GROSS. Fees eat $1.60/7d (~$0.015/trade). Gross-positive/net-negative is a fee-drag problem worth a look, but 1 change/hr rule → no action tonight.
+- storm-confl-waiver deadline 2026-11-26 (shadow_disposition.json is truth) — default KEEP shadow; no storm
+- Unarmed WR 22.2% (-$0.50) vs armed 100% (+$0.14) — stall stack still owns the fix
+BY: auto_1hr
