@@ -4585,5 +4585,16 @@
     "after": "docstring documents A3/A4/A7/A8/C6 FAIL-by-design post-revert + C1/C3 stale baseline 6740b6fb^ since ship-day",
     "rationale": "15 FAILs after revert are expected (13 pre-existing stale-baseline + A7/A8/C6 by design) — document instead of rewriting a dated historical gate",
     "impact": "zero behavior; future runs not confused by red probes"
+  },
+  {
+    "timestamp": "2026-11-20T20:46:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #283: atrtrail-clip-12 disposition note — COHORT AGING FLAG (atr_trail_hit path dead since 10-25; 11-21 walk must replay locked 10-31 cohort not trailing-30d n=2)",
+    "type": "data",
+    "file": "data/shadow_disposition.json",
+    "before": "notes without aging flag",
+    "after": "notes + aging flag appended",
+    "rationale": "trailing-30d query would silently fail the n>=30 bar and mis-scope the walk",
+    "impact": "prep for 11-21 batch; zero trading behavior change"
   }
 ]

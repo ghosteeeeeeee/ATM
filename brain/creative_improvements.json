@@ -11919,5 +11919,23 @@
     "category": "measurement fix",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-20T20:40:00Z",
+    "idea": "atr_trail_hit exit-path death audit — the exit stopped firing after 2026-10-25 (1-7/day through 10-21, then 1 on 10-25, 1 on 11-14, zero since; trailing-30d n=2 vs n=31 at the 10-31 measurement). Determine cause (PM-trail ownership expansion vs one-way-gate bug in tpsl_utils) before the 11-21 atrtrail-clip-12 walk widens a clip that no longer exists in live flow",
+    "rationale": "If a designed exit silently died, every 'foregone/winner clip' counterfactual against it is measuring a corpse. If PM trail legitimately absorbed the cohort, the amplify entry should be re-scoped to profit-monster-trail instead. Either answer changes what 11-21 ships.",
+    "expected_impact": "Prevents a wasted walk + correct cohort scoping for the $11.71/30d clip evidence; possible bug catch if the gate is stuck",
+    "category": "exit engine hygiene",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-20T20:42:00Z",
+    "idea": "jup/vb TAT shadow has only 1 distinct trade (16987) of shadow lines — do NOT evaluate JUP_TRAIL_ARM_TIMEOUT / VB_TRAIL_ARM_TIMEOUT on this sample at the 11-21 prearm soak read; if power is insufficient, extend collection window instead of concluding NO-SHIP from n=1",
+    "rationale": "jup 7d arm rates are healthy (SHORT 71.4%, LONG 60.0%) so stalls are currently rare — the shadow is structurally under-collecting precisely when the signal works. A thin-data NO-SHIP would be an unforced error (same class as the n<20 suggestions the audit rules ban).",
+    "expected_impact": "Protects the 11-21 TAT disposition from a false negative; worst case costs a few extra collection days",
+    "category": "measurement discipline",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

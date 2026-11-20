@@ -1,214 +1,201 @@
 {
-  "timestamp": "2026-11-20T12:55:00Z",
-  "run": "brain_auditor #282",
+  "timestamp": "2026-11-20T20:45:00Z",
+  "run": 283,
+  "headline": "0 config changes (nothing passed bars; #282 revert verified holding; 11-item batch due tomorrow). NEW SIDE-FIND: atr_trail_hit exit path DEAD since 2026-10-25 — atrtrail-clip-12 walk (due 11-21) must replay the locked 10-31 cohort, not trailing-30d (n=2). Contrarian+floor joins re-ran; rider-fade guard bar MET (39 tokens/62 lines); 0 kill candidates; 24h turned positive +0.30 gross.",
   "session_brain_stats": {
-    "queries": 4,
-    "hits": 20,
-    "citable_relevant": 2,
-    "note": "dup-heavy; scores ~0.98-1.09 (higher=worse L2); prior-art query for 'revert after failed candle-walk bar' returned unrelated hits -> no prior art found from session brain (registry harvest-ship revert-default is the only precedent)"
+    "queries": 7,
+    "hits_returned": 35,
+    "cited_recommendations": 0,
+    "note": "no new change recommendations this run -> citations attached to monitored items below"
   },
   "questions_asked": [
     {
-      "question": "stop-tighten scope widen revert what happened",
+      "question": "what did we say about ai-trader-pending manual SL BTC losses",
       "results_found": 5,
       "cited": true,
-      "citation": [
-        "calwndar 2026-10-31 'Stop-tighten shipped with its own APPROVE + bug_hunter 8/8, live and logging'",
-        "ugb_pt exit 2026-10-31 'both consumers are only-tighten — the clamp can never loosen'"
+      "cite": [
+        "ai-trader btc auto trader",
+        "2026-10-21",
+        "BTC SHORT closed at SL $82,096 — loss -1.59%. Price bounced from oversold."
       ]
     },
     {
-      "question": "what did we say about stop-tighten clamp stopping recoveries",
+      "question": "have we tried gating atr-trend- short momentum filter",
+      "results_found": 5,
+      "cited": false,
+      "note": "no direct prior art on an atr-trend- entry gate; only generic momentum-filter discussions — downgraded to monitor, not proposed"
+    },
+    {
+      "question": "arm rate unarmed trades fix stall stack",
       "results_found": 5,
       "cited": true,
-      "citation": [
-        "ugb_pt exit 2026-10-31 'clamp can never loosen math' — supports revert safety: revert only restores native ATR proposals, never loosens below proposal"
+      "cite": [
+        "yolo dash",
+        "2026-11-02",
+        "MFE_EXIT_ARM_PCT 0.0 -> 0.004 — giveback rule engages after peak +0.40% price (same arm PM-trail uses)"
       ]
     },
     {
-      "question": "have we tried reverting a ship after failed candle-walk bar",
+      "question": "stop tighten scope widen revert what happened",
       "results_found": 5,
       "cited": false,
-      "note": "unrelated hits = no prior art; only registry precedent is harvest-ship-2026-11-04 default_action reverts"
+      "note": "weak hits; #282 CURRENT.md record used as source of truth instead"
     },
     {
-      "question": "stop tighten scope walk 1m candle walk owed caveats",
+      "question": "what did we say about manual_sl_hit ai-trader losses too tight",
+      "results_found": 5,
+      "cited": true,
+      "cite": [
+        "ugb_pt exit",
+        "2026-10-31",
+        "SL was 0.14% from entry but ATR_SL_MIN is 1.3% — SL was NOT set by ATR system"
+      ]
+    },
+    {
+      "question": "have we tried trail arm timeout for atr-trend signal",
       "results_found": 5,
       "cited": false,
-      "note": "weak/dup hits, not cited"
+      "note": "no direct prior art for an atr-trend TAT; per-signal TAT route (stall stack) is the shipped pattern — any atr-trend TAT needs its own eval, not proposed this run"
+    },
+    {
+      "question": "fee drag churn trades reduction idea",
+      "results_found": 5,
+      "cited": true,
+      "cite": [
+        "Build New Linear Regression Signal",
+        "2026-10-29",
+        "brain's entry path hardcodes order_type=Market -> taker 0.09% RT; maker fees would add +0.06% to every trade"
+      ]
     }
   ],
   "trade_summary_24h": {
-    "trades": 15,
-    "wr": 60.0,
-    "pnl": 0.15,
-    "48h": {
-      "trades": 31,
-      "wr": 51.6,
-      "pnl": -0.3
-    },
-    "7d": {
-      "trades": 111,
-      "wr": 49.5,
-      "pnl": 0.54,
-      "long": "-0.11 (41.8%)",
-      "short": "+0.65 (57.1%)",
-      "armed": "56T 85.7% +4.46",
-      "unarmed": "55T 12.7% -3.92",
-      "chop_bleed_pct_gross_loss": 84.6
-    },
-    "14d": {
-      "trades": 205,
-      "wr": 48.3,
-      "pnl": -1.59,
-      "trail_family": "71T 67W 94.4% +4.18",
-      "hard_max_loss": "26T 0W -2.75"
-    },
-    "30d": {
-      "trades": 642,
-      "wr": 52.5,
-      "pnl": -4.16
-    },
-    "regimes_7d": "NORMAL only positive 25T 68.0% +1.71 / HIGH -0.73 / EXTREME -0.44",
-    "exit_families_7d": "TRAIL 39T 94.9% +2.80, TP +1.52 vs HML 15T 0% -1.68 + ATR_SL 14T 0% -1.45 + manual_sl 9T 0% -0.98"
+    "24h": "15T 53.3% +0.30 gross (auto_1hr net +0.10 after fees)",
+    "7d": "109T 49.5% +0.66 gross / ~-0.85 net after ~1.5 fees (fee-drag continues)",
+    "14d_exit_families": "TRAIL 79T 96.2% +4.75 vs HML 25T 0% -2.64, ATR_SL 30T 0% -3.31, manual_sl 19T 0% -1.84 (all ai-trader-pending)",
+    "armed_vs_unarmed_7d": "armed 55T 85.5% +4.53 vs unarmed 54T 13.0% -3.87",
+    "chop_bleed_7d": "never-armed owns 85% of dollar bleed (-4.08 of -4.80)",
+    "worst_7d_cells": "atr-trend- SHORT 27T -0.41 / btc-pump-rider+ LONG 10T 30% -0.24 / r2v2-long3 5T -0.18 — all n small or owned",
+    "long_vs_short_7d": "SHORT side carries (jup SHORT 14T +0.44, ai-trader SHORT 13T +0.60)"
   },
   "shadow_analysis": {
-    "contrarian": "RE-RAN 12:30Z (mandate): overall flip 47.5% W1001/L1108 n=2109; rider heterogeneous chi2 p=4.3e-39 = per-signal only; pc-|BTC-BELOW 64.6% n=48 HOLDS (tape-split due 11-25); pc-|AT 28.6% = never blanket-flip",
-    "floor_admit": "RE-RAN 12:42Z: floor_only 49.1% n=1849 vs always_admit 45.1% n=430, fisher p=0.132 (decaying: 0.0877->0.132) -> NO-SHIP stands, route closed (note appended)",
-    "oscillator": "archived fossil 2026-10-27 — none",
-    "wyckoff": "retired 10-31",
-    "rr_shadow": "orphaned, 24d stale",
-    "shadow_trader": "12:41Z report: all gates negative-EV (would-win 44-56% — gates earning keep); exit A/B pm_trail +18,941 vs hard_max -24,571 = TRAIL-OR-NOTHING; top source grind-breakout- 94.4% n=36 (clone-hunt in-flight)",
-    "rider_fade_guard": "COLLECTING in /var/www/hermes/logs/signals.log (NOT /root/.hermes/logs — false-alarm grepped wrong file first): 58 [RIDER-FADE-SHADOW] lines, 37 distinct tokens vs 15-token bar = already met for the 11-21/22 formal read",
-    "overall": "3/6 raw answerable (contrarian + floor + shadow_trader) + stop-tighten walk shipped this run; joins are manual-each-run (no producers) — ran both unconditionally"
+    "contrarian": "JOIN RE-RAN 20:30Z (mandate) — overall flip 47.3% n=2143; pc-|BTC-BELOW 64.6% n=48 HOLDS (tape-split watch due 11-25); pc-|AT 28.6% = never blanket; btc-pump-rider+ chi2 p=4.9e-40 HETEROGENEOUS = per-signal only",
+    "floor_admit": "JOIN RE-RAN 20:31Z — floor_only 49.2% vs always_admit 45.4%, fisher p=0.1517 (decaying 0.0877->0.132->0.1517) -> NO-SHIP stands; bars n>=200 + same-sign PASS but significance never cleared",
+    "oscillator": "ARCHIVED 2026-10-27 fossil — not read",
+    "wyckoff": "RETIRED 10-31 — not read",
+    "rr_shadow": "ORPHANED (no producer) — not read",
+    "shadow_trader": "report 20:31Z — exit A/B pm_trail +19,160 vs hard_max -24,742 = trail-or-nothing unchanged; every gate blocks negative-EV cohorts (earning keep); grind-breakout- 94.4% n=36 top source = clone-hunt open 11-14",
+    "rider_fade_guard": "COLLECTING 62 lines / 39 distinct tokens vs 15 bar = MET (formal read owed 11-21/22)",
+    "tat_shadow": "jup/vb TAT [SHADOW] lines cover only 1 distinct trade (16987) — structurally under-powered, evaluate at prearm soak only with power caveat (see creative)",
+    "overall": "3/6 shadow sources answerable (contrarian, floor, shadow_trader) + rider-fade guard + TAT thin"
   },
-  "headline": "OWED STOP-TIGHTEN CANDLE-WALK RAN 1 DAY EARLY + REVERT EXECUTED: walk limb (i) FAIL (+$0.29/30d vs $1.00 bar) — and the walk has a proven blind spot (clamped trades stored at exactly 0.750 read as 'no_bind', hiding the feature's realized value). Corrected via ENFORCE-log join + no-clamp exit-stack replay: -$0.55..+$0.56 per 12d live window (6 of 9 clamp-bound losers were on recovery paths), corrected limb(i) -$0.26..+$0.85/30d — no variant robustly clears $1.00. Pre-registered REVERT clause of registry amplify-stoptighten-scope-widen (CEO consult 20261108T180116Z) FIRED: STOP_TIGHTEN_SOURCES back to 2 sources, guardian restarted 12:41Z, jup/vb clamp UNCHANGED (cap 0.75 ENFORCE True). CEO: veto = re-append 6 entries (restore path in constants comment).",
-  "drift_findings": [
-    {
-      "item": "stop-tighten scope-widen candle-walk owed since 11-08, deadline 11-21",
-      "status": "DISCHARGED — script built (prior #282 partial session 08:39Z) + run this session; walk FAIL -> pre-registered REVERT executed",
-      "impact": "sub-materiality feature removed before deadline"
-    },
-    {
-      "item": "payoff_fix_probes_2026-11-08.py frozen baseline 6740b6fb^",
-      "status": "C1/C3 stale since ship-day (15 FAILs now = 13 pre-existing + A7/A8/C6 by design post-revert)",
-      "action": "docstring marked HISTORICAL SHIP GATE — no rewrite of dated gate"
-    },
-    {
-      "item": "fade guard counts in wrong file risk",
-      "status": "guard logs to /var/www/hermes/logs/signals.log; /root/.hermes/logs/signals.log has ZERO rider/fade lines — future audits must grep the WWW path (recorded here)",
-      "impact": "false 'collector broken' alarm this run, resolved"
-    },
-    {
-      "item": "walk script blind spot (clamped trades)",
-      "status": "documented in creative_improvements; any future stop-tighten eval on post-11-08 trades must read ENFORCE-log original proposals",
-      "impact": "undercounted realized clamp value to ~$0"
-    }
-  ],
+  "drift_findings": [],
   "recurring_problems": [
     {
-      "topic": "chop-bleed / never-armed dollar share",
-      "detail": "7d 84.6% (-4.13 of -4.88), 14d ~88%, 30d 92.6% — persistent; armed 85.7% WR vs unarmed 12.7% (7d)",
-      "owner": "entry-quality + TAT/prearm family (prearm-breakeven lock bars MET, shadow soak read due 11-21)"
+      "problem": "fee-drag: 7d gross +0.66 vs ~1.5 fees = net negative while gross turns positive",
+      "status": "open",
+      "note": "prior art: maker-fee lever (session 10-29) never shipped; unarmed churn is the fee base"
     },
     {
-      "topic": "shadow joins have no systemd producers",
-      "detail": "contrarian + floor joins re-run manually each run (both ran this run)",
-      "owner": "known MED-LOW drift, repeated 10+ runs"
+      "problem": "arm-rate gap: unarmed 13% WR vs armed 85.5% 7d — 'stall stack owns fix' per auto_1hr hourly",
+      "status": "in-flight",
+      "note": "TAT covers bb-squeeze/pump-chain/bb-bounce live + jup/vb shadow; generic arm-rate gate REJECTED #195 — do not re-propose"
     }
   ],
-  "missing_implementations": [
-    {
-      "idea": "clamped-exit recovery-rate KPI per family",
-      "status": "proposed (creative)",
-      "why": "would have made the scope-widen sign question measurable instead of modeling-dependent"
-    }
-  ],
+  "missing_implementations": [],
   "creative_improvements": [
-    {
-      "date": "2026-11-20T12:55:00Z",
-      "idea": "CLAMP-RECOVERY KPI: post-clamp-entry recovery-to-entry within 8h rate per family; >50% at n>=15 = cap too tight for that family",
-      "category": "exit sniper",
-      "status": "suggested",
-      "risk": "low"
-    },
-    {
-      "date": "2026-11-20T12:55:00Z",
-      "idea": "stop-tighten counterfactuals must read original pre-clamp proposals from ENFORCE logs, never stored stop_loss",
-      "category": "measurement fix",
-      "status": "suggested",
-      "risk": "low"
-    }
+    "atr_trail_hit exit-path death audit (logged to brain/creative_improvements.json)",
+    "jup/vb TAT thin-data power guard for the 11-21 read (logged)"
   ],
   "losing_trade_autopsy_48h": {
+    "method": "recovery_replay adverse-first (selfcheck PASS)",
     "n": 14,
     "never_adverse": 0,
     "recovered_after_adverse": 11,
     "never": 3,
-    "never_list": [
-      "IMX atr-trend- SHORT -0.12 hard_max",
-      "GOAT r2v2-long7 LONG -0.12 cut-loser (MAE 1.03, MFE 0)",
-      "ALT atr-trend- SHORT -0.11 atr_sl (MAE 0.92)"
-    ],
-    "wrong_side": "REFUTED 133rd consecutive run (#61 p=0.116, #84 t=-0.04); NEVER cohort = 21% structural vs 17.5% baseline"
+    "never_list": "GOAT r2v2-long7 -0.12 cut-loser / IMX atr-trend- -0.12 HML / ALT atr-trend- -0.11 atr_sl_hit",
+    "verdict": "WRONG-SIDE REFUTED 134th consecutive run (#61 opposite-side p=0.116, #84 forward-return t=-0.04)",
+    "note": "3 BTC ai-trader SHORT manual_sl losses today are CEO-domain (manual levels); not NEVER on recovery replay"
   },
   "kill_screen": {
-    "new_targets": 0,
-    "detail": "14d sub-50 WR n>=15 net>0 only = ai-trader-pending SHORT 29T 37.9% +0.49 (profitable, CEO-domain)"
+    "criteria": "14d sub-50% WR n>=15 net<0",
+    "candidates": 0,
+    "action": "none"
   },
-  "config_changes_applied": [
-    {
-      "file": "scripts/hermes_constants.py",
-      "change": "STOP_TIGHTEN_SOURCES 8->2 sources (scope-widen REVERT)",
-      "authority": "pre-registered clause, registry amplify-stoptighten-scope-widen, CEO consult 20261108T180116Z package",
-      "revert_path": "re-append 6 entries (comment carries it)",
-      "guardian": "restarted 12:41Z for import-time binding"
-    }
-  ],
+  "config_changes_applied": [],
   "changes_from_last_run": [
     {
-      "item": "#281 rider_fade_threshold_walk.py",
-      "check": "script present, disposition pre-read recorded, guard collecting 58 lines/37 tokens",
+      "item": "#282 STOP_TIGHTEN_SOURCES revert",
+      "check": "tuple = (jup_yolo_mirrored, volume-buildup-) in hermes_constants.py:761; git diff EMPTY (committed); ENFORCE True",
       "result": "PASS"
     },
     {
-      "item": "#280 fade guard collecting",
-      "check": "58 lines, 37 distinct tokens (bar 15)",
-      "result": "PASS (bar already met early)"
+      "item": "#282 guardian restart post-revert",
+      "check": "hl-sync-guardian.py PID start 12:41",
+      "result": "PASS"
     },
     {
-      "item": "#280 jup-long-blocked clonehunt open 11-23",
-      "check": "registry entry present",
+      "item": "#282 payoff probes docstring HISTORICAL marker",
+      "check": "changes_log entry present 12:45Z",
       "result": "PASS"
     },
     {
       "item": "contrarian join mandate",
-      "check": "re-ran 12:30Z",
+      "check": "re-ran 20:30Z this run",
       "result": "PASS"
     },
     {
-      "item": "constants EMPTY git diff expectation",
-      "check": "NOW has this run's revert diff (intended, logged)",
-      "result": "PASS w/ change"
+      "item": "floor join",
+      "check": "re-ran 20:31Z, p=0.1517 NO-SHIP stands",
+      "result": "PASS"
     },
     {
-      "item": "session lock / size-reduce / checkpoint / tracebacks",
-      "check": "lock absent, size-reduce absent=1.0x, checkpoint_registry only 12-03 day-scale, 0 Tracebacks",
+      "item": "rider-fade guard collecting",
+      "check": "62 lines / 39 distinct tokens (bar 15)",
+      "result": "PASS (bar met)"
+    },
+    {
+      "item": "session lock",
+      "check": "absent",
+      "result": "PASS"
+    },
+    {
+      "item": "size-reduce file",
+      "check": "absent = 1.0x",
+      "result": "PASS"
+    },
+    {
+      "item": "checkpoint registry",
+      "check": "1 pending = kill-line 12-03 (day-scale, not this run's)",
+      "result": "PASS"
+    },
+    {
+      "item": "pipeline Tracebacks",
+      "check": "0",
       "result": "PASS"
     }
   ],
   "amplify": {
-    "light_screen": "already logged #282 in shadow_disposition note_2026120_friday: 6 n>=10 positive 30d cells ALL claimed/in-flight/inert -> 0 NEW proposals, formal weekly Mon 11-23",
-    "inflight_serviced": "amplify-stoptighten-scope-widen CLOSED-REVERTED this run (the walk WAS its owed measurement)",
-    "flip_kpi": "0 conversions this week — fade candidate FAIL-fk; scope-widen now closed-reverted (both would-be candidates gone)"
+    "type": "light screen (formal weekly due Mon 2026-11-23)",
+    "ranked_30d_winner_cells": [
+      "ai-trader-pending NORMAL SHORT 26T +1.30 — CLAIMED amplify-ai-trader-pending-normal-short-btc-cell due 11-22",
+      "bb-squeeze+ NORMAL LONG 39T +0.66 — CLAIMED (bbsqueeze-module-rsi-reband 11-21 + hml-entry-profile in-flight)",
+      "volume-buildup- HIGH SHORT 20T +0.49 — CLAIMED (winner-cell-size-125 + boost live)",
+      "atr-trend- NORMAL SHORT 17T +0.26 — CLAIMED (1.25 boost since 2026-11-12)",
+      "jup_yolo_mirrored HIGH SHORT 27T +0.22 — CLAIMED (amplify-jup-short-walk due 11-21)",
+      "pump-chain- NORMAL LONG 31T +0.15 WR 38.7% — net below +0.50 bar (trivial cell)"
+    ],
+    "new_proposals": 0,
+    "why_not": "all 6 positive 30d n>=10 cells are claimed/in-flight or sub-size; no cell cleared a new-proposal bar this run",
+    "flip_kpi": "0 conversions this week so far — rider-fade is the live candidate (guard bar met, formal read 11-21/22); scope-widen reverted and removed as candidate"
   },
   "next_actions": [
-    "11-21 batch of 11 registry reads (day-scale)",
-    "11-21/22 rider-fade formal deadline read (guard bar already met: 37 tokens vs 15)",
-    "11-21 amplify-cell-conf-tilt-floorproof deadline + prearm-breakeven shadow soak read",
-    "11-22 win-side-capture + ai-trader NORMAL SHORT cell read",
-    "11-23 jup-long-blocked clonehunt + formal weekly AMPLIFY",
-    "11-25 watch-contrarian tape-split pc- + pcfade re-promote",
-    "CEO: ratify/veto the scope-widen REVERT (veto = re-append 6 entries)"
-  ]
+    "11-21: batch of 11 dispositions due (jup-short-walk, atrtrail-clip-12, prearm-breakeven-lock, cell-conf-tilt-floorproof, bbsqueeze-rsi-reband, structure-flip-early-exit, slope-jup-short-exempt, r2v2-long3-clonehunt, pcv6-extreme-short-cell, short-rsi-hard-ceiling-85-walk, reentry-study) — atrtrail walk MUST replay locked 10-31 cohort (flag appended this run)",
+    "11-21: rider-fade formal read (guard bar 39/15 MET) + prearm soak read (TAT n=1 caveat)",
+    "11-22: win-side + ai-trader NORMAL SHORT cell + rider-fade threshold walk",
+    "11-23: jup-long-blocked clonehunt + formal weekly AMPLIFY + flip-KPI report",
+    "11-25: contrarian tape-split watch + pcfade review",
+    "11-26: storm waiver deadline (file truth)",
+    "CEO queue: scope-widen revert ratify/veto (from #282) · LONG arm tripwire · mult-150 label · exitstack dual-read · slippage BUILD #1 · ai-trader MFE-giveback observation"
+  ],
+  "readiness": "0 open = FLAT, watchdog health good, 0 steers. Regime: btc_15m SHORT_BIAS / btc_4h SHORT_BIAS (agree = with-tape), continuum BELOW, vol LOW, zscore NEUTRAL, velocity SLOW, acceleration NEGATIVE, trend_quality UP / market_phase RECOVERY (mixed vs bias — treat SHORT_BIAS as primary). Short-with-tape under EMA300 preferred; LONGs only on sustained EMA300 reclaim with volume; trail-family first; size 1.0x."
 }
