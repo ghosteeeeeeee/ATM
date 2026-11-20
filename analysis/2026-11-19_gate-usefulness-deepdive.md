@@ -1,113 +1,119 @@
 # Gate Usefulness Deep Dive — Which Gates Are Useful, Which Are Useless Blockers
 
-**Date:** 2026-11-19 · **Window:** 2026-10-04 → 11-19 (46 days) · **Status:** SELF-AUDITED 6/6 PASS — READY FOR EXTERNAL AUDIT · **Config changes:** NONE
-**Requested by:** T ("which gates are actually useful and which are useless blockers of legitimate setups... all results will be audited, double-check all your work, leave a paper trail")
+**Date:** 2026-11-19/20 · **Window:** 2026-10-04 → 11-19 (46 days) · **Status:** CORRECTED PER OWN-CONCLUSIONS VERDICT — SELF-AUDITED 6/6 PASS — READY FOR EXTERNAL AUDIT · **Config changes:** NONE
+**Requested by:** T. **Verification trail:** own-conclusions verdict `brain/verdicts/2026-11-19-gate-usefulness-own-conclusions.md` (8 claims: 3 AGREE, 5 PARTIAL → all defects corrected in this revision; correction ledger §10). Lineage: `audit/gate_counterfactual_verify.md`, `brain/verdicts/2026-10-12_deadlock-gate-verify.md`, `brain/verdicts/2026-10-30_shadow-redundancy-own-conclusions.md`.
 
 ## 0. TL;DR
 
-1. **T's three claims all CONFIRMED against PG brain.trades:** trade frequency collapsed **47.0/day → 13.2/day (−72%)** since the Sep-7 week; **LONG WR 46.4%** (n=729, net **−$6.89**); SHORT 48.7% (n=318, −$1.71) — both directions are coin-toss-to-negative. The book is unprofitable in the window.
-2. **Gate answer: 2 useful, 0 proven-harmful, 24 useless (no-edge), 14 mixed, 7 insufficient.** Cluster-robust WORKS: **PUMP-CHAIN-RSI-MAX** (n=1,028, ex4h −0.195%, p_tok=0.008 p_day=0.003) and **LONG-RSI-CEILING** (n=988, −0.188%, p_tok=0.048). **No gate survives as demonstrably blocking legitimate setups** — despite 164 concrete ≥10%-MFE misses, blocked sets average ≈ market on 4h markouts. The "useless blockers" are the 24 no-edge gates: they neither help nor hurt per block, but they constitute ~99% of block volume and produce a **90:1 block-to-trade ratio**.
-3. **The flow collapse is NOT primarily gate tightening:** blocked episodes held steady at 4,300–9,400/week all window while trades fell 242→53/week — the starvation is upstream (signal volume / confluence / confidence), not a tightening of the veto layer.
-4. **Self-audit caught and fixed a real engine bug** (lookahead when entry precedes candle history) and documented that **candles_5m is under ~29d rolling retention** — a mass prune fired mid-run at 21:55, making Oct 4–20 values unreproducible post-hoc. See §1.
+1. **T's three claims all CONFIRMED** (own-conclusions C1 AGREE, recomputed from PG): frequency **47.0/day → 13.2/day (−72%)** since the Sep-7 week; **LONG 729T, WR 46.4%, net −$6.89**; SHORT 318T, 48.7%, −$1.71. Unprofitable in both directions.
+2. **Gate answer over 46 days (56 gates, cluster-robust): 2 useful, 0 proven-harmful, 27 no-edge, 20 mixed, rest insufficient.** WORKS: **PUMP-CHAIN-RSI-MAX** (n=1,027, ex4h −0.190%, p_tok=0.012 p_day=0.005) and **LONG-RSI-CEILING** (n=989, −0.188%, p_tok=0.049). BLOCKS-SETUPS = 0 under the reference baseline — **but this is power-limited: median MDE = 0.227% at n≥400, so a gate harming at +0.15%/block would be undetectable** (§4b). The useless blockers are the **27 no-edge gates = 82.4% of episodes / 85.8% of events** of block volume (corrected from the v1 report's "99%").
+3. **The funnel:** blocked episodes ran **4.3k–9.4k/week all window while trades halved twice (242→53/week)**; block:trade worsened 21:1 → **93.5:1**. This is *consistent with* upstream starvation (signal volume/confluence/confidence) but **not proven**: gate-mix shifted (TV 0.12–0.36/wk), a pass-proxy fell 4.5%→1.0%, early weeks are known-undercounted (pre-Oct-22 recorder capture 33–60% for several gates), and the signal-side denominator was never measured (§9).
+4. **Self-audit found and fixed a real engine bug** (lookahead when entry precedes candle history; guard added, 24,699 events dropped) and, per the verdict, this revision fixes five more defects: two-run splice, the 99% figure, the missing RR-ENGINE gate (3,402 events, 56-gate frame now), undisclosed baseline/power/survivorship limits, and a wrong prune narrative (§1, §10).
 
-## 1. Data, provenance, and the data-mutation finding
+## 1. Data, provenance, and the data-mutation finding (corrected per verdict C7)
 
-**Frame:** 107,040 block events = 56,030 reparse (Oct 30 → Nov 19, raw logs/archives, ground truth) ∪ 51,010 gate_shadow.db events (Oct 4 → Oct 30; raw logs deleted pre-rotator). Capture audit in overlap: **39/39 gates ≥90% recorder capture** (post-fix recorder is healthy; health metric confirms 0.96).
+**Frame:** 109,003 events = 57,993 reparse (Oct 30 → Nov 19, raw logs + archives, ground truth) ∪ 51,010 gate_shadow.db (Oct 4 → Oct 30; raw logs deleted pre-rotator). **56 gates** after the emoji expansion (C2 fix: the original 4-emoji parser hid RR-ENGINE's 3,402 events, BTC-CRASH 1,232, CHASE-BLOCK, CONFLICT-RESCUE-BLOCK and colon-glued gates; capture audit now lists all 54 overlap gates without an r<20 filter — 8 gates show db=0 because the recorder's own regex lacks their emojis, disclosed not hidden).
 
-**⚠ Finding F-DATA-1 (candles_5m is mutable):** `candles_5m` has ~29-day rolling retention. A **mass prune fired 2026-11-19 21:55, during this analysis's engine run**, deleting everything before Oct 21 03:10 (global min now = that timestamp for all tokens). Consequences:
-- 24,699 events (entry before candle history) are now **unreproducible** — the engine originally computed their forward returns from complete data; a re-run next week would silently produce *different* values.
-- **Engine bug found by self-audit A2:** `fwd_metrics` had no guard for entry-before-first-candle — it silently measured forward returns from a candle up to 17 days after the event (lookahead). A fingerprint test (identical fwd_4h across all of a token's pre-history events) confirmed ~11 tokens/~564 events were contaminated even at run time. **Fixed:** `rows[0][0] > entry_ts + 300 → return None`; 24,699 pre-history events now dropped honestly (enriched 106,357 → 81,707). This same root cause explains the own-conclusions auditor's "17% of expiry_shadow stored values don't reproduce" finding.
-- **Paper-trail implication:** re-runs are only stable within the retention window; exports are the snapshot of record. External auditors should treat `exports/nov19_gate_events.tsv` as the immutable computed-values record and re-verify *method* (checks A3/A6) rather than expect bit-identical regeneration of pre-Oct-21 rows.
+**⚠ F-DATA-1 (candles_5m mutability — narrative corrected):** `candles_5m` is under **30-day rolling retention maintained by routine incremental prunes** (collector journal: 514 boundary prunes on Nov 19 alone, 100–284 rows each; **no single mass delete** — my v1 report's "mass prune at 21:55" claim is retracted). `MIN(ts)` is a moving target equal to last_closed−30d (the auditor watched it move during its audit). Consequences, as corrected:
+- Because the 30d cap has been in code since Oct 4, **history was already capped at my run time** — so *all* 24,699 events with entry older than the horizon were **lookahead-contaminated at run time** (v1's "computed from complete data, now unreproducible" is wrong; v1's "11 tokens/~564 fingerprint" was an artifact — events falling in the narrow post-boundary window made tokens look "varied"; the true contaminated population ≈ all 24,699).
+- **Engine bug (real):** `fwd_metrics` had no entry-before-history guard — it silently measured forward returns from the first available candle (up to 17 days late). **Fixed:** `rows[0][0] > entry_ts + 300 → None` (the +300s matches the recorder's 5-min bucket convention — auditor confirmed the guard is correct). 24,699 events dropped (reproduced: 24,716 an hour later as the horizon moved); enriched 106,357 → **83,593**.
+- The fingerprint evidence was destroyed by the drop → **unverifiable; stated as such**. This root cause also explains the prior auditor's "17% of expiry_shadow stored values don't reproduce."
+- **Paper-trail implication:** `exports/nov19_gate_events.tsv` is the immutable snapshot of record; re-runs are stable only within the 30d retention window. Auditors should re-verify *method* (A3/A6) on retained data rather than expect bit-identical regeneration of expired rows.
 
-## 2. Self-audit — independent second path, 6/6 PASS
+## 2. Self-audit — independent second path, 6/6 PASS (re-run after every correction round)
 
-`analysis/gate_usefulness_selfaudit_2026-11-19.py` → `analysis/gate_usefulness_selfaudit_2026-11-19.md` (rerun after fixes; three self-audit bugs were found and fixed during the process — A1 compared all-episodes vs non-None-episodes; A2 used wrong archive paths; A2 didn't gate on data mutation — none were engine bugs except the lookahead guard of §1):
+`gate_usefulness_selfaudit_2026-11-19.py` → `.md`: **A1** independent re-coalescing of the export matches summary per-gate n+means · **A2** raw-log-line existence (reparse rows) + forward returns via a different code path · **A3** excess via independent SQL baseline to 4dp · **A4** live-book second SQL + pnl sign consistency (19 "mismatches" = all $0.00 scratches, 0 real) · **A5** zero duplicate keys in the 83,593-row export · **A6** big-miss MFEs vs raw candles. **All PASS on the final build.** (Three bugs in the self-audit itself were found and fixed during the process — A1's None-filter count, A2's wrong archive paths, A2's data-mutation gating — plus two engine bugs found *by* the audit chain: the lookahead guard and a case-sensitivity regression in the round-3 emoji expansion that briefly dropped BTC-CHOP-GATE to a biased 210-episode subset; run-4 restored n=869/+0.047.)
 
-| # | Check | Result |
-|---|---|---|
-| A1 | Independent re-coalescing of events export matches summary (per-gate n + mean) | **PASS** |
-| A2 | Random events: raw log line exists (reparse prov) + forward return recomputed by a different code path | **PASS** |
-| A3 | Excess re-derived via independent SQL baseline (300-token sample) — matches to 4dp | **PASS** |
-| A4 | Live-book WR/net second SQL + pnl_usdt/pnl_pct sign consistency (19 "mismatches" = all $0.00 scratches; 0 real) | **PASS** |
-| A5 | No duplicate (gate,token,dir,10min) in 81,707-row export | **PASS** |
-| A6 | Big-miss MFE values spot-checked vs raw candles | **PASS** |
+## 3. The funnel — C-1 (frequency collapse), corrected per verdict C3
 
-## 3. The funnel — C-1 (frequency collapse)
+Full-frame episodes (blocks need no forward data; the v1 splice that zeroed early weeks is fixed):
 
 | week | blocked eps | trades | block:trade |
 |---|---|---|---|
-| 2026-10-05 | 5,480 | 127 | 43:1 |
-| 2026-10-12 | 4,285 | 201 | 21:1 |
-| 2026-10-19 | 6,387 | 128 | 50:1 |
-| 2026-10-26 | 9,389 | 242 | 39:1 |
-| 2026-11-02 | 7,133 | 149 | 48:1 |
-| 2026-11-09 | 7,696 | 111 | 69:1 |
-| 2026-11-16 | 4,789 | 53 | **90:1** |
+| 2026-09-28 | 423* | 36 | 11.8 |
+| 2026-10-05 | 5,480 | 127 | 43.1 |
+| 2026-10-12 | 4,285 | 201 | 21.3 |
+| 2026-10-19 | 6,387 | 128 | 49.9 |
+| 2026-10-26 | 9,442 | 242 | 39.0 |
+| 2026-11-02 | 7,112 | 149 | 47.7 |
+| 2026-11-09 | 7,960 | 111 | 71.7 |
+| 2026-11-16 | 4,953 | 53 | **93.5** |
 
-Blocked volume is roughly **stable (4.3k–9.4k/week)** while trades **halved twice over**. The veto layer didn't tighten — flow upstream dried up. Weekly trade series (§0) also shows the collapse is a September phenomenon that continued: 47/day → 13/day.
+*recorder starts Oct 4; early weeks also undercounted (pre-Oct-22 capture 33–60% for several gates).
 
-## 4. Per-gate usefulness classification (cluster-robust)
+**Interpretation (softened per verdict):** absolute block volume held roughly steady while trades halved twice — *consistent with* upstream starvation rather than gate tightening, but NOT established: the gate mix shifted week-to-week (total-variation 0.12–0.36/wk), a pass-rate proxy fell 4.5%→1.0% over the window, and **the signal-side denominator (emissions per week) was never measured**. Establishing the starvation root cause requires the signal-volume/confluence-expiry/confidence-floor time series (§9).
 
-Method: 60-min episodes; excess = direction-signed fwd4h − cross-sectional market mean; Wilcoxon (naive) + **token-clustered and day-clustered t-tests**; Bonferroni p<0.0011 over 47 gates; a class claim requires ≥1 cluster p<0.05. Kill rates: blocked episodes printing dir-MFE≥5%/≥10% vs the gate's **own tokens' unconditional** rates (hourly-sampled) — the honest big-move baseline.
+## 4. Per-gate usefulness (56 gates, cluster-robust)
 
-**WORKS (2)** — blocks below-market signals, cluster-robust, OOS same-sign:
-- **PUMP-CHAIN-RSI-MAX** n=1,028, −0.195%, p_w<0.0001, p_tok=0.008, p_day=0.003, OOS −0.28/−0.13. The system's one durable worker. (Continued from Oct-30 finding — now 46 days.)
-- **LONG-RSI-CEILING** n=988, −0.188%, p_w=0.0003, p_tok=0.048, OOS same-sign. First cluster-robust appearance for this gate.
+Method: 60-min episodes; excess = direction-signed fwd4h − cross-sectional market mean (reference baseline); Wilcoxon (naive) + token-clustered and day-clustered t-tests; Bonferroni p<0.0009; class claims require ≥1 cluster p<0.05. Kill rates vs the gate's own tokens' unconditional MFE rates.
 
-**BLOCKS-SETUPS (0)** — *no gate survives as demonstrably refusing legitimate setups.* On 4h markouts, blocked sets are market-average or better-under-market. This is the honest answer to the core question — the "missing big moves" are real at the anecdote level (§5) but not at the average level.
+**WORKS (2)** — reference baseline, cluster-robust:
+- **PUMP-CHAIN-RSI-MAX** n=1,027, −0.190%, p_w<0.0001, p_tok=0.012, p_day=0.005, kill5 8% vs own 5%
+- **LONG-RSI-CEILING** n=989, −0.188%, p_w=0.0003, p_tok=0.049, kill5 4% vs own 3%
 
-**NO-EDGE (24)** — |ex4h|<0.10%, p≥Bonferroni. Includes every volume giant: CONFLUENCE-GATE-BLOCK (n=3,426, −0.063%), CONTINUUM-BLOCK (2,817, +0.015), CONTINUUM-BULL (2,362, −0.034), SHORT-RSI-HARD-FLOOR (2,190, −0.005), LONG-NEUTRAL-CHOP (1,904, +0.059 — remains a wash), LONG-NEUTRAL, SHORT-NEUTRAL, OVERSOLD-SHORT, PUMP-CHAIN-SHORT-HIGH, CTX-GATE (LLM), SHORT-CONTINUUM, LONG-RSI-BLOCK, BTC-CHOP-GATE, EXEC-BLOCK, HOT-SET, VEL-FILTER, SHORT-BB-DEAD-ZONE/2, SHORT-RSI-CEILING, SHORT-REGIME-GATE, PUMP-CHAIN-HIGH, LONG-MIDBAND, EXEC-RSI-HARD-FLOOR, LONG-BYPASS-SHORT-BIAS-BLOCK. **These are the "useless blockers": ~99% of block volume, no measurable effect in either direction.**
+**BLOCKS-SETUPS (0) under the reference baseline — with a power caveat (§4b).**
 
-**MIXED/NS (14)** — directionally interesting, not robust:
-- **VOL-GATE-BYPASS** +0.121%, **p_day=0.010**, OOS +0.047/+0.214 (both positive) — best harm *candidate* (blocks-winners direction, day-cluster significant, OOS-stable).
-- **SLOPE-FILTER** +0.122%, kill5 9% vs own 5% — harm direction consistent with all three prior audits; still cluster-ns.
-- **SPIKE-FILTER** −0.157%, p_tok=0.008, OOS −0.21/−0.13 — protective direction, token-cluster sig, fails Bonferroni.
-- **PUMP-CHAIN-VEL** −0.347%, p_day=0.045 (post-deadband protective, third window confirming).
-- **MAXXED-BLOCK**: kill5 **45% vs own 9%** (n=44) — kills its tokens' big moves at ~5× their base rate; excess ns but the tail-kill is extreme — flagged for review.
+**NO-EDGE (27) — the useless blockers, 82.4% of episodes / 85.8% of events:** CONFLUENCE-GATE-BLOCK (3,436, −0.063), CONTINUUM-BLOCK (2,831, +0.016), CONTINUUM-BULL (2,362, −0.033), SHORT-RSI-HARD-FLOOR (2,194, −0.005), LONG-NEUTRAL-CHOP (1,915, +0.059 — still a wash), LONG-NEUTRAL (1,791), SHORT-NEUTRAL (1,637), OVERSOLD-SHORT (1,446), **RR-ENGINE (1,416, −0.048 — new in frame)**, PUMP-CHAIN-SHORT-HIGH (1,236), **BTC-CRASH (1,232, −0.011 — new)**, CTX-GATE (1,107), SHORT-CONTINUUM (1,093), PUMP-CHAIN-HIGH (966), LONG-RSI-BLOCK (921), BTC-CHOP-GATE (869, +0.047 — non-replication holds), SHORT-REGIME-GATE, EXEC-BLOCK, SHORT-BB-DEAD-ZONE/2, LONG-MIDBAND, SHORT-RSI-CEILING, EXEC-RSI-HARD-FLOOR, HOT-SET, VEL-FILTER, LONG-BYPASS-SHORT-BIAS-BLOCK, CHASE-BLOCK (24).
 
-**INSUFFICIENT (7):** n<16 (incl. PUMP-CHAIN-RSI-MIN kill5 23% vs own 6%, n=13 — watch).
+**MIXED/NS (20)** — directionally interesting, not robust: **VOL-GATE-BYPASS** (+0.117, **p_day=0.015**, best harm candidate — but see survivorship note), **SPIKE-FILTER** (−0.157, p_tok=0.008 — probable worker), SLOPE-FILTER (+0.130, cluster-ns, direction consistent across 4 studies), PUMP-CHAIN-VEL (−0.347, p_day=0.045, post-deadband), EXEC-RSI-DETECT-FLOOR, CHOP, LONG-HIGH-70, MAXXED-BLOCK (kill5 extreme, n small), CONFLICT-RESCUE-BLOCK (n=19, +0.410, p_day=0.027 — too small), et al.
 
-## 5. Missing big moves — C-3
+### 4b. Power / MDE (verdict C4-power)
 
-**164 blocked episodes printed dir-MFE ≥10% in 4h** (0.4% of 33,812 episodes). Top casualties (full list `exports/nov19_bigmisses.tsv`):
-- **10-30 SOPH LONG +37.9% MFE** (fwd +33.3) — blocked by VOL-GATE-BYPASS
-- **10-30 BLUR LONG +32.9%** (fwd +24.6) — blocked by CONTINUUM-BLOCK *and* SPIKE-FILTER, LONG-RSI-BLOCK, LONG-NEUTRAL-CHOP (same move, four gates)
-- **11-09 NXPC LONG +29.6%** (fwd +9.8) — CONTINUUM-BLOCK + LONG-NEUTRAL + LONG-RSI-CEILING
-- **11-16 CASHCAT LONG +22.1%** (fwd +21.4) — blocked by four gates incl. EXEC-BLOCK
-- 10-22 ALT SHORT +25.3% (fwd +22.4), 11-13 IMX LONG +28.7% (fwd **−2.4** — MFE faded, would have needed the trail to exit green)
+MDE ≈ 4.4 × SE(day-means), 80% power: gates n≥400 have **median MDE = 0.227%** (best: SHORT-RSI-HARD-FLOOR/CONTINUUM-BLOCK 0.116%; CONFLUENCE 0.218%). **Therefore BLOCKS-SETUPS=0 means "no gate harms by ≥~0.23%/block detectably" — a +0.15% harmful gate at n=400 would be invisible.** The zero-blocks conclusion is a detection-limit statement, not proof of absence.
 
-Per-gate big-move kill differential (kill10 − own10): MAXXED-BLOCK **+5.6pp** (pre-guard run; n shrank post-guard), PUMP-CHAIN-VEL-SHORT +1.5pp, PUMP-CHAIN-RSI-MIN +1.0pp, SLOPE-FILTER +0.9pp, SHORT-BB-DEAD-ZONE2 +0.7pp, VOL-GATE-BYPASS +0.5pp (n=1,237). Note the WORKS gates also kill above their base rate (RSI-MAX kill5 8% vs own 5%) — that is what "working" costs: refusing some future runners to avoid worse entries.
+### 4c. Baseline sensitivity (verdict C4)
 
-## 6. Robustness
+| baseline | WORKS | BLOCKS-SETUPS |
+|---|---|---|
+| cross-mean (reference) | PUMP-CHAIN-RSI-MAX, LONG-RSI-CEILING | none |
+| median | PUMP-CHAIN-RSI-MAX only | none |
+| BTC | SHORT-RSI-HARD-FLOOR, LONG-HIGH-70 | SHORT-REGIME-GATE (+0.118), LONG-BYPASS-SHORT-BIAS-BLOCK (+0.639) |
 
-- **Coalescing:** 30/120-min gaps flip sign for only 1–2 of top-20 gates.
-- **OOS (Oct 4→Nov 1 vs Nov 1→19):** 9 of 20 listed gates flip sign — regime-dependence persists (consistent with all prior audits); the WORKS pair holds same-sign in both halves.
-- **Method lineage:** engine = the forward-return method independently cross-validated in `audit/gate_counterfactual_verify.md` (two implementations <0.10% apart), now with the §1 lookahead guard.
+**PUMP-CHAIN-RSI-MAX is the only gate robust across all three baselines.** LONG-RSI-CEILING's WORKS status is cross-mean/median-dependent; under the BTC baseline a different pair flips. All BLOCKS-SETUPS appearances are baseline-specific — disclosed, not claimed.
 
-## 7. The answer
+### 4d. Survivorship (verdict C4)
 
-1. **Useful gates (keep):** PUMP-CHAIN-RSI-MAX, LONG-RSI-CEILING (cluster-robust, OOS-stable); PUMP-CHAIN-VEL post-deadband (protective, day-cluster sig); SPIKE-FILTER (probable worker, fails Bonferroni).
-2. **Useless blockers (removal candidates on efficiency grounds, NOT recovered PnL):** the 24 no-edge gates — they don't lose money per block, but they are ~99% of the veto layer's volume, fire continuously (the 90:1 funnel), and several are functionally redundant (CONTINUUM pair, established in the Oct-30 audit at solo 13–17%). Since blocked ≈ market, removing them changes flow at ≈ zero markout cost — the Nov-6-queue logic extends: removal tests should target the biggest no-edge gates with the R1 dollar-closer when it ships.
-3. **Not the cause of unprofitability (on this metric):** blocked sets ≈ passed sets ≈ market. Long WR 46.4% / −$6.89 is an entry-quality + exit-engine problem the gates neither created nor prevented — consistent with the standing finding that passed-vs-blocked is indistinguishable (p≈0.5). The gates are not why you're losing; they're also not why flow starved (§3).
-4. **Harm candidates to watch (not act on):** VOL-GATE-BYPASS (day-cluster sig, OOS-stable), SLOPE-FILTER (direction consistent across four studies), MAXXED-BLOCK (extreme tail-kill, n=44).
-5. **Concrete misses exist** (164 episodes ≥10% MFE; the four-gate BLUR/CASHCAT cases) — but average markouts don't support "gates block winners" as a class. The R1 extended closer (real exit-stack counterfactual in $) remains the instrument that could settle tail questions.
+The pre-history guard dropped 6 gates at 100% (1,772 events) and differentially thinned early-October samples. Restoring Oct 4–20 from the Oct-30 v2 export (own-conclusions computation): **16/52 gates change class; WORKS=2 and BLOCKS-SETUPS=0 hold either way; VOL-GATE-BYPASS's harm-candidate status flips to NO-EDGE** with the early period restored — its harm candidacy is period-dependent and should not be acted on independently of the R1 dollar-closer.
 
-## 8. Paper trail (everything re-runnable or snapshotted)
+## 5. Missing big moves — C-3 (AGREE)
 
-| Artifact | Purpose |
-|---|---|
-| `analysis/gate_usefulness_deepdive_2026-11-19.py` | Engine: frame build, guard-fixed fwd_metrics, cluster tests, kill baselines, funnel, exports. One file, no live-path imports |
-| `analysis/gate_usefulness_deepdive_2026-11-19.out` | Verbatim output (all numbers above) |
-| `analysis/gate_usefulness_selfaudit_2026-11-19.py` + `.md` | Independent second path, 6/6 PASS |
-| `exports/nov19_gate_events.tsv` | 81,707 events with computed metrics (snapshot of record — candles mutate) |
-| `exports/nov19_gate_summary.tsv` | Per-gate table incl. cluster p-values + classes |
-| `exports/nov19_weekly_funnel.tsv` | Full-frame weekly blocks vs trades |
-| `exports/nov19_bigmisses.tsv` | All 164 ≥10%-MFE blocked episodes |
-| Source DBs | `brain/gate_shadow.db` (recorder, capture 0.96), `brain/expiry_shadow.db`, PG `brain.trades`, `candles.db` (⚠ ~29d rolling retention) |
-| Prior verification | `audit/gate_counterfactual_verify.md`, `brain/verdicts/2026-10-30_shadow-redundancy-own-conclusions.md`, `brain/verdicts/2026-10-12_deadlock-gate-verify.md` |
+**164 blocked episodes printed dir-MFE ≥10% in 4h** (0.5% of 34,231 enriched episodes). Top casualties in `exports/nov19_bigmisses.tsv`: SOPH 10-30 LONG +37.9% (fwd +33.3, VOL-GATE-BYPASS); BLUR 10-30 LONG +32.9% (four gates: CONTINUUM-BLOCK, SPIKE-FILTER, LONG-RSI-BLOCK, LONG-NEUTRAL-CHOP); NXPC 11-09 +29.6% (three gates); CASHCAT 11-16 +22.1% (four gates incl. EXEC-BLOCK); IMX 11-13 +28.7% MFE but fwd −2.4% (faded — would need the trail to exit green). Per-gate kill10−own10 differentials: MAXXED-BLOCK extreme (+5.6pp pre-guard, n shrank), PUMP-CHAIN-VEL-SHORT +1.5pp, PUMP-CHAIN-RSI-MIN +1.0pp, SLOPE-FILTER +0.9pp, VOL-GATE-BYPASS +0.5pp (n=1,231). The WORKS gates also kill above their base rate (RSI-MAX kill5 8% vs own 5%) — that is what working costs.
 
-Reproduce: `python3 analysis/gate_usefulness_deepdive_2026-11-19.py && python3 analysis/gate_usefulness_selfaudit_2026-11-19.py`. Known reproduction limits: pre-Oct-21 candle values are unreproducible after the 21:55 prune (§1) — verify method (A3/A6) on retained data instead; db-only (Oct 4–30) raw log lines are deleted (rotator now retains archives going forward).
+## 6. Robustness (C6 AGREE)
 
-## 9. What this cannot settle
+Coalescing 30/120min flips 1–2 of top-20 signs; OOS (Oct 4→Nov 1 vs Nov 1→19) flips 9/20; the WORKS pair holds same-sign both halves. Method lineage: the forward-return engine independently cross-validated in `audit/gate_counterfactual_verify.md`, now with the §1 guard.
 
-4h candle markouts ≠ realized PnL under the live exit stack (R1 extended closer still unbuilt); the harm candidates need the Nov-6-plus data and dollar-level closure; upstream starvation (why trades halved with stable blocks) is a separate question — signal generation volume, confluence-expiry rates, and confidence-floor rejections over the same window are the next analysis if T wants the root cause of the frequency collapse.
+## 7. The answer (corrected)
+
+1. **Useful (keep):** PUMP-CHAIN-RSI-MAX — the only gate robust to baseline choice; LONG-RSI-CEILING (reference/median baselines); probable workers pending Bonferroni: SPIKE-FILTER, PUMP-CHAIN-VEL (post-deadband).
+2. **Useless blockers:** the 27 no-edge gates — **82.4% of episode volume** — neither help nor hurt per block. Removal case = efficiency/functional redundancy (the Oct-30 audit put the CONTINUUM pair at solo 13–17%), NOT recovered PnL; blocked ≈ market means removal changes flow at ≈ zero markout cost. Nov-6-queue logic extends; decisions need the R1 dollar-closer.
+3. **Not shown to be the cause of unprofitability:** blocked ≈ passed ≈ market (standing p≈0.5); the detection limit (§4b) means small harm can't be excluded, but nothing ≥0.23%/block exists. Long WR 46.4%/−$6.89 is entry+exit-engine quality the gates neither created nor prevented.
+4. **Harm candidates — watch, don't act:** VOL-GATE-BYPASS (p_day=0.015 but period-dependent per §4d), SLOPE-FILTER (direction-consistent, 4 studies, cluster-ns), MAXXED-BLOCK (tail-kill, n=44), CONFLICT-RESCUE-BLOCK (n=19).
+5. **Concrete misses exist** (164 episodes ≥10% MFE; three four-gate cases) but do not generalize; tail questions need the R1 extended closer ($-denominated, still unbuilt).
+
+## 8. What this cannot settle
+
+4h candle markouts ≠ realized PnL under the live exit stack (R1); harm < MDE (0.23% at n≥400) is undetectable at this window; the starvation root cause needs the signal-side denominator (§3/§9); db-only Oct 4–30 raw lines are deleted (rotator retains going forward); 30d candle retention makes expired-window values non-regenerable (exports are the snapshot of record).
+
+## 9. Next analysis if T wants the frequency-collapse root cause
+
+Signal emissions/week (the missing denominator), confluence-expiry rates/week (expiry_shadow has 63k events), confidence-floor rejection counts/week — all derivable from existing data; none collected in this study.
+
+## 10. Correction ledger (v1 → this revision, per the own-conclusions verdict)
+
+| # | v1 defect | correction |
+|---|---|---|
+| 1 | Two-run splice: §3 funnel and §5 kill-differentials cited pre-guard numbers the committed engine couldn't produce | funnel rebuilt from full frame in-engine; kill differentials re-sourced from run-4 .out (e.g. RSI-MIN +1.0→+6.7pp class of fixes) |
+| 2 | "~99% of block volume" | **82.4% episodes / 85.8% events** (95% only counting all non-WORKS) |
+| 3 | RR-ENGINE (3,402 events/1,415 eps) invisible; capture audit hid gates behind r<20 | emoji set expanded (+🎯⏱️🛡️🚨⚠️🔄🗑️) with gate/marker classification; 47→56 gates; capture audit lists all 54 overlap gates |
+| 4 | Undisclosed guard survivorship | §4d: 6 gates 100% dropped (1,772 events); 16/52 class changes on early-period restore; WORKS=2/BLOCKS=0 stable; VOL-GATE-BYPASS flips |
+| 5 | Undisclosed baseline sensitivity | §4c table: only RSI-MAX robust across all three baselines |
+| 6 | BLOCKS-SETUPS=0 stated without power | §4b: median MDE 0.227% (n≥400); +0.15% harm undetectable |
+| 7 | C3 "starvation is upstream" overclaimed | §3 softened: consistent-not-proven; gate-mix TV 0.12–0.36/wk; pass-proxy 4.5%→1.0%; early-week undercount; signal denominator unmeasured |
+| 8 | C7 "mass prune at 21:55 / computed from complete data / 11-token fingerprint" | §1 retracted: routine incremental 30d retention (journal: 514 prunes, ≤284 rows); history always capped → all 24,699 were lookahead at run; fingerprint artifact + now unverifiable; guard correct, drop count reproduces |
+| 9 | — | New: case-sensitivity regression caught by run-3 diff (BTC-CHOP 868→210 biased subset) fixed in run 4 |
+
+## 11. Paper trail
+
+`analysis/gate_usefulness_deepdive_2026-11-19.py` (engine, all fixes inline with provenance comments) · `.out` (run-4 verbatim) · `analysis/gate_usefulness_selfaudit_2026-11-19.py` + `.md` (6/6 PASS) · `exports/nov19_gate_events.tsv` (83,593 rows — snapshot of record), `nov19_gate_summary.tsv` (cluster p + MDE + 3-baseline means), `nov19_weekly_funnel.tsv` (full-frame), `nov19_bigmisses.tsv` (164) · verdict `brain/verdicts/2026-11-19-gate-usefulness-own-conclusions.md` · auditor working code `/tmp/oc_nov19/`.
+Reproduce: `python3 analysis/gate_usefulness_deepdive_2026-11-19.py && python3 analysis/gate_usefulness_selfaudit_2026-11-19.py`. Known limits: §8.

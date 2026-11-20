@@ -23,6 +23,16 @@ cluster-robust p (token-clustered AND day-clustered t-tests on cluster means),
 Wilcoxon naive labeled naive, Bonferroni across gates, OOS halves,
 coalescing sensitivity 30/60/120min.
 
+CORRECTION ROUND (2026-11-19/20, per own-conclusions verdict
+brain/verdicts/2026-11-19-gate-usefulness-own-conclusions.md):
+  - emoji set expanded (+🎯⏱️🛡️🚨⚠️🔄🗑️) with gate/marker classification →
+    RR-ENGINE (3,402 events, was invisible) and colon-glued gates now in frame
+  - funnel rebuilt from FULL frame (blocks need no forward data) — the
+    pre-guard build zeroed weeks whose events were dropped as pre-history
+  - baseline sensitivity (cross-mean/median/BTC) + classification under each
+  - MDE (4.4 × day-SE) printed per gate — BLOCKS-SETUPS=0 is power-limited
+  - capture audit no longer hides gates behind an r<20 filter
+
 Outputs:
   analysis/gate_usefulness_deepdive_2026-11-19.out
   analysis/exports/nov19_gate_events.tsv, nov19_gate_summary.tsv,
@@ -50,13 +60,22 @@ EPISODE_GAP = 3600
 SPLIT_TS = datetime(2026, 11, 1, 0, 0, tzinfo=timezone.utc).timestamp()
 DB_TAIL_CUT = datetime(2026, 10, 30, 20, 39, 35, tzinfo=timezone.utc).timestamp()
 
-# recorder's current regexes (gate_shadow.py, incl. Oct-22 `:?` fix)
+# Shape-match all block emojis (incl 🎯 RR-ENGINE, 🔄 CONFLICT-RESCUE, 🗑️
+# LOSERS-BLOCK — added 2026-11-19 per own-conclusions C2: RR-ENGINE's 3,402
+# events were invisible to the 4-emoji set), then CLASSIFY: a shape-matched
+# line is a BLOCK iff the gate name contains 'BLOCK' or the line carries a
+# block marker (blocked/HARD BLOCK/denied/skip) — mirrors the independently
+# validated v3.2 gate-audit parser. Soft multipliers (TIDE →0.7x, RR PENALTY,
+# SLOPE-OVERRIDE relaxed, OPP-PENALTY, PHANTOM-DBG) carry no marker → excluded.
 BLOCK_RE = re.compile(
-    r'(?:🚫|🔒|🚧|🌊)\s+\[([A-Za-z0-9_-]+)\]\s+([A-Z0-9]+):?\s+(LONG|SHORT)\b'
-    r'.*?(?:blocked|BLOCKED)', re.IGNORECASE)
+    r'(?:🚫|🔒|🚧|🌊|🎯|⏱️|🛡️|🚨|⚠️|🔄|🗑️)\s+\[([A-Za-z0-9_-]+)\]\s+'
+    r'([A-Z0-9]{1,12}):?\s*(LONG|SHORT)\b', re.IGNORECASE)
 CONF_RE = re.compile(
     r'🔒\s+\[CONFLUENCE-GATE-BLOCK\]\s+([A-Z0-9]+)\s+(LONG|SHORT)\b', re.IGNORECASE)
-EXCLUDE_SUB = ('WOULD', 'SKIPPED', 'shadow', 'SHADOW', 'DEBUG')
+EXCLUDE_SUB = ('WOULD', 'SKIPPED', 'shadow', 'SHADOW', 'DEBUG',
+               'PHANTOM-DBG', 'PENALTY:', 'relaxed', 'allowed')
+BLOCK_MARKERS = ('blocked', 'hard block', 'denied', 'skip')  # matched on line.lower()
+EXCLUDE_GATE = {'CONFLUENCE-DEBUG', 'DIRECTION-LOCK'}
 
 from scipy import stats as sps
 
@@ -91,6 +110,20 @@ def cluster_p(vals, keys):
     except ValueError:
         return None, len(means)
 
+def cluster_se(vals, keys):
+    """SE of cluster means (for MDE / power, own-conclusions C4-power)."""
+    by = defaultdict(list)
+    for v, k in zip(vals, keys):
+        if v is not None:
+            by[k].append(v)
+    means = [sum(v) / len(v) for v in by.values() if v]
+    if len(means) < 5:
+        return None, len(means)
+    m = sum(means) / len(means)
+    var = sum((x - m) ** 2 for x in means) / (len(means) - 1)
+    import math
+    return (var ** 0.5) / (len(means) ** 0.5), len(means)
+
 # ── frame ────────────────────────────────────────────────────────────────────
 def parse_stream(fh, frame):
     for line in fh:
@@ -99,6 +132,13 @@ def parse_stream(fh, frame):
         m = BLOCK_RE.search(line)
         if m:
             gate, tok, d = m.group(1), m.group(2).upper(), m.group(3).upper()
+            ll = line.lower()  # markers must be case-insensitive: BTC-CHOP etc.
+            # log "BLOCKED" uppercase while gate name lacks BLOCK (case bug
+            # found by run-3 diff: BTC-CHOP 868→210 episodes, biased subset)
+            if gate.upper() not in {g.upper() for g in EXCLUDE_GATE} and \
+               'BLOCK' not in gate.upper() and \
+               not any(k in ll for k in BLOCK_MARKERS):
+                continue
         else:
             mc = CONF_RE.search(line)
             if not mc:
@@ -223,15 +263,21 @@ def market_fwd_dicts():
         _MKT[hname] = d
     return _MKT
 
-def market_mean(bucket_ts, hname):
-    key = (bucket_ts, hname)
+def market_mean(bucket_ts, hname, mode='mean'):
+    key = (bucket_ts, hname, mode)
     if key in _MKT_CACHE:
         return _MKT_CACHE[key]
     d = market_fwd_dicts()[hname].get(bucket_ts)
     if not d or len(d) < 20:
         _MKT_CACHE[key] = None
         return None
-    m = sum(d.values()) / len(d)
+    if mode == 'mean':
+        m = sum(d.values()) / len(d)
+    elif mode == 'median':
+        vs = sorted(d.values())
+        m = vs[len(vs) // 2]
+    else:  # btc
+        m = d.get('BTC')
     _MKT_CACHE[key] = m
     return m
 
@@ -334,13 +380,17 @@ def main():
     cap = []
     for g in sorted(set(db_overlap) | set(rep_gate), key=lambda x: -rep_gate.get(x, 0)):
         r = rep_gate.get(g, 0)
-        if r < 20:
-            continue
         dbn = db_overlap.get(g, 0)
-        cap.append((g, dbn, r, dbn / r * 100))
-    worst = sorted(cap, key=lambda x: x[3])[:8]
-    P("    lowest-capture gates: " + '; '.join(f"{g}={c:.0f}%" for g, _, _, c in worst))
-    P(f"    gates ≥90% capture: {sum(1 for _,_,_,c in cap if c>=90)}/{len(cap)}")
+        cap.append((g, dbn, r, dbn / r * 100 if r else float('nan')))
+    P(f"    ALL gates in overlap ({len(cap)}), lowest capture first "
+      f"(no r<20 filter — own-conclusions C2):")
+    for g, dbn, r, c in sorted(cap, key=lambda x: (x[3] if x[3] == x[3] else 999))[:12]:
+        P(f"      {g:30} db={dbn:5} reparse={r:5} capture={c:.0f}%")
+    n90 = sum(1 for _, _, r, c in cap if r and c >= 90)
+    nrep = sum(1 for _, _, r, _ in cap if r)
+    P(f"    gates ≥90% capture: {n90}/{nrep} with reparse presence; "
+      f"gates absent from reparse (db-only): "
+      f"{[g for g, _, r, _ in cap if not r]}")
 
     # ── 2. enrich ────────────────────────────────────────────────────────────
     enriched = []
@@ -355,8 +405,13 @@ def main():
         bucket = int(ts + 299) // 300 * 300
         mb = market_mean(bucket, '4h')
         exc = (fm['f4h'] - (mb if d == 'LONG' else -mb)) if mb is not None else None
+        # baseline sensitivity (own-conclusions C4): median + BTC baselines
+        mbm = market_mean(bucket, '4h', 'median')
+        exc_med = (fm['f4h'] - (mbm if d == 'LONG' else -mbm)) if mbm is not None else None
+        mbb = market_mean(bucket, '4h', 'btc')
+        exc_btc = (fm['f4h'] - (mbb if d == 'LONG' else -mbb)) if mbb is not None else None
         enriched.append((ts, gate, tok, d, prov, fm['f30'], fm['f1h'], fm['f4h'],
-                         exc, fm['mfe'], btc_vel30(ts)))
+                         exc, fm['mfe'], btc_vel30(ts), exc_med, exc_btc))
     P()
     P(f"── 2. ENRICHED: {len(enriched)} events with forward data " + "─" * 55)
     P(f"  dropped for pre-history (entry precedes candle-data start — candles_5m "
@@ -368,7 +423,23 @@ def main():
     def week_of(ts):
         dt = datetime.fromtimestamp(ts, timezone.utc)
         return (dt - __import__('datetime').timedelta(days=dt.weekday())).date()
-    # episodes first (60min coalesce)
+    # FUNNEL uses the FULL frame (blocks need no forward data) — own-conclusions
+    # C3 fix: pre-guard build derived funnel from enriched, zeroing weeks whose
+    # events were dropped as pre-history.
+    fby = defaultdict(list)
+    for ts, gate, tok, d, prov in frame:
+        fby[(gate, tok, d)].append(ts)
+    n_full_eps = 0
+    ep_full_week = defaultdict(int)
+    for key, lst in fby.items():
+        lst.sort()
+        last = None
+        for ts in lst:
+            if last is None or ts - last > EPISODE_GAP:
+                n_full_eps += 1
+                ep_full_week[week_of(ts)] += 1
+            last = ts
+    # GATE analysis uses enriched episodes (need forward data)
     by_key = defaultdict(list)
     for e in enriched:
         by_key[(e[1], e[2], e[3])].append(e)
@@ -381,10 +452,9 @@ def main():
                 episodes.append(e)
             last = e[0]
     episodes.sort()
-    P(f"  episodes (60min coalesce): {len(episodes)}")
-    ep_week = defaultdict(int)
-    for e in episodes:
-        ep_week[week_of(e[0])] += 1
+    P(f"  episodes: full-frame={n_full_eps} (funnel); "
+      f"enriched-with-forward-data={len(episodes)} (gate analysis)")
+    ep_week = ep_full_week
     cur.execute("""
         SELECT (date_trunc('week', open_time) - interval '1 day')::date + 1 AS wk, COUNT(*)
         FROM trades WHERE paper='f' AND status='closed' AND open_time >= '2026-10-04'
@@ -422,6 +492,9 @@ def main():
             continue
         p_tok, _ = cluster_p(vals, [r[2] for r in recs])
         p_day, _ = cluster_p(vals, [int(r[0] // 86400) for r in recs])
+        day_se, n_days = cluster_se(vals, [int(r[0] // 86400) for r in recs])
+        # MDE (80% power, two-sided, ~t-multiplier 4.4 on day-SE — auditor's method)
+        mde = 4.4 * day_se if day_se is not None else None
         # big-move kills vs own-token unconditional
         k5 = sum(1 for r in recs if r[9] is not None and r[9] >= 5.0) / n * 100
         own5v = [token_uncond_mfe(r[2], r[3], 5.0) for r in recs]
@@ -435,11 +508,26 @@ def main():
         p_d_s = f"{p_day:.4f}" if p_day is not None else "n/a"
         P(f"{gate:26} {fs:>5} {n:5} │ {s4['mean']:+8.3f} {p_w_s:>7} {p_t_s:>7} "
           f"{p_d_s:>7} │ {k5:5.1f}% {own5:5.1f}% │ {k10:5.1f}% {own10:5.1f}%")
+        mv = [r[11] for r in recs if r[11] is not None]
+        bv = [r[12] for r in recs if r[12] is not None]
         rows_out.append(dict(gate=gate, fs=fs, n=n, s4=s4, p_tok=p_tok, p_day=p_day,
-                             k5=k5, own5=own5, k10=k10, own10=own10))
+                             k5=k5, own5=own5, k10=k10, own10=own10,
+                             mde=mde, n_days=n_days,
+                             med_mean=(sum(mv) / len(mv)) if mv else None,
+                             btc_mean=(sum(bv) / len(bv)) if bv else None))
     P("  kill5/own5 = share of blocked episodes printing dir-MFE>=5% vs the gate's OWN tokens'")
     P("  unconditional share (same threshold) — differential >0 means the gate kills big moves")
     P("  at ABOVE the rate those tokens simply print them (i.e. not just 'tokens are volatile').")
+    P()
+    P("── 4b. POWER / MDE (own-conclusions C4-power): detectable effect at 80% power " + "─" * 14)
+    P("  MDE ≈ 4.4 × SE(day-means). BLOCKS-SETUPS=0 must be read against these:")
+    for r in sorted([x for x in rows_out if x['mde'] is not None and x['n'] >= 100],
+                    key=lambda x: x['mde'])[:12]:
+        P(f"    {r['gate']:26} n={r['n']:5} days={r['n_days']:3} MDE={r['mde']:.3f}%")
+    big_mde = [x['mde'] for x in rows_out if x['mde'] is not None and x['n'] >= 400]
+    if big_mde:
+        P(f"  gates n>=400: median MDE={sorted(big_mde)[len(big_mde)//2]:.3f}% "
+          f"— a harmful gate of +0.15% would be UNDETECTABLE at this n.")
 
     # ── 5. classification ────────────────────────────────────────────────────
     P()
@@ -476,6 +564,31 @@ def main():
               f"p_tok={r['p_tok'] if r['p_tok'] is not None else float('nan'):.3f} "
               f"p_day={r['p_day'] if r['p_day'] is not None else float('nan'):.3f} {extra}")
         P()
+
+    # ── 5b. baseline sensitivity (own-conclusions C4) ────────────────────────
+    P("── 5b. BASELINE SENSITIVITY (classification under 3 baselines) " + "─" * 40)
+    for mode, idx, label in (('cross-mean', 8, 'mean'), ('median', 11, 'median'),
+                             ('BTC', 12, 'btc')):
+        sets = {'WORKS': [], 'BLOCKS-SETUPS': []}
+        for gate in gate_eps:
+            recs = gate_eps[gate]
+            if len(recs) < 16:
+                continue
+            vv = [r[idx] for r in recs]
+            sm = summarize(vv)
+            if sm is None or sm['p'] is None:
+                continue
+            pt, _ = cluster_p(vv, [r[2] for r in recs])
+            pd_, _ = cluster_p(vv, [int(r[0] // 86400) for r in recs])
+            cok = ((pt is not None and pt < 0.05) or (pd_ is not None and pd_ < 0.05))
+            if sm['mean'] <= -0.10 and sm['p'] < bonf and cok:
+                sets['WORKS'].append(f"{gate}({sm['mean']:+.3f})")
+            elif sm['mean'] >= 0.10 and sm['p'] < bonf and cok:
+                sets['BLOCKS-SETUPS'].append(f"{gate}({sm['mean']:+.3f})")
+        P(f"  {label:10} baseline: WORKS={sets['WORKS'] or 'none'} | "
+          f"BLOCKS-SETUPS={sets['BLOCKS-SETUPS'] or 'none'}")
+    P("  NOTE: the primary (cross-mean) baseline is the reference method; med/BTC")
+    P("  rows disclose how much each class depends on baseline choice (C4).")
 
     # ── 6. big-move misses ───────────────────────────────────────────────────
     P("── 6. MISSING BIG MOVES (C-3): blocked episodes with dir-MFE>=10% " + "─" * 36)
@@ -547,20 +660,25 @@ def main():
     os.makedirs(EXPORTS, exist_ok=True)
     with open(os.path.join(EXPORTS, 'nov19_gate_events.tsv'), 'w') as f:
         f.write("ts\tgate\ttoken\tdirection\tprovenance\tfwd_30m\tfwd_1h\tfwd_4h\t"
-                "excess_4h\tmfe_4h\tbtc_vel30\n")
+                "excess_4h\tmfe_4h\tbtc_vel30\texcess_4h_medbase\texcess_4h_btcbase\n")
         for e in enriched:
             f.write('\t'.join('' if v is None else (
                 f'{v:.4f}' if isinstance(v, float) else str(v)) for v in e) + '\n')
     with open(os.path.join(EXPORTS, 'nov19_gate_summary.tsv'), 'w') as f:
         f.write("gate\tfirst_seen\tepisodes\tex4h_mean\tp_wilcoxon\tp_token_cluster\t"
-                "p_day_cluster\tkill5_pct\town5_pct\tkill10_pct\town10_pct\tclass\n")
+                "p_day_cluster\tkill5_pct\town5_pct\tkill10_pct\town10_pct\tclass\t"
+                "mde_pct\tex4h_medbase_mean\tex4h_btcbase_mean\n")
         for r in rows_out:
             k = next((name for name, lst in cls.items() if r in lst), '')
+            mde_s = f"{r['mde']:.4f}" if r.get('mde') is not None else ''
+            med_s = f"{r['med_mean']:.4f}" if r.get('med_mean') is not None else ''
+            btc_s = f"{r['btc_mean']:.4f}" if r.get('btc_mean') is not None else ''
             f.write(f"{r['gate']}\t{r['fs']}\t{r['n']}\t{r['s4']['mean']:.4f}\t"
                     f"{r['s4']['p'] if r['s4']['p'] is not None else ''}\t"
                     f"{r['p_tok'] if r['p_tok'] is not None else ''}\t"
                     f"{r['p_day'] if r['p_day'] is not None else ''}\t"
-                    f"{r['k5']:.1f}\t{r['own5']:.1f}\t{r['k10']:.1f}\t{r['own10']:.1f}\t{k}\n")
+                    f"{r['k5']:.1f}\t{r['own5']:.1f}\t{r['k10']:.1f}\t{r['own10']:.1f}\t{k}\t"
+                    f"{mde_s}\t{med_s}\t{btc_s}\n")
     with open(os.path.join(EXPORTS, 'nov19_weekly_funnel.tsv'), 'w') as f:
         f.write("week\tblocked_episodes\ttrades\n")
         for wk in sorted(set(ep_week) | set(tr_week)):
