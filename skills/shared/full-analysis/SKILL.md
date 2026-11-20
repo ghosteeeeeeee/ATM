@@ -652,6 +652,21 @@ six-trade sequence is the proof case:
    closes the ENTIRE position, and per-tranche attribution corrupts (both
    rows sync to the merged entry). Multi-tranche = plan for "tightest
    level governs everything" (align TPs, expect first-hit-closes-all).
+8. **First-break entries are the retest-stop trap** (2026-11-20 harness,
+   the 9 burned rungs, independent-verdict AGREE-HIGH): entering the
+   instant a level breaks with the stop at the reclaim-of-broken-level
+   puts the stop INSIDE the retest's own wick envelope — MAE across the
+   nine = 0.26–2.89% while armed stops were 0.25–0.58% → **0/9 as-armed,
+   −33.93% margin** (stops-ignored direction was right8/9 — the entry×
+   stop geometry, not the direction, was the defect). The brain gates
+   that vetoed them (BANANA RSI<35 / HARD_FLOOR<45, all nine rejections
+   cite them) are right about the SHAPE: the gate-compatible,
+   §11-faithful entry is the **re-cross after the sweep-reclaim resolves
+   with RSI recovered**, stop at the LEVEL (0.8% class) — not the
+   trigger-reclaim. Consolidations deliver **runs of failed touches**
+   before the clean leg (the Nov18–20 stop-run boundaries reproduce
+   exactly; run-length counts are clustering-dependent — H1's specifics
+   stay UNSETTLED until plan §9's F-3/F-5 clear).
 
 ### 12. The no-edge default: ARM THE BRACKET (CEO directive, 2026-10-21)
 
@@ -770,6 +785,46 @@ extreme). Rules:
    (d) a pin verdict is DIRECTION "undecided BY DESIGN" + ENTRY "none"
    + the armed-book listing (§12 completion) — a positioning answer,
    not a prediction.
+
+### 15. Evidence discipline — what a strategy claim must survive (2026-11-20 harness + two independent audits)
+
+Before ANY backtest number is quoted in an analysis, a plan, or a report:
+1. **Four columns or it didn't happen**: as-simulated /
+   confirmable-levels / flat-only / net-of-costs (0.09% RT fees + 0.10%
+   slip = 0.19% price per round trip). Gross, lookahead, or
+   unlimited-position numbers are illustrations, not edges.
+2. **Lookahead kills, twice**: a swing's level is knowable the bar AFTER
+   its confirm bar (the confirm bar's own close is mid-bar unknowable);
+   gates read the PRIOR bar's close. A delay0 column must be labeled
+   as-simulated — never compared to production as if it were real.
+3. **Base-rate control**: every retest/recovery stat must beat its
+   generic control (any 0.5% red bar bounces 90% within 24h — a raw
+   "70% retest" proves nothing alone). H1's major-break/retest claims
+   remain UNSETTLED until F-3/F-5 (plan §9).
+4. **Gate with shipped labels**: a re-derived proxy gate (EMA80/320)
+   agreed with the production `structure_json` states only **26%** —
+   gate backtests with the SHIPPED state labels, and the gate's effect
+   is side/column-dependent (gated < ungated in 17/32 rows; it *helped*
+   longs 14/16) — never assume a gate helps; measure it per side.
+5. **Concentration**: episodes are not independent (runs of 7–12; top-3
+   half-days carried 73% of one total) — report block/half-day shares
+   alongside counts.
+6. **Pin the data**: `candles_15m` is a rolling 90-day window — print
+   window + full-row sha with every result (a roll moved 65/99 lines
+   between runs); re-run before citing an old number.
+7. **State the fill model**: signs flip on slip alone (breakeven slip
+   ≈ +1.9 bps over taker fees; ~6 bps RT flipped the fixed-TP short
+   rows from negative to positive) — the assumption travels with the
+   number.
+8. **Proxy ≠ production**: a backtest exit-model is a stand-in — name
+   its differences from the shipped code (the TRAIL proxy lacked
+   adverse-raise, BE-cap, birth re-anchor, and the 30-min cycle — ten
+   documented differences) before presenting its results as system
+   expectations.
+   Reference: `scripts/backtest_retest_fade.py` (pinned constants,
+   data-sha header) · `plans/2026-11-20_retest-fade-system-plan.md`
+   §7–9 · verdicts `1795152254`, `1795157600`,
+   `bug-hunter-retest-fade-harness-2026-11-20`.
 
 ## Analysis Script
 
@@ -974,4 +1029,10 @@ INVARIANT + add-on-winners sizing table; §13 regime-split (CHOP→1h
 major vs TREND→15m responsive) with the mechanics pointer to
 manual-trade-override; Verdict Rules ride-cost accounting (41% captured
 canonical method); Step0 hard_max_loss = structure-widened cap note;
-lifecycle intro count fixed.
+lifecycle intro count fixed. **2026-11-20 upgrade**: protocol item15
+evidence-discipline (four-column standard; lookahead + prior-bar gates;
+base-rate controls; shipped-state gates at 26% agreement; block
+concentration; data-sha pinning; fill-model disclosure; proxy≠production
+ten-difference rule) + §11 point8 first-break/retest-stop trap with the
+gate-compatible entry shape (9-run study, AGREE-HIGH; H1 specifics
+unsettled per plan §9 F-3/F-5).
