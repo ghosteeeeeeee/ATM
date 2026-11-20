@@ -17,6 +17,18 @@ Modes:
   --help      documents every param, step choice, formula and the four limbs
               BEFORE any data is touched (argparse epilog below).
 
+--cells {signal,family} (calibrate mode only; decision checkpoint
+20261120T141947Z, pre-registered B3 iteration):
+  signal  (default) = P0 full-label cells (signal, direction,
+          volatility_regime) — byte-identical P0 behavior; report ->
+          brain/analysis/probability-matrix-calibration.md
+  family  = opt-in coarser cells (family, direction, volatility_regime);
+          family_of() walks RAW trades.signal via market_phase_gate.
+          signal_family (exact checkpoint policy); 'Other' trades are
+          EXCLUDED from cells (counted as uncovered); CR1 cluster = family;
+          report -> brain/analysis/probability-matrix-calibration-family.md
+          (the P0 report path is NEVER written in family mode).
+
 TUNING VALUES (documented CLI defaults; P0 must NOT touch hermes_constants, spec §8):
   DEFAULT_DAYS  = 90   data-anchored lookback window (streak_analysis parity)
   TRAIN_DAYS    = 30   rolling-origin train span
@@ -92,10 +104,14 @@ from datetime import timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import *  # noqa: F401,F403
+from market_phase_gate import signal_family  # existing FAMILY_MAP, no edits to it
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CELL_DB = os.path.join(REPO, 'brain', 'cell_stats.db')
 REPORT_MD = os.path.join(REPO, 'brain', 'analysis', 'probability-matrix-calibration.md')
+REPORT_MD_FAMILY = os.path.join(REPO, 'brain', 'analysis',
+                                'probability-matrix-calibration-family.md')
+CELLS_MODE = 'signal'  # 'signal' (default, P0 byte-identical) | 'family' (opt-in)
 
 # ── header constants: documented CLI defaults (spec §8 — NOT hermes_constants) ─
 DEFAULT_DAYS = 90        # data-anchored lookback (streak_analysis parity)
@@ -301,8 +317,31 @@ def pct(vals, q):
     return round(s[idx], 4)
 
 
-def cell_key(r):
+def family_of(raw_signal):  # input = RAW trades.signal (no normalization)
+    """Decision checkpoint 20261120T141947Z exact mapping policy — reuses
+    market_phase_gate.signal_family (existing FAMILY_MAP), no new map."""
+    for seg in [raw_signal] + raw_signal.split(','):
+        fam = signal_family(seg.strip())
+        if fam != 'Other':
+            return fam
+    return 'Other'
+
+
+def store_key(r):
+    """Live-store join key — always signal-keyed (cell_stats.db is signal-keyed);
+    the §6 store view stays signal-keyed in both modes."""
     return (r['signal'], r['direction'], r['regime'])
+
+
+def cell_key(r):
+    if CELLS_MODE == 'family':
+        return (family_of(r['signal']), r['direction'], r['regime'])
+    return (r['signal'], r['direction'], r['regime'])
+
+
+def cluster_of(r):
+    """CR1 cluster label: family in family mode, raw signal in signal mode."""
+    return cell_key(r)[0]
 
 
 # ── key matching (landmine: exact first, normalized fallback, never silent) ───
@@ -319,7 +358,7 @@ def match_store(window_rows, store_cells):
     norm_examples, exact_examples = [], []
     seen_exact, seen_norm = set(), set()
     for r in window_rows:
-        k = cell_key(r)
+        k = store_key(r)
         if k in exact:
             matched_exact += 1
             matched_rows.append((r, exact[k]))
@@ -427,10 +466,15 @@ def build_folds(rows, days, train_d, test_d, want):
 
 
 def admit(train):
-    """Cell admission from THIS fold's train ONLY; frozen blended predictor."""
+    """Cell admission from THIS fold's train ONLY; frozen blended predictor.
+    Family mode: 'Other' never admissible — excluded from cells (decision
+    checkpoint 20261120T141947Z), so Other trades stay uncovered."""
     counts = defaultdict(lambda: [0, 0])
     for r in train:
-        c = counts[cell_key(r)]
+        k = cell_key(r)
+        if CELLS_MODE == 'family' and k[0] == 'Other':
+            continue
+        c = counts[k]
         c[0] += 1
         c[1] += y_of(r['pnl_usdt'])
     cells = {}
@@ -484,6 +528,8 @@ def reliability_md(buckets, title, in_sample=False):
 
 
 def run_calibrate(args):
+    global CELLS_MODE
+    CELLS_MODE = args.cells  # 'signal' (default) | 'family' (opt-in, checkpoint B3)
     days, folds_want = args.days, args.folds
     lines = []
     out = lines.append
@@ -513,9 +559,11 @@ def run_calibrate(args):
 
     # ── per-fold admission + coverage ────────────────────────────────────────
     fold_stats, covered, uncovered_n = [], [], 0
+    fold_cells = []
     all_test_n = 0
     for f in folds:
         cells = admit(f['train'])
+        fold_cells.append(cells)
         tr_n = len(f['train'])
         te = f['test']
         te_n = len(te)
@@ -572,7 +620,7 @@ def run_calibrate(args):
         wr_b = wr_bot
         vals = [y_of(t['pnl_usdt']) - wr_b for t in top2 + bot2]
         # constant shift leaves CR1 deviations unchanged; beta = w*(wr_top-wr_bot)
-        cl = [t['signal'] for t in top2 + bot2]
+        cl = [cluster_of(t) for t in top2 + bot2]
         try:
             a_ci = cluster_ci(vals, cl)
         except Exception as e:  # scipy missing etc.
@@ -620,7 +668,7 @@ def run_calibrate(args):
               (max(EPS_P, min(1 - EPS_P, r['final_confidence'] / 100.0)) - y) ** 2)
              for r, y in zip(inter, ys)]
         try:
-            b_ci = cluster_ci(d, [r['signal'] for r in inter])
+            b_ci = cluster_ci(d, [cluster_of(r) for r in inter])
         except Exception as e:  # never crash the report — INCONCLUSIVE
             b_ci = {'ok': False, 'note': f'{type(e).__name__}: {e}'}
         if b_ci.get('ok'):
@@ -641,7 +689,7 @@ def run_calibrate(args):
         ys = [y_of(r['pnl_usdt']) for r in covered]
         d = [(r['p'] - y) ** 2 - 0.25 for r, y in zip(covered, ys)]
         try:
-            c_ci = cluster_ci(d, [r['signal'] for r in covered])
+            c_ci = cluster_ci(d, [cluster_of(r) for r in covered])
         except Exception as e:  # never crash the report — INCONCLUSIVE
             c_ci = {'ok': False, 'note': f'{type(e).__name__}: {e}'}
         if c_ci.get('ok'):
@@ -690,18 +738,22 @@ def run_calibrate(args):
         s_cov, s_brier, s_buckets = 0.0, None, []
 
     # ══ build report ═════════════════════════════════════════════════════════
+    cell_desc = ('(family, direction, volatility_regime)' if CELLS_MODE == 'family'
+                 else '(signal, direction, volatility_regime)')
+    cl_label = 'family' if CELLS_MODE == 'family' else 'signal'
+    cells_note = '' if CELLS_MODE == 'signal' else f', cells={CELLS_MODE}'
     out('# Probability Matrix — P0 calibration study')
     out('')
     out('- spec: `brain/plans/probability-matrix-spec.md` v1.1 (§3.1/§3.2/§4/§5); '
         'P0 = study only, SELECT-only, zero trading-path changes')
     out(f'- generated by `scripts/probability_matrix.py calibrate` '
-        f'(days={days}, folds={len(folds)} of {folds_want} requested, '
+        f'(days={days}, folds={len(folds)} of {folds_want} requested{cells_note}, '
         f'train={TRAIN_DAYS}d, test={TEST_DAYS}d, step={TEST_DAYS}d)')
     out(f'- data-anchored window: **{win_lo} → {anchor}** (window start = actual '
         'MIN(close_time); anchor = max close_time, not wall clock — SQL anchored '
         'to MAX(close_time), streak_analysis parity)')
     out(f'- trades in window: **{len(rows)}** | win def: `{WIN_DEF}` | '
-        f'cell = (signal, direction, volatility_regime)')
+        f'cell = {cell_desc}')
     out(f'- **final_confidence coverage (window): {conf_n}/{len(rows)} = '
         f'{conf_n/len(rows):.1%}** | mfe_pct coverage: {mfe_n}/{len(rows)} = '
         f'{mfe_n/len(rows):.1%}')
@@ -710,6 +762,18 @@ def run_calibrate(args):
         f'uncovered test trades: {uncovered_n} (counted, never dropped)')
     out(f'- confidence-intersection subset: **{len(inter)}/{all_test_n} = '
         f'{inter_share:.1%}** of test trades')
+    if CELLS_MODE == 'family':
+        fam_n = defaultdict(int)
+        for r in rows:
+            fam_n[family_of(r['signal'])] += 1
+        other_n = fam_n.pop('Other', 0)
+        adm_fams = sorted({k[0] for cs in fold_cells for k in cs})
+        out(f'- **family mode**: distinct families in window = {len(fam_n)} '
+            f'(excl. Other) | **Other share = {other_n}/{len(rows)} = '
+            f'{other_n / len(rows):.1%} — EXCLUDED from cells (never admissible; '
+            'counted as uncovered in coverage denominators)** | families with '
+            f'>=1 admitted cell (train n>={N_MIN} in some fold) = {len(adm_fams)}: '
+            + ', '.join(f'`{x}`' for x in adm_fams))
     out('')
     out('```')
     out('SQL: ' + ' '.join(SQL.split()))
@@ -788,7 +852,7 @@ def run_calibrate(args):
         out(f'- top-2 deciles WR = **{wr_top:.1%}** (n={len(top2)}) vs bottom-2 = '
             f'**{wr_bot:.1%}** (n={len(bot2)}), Δ = {(wr_top - wr_bot):+.1%}')
         if a_ci and a_ci.get('ok'):
-            out(f'- cluster-robust (cluster=signal, CR1): t = {a_ci["t"]:+.2f}, '
+            out(f'- cluster-robust (cluster={cl_label}, CR1): t = {a_ci["t"]:+.2f}, '
                 f'p = {fmt_p(a_ci["p"])}, G = {a_ci["g"]}, n = {a_ci["n"]}; '
                 f'95% CI on ΔWR-proxy = [{a_ci["lo"]:+.4f}, {a_ci["hi"]:+.4f}] '
                 '(naive p would be optimistic — flagged, not used)')
@@ -880,7 +944,7 @@ def run_calibrate(args):
     out('- **Observational bias**: cells condition on trades that survived existing '
         'gates; a gate that changes admission changes the population (P1 counterfactual '
         'is the honest test, §6 of the spec).')
-    out('- **Clustering**: all significance is cluster-robust (cluster=signal, CR1, '
+    out(f'- **Clustering**: all significance is cluster-robust (cluster={cl_label}, CR1, '
         'cluster_t.py math); naive p-values are optimistic and not used.')
     if sg_txt:
         out(f'- **{sg_txt}**')
@@ -897,18 +961,20 @@ def run_calibrate(args):
     out('')
     out('```bash')
     out(f'python3 /root/.hermes/scripts/probability_matrix.py calibrate '
-        f'--days {days} --folds {folds_want}')
+        f'--days {days} --folds {folds_want}'
+        + ('' if CELLS_MODE == 'signal' else f' --cells {CELLS_MODE}'))
     out('```')
     out('')
 
+    report_path = REPORT_MD_FAMILY if CELLS_MODE == 'family' else REPORT_MD
     md = '\n'.join(lines)
-    os.makedirs(os.path.dirname(REPORT_MD), exist_ok=True)
-    tmp = REPORT_MD + '.tmp'
+    os.makedirs(os.path.dirname(report_path), exist_ok=True)
+    tmp = report_path + '.tmp'
     with open(tmp, 'w') as fh:
         fh.write(md + '\n')
-    os.replace(tmp, REPORT_MD)
+    os.replace(tmp, report_path)
     print(md)
-    log(f'\n[wrote] {REPORT_MD}')
+    log(f'\n[wrote] {report_path}')
     log(f'GATE: {gate} | limbs: (a)={a_verdict} (b)={b_verdict} '
         f'(c)={c_verdict} (d)={d_verdict}')
     log(f'fold test coverage: ' + ', '.join(
@@ -1113,6 +1179,11 @@ def selfcheck():
     assert norm_key('pump-chain+') == 'pump_chain', 'dash form -> underscore form'
     assert norm_key('bb-bounce-v2-long+') == 'bb_bounce_v2_long', 'compound key'
     assert norm_key(' jup_yolo_mirrored ') == 'jup_yolo_mirrored', 'idempotent'
+    # family mapping (decision checkpoint 20261120T141947Z exact policy)
+    assert family_of('pump-chain+') == 'Pump_Flow', 'raw dash-form hits FAMILY_MAP'
+    assert family_of('accel-300-,rs-r79') == 'Accelerate', 'comma-segment walk'
+    assert family_of('ADA(...),pump-chain+') == 'Pump_Flow', 'late segment hit'
+    assert family_of('jup_yolo_mirrored') == 'Other', 'unmapped -> Other (excluded)'
     # cluster math: must agree exactly with brain/analysis/cluster_t.py
     sys.path.append(os.path.join(REPO, 'brain', 'analysis'))
     from cluster_t import cluster_t
@@ -1162,6 +1233,15 @@ def main():
                    help=f'rolling-origin folds requested, >=3 required (default '
                         f'{DEFAULT_FOLDS}; each = train {TRAIN_DAYS}d -> test '
                         f'{TEST_DAYS}d stepping {TEST_DAYS}d)')
+    p.add_argument('--cells', choices=['signal', 'family'], default='signal',
+                   help='cell keying for calibrate mode: signal (default) = '
+                        '(signal, direction, volatility_regime), byte-identical P0; '
+                        "family = (family, direction, volatility_regime) via "
+                        'market_phase_gate.signal_family on RAW trades.signal '
+                        "(decision checkpoint 20261120T141947Z), 'Other' excluded "
+                        'from cells -> report '
+                        'brain/analysis/probability-matrix-calibration-family.md '
+                        '(report mode is always signal-keyed)')
     p.add_argument('--selfcheck', action='store_true',
                    help='assert-based pure-math checks (blending, Brier, clipping, '
                         'cluster parity); no DB, exit 1 on failure')
