@@ -94,7 +94,7 @@
       <div class="value" id="stat-wr">--</div>
     </div>
     <div class="stat">
-      <div class="label">TOTAL P&amp;L</div>
+      <div class="label">TOTAL P&amp;L (NET)</div>
       <div class="value" id="stat-pnl">--</div>
     </div>
     <div class="stat">
@@ -357,7 +357,11 @@
         const wins = closed.filter(t => parseFloat(t.pnl_pct || 0) > 0).length;
         const total = closed.length;
         const winRate = total > 0 ? Math.round(wins / total * 100) : 0;
-        const totalPnl = closed.reduce((s, t) => s + parseFloat(t.pnl_usdt || 0), 0);
+        // NET-of-fee total (CEO 20261120T002223Z Phase 0): sum the API's net_pnl
+        // field client-side — no data rewrite; falls back to gross pnl_usdt on
+        // stale JSON that predates the field. Gross kept as secondary label.
+        const totalGross = closed.reduce((s, t) => s + parseFloat(t.pnl_usdt || 0), 0);
+        const totalPnl = closed.reduce((s, t) => s + parseFloat(t.net_pnl ?? t.pnl_usdt ?? 0), 0);
         const pnlClass = totalPnl > 0 ? '' : totalPnl < 0 ? ' neg' : ' neutral';
 
         // Short/Long winrate
@@ -394,7 +398,7 @@
         document.getElementById('stat-long-wr').innerHTML = longTrades.length > 0 ? longWR + '% <span style="font-size:0.75em;color:#888">(' + longWins + '/' + longTrades.length + ')</span>' : '--';
         document.getElementById('stat-win-streak').textContent = bestWin > 0 ? bestWin + 'W' : '--';
         document.getElementById('stat-loss-streak').textContent = bestLoss > 0 ? bestLoss + 'L' : '--';
-        document.getElementById('stat-pnl').innerHTML = totalPnl > 0 ? '<span class="win">+' + totalPnl.toFixed(2) + '</span>' : '<span class="' + (totalPnl < 0 ? 'loss' : 'neutral') + '">' + totalPnl.toFixed(2) + '</span>';
+        document.getElementById('stat-pnl').innerHTML = (totalPnl > 0 ? '<span class="win">+' + totalPnl.toFixed(2) + '</span>' : '<span class="' + (totalPnl < 0 ? 'loss' : 'neutral') + '">' + totalPnl.toFixed(2) + '</span>') + ' <span style="font-size:0.7em;color:#888">net · gross ' + (totalGross >= 0 ? '+' : '') + totalGross.toFixed(2) + '</span>';
         document.getElementById('status').textContent =
           `Updated: ${new Date(d.updated).toLocaleString()} | Open: ${d.open_count} | Closed: ${d.closed_count} | Win Rate: ${winRate}%`;
 
