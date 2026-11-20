@@ -1396,19 +1396,29 @@ def _monitor_pending_orders_impl(btc_price):
     # invites hand-edits of this file) must never kill the monitor
     # cycle (armed rungs stop firing = the original incident class).
     if PENDING_ORDERS_CAN_PERSIST:
-        try:
-            _now = time.time()
-            for _pk in [k for k, v in state.items()
-                        if isinstance(v, dict)
-                        and v.get("status") in ("first_break", "retested", "rejected")
-                        and (_now - float(v.get("ts") or 0)) > 7 * 86400]:
-                del state[_pk]
-                changed = True
-                log(f"pending order {_pk}: waiting-state pruned after 7d "
-                    f"without reclaim — re-qualifies fresh (config order "
-                    f"persists)")
-        except Exception as _pe:
-            log(f"pending-state prune skipped (non-fatal): {_pe}", "WARN")
+        _now = time.time()
+        # N1 refinement: the age check is PER-ENTRY — one corrupt ts
+        # (the orphan alert invites hand-edits) skips that entry only,
+        # never the whole prune (an all-or-nothing guard would silently
+        # disable hygiene after the first bad row). Candidates are
+        # materialized first: deleting from state during iteration of a
+        # live view would RuntimeError.
+        for _pk, _pv in [(k, v) for k, v in state.items()
+                         if isinstance(v, dict)
+                         and v.get("status") in ("first_break", "retested",
+                                                 "rejected")]:
+            try:
+                if (_now - float(_pv.get("ts") or 0)) <= 7 * 86400:
+                    continue
+            except (TypeError, ValueError):
+                log(f"waiting-state {_pk}: non-numeric ts — kept (not "
+                    f"prunable)", "WARN")
+                continue
+            del state[_pk]
+            changed = True
+            log(f"pending order {_pk}: waiting-state pruned after 7d "
+                f"without reclaim — re-qualifies fresh (config order "
+                f"persists)")
     seen_ids = set()
     serial_claimed = False   # one serial-ladder rung fires per cycle
     for order in cfg["orders"]:
