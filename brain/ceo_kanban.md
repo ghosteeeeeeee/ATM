@@ -36,3 +36,7 @@ BY: auto_1hr
 
 ## TEAM UPDATES
 - [2026-11-10 06:21 UTC] auto_1hr: NO CONFIG CHANGE — 2T 1W1L '-$0.08' (SOL jup_yolo_mirrored trail +$0.05, SUPER hh-hl+ atr_sl_hit -$0.13), 0 open | 24h 17T 35.3% '-$0.79' RED | kill none | inversion 0 | boost none | pump-chain+ 14d n=20 40% WR all-EXTREME borderline noted | no storm (window-min -0.38% / at-run -0.38%)
+
+## TEAM UPDATES
+- [2026-11-20 19:54 UTC] auto_1hr: 🌩️ [STORM-READINESS] window-min -1.91% / at-run +0.09% | blocked 124 (combo_key-stale 28, expired-hotset 27, compaction_stale 22, pump-chain-* 25, short-gates 9, long-rsi-ceiling 7, other 6) | true-starvation 33 RSI>=35 | counterfactual $+0.03 (touch 25/33) | waiver: SHADOW=True ENFORCE=False — cf POSITIVE -> **streak 1/3** (15:56 -$3.29 reset; 2 more positives, deadline 2026-11-26 file truth) | split: blocked SHORTs $+0.64, blocked LONGs $-0.60
+- [2026-11-20 19:54 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour net +0.04 | 24h 17T 58.8% net +0.10 (payoff 1.10) GREEN | kill none | inversion 0 | boost none eligible | arm-rate unarmed 58.8% (stall stack owns fix, no new gate)

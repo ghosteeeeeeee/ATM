@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-11-19 23:48:21",
+  "timestamp": "2026-11-20 15:48:23",
   "total_checks": 20,
-  "passed": 13,
+  "passed": 12,
   "critical_count": 7,
-  "warning_count": 0,
+  "warning_count": 1,
   "criticals": [
     {
       "name": "sqlite_leaks",
@@ -13,13 +13,13 @@
     },
     {
       "name": "sql_injection",
-      "msg": "40 files with f-string SQL",
+      "msg": "42 files with f-string SQL",
       "file": "session_brain.py:499",
       "fix": "Use parameterized queries: cursor.execute('SELECT ... WHERE col = ?', (value,))"
     },
     {
       "name": "cursor_leaks",
-      "msg": "52 files: ceo_dashboard_api.py, study_winning_combos.py, family_map_dashboard.py, apply_fixes.py, wave_backtest.py",
+      "msg": "54 files: ceo_dashboard_api.py, study_winning_combos.py, family_map_dashboard.py, apply_fixes.py, wave_backtest.py",
       "file": "ceo_dashboard_api.py.py",
       "fix": "Add cursor.close() in finally block to prevent 'database is locked'"
     },
@@ -31,7 +31,7 @@
     },
     {
       "name": "connection_leaks",
-      "msg": "54 files with sqlite3.connect but no finally block: ceo_dashboard_api.py, study_winning_combos.py, session_brain.py, apply_fixes.py, pump_flow_engine.py",
+      "msg": "56 files with sqlite3.connect but no finally block: ceo_dashboard_api.py, study_winning_combos.py, session_brain.py, apply_fixes.py, pump_flow_engine.py",
       "file": "",
       "fix": "Use 'with _db_cursor(path) as (conn, cur):' from signal_schema or add try/finally"
     },
@@ -48,5 +48,12 @@
       "fix": "Use 'from _secrets import BRAIN_DB_DICT' instead of inline passwords"
     }
   ],
-  "warnings": []
+  "warnings": [
+    {
+      "name": "trade_frequency",
+      "msg": "0 trades in 6h (0.0/hr)",
+      "file": "",
+      "fix": "Enable more signals or reduce filters if rate < 0.5/hr"
+    }
+  ]
 }

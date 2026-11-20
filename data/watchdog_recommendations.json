@@ -1,29 +1,20 @@
 {
-  "timestamp": "2026-11-20T07:09:11.891758+00:00",
-  "steers": [
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: IMX + STX",
-      "detail": "Both opened within 0 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-001"
-    }
-  ],
+  "timestamp": "2026-11-20T19:39:17.300997+00:00",
+  "steers": [],
   "portfolio_health": "good",
   "regime": {
-    "btc_15m": "LONG_BIAS",
+    "btc_15m": "SHORT_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "AT",
+    "continuum": "BELOW",
     "volatility": "LOW",
     "zscore_tier": "NEUTRAL",
-    "velocity_state": "SLOW",
+    "velocity_state": "RISING",
     "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "CALM",
-    "trend_quality": "STRONG_UP"
+    "linreg_alignment": 1.0,
+    "wyckoff_phase": "MARKDOWN",
+    "market_phase": "DECLINING",
+    "trend_quality": "UP"
   },
-  "open_count": 2
+  "open_count": 0
 }

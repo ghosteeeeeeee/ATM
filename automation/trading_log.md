@@ -30574,3 +30574,31 @@ BY: auto_1hr
 - 7d NET -0.95 — fee-drag persists; 1 change/hr rule → no action
 - Unarmed WR 22.2% (-0.56) vs armed 100% (+0.49) — stall stack still owns the fix
 BY: auto_1hr
+
+## [2026-11-20 19:54] Hourly Analysis
+
+**Trades:** 2 closed last hour (1 win, 1 loss) | 0 open
+**PnL NET:** hour +$0.04 | 24h NET $+0.10 (n=17, gross +0.38, fees 0.28, payoff 1.10, WR 58.8%) | 7d NET $-0.91 (n=109, WR 49.5%) — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** 🌩️ [STORM-READINESS] window-min -1.91% / at-run +0.09% | blocked 124 (combo_key-stale 28, expired-hotset 27, compaction_stale_10min 22, pump-chain-* 25, short-*gates 9, long-rsi-ceiling 7, vol-gate-override-0.0 3, oversold-knife 2, rep-low-reputation 1) | true-starvation 33 RSI>=35 (125 raw expired rows, deduped first-fire-per-token 33, all walked, 0 skipped) | counterfactual $+0.03 (touch 25/33) | waiver: SHADOW=True ENFORCE=False — counterfactual POSITIVE -> **streak 1/3** (15:56 storm was -$3.29 negative, reset it; 2 more positives flip enforce bar, deadline 2026-11-26 file truth); split: blocked SHORTs $+0.64 (16), blocked LONGs $-0.60 (17) — dump-then-recover: dump SHORT winners were starved, dump LONGs roughly flat
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: BTC ai-trader-pending SHORT mfe_exit +0.18 net (+8.61%), BTC ai-trader-pending SHORT manual_sl_hit -0.14 net (-5.52%)
+- Kill check: last-hour ai-trader-pending 1W1L = 50% (n=2 <3); no 0%-WR signal n>=3 -> no kill
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 0/17 = 0% (<40%); tpsl_utils deployed
+- Boost: none eligible — jup_yolo_mirrored 3T 100% net +0.24 (n=3 <5); atr-trend- 8T 75% net +0.10 multi-token but already 1.25 (boosted 2026-11-12); ai-trader-pending 4T 25% net -0.18 (losing, not boost material)
+- Arm rate: unarmed 10/17 = 58.8% below 70%, WR 30.0% net -$0.39 vs armed 7/100% net +$0.49 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 16:00 -0.17, 18:00 +0.11, 19:00 +0.04 — not 3 consecutive negatives -> no size cut
+- Frequency: 2 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.276% < 0.5% (max 0.734) — OK
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET +0.10 at 58.8% WR / payoff 1.10 — first green-into-fee day this week; 7d still -0.91
+- Storm cf only +0.03 (essentially flat) — bar 1/3 but weak positive; needs 2 more real-positive storms before 2026-11-26 deadline
+- Unarmed WR 30.0% (-$0.39) vs armed 100% (+$0.49) — stall stack still owns the fix
+BY: auto_1hr

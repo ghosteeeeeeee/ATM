@@ -1715,3 +1715,9 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 **E findings (30d, 630 trades, pnl_usdt):** G0 clean 19 (36.8%, −$0.59) · G1 join-age≥10m 186 (48.9%, −$1.38) — ⚠️ join-quality footnote: 97% discordant vs staleness stamp, trust the STAMP view (G1=1); G2 sign-flip 2 (+$0.03); G3 missing 423 (54.6%, −$2.23, 419 predate signals-table era). Descriptive drift: momentum-flip trades +$0.63 (n=83) vs non-flip −$4.14 (n=475) — no filter recommendations per §E-SPEC.
 
 **Metric checkpoint:** 7d = 108T / +$0.34 / 49.1% WR (this run's baseline, re-query next run) · E report+bug_hunter recorded ✅ (deadline 11-27, met early) · `hermes_constants.py` diff = EMPTY attributable to this run ✅.
+
+## CEO Status — 20261120T193825Z
+### Health: pipeline=active (timer ran 19:38Z, clean exit) guardian=active open_pos=0
+### Numbers: 24h 17T +0.35 58.8% | 7d 109T +0.63 49.5%
+### Findings: clean — proactive Q (errors): only WARNs, no failures (disk 87%, gate_shadow capture-ratio 0.51, TOK-OVERRIDE log spam repeated 20x today)
+### Recommendation: disk at 87% (3x today) — schedule log/db cleanup before it hits 90%; rest fine.

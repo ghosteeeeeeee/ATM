@@ -1,15 +1,17 @@
 # Signal Performance Report
-**Generated:** 2026-11-20 01:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-20 19:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,886 | **WR:** 51.3% | **PnL:** -125.90%
+- **Total trades (all time):** 3,899 | **WR:** 51.3% | **PnL:** -123.67%
 - **Date range:** 2026-07-29 → 2026-11-20
 
 ---
 
 ## WINNERS (WR > 55%, PnL > 0)
 
-None found.
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| atr-trend- | SHORT | — | —% | — | 8 | 75.0% | +2.67 | ❓ |
 
 ---
 
@@ -21,10 +23,7 @@ None found.
 
 ## MARGINAL (30-50% WR)
 
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| atr-trend- | SHORT | 4 | 50.0% | -1.40 | ❓ | Needs more data |
-| btc-pump-rider+ | LONG | 2 | 50.0% | +0.14 | ❓ | Needs more data |
+None found.
 
 ---
 
@@ -42,8 +41,7 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] atr-trend- SHORT** — WR=50.0%, PnL=-1.40% over 4 trades. Monitor next cycle.
-2. **[WATCH] btc-pump-rider+ LONG** — WR=50.0%, PnL=+0.14% over 2 trades. Monitor next cycle.
+1. **[KEEP] 1 winning combos** — atr-trend-. LONG side dominant.
 
 ---
 
@@ -55,6 +53,9 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-11-20 | 03d6800 | F6: register MFE_EXIT_* in CEO_PROTECTED_FLAGS (bug-hunter m... |
+| 2026-11-20 | 5c814dc | straight-line escape: no level-starvation on one-way moves +... |
+| 2026-11-20 | eaac17c | scripts: audit #282 — stop-tighten scope-widen REVERT (walk ... |
 | 2026-11-20 | 9cdf09e | scripts: net-of-fee net_pnl KPI, PREARM enforce GO, preserve... |
 | 2026-11-19 | a037e7a | ceo-deep 20261119T225832Z result-1: atr-trend ride_it exit t... |
 | 2026-11-19 | 1c9ef17 | scripts: brain_auditor audit #279 — steer root-cause + fade-... |
@@ -62,8 +63,5 @@ None found. Top performers are already enabled.
 | 2026-11-17 | afa915d | auto_1hr: hourly analysis 2026-11-17 19:52 — no changes (0 c... |
 | 2026-11-16 | 08412fc | scripts: pump-long-push 20261116T153048Z — 3 log-only shadow... |
 | 2026-11-14 | 99cffce | verifier 0090d750 closures: stale_exit structure-gate (F-2) ... |
-| 2026-11-14 | b99cf4e | watchdog: trade-watchdog analysis 2026-11-14 04:56 — trail-s... |
-| 2026-11-14 | b5a7c92 | watchdog: cycle 2026-11-14 00:55 — reclaim-exit steer age=3,... |
-| 2026-11-13 | 114711f | SL placement fix (CEO 2026-11-13): structure-widened guardia... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
