@@ -52,7 +52,12 @@ different separators — cell_stats.db holds BOTH dash-form pump-chain+ (from
 trades.signal) and underscore-form pump_chain (from source) with DIFFERENT stats):
   RULE: strip -> lower -> '-'->'_' -> remove '+' -> whitespace->'_' -> collapse
         '_' runs -> strip leading/trailing '_'
-        (signal_compactor.py cell-stats lookup parity, :2256)
+        DELTA vs signal_compactor.py:2245 cell-stats lookup: live does
+        replace('-','_').replace('+','').replace(' ','_').lower().rstrip('_')
+        ONLY — no pre-strip, literal space (not whitespace-class), no '_'-run
+        collapse, no leading-strip. This rule is a STRICT SUPERSET, NOT exact
+        parity; exact match is tried first and normalization fired 0 times this
+        run (0 fallback matches), so the delta never changed a match.
   EXACT match first; normalized match only as fallback when no exact hit; a
   normalized key that maps to >1 store key is AMBIGUOUS and counted unmatched
   (never silently merged — the auditor found normalization hitting the WRONG
@@ -107,9 +112,15 @@ WIN_DEF = 'pnl_usdt > 0 (pnl_usdt == 0 counts as non-win)'
 
 NORM_RULE = ("strip -> lower -> '-'->'_' -> remove '+' -> whitespace->'_' -> "
              "collapse '_' runs -> strip leading/trailing '_' "
-             "(signal_compactor.py cell-stats lookup parity)")
+             "(SUPERSET of signal_compactor.py:2245 lookup: live = "
+             "replace('-','_').replace('+','').replace(' ','_').lower()."
+             "rstrip('_') only — no pre-strip, no run-collapse, no "
+             "leading-strip; exact match first, 0 fallbacks this run)")
 
 # Exact SQL, printed on every run for reproducibility (params = (days,)).
+# Window start anchored to MAX(close_time) in-data (NOT NOW()) so window ==
+# [anchor-days, anchor], deterministic given the data — same anchor build_folds
+# uses for labels (two-clocks fix).
 SQL = (
     "SELECT id, close_time, signal, direction, "
     "       COALESCE(NULLIF(volatility_regime, ''), NULLIF(regime, ''), 'UNKNOWN') AS regime, "
@@ -118,8 +129,10 @@ SQL = (
     "            THEN (_signal_metadata->>'final_confidence')::float END AS final_confidence "
     "FROM trades "
     "WHERE status = 'closed' "
-    "  AND close_time > NOW() - make_interval(days => %s) "
     "  AND pnl_usdt IS NOT NULL "
+    "  AND close_time > (SELECT MAX(close_time) - make_interval(days => %s) "
+    "                    FROM trades "
+    "                    WHERE status = 'closed' AND pnl_usdt IS NOT NULL) "
     "ORDER BY close_time ASC, id ASC"
 )
 
@@ -133,11 +146,12 @@ def log(msg):
 
 def print_sql(days):
     log('SQL: ' + ' '.join(SQL.split()))
-    log(f'params: ({days},)   window: trailing {days}d, status=closed, '
-        'pnl_usdt NOT NULL, ordered by close_time ASC, id ASC')
+    log(f'params: ({days},)   window: [MAX(close_time)-{days}d, MAX(close_time)], '
+        'status=closed, pnl_usdt NOT NULL, ordered by close_time ASC, id ASC')
 
 
-# ── data fetch (SELECT-only, cursors closed in finally — repo convention) ─────
+# ── data fetch (SELECT-only; 3 .execute sites in this file — SQL, STORE_SQL,
+# meta SELECT — all SELECT constants; cursors closed in finally — repo convention) ─
 def fetch_trades(days):
     import psycopg2
     from _secrets import BRAIN_DB_DICT
@@ -171,6 +185,7 @@ def fetch_trades(days):
 def load_store():
     """Read-only view of brain/cell_stats.db `cells` (the live store)."""
     conn = None
+    cur = None
     try:
         conn = sqlite3.connect(f'file:{CELL_DB}?mode=ro', uri=True)
         cur = conn.cursor()
@@ -178,9 +193,10 @@ def load_store():
                   'wr_raw': wr, 'admission': adm, 'tradeable': bool(t)}
                  for s, d, g, n, w, wr, adm, t in cur.execute(STORE_SQL).fetchall()]
         meta = dict(cur.execute('SELECT key, value FROM meta').fetchall())
-        cur.close()
         return cells, meta
     finally:
+        if cur is not None:
+            cur.close()
         if conn is not None:
             conn.close()
 
@@ -250,18 +266,22 @@ def cluster_stats(values, clusters):
 
 
 def cluster_ci(values, clusters):
-    """Paired cluster-robust CI + two-sided p (t with G-1 df, scipy)."""
-    from scipy import stats
+    """Paired cluster-robust CI + two-sided p (t with G-1 df, scipy).
+    Never raises: import/cluster failures return {'ok': False, ...}."""
     try:
+        from scipy import stats
         beta, se, t, g = cluster_stats(values, clusters)
     except ValueError as e:
         return {'ok': False, 'note': str(e)}
+    except Exception as e:  # scipy missing etc. — callers treat as INCONCLUSIVE
+        return {'ok': False, 'note': f'{type(e).__name__}: {e}'}
+    crit = float(stats.t.ppf(0.975, g - 1))  # g >= 2 guaranteed by cluster_stats
     if math.isinf(t):
         p = 0.0
     else:
         p = float(min(1.0, 2 * stats.t.sf(abs(t), g - 1)))
     return {'ok': True, 'beta': beta, 'se': se, 't': t, 'p': p, 'g': g,
-            'lo': beta - 1.96 * se, 'hi': beta + 1.96 * se, 'n': len(values)}
+            'lo': beta - crit * se, 'hi': beta + crit * se, 'n': len(values)}
 
 
 def fmt_p(p):
@@ -368,7 +388,7 @@ def key_match_section(ms):
         f'{ms["n_store_stale"]}',
         '',
         '- sample collisions (normalized <- distinct store keys): '
-        + (', '.join('`' + n + '` <- {' + ', '.join('`' + k + '`' for k in ks) + '}'
+        + (', '.join('`' + n + '` <- {' + ', '.join('`' + k + '`' for k in sorted(ks)) + '}'
                      for n, ks in ms['collisions']) or 'none'),
         '- sample stale store keys (no trade this window): '
         + (', '.join(f'`{k}`' for k in ms['store_stale']) or 'none'),
@@ -476,7 +496,9 @@ def run_calibrate(args):
     log(f'- trades (status=closed, pnl NOT NULL): **{len(rows)}**')
 
     anchor, start, folds = build_folds(rows, days, TRAIN_DAYS, TEST_DAYS, folds_want)
-    log(f'- data-anchored window: {start} → {anchor}')
+    win_lo = min(r['close_time'] for r in rows)
+    log(f'- data-anchored window: {win_lo} → {anchor} '
+        f'(SQL start = anchor-{days}d = {start})')
     if len(folds) < 3:
         log(f'ERROR: only {len(folds)} full folds fit in {days}d '
             f'(need >=3: train {TRAIN_DAYS}d + test {TEST_DAYS}d stepping {TEST_DAYS}d). '
@@ -556,14 +578,12 @@ def run_calibrate(args):
         except Exception as e:  # scipy missing etc.
             a_ci = {'ok': False, 'note': f'{type(e).__name__}: {e}'}
 
-    # final-fold sign check (pooled decile thresholds, applied to last fold)
-    thr_top = min((t['p'] for t in top2), default=None)
-    thr_bot = max((t['p'] for t in bot2), default=None)
-    # final fold's covered trades (each test trade sits in exactly one fold, so
-    # the 'p' key marks covered ones — set from that fold's frozen predictor)
+    # final-fold sign check: SAME rank key + decile split as the pooled deciles
+    # (p, signal, close_time) — not a threshold approximation (label honesty)
     last_fold_cov = [r for r in folds[-1]['test'] if 'p' in r]
-    lf_top = [r for r in last_fold_cov if thr_top is not None and r['p'] >= thr_top]
-    lf_bot = [r for r in last_fold_cov if thr_bot is not None and r['p'] <= thr_bot]
+    lfb = reliability_buckets(last_fold_cov) if last_fold_cov else []
+    lf_top = [t for b in lfb[8:] for t in b['trades']]
+    lf_bot = [t for b in lfb[:2] for t in b['trades']]
     if lf_top and lf_bot:
         lf_wr_top = sum(y_of(r['pnl_usdt']) for r in lf_top) / len(lf_top)
         lf_wr_bot = sum(y_of(r['pnl_usdt']) for r in lf_bot) / len(lf_bot)
@@ -599,7 +619,10 @@ def run_calibrate(args):
         d = [((r['p'] - y) ** 2 -
               (max(EPS_P, min(1 - EPS_P, r['final_confidence'] / 100.0)) - y) ** 2)
              for r, y in zip(inter, ys)]
-        b_ci = cluster_ci(d, [r['signal'] for r in inter])
+        try:
+            b_ci = cluster_ci(d, [r['signal'] for r in inter])
+        except Exception as e:  # never crash the report — INCONCLUSIVE
+            b_ci = {'ok': False, 'note': f'{type(e).__name__}: {e}'}
         if b_ci.get('ok'):
             b_pass = b_ci['beta'] < 0 and b_ci['hi'] < 0
             b_verdict = 'PASS' if b_pass else 'FAIL'
@@ -617,7 +640,10 @@ def run_calibrate(args):
     if covered:
         ys = [y_of(r['pnl_usdt']) for r in covered]
         d = [(r['p'] - y) ** 2 - 0.25 for r, y in zip(covered, ys)]
-        c_ci = cluster_ci(d, [r['signal'] for r in covered])
+        try:
+            c_ci = cluster_ci(d, [r['signal'] for r in covered])
+        except Exception as e:  # never crash the report — INCONCLUSIVE
+            c_ci = {'ok': False, 'note': f'{type(e).__name__}: {e}'}
         if c_ci.get('ok'):
             c_pass = c_ci['beta'] < 0 and c_ci['hi'] < 0
             c_verdict = 'PASS' if c_pass else 'FAIL'
@@ -640,6 +666,16 @@ def run_calibrate(args):
                                 and c_verdict == 'PASS' and d_verdict == 'PASS')
             else 'STOP')
 
+    # small-G caveat (G<10): cluster inference with few clusters is indicative only
+    sg = [(lbl, ci['g']) for lbl, ci in (('a', a_ci), ('b', b_ci), ('c', c_ci))
+          if ci and ci.get('ok') and ci['g'] < 10]
+    sg_txt = ''
+    if sg:
+        gs = '/'.join(str(g) for g in sorted({g for _, g in sg}))
+        sg_txt = (f'small-G (G={gs}<10): cluster inference unreliable — '
+                  f'treat p/CI as indicative (limbs {",".join(l for l, _ in sg)})')
+        log(sg_txt)
+
     # ── in-sample live-store view (DESCRIPTIVE) ──────────────────────────────
     store_rows = ms['matched_rows']
     if store_rows:
@@ -661,8 +697,9 @@ def run_calibrate(args):
     out(f'- generated by `scripts/probability_matrix.py calibrate` '
         f'(days={days}, folds={len(folds)} of {folds_want} requested, '
         f'train={TRAIN_DAYS}d, test={TEST_DAYS}d, step={TEST_DAYS}d)')
-    out(f'- data-anchored window: **{start} → {anchor}** (anchor = max close_time, '
-        'not wall clock — streak_analysis parity)')
+    out(f'- data-anchored window: **{win_lo} → {anchor}** (window start = actual '
+        'MIN(close_time); anchor = max close_time, not wall clock — SQL anchored '
+        'to MAX(close_time), streak_analysis parity)')
     out(f'- trades in window: **{len(rows)}** | win def: `{WIN_DEF}` | '
         f'cell = (signal, direction, volatility_regime)')
     out(f'- **final_confidence coverage (window): {conf_n}/{len(rows)} = '
@@ -705,6 +742,11 @@ def run_calibrate(args):
     out(f'- pooled OOS coverage: **{len(covered)}/{all_test_n} = {pooled_cov:.1%}** '
         f'; worst fold: **{worst_cov:.1%}** ; uncovered test trades: {uncovered_n} '
         '(new/low-volume signals born UNCALIBRATED by design — §9 churn)')
+    test_horizon = len(folds) * TEST_DAYS
+    out(f'- **test horizon caveat**: OOS test folds span {test_horizon}d of the '
+        f'{days}d window ({len(folds)} × {TEST_DAYS}d, positioned train {TRAIN_DAYS}d '
+        f'in); {len(rows) - all_test_n}/{len(rows)} window trades fall OUTSIDE the '
+        'test horizon (train-side / pre-fold-gap) and are never OOS-scored')
     out('- **IN-SAMPLE/DESCRIPTIVE** live-store view: see §6 (store computed from '
         'this same window — leakage, not evidence)')
     out('')
@@ -752,6 +794,8 @@ def run_calibrate(args):
                 '(naive p would be optimistic — flagged, not used)')
         else:
             out(f'- cluster-robust: unavailable ({a_ci and a_ci.get("note")})')
+        if sg_txt and any(l == 'a' for l, _ in sg):
+            out(f'- **{sg_txt}**')
         out(f'- final test fold (fold {len(folds)}) sign check: {sign_txt}')
     out('')
 
@@ -838,6 +882,8 @@ def run_calibrate(args):
         'is the honest test, §6 of the spec).')
     out('- **Clustering**: all significance is cluster-robust (cluster=signal, CR1, '
         'cluster_t.py math); naive p-values are optimistic and not used.')
+    if sg_txt:
+        out(f'- **{sg_txt}**')
     out('- **pnl_usdt == 0** counts as non-win (y=0); matches streak_analysis.')
     out('- **Regime axis**: volatility_regime with regime fallback (cell_stats.py:80 '
         'parity); trades.regime is a different vocabulary and only a fallback.')
@@ -915,12 +961,20 @@ def compute_report_cells(rows):
         if a['win_pnl']:
             avg_win = mean(a['win_pnl'])
         else:
-            avg_win = mean(sig_win.get((sig, d), [])) or mean(glob_win) or 0.0
+            avg_win = mean(sig_win.get((sig, d), []))
+            if avg_win is None:
+                avg_win = mean(glob_win)
+            if avg_win is None:  # exact 0.0 is a REAL mean, not missing
+                avg_win = 0.0
             fb += 'win'
         if a['loss_pnl']:
             avg_loss = mean(a['loss_pnl'])
         else:
-            avg_loss = mean(sig_loss.get((sig, d), [])) or mean(glob_loss) or 0.0
+            avg_loss = mean(sig_loss.get((sig, d), []))
+            if avg_loss is None:
+                avg_loss = mean(glob_loss)
+            if avg_loss is None:
+                avg_loss = 0.0
             fb += '+loss' if fb else 'loss'
         ev = ev_usdt(p, avg_win, avg_loss)
         epr = ev_per_risk(ev, avg_loss)
@@ -946,7 +1000,7 @@ def run_report(args):
     print_sql(days)
 
     anchor = max(r['close_time'] for r in rows)
-    start = anchor - timedelta(days=days)
+    win_lo = min(r['close_time'] for r in rows)
     mfe_n = sum(1 for r in rows if r['mfe_pct'] is not None)
     conf_n = sum(1 for r in rows if r['final_confidence'] is not None)
     store_cells, store_meta = load_store()
@@ -958,8 +1012,9 @@ def run_report(args):
     out = L.append
     out('# Probability Matrix — report (§3.1 cell schema + §5 payoff layer)')
     out('')
-    out(f'- data-anchored window: **{start} → {anchor}** | trades: **{len(rows)}** | '
-        f'win def: `{WIN_DEF}`')
+    out(f'- data-anchored window: **{win_lo} → {anchor}** (window start = actual '
+        f'MIN(close_time); SQL anchored to MAX(close_time)-{days}d) | '
+        f'trades: **{len(rows)}** | win def: `{WIN_DEF}`')
     out(f'- final_confidence coverage: {conf_n}/{len(rows)} = {conf_n/len(rows):.1%} '
         '| (confidence comparison lives in calibrate mode, intersection subset)')
     out(f'- mfe_pct coverage: {mfe_n}/{len(rows)} = {mfe_n/len(rows):.1%}')
@@ -1068,8 +1123,27 @@ def selfcheck():
     assert abs(t - t_ref) < 1e-12 and abs(beta - beta_ref) < 1e-12 and g == g_ref, \
         'cluster math drifted from cluster_t.py'
     assert abs(se - abs(beta / t)) < 1e-12, 'se consistent with t'
-    log('selfcheck PASS (17 asserts: blending, clip, Brier, log-loss, y, EV, '
-        'ev_per_risk null, norm rule, cluster_t parity)')
+    # cluster_ci (code-review fix): t(G-1) critical for BOTH p and 95% CI vs scipy
+    from scipy import stats as _st
+    ci = cluster_ci(vals, cl)
+    crit = float(_st.t.ppf(0.975, ci['g'] - 1))
+    assert (ci['ok'] and abs(ci['p'] - min(1.0, 2 * _st.t.sf(abs(ci['t']), ci['g'] - 1))) < 1e-12
+            and abs(ci['lo'] - (ci['beta'] - crit * ci['se'])) < 1e-12
+            and abs(ci['hi'] - (ci['beta'] + crit * ci['se'])) < 1e-12), \
+        'cluster_ci p/CI must use t(G-1), not 1.96'
+    # degenerate-cluster guard: g<2 raises
+    try:
+        cluster_stats(vals, ['a'] * len(vals))  # 1 cluster -> g=1
+        _raised = False
+    except ValueError:
+        _raised = True
+    assert _raised, 'g<2 must raise ValueError'
+    # count asserts dynamically so the reported number can never drift
+    import inspect
+    n_assert = sum(1 for l in inspect.getsource(selfcheck).splitlines()
+                   if l.strip().startswith('assert '))
+    log(f'selfcheck PASS ({n_assert} asserts: blending, clip, Brier, log-loss, y, EV, '
+        'ev_per_risk null, norm rule, cluster_t parity, cluster_ci t-CI, g<2 raise)')
     return True
 
 
