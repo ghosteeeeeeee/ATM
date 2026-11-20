@@ -16,10 +16,34 @@ cat data/vacation_size_reduce.json 2>/dev/null  # size-reduce status — FILE IS
 
 ## Step 2: Query Last Hour's Trades
 
+**NET-OF-FEE KPI RULE (CEO 20261120T002223Z Phase 0, due 2026-11-20):** every
+PnL figure you quote (hour / 24h / 7d / 14d lines in `automation/trading_log.md`
+and `automation/recent_changes.log`) MUST be **net of fees** — `pnl_usdt −
+fee_total`, with `fees` the TEXT JSON column:
+`SUM(pnl_usdt) - SUM(CASE WHEN fees LIKE '{%' THEN (fees::json->>'fee_total')::numeric ELSE 0 END)` (NULL/non-JSON fees = 0; same expression as
+`control_tower_api.fee_net_24h`). **Never quote bare `SUM(pnl_usdt)` (gross) as
+the KPI** — the dashboards already got flagged for gross-as-net. Always show
+**payoff** (avg win ÷ |avg loss|) next to WR; gross only as a labeled secondary.
+
 ```python
 import psycopg2
 conn = psycopg2.connect(host='/var/run/postgresql', database='brain', user='postgres', password='[BRAIN_DB_PASSWORD]')
 cur = conn.cursor()
+
+# Canonical KPI line (net + payoff) — quote THIS for the hourly KPI line.
+# (CEO 20261120T002223Z: net-of-fee + payoff mandatory; gross is secondary.)
+cur.execute("""
+    SELECT COUNT(*) as n,
+           ROUND(100.0*SUM(CASE WHEN pnl_usdt>0 THEN 1 ELSE 0 END)/NULLIF(COUNT(*),0),1) as wr,
+           ROUND(COALESCE(SUM(pnl_usdt),0),2) as gross,
+           ROUND(COALESCE(SUM(CASE WHEN fees LIKE '{%' THEN (fees::json->>'fee_total')::numeric ELSE 0 END),0),2) as fees,
+           ROUND(COALESCE(SUM(pnl_usdt) - SUM(CASE WHEN fees LIKE '{%' THEN (fees::json->>'fee_total')::numeric ELSE 0 END),0),2) as net,
+           ROUND(AVG(pnl_usdt) FILTER (WHERE pnl_usdt>0)
+                 / NULLIF(ABS(AVG(pnl_usdt) FILTER (WHERE pnl_usdt<0)),0),2) as payoff
+    FROM trades
+    WHERE close_time > NOW() - INTERVAL '24 hours' AND status = 'closed'
+""")
+print("24h KPI (n, wr, gross, fees, net, payoff):", cur.fetchone())
 
 # Trades closed in last hour
 # pnl_pct is ALREADY in percent units (5.0 = +5.0% account return = raw move × leverage).
@@ -27,7 +51,9 @@ cur = conn.cursor()
 # hard_max_loss ~1% PRICE move becomes ~3-5% account loss at 3-5x leverage — expected, not a bug.
 cur.execute("""
     SELECT token, signal, direction, exit_reason,
-           ROUND(pnl_usdt,2) as pnl, ROUND(pnl_pct,2) as pnl_pct
+           ROUND(pnl_usdt,2) as pnl,
+           ROUND(pnl_usdt - COALESCE(CASE WHEN fees LIKE '{%' THEN (fees::json->>'fee_total')::numeric END, 0), 4) as net,
+           ROUND(pnl_pct,2) as pnl_pct
     FROM trades
     WHERE close_time > NOW() - INTERVAL '1 hour' AND status = 'closed'
     ORDER BY close_time DESC
@@ -40,13 +66,14 @@ for t in trades:
 # Win rate by close reason (last 24h)
 cur.execute("""
     SELECT exit_reason, COUNT(*) as trades, 
-           ROUND(SUM(pnl_usdt),2) as pnl,
+           ROUND(SUM(pnl_usdt),2) as gross,
+           ROUND(COALESCE(SUM(pnl_usdt) - SUM(CASE WHEN fees LIKE '{%' THEN (fees::json->>'fee_total')::numeric ELSE 0 END),0),2) as net,
            ROUND(AVG(pnl_usdt),3) as avg_pnl
     FROM trades 
     WHERE close_time > NOW() - INTERVAL '24 hours' AND status = 'closed'
     GROUP BY exit_reason ORDER BY trades DESC
 """)
-print("\n24h by close reason:")
+print("\n24h by close reason (quote NET, not gross):")
 for r in cur.fetchall():
     print(r)
 
@@ -57,12 +84,13 @@ for r in cur.fetchall():
 cur.execute("""
     SELECT trailing_activated, COUNT(*) as trades,
            ROUND(100.0*SUM(CASE WHEN pnl_usdt > 0 THEN 1 ELSE 0 END)/COUNT(*),1) as wr,
-           ROUND(SUM(pnl_usdt),2) as pnl
+           ROUND(SUM(pnl_usdt),2) as gross,
+           ROUND(COALESCE(SUM(pnl_usdt) - SUM(CASE WHEN fees LIKE '{%' THEN (fees::json->>'fee_total')::numeric ELSE 0 END),0),2) as net
     FROM trades
     WHERE close_time > NOW() - INTERVAL '24 hours' AND status = 'closed'
     GROUP BY trailing_activated
 """)
-print("\n24h arm-rate (True=trail armed):")
+print("\n24h arm-rate (True=trail armed; quote NET):")
 for r in cur.fetchall():
     print(r)
 conn.close()
@@ -123,7 +151,8 @@ Check if `tpsl_utils.py` fix is deployed. If not, alert CEO.
 ```sql
 SELECT volatility_regime, COUNT(*),
        ROUND(100.0*SUM(CASE WHEN pnl_usdt>0 THEN 1 ELSE 0 END)/NULLIF(COUNT(*),0),1) wr,
-       ROUND(SUM(pnl_usdt),2) pnl
+       ROUND(SUM(pnl_usdt),2) gross,
+       ROUND(COALESCE(SUM(pnl_usdt) - SUM(CASE WHEN fees LIKE '{%' THEN (fees::json->>'fee_total')::numeric ELSE 0 END),0),2) net
 FROM trades WHERE signal LIKE '%X%' AND close_time > NOW() - INTERVAL '14 days'
 GROUP BY volatility_regime;
 ```
@@ -192,7 +221,7 @@ Append to `automation/trading_log.md`:
 ## [YYYY-MM-DD HH:MM] Hourly Analysis
 
 **Trades:** X closed (Y wins, Z losses)
-**PnL:** $X.XX (WR: XX.X%)
+**PnL NET:** $X.XX (gross $X.XX, fees $X.XX, payoff X.XX, WR: XX.X%)
 
 **Changes:**
 1. [Change] — [why]
@@ -223,7 +252,7 @@ PostgreSQL treats `"double quotes"` as column identifiers, NOT string literals. 
 - `signal` (signal name)
 - `direction` ('LONG' or 'SHORT')
 - `exit_reason` (close reason: 'atr_sl_hit', 'tp_hit', etc.)
-- `pnl_usdt`, `pnl_pct` (PnL columns)
+- `pnl_usdt`, `pnl_pct` (PnL columns — `pnl_usdt` is GROSS; net = `pnl_usdt − fee_total` from the `fees` TEXT-JSON column, per NET-OF-FEE KPI RULE)
 - `entry_price`, `exit_price`, `stop_loss`, `target`
 - `amount_usdt` (position size)
 

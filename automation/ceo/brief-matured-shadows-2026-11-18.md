@@ -39,7 +39,7 @@ stop-tighten 0.75 ENFORCE (3/3 bars MET 11-14, 8-source scope) · slippage-colum
 floor route closed · amplifier reverted · winner-cell reverted to 1.0 · goals pinned
 (long WR → ≥48.2% BE in 7d, approvals ≥8/day). Notional question STILL unanswered by T
 (every math since the mega-crash verdict points at it: expectancy ≈0.104%/trade → current $13
-notional caps the book at ~$0.08/day no matter the WR).
+notional caps the book at ~$0.08/day no matter the WR). (CORRECTED per CEO 20261120T002223Z: premise traced a mislabeled avg-WIN column; notional-caps ratified as non-levers)
 
 ## Questions to rule
 1. **Read the matured set NOW:** `amplify-prearm-breakeven-lock` (bars MET — ship or why
