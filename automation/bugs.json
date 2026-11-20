@@ -1846,6 +1846,20 @@
       "root_cause": "pnl_pct is leveraged (price_move x lev) while pnl_usdt = price_move x notional; screens mixing them without the units guard (#193) misstate payoff.",
       "found_by": "CEO consult 20261113T040327Z side-find (LOW)",
       "fix": "audit one basis for payoff screens (use pnl_usdt/amount = price-move % per #193 rule), re-run any screen that mixed them; note the $3.7-4.0 effective-notional finding affects 'size' conclusions."
+    },
+    {
+      "id": "BUG-101",
+      "title": "Two competing net-pnl definitions (payload rounded-gross-minus-fee vs fees JSON inner net_pnl)",
+      "severity": "LOW",
+      "status": "OPEN",
+      "files": [
+        "scripts/hermes-trades-api.py",
+        "scripts/control_tower_api.py"
+      ],
+      "symptom": "trades-api payload net_pnl = ROUND(gross,2) - fee_total while the fees JSON's inner net_pnl = unrounded gross - fee; cent-level disagreements between two fields both called 'net' (payload follows the control_tower fee_net_24h basis).",
+      "root_cause": "two writers computing net independently at different rounding points.",
+      "found_by": "agent-1 MoE Phase0 build 2026-11-20 (sideways LOW)",
+      "fix": "one canonicalization ruling: pick the basis (control_tower fee_net_24h = canonical), make the other derive from it or document the rounding contract in both readers."
     }
   ],
   "schema": {
