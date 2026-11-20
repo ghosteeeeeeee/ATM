@@ -1486,20 +1486,46 @@ def _monitor_pending_orders_impl(btc_price):
             seen_ids.add(oid)
             crossed = (px >= trigger_price) if trigger == "above" \
                 else (px <= trigger_price)
-            # no-burn re-cross-wait (CEO 2026-11-20): a gate-rejected
-            # rung never opened a position, so it is never consumed.
-            # While price is still beyond the trigger (the extreme-RSI
-            # zone that vetoes it) it only waits; once price reclaims
-            # the trigger the state is deleted and the rung re-arms
-            # fresh — firing on the NEXT cross with RSI recovered (§11).
+            # ── MULTI-TOUCH ENTRY + NO-BURN (CEO 2026-11-20: 'apply the
+            # multiple touch theory — DO NOT take the first break'; after
+            # #17004 lost in 3 minutes on an arbitrary fresh-air stop):
+            #   fresh rung  --cross#1-->  first_break   (NEVER fills)
+            #   first_break --reclaim-->  retested      (level reclaimed)
+            #   retested    --cross#2-->  fill (the failed-retest entry,
+            #                            §11 — the sims' CONFIRM shape)
+            #   rejected (brain veto at a fill) --reclaim--> retested
+            #       (no burn; next cross#2 fills with RSI recovered)
+            # FIRST BREAK NEVER FILLS. Stays in state until the re-cross.
             _st_prev = state.get(oid)
-            if isinstance(_st_prev, dict) and _st_prev.get("status") == "rejected":
+            _ps = _st_prev.get("status") if isinstance(_st_prev, dict) else None
+            if _ps == "rejected":
                 if crossed:
                     continue
-                del state[oid]
+                state[oid] = {"status": "retested", "ts": time.time(),
+                              "price": trigger_price}
                 changed = True
-                log(f"pending order {oid}: gate-rejected rung re-armed "
-                    f"after trigger reclaim (no-burn)")
+                log(f"pending order {oid}: rejected rung retested after "
+                    f"trigger reclaim (no-burn) — armed for the re-cross")
+                continue
+            if _ps == "first_break":
+                if not crossed:
+                    state[oid] = {"status": "retested", "ts": time.time(),
+                                  "price": trigger_price}
+                    changed = True
+                    log(f"pending order {oid}: level reclaimed after first "
+                        f"break — armed for the re-cross (multi-touch)")
+                    continue
+                continue
+            if _ps == "retested":
+                if not crossed:
+                    continue
+                # cross#2 — fall through to stacking/steer = the fill
+            elif crossed:
+                state[oid] = {"status": "first_break", "ts": time.time(),
+                              "price": trigger_price}
+                changed = True
+                log(f"pending order {oid}: FIRST break seen — no fill "
+                    f"(multi-touch: wait for reclaim + re-cross)")
                 continue
             if crossed and (str(oid).startswith("btc-auto-")
                             or order.get("serial") is True):

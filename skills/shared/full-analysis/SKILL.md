@@ -667,6 +667,24 @@ six-trade sequence is the proof case:
    before the clean leg (the Nov18–20 stop-run boundaries reproduce
    exactly; run-length counts are clustering-dependent — H1's specifics
    stay UNSETTLED until plan §9's F-3/F-5 clear).
+9. **First break NEVER fills; entries are reclaim → re-cross; stops sit
+   at major structure — never an arbitrary percentage** (CEO directive
+   2026-11-20, after #17004). The execution machine (trade_watchdog):
+   a fresh rung's FIRST cross records `first_break` and does NOT fill;
+   when price reclaims the level → `retested`; only the NEXT cross
+   (the failed-retest re-cross, §11's CONFIRM shape) fills — a
+   brain-vetoed fill maps its reclaim to `retested` too (no burn).
+   Why: #17004 was a first-tick catch with a `price×1.006` stop — no
+   level broken, no thesis — and lost −6.89% margin in 3 minutes on the
+   bounce; the sims had already scored first-break entries with
+   reclaim-stops **0/9** (Study 1). Counterfactuals: the two-state
+   machine skips #17004 entirely ($0); a conviction stop alone does
+   not (it was −6.3% unrealized, never touched). Stop doctrine for
+   catch-style arms: **MAJOR structure** (sh1h + 0.1·ATR1h — the lag's
+   line convention), which means the worst case is the structure
+   distance × leverage (at 10x, a 4.9% stop ≈ −49% margin — size and
+   serial are the bounds; say so when arming). The keeper's fresh-air
+   arms carry this stop; structure rungs keep their reclaim-SLs.
 
 ### 12. The no-edge default: ARM THE BRACKET (CEO directive, 2026-10-21)
 
@@ -1035,4 +1053,7 @@ base-rate controls; shipped-state gates at 26% agreement; block
 concentration; data-sha pinning; fill-model disclosure; proxy≠production
 ten-difference rule) + §11 point8 first-break/retest-stop trap with the
 gate-compatible entry shape (9-run study, AGREE-HIGH; H1 specifics
-unsettled per plan §9 F-3/F-5).
+unsettled per plan §9 F-3/F-5) + §11 point9 multi-touch EXECUTION rule
+(first break never fills — reclaim→re-cross machine in the watchdog;
+stops at major structure sh1h+0.1·ATR1h, never arbitrary %; #17004
+first-tick/arbitrary-stop loss −6.89% in 3min = the motivating case).

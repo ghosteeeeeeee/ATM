@@ -809,8 +809,13 @@ def _ladder_keeper(decision, summary):
                 trig = round(price * 0.997)
                 fresh_air = True
             if trig and reach_lo <= trig < price:
+                # CEO 2026-11-20 (#17004: price×1.006 lost in 3min):
+                # fresh-air stops sit at MAJOR STRUCTURE — the 1h swing
+                # high + 0.1·ATR1h (the lag's line convention), never an
+                # arbitrary percentage: 'have some conviction to hold
+                # till (major) resistance is broken'.
                 sl = (round(sl1h + 0.60 * atr15) if trig == trig1h
-                      else (round(price * 1.006) if fresh_air
+                      else (round(sh1h + 0.10 * atr1) if fresh_air
                             else round(sl15 + 0.60 * atr15)))
                 # ponytail: TP gap fixed at arm time (3·ATR1h THEN, never
                 # moved — F-2 restated doctrine) — if ATR1h later grows
@@ -835,8 +840,10 @@ def _ladder_keeper(decision, summary):
                     orders[-1]['note'] += (
                         f" | FRESH-AIR ARM: both floors stale above price "
                         f"(sl1h {sl1h:.0f}, sl15 {sl15:.0f} > {price:.0f}) — "
-                        f"continuation leg; SL {sl} = price×1.006 reclaim, "
-                        f"fires on the next down-tick.")
+                        f"continuation leg; SL {sl} = MAJOR structure "
+                        f"(sh1h+0.1·ATR1h), never an arbitrary %; fills "
+                        f"ONLY on the reclaim+re-cross (multi-touch, "
+                        f"first break never fills).")
                     appended.append(('ladder_keeper', oid, f"short @ {trig} (FRESH-AIR below price {price:.0f}, SL {sl}, TP {tp})"))
                 else:
                     appended.append(('ladder_keeper', oid, f"short @ {trig} (1h major floor {sl1h:.0f}, SL {sl}, TP {tp})"))
