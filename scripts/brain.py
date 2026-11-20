@@ -405,6 +405,7 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                trailing_phase2_dist: float = None,
                leverage: int = 1, experiment: str = None,
                flipped_from_trade: bool = False,
+               prearmed: bool = False,
                regime: str = None,
                volatility_regime: str = None,  # NEW: FLAT/NORMAL/HIGH/EXTREME
                # ── Signal indicator fields (captured at entry from hotset) ──
@@ -439,6 +440,13 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     is_manual=True: direct CEO command — bypasses vacation pause marker.
     force=True: deliberate second tranche — bypasses the same-coin duplicate
     guard (protocol §7 adds). NEVER passed by the automated pipeline.
+    prearmed=True: PRE-ARMED LEVEL ORDER (the ladder rungs / CEO arms via
+    the pending-order pipeline) — skips ONLY the SHORT knife/floor RSI
+    gates (BANANA <35 / HARD_FLOOR): the entry is a committed
+    structure-level order with explicit SL/TP, serial + stacking guarded,
+    and the CEO directive 2026-11-20 is 'we need to catch these shorts'.
+    Every OTHER gate stays (dup, kill switch, vacation, shape,
+    validate_levels, blacklist/penalty paths).
     """
     import sys, os, random
 
@@ -456,7 +464,10 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     # ctx/exec exemptions die here at the final gate (approval→exec→brain
     # contradiction → FAILED claim + hotset cooldown). Bear-query errors fail
     # CLOSED (block), mirroring the decider helper.
-    if direction == 'SHORT':
+    if direction == 'SHORT' and prearmed:
+        print(f"[brain.py] \u23ed PREARMED {token} SHORT: knife/floor RSI gate "
+              f"skipped (pre-armed level order — structure/SL govern)")
+    if direction == 'SHORT' and not prearmed:
         try:
             from hermes_constants import (SHORT_RSI_HARD_FLOOR, SHORT_RSI_HARD_FLOOR_JUP_YOLO,
                                           OVERSOLD_SHORT_RSI_MAX)
@@ -1640,6 +1651,8 @@ if __name__ == "__main__":
                                 help="Deliberate second tranche — bypasses same-coin duplicate guard (CEO-directed adds and CEO-configured pending orders; the signal pipeline never passes it)")
         add_parser.add_argument("--flipped", action="store_true", default=False,
                                 help="Mark this trade as flipped from original signal direction")
+        add_parser.add_argument("--prearmed", action="store_true", default=False,
+                                help="Pre-armed level order (ladder rung / CEO arm via pending pipeline) — skips ONLY the SHORT knife/floor RSI gates; all other gates intact (CEO 2026-11-20)")
         add_parser.add_argument("--signal-z-score", type=float, dest="signal_z_score",
                                 help="z_score at signal entry")
         add_parser.add_argument("--signal-rsi-14", type=float, dest="signal_rsi_14",
@@ -1731,6 +1744,7 @@ if __name__ == "__main__":
                 flipped_from_trade=args.flipped,
                 is_manual=args.manual,
                 force=args.force,
+                prearmed=args.prearmed,
                 regime=args.regime,
                 signal_z_score=args.signal_z_score,
                 signal_rsi_14=args.signal_rsi_14,

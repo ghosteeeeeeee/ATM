@@ -1675,6 +1675,12 @@ def _execute_pending_order_impl(order):
         ]
         if str(order.get("id", "")).startswith("btc-ceo-"):
             cmd.append("--force")
+        # ALL pending orders are pre-armed structure levels (CEO 2026-11-20:
+        # 'we need to catch these shorts' — the knife/floor RSI gates veto
+        # every rung in a knife; the rung's own SL + serial/stacking +
+        # kill-switch remain the risk controls). brain skips ONLY those
+        # two RSI gates for --prearmed.
+        cmd.append("--prearmed")
         log(f"AUTO-EXEC pending order {oid}: {' '.join(cmd[4:])}")
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=120,
                            cwd=SCRIPTS_DIR)
