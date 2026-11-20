@@ -1,0 +1,1282 @@
+ts	source	cause	token	direction	confidence	fwd_1h_raw	fwd_4h_raw	excess_1h	excess_4h	mfe_4h
+1795177201.0000	signals-expired	short-rsi-hard-floor	BCH	SHORT	85.0000					
+1795177260.0000	signals-expired	short-rsi-hard-floor	ALT	SHORT	78.0000	0.2262	3.8688	-0.5049	-0.4955	5.6561
+1795177260.0000	signals-expired	short-rsi-hard-floor	BANANA	SHORT	78.0000	0.5507	4.2290	-0.1804	-0.1353	4.9961
+1795177260.0000	signals-expired	short-rsi-hard-floor	SUPER	SHORT	78.0000	0.5038	3.8707	-0.2274	-0.4936	5.4534
+1795177260.0000	signals-expired	short-rsi-hard-floor	SUSHI	SHORT	78.0000	1.0724	4.6247	0.3412	0.2604	6.0322
+1795177260.0000	signals-expired	short-rsi-hard-floor	YGG	SHORT	78.0000	0.5952	3.3009	-0.1359	-1.0634	5.0325
+1795177441.0000	signals-expired	spike-filter-long	ETH	LONG	69.7800	-0.3438	-5.8197	0.3873	-1.4554	1.1706
+1795177560.0000	signals-expired	long-midband	BTC	LONG	88.0000					
+1795177620.0000	signals-expired	short-rsi-hard-floor	HYPE	SHORT	72.7000					
+1795177620.0000	signals-expired	rr-engine-hard-block	BTC	SHORT	69.7000					
+1795177620.0000	signals-expired	short-regime-gate	ETH	SHORT	71.5000					
+1795177680.0000	signals-expired	confluence-single-not-bypass	SAGA	LONG	80.4000					
+1795177860.0000	signals-expired	spike-filter-long	ETH	LONG	84.1840					
+1795177860.0000	signals-expired	long-midband	BTC	LONG	88.0000					
+1795177920.0000	signals-expired	compaction-stale-10min	BABY	SHORT	66.0000					
+1795177980.0000	signals-expired	vol-gate-override-0	INJ	SHORT	88.0000					
+1795177980.0000	signals-expired	rr-engine-hard-block	BTC	SHORT	88.0000					
+1795177980.0000	signals-expired	pump-chain-long-high	ICP	LONG	88.0000					
+1795177980.0000	signals-expired	pump-chain-rsi-max	GRASS	LONG	88.0000					
+1795177980.0000	signals-expired	pump-chain-vel	APT	LONG	88.0000					
+1795178040.0000	signals-expired	pump-chain-long-high	ADA	LONG	88.0000					
+1795178040.0000	signals-expired	pump-chain-long-high	BIGTIME	LONG	88.0000					
+1795178040.0000	signals-expired	pump-chain-long-high	ACE	LONG	88.0000					
+1795178160.0000	signals-expired	vol-gate-override-0	CHIP	SHORT	69.0000					
+1795178220.0000	signals-expired	pump-chain-short-high	DYDX	SHORT	88.0000					
+1795178460.0000	signals-expired	long-rsi-ceiling	BLUR	LONG	84.0000					
+1795178460.0000	signals-expired	long-rsi-ceiling	BLUR	LONG	84.0000					
+1795178520.0000	signals-expired	rr-engine-hard-block	BTC	SHORT	88.0000					
+1795178580.0000	signals-expired	confluence-single-not-bypass	NXPC	LONG	77.4400					
+1795178700.0000	signals-expired	long-high-70	ETH	LONG	81.1000					
+1795178760.0000	signals-expired	short-rsi-hard-floor	SOL	SHORT	75.8600					
+1795179000.0000	signals-expired	compaction-stale-10min	HYPE	SHORT	65.0000					
+1795179061.0000	signals-expired	pump-chain-long-high	GMX	LONG	88.0000					
+1795179061.0000	signals-expired	short-rsi-hard-floor	ME	SHORT	78.0000					
+1795179540.0000	signals-expired	rr-engine-hard-block	BTC	SHORT	88.0000					
+1795179720.0000	signals-expired	compaction-stale-10min	ALGO	SHORT	69.0000					
+1795179960.0000	signals-expired	short-rsi-hard-floor	MET	SHORT	78.0000					
+1795180140.0000	signals-expired	rr-engine-hard-block	PENDLE	LONG	80.0000					
+1795180260.0000	signals-expired	pump-chain-long-high	GOAT	LONG	88.0000					
+1795180260.0000	signals-expired	pump-chain-rsi-max	BLUR	LONG	80.0000					
+1795180260.0000	signals-expired	compaction-stale-10min	HYPE	SHORT	65.0000					
+1795180260.0000	signals-expired	compaction-stale-10min	KSHIB	SHORT	78.0000					
+1795180320.0000	signals-expired	compaction-stale-10min	CHIP	SHORT	68.0000					
+1795180560.0000	signals-expired	oversold-knife	ACE	SHORT	78.0000					
+1795180620.0000	signals-expired	compaction-stale-10min	LTC	SHORT	67.0000					
+1795180620.0000	signals-expired	compaction-stale-10min	PONS	SHORT	65.0000					
+1795180861.0000	signals-expired	short-rsi-hard-floor	ATOM	SHORT	78.0000					
+1795181161.0000	signals-expired	confluence-single-not-bypass	GOAT	LONG	88.0000					
+1795181760.0000	signals-expired	compaction-stale-10min	MERL	SHORT	78.0000					
+1795181820.0000	signals-expired	compaction-stale-10min	HYPE	SHORT	66.8000					
+1795182180.0000	signals-expired	vol-gate-override-0	INJ	SHORT	88.0000					
+1795182180.0000	signals-expired	vol-gate-override-0	FIL	SHORT	88.0000					
+1795182540.0000	signals-expired	pump-chain-short-high	BIGTIME	SHORT	88.0000					
+1795182660.0000	signals-expired	vol-gate-override-0	IO	SHORT	88.0000					
+1795182660.0000	signals-expired	compaction-stale-10min	BTC	SHORT	69.3000					
+1795182721.0000	signals-expired	short-regime-gate	BCH	SHORT	73.0000					
+1795182900.0000	signals-expired	compaction-stale-10min	IO	LONG	88.0000					
+1795182961.0000	signals-expired	confluence-single-not-bypass	XTEN	SHORT	88.0000					
+1795183202.0000	signals-expired	compaction-stale-10min	HYPE	SHORT	66.6000					
+1795183260.0000	signals-expired	rr-engine-hard-block	BTC	LONG	88.0000					
+1795183226.0000	signals-expired	combo-stale(merge-window)	SOL	LONG	73.2000					
+1795183321.0000	signals-expired	approved-fell-out-of-hotset	KAS	SHORT	77.0000					
+1795183380.0000	signals-expired	long-rsi-ceiling	INJ	LONG	88.0000					
+1795183380.0000	signals-expired	pump-chain-long-high	CC	LONG	88.0000					
+1795183380.0000	signals-expired	long-neutral-chop	ALGO	LONG	69.0000					
+1795183226.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	73.2000					
+1795183321.0000	signals-expired	approved-fell-out-of-hotset	BTC	SHORT	88.0000					
+1795183380.0000	signals-expired	vol-gate-override-0	ZORA	LONG	74.0000					
+1795183380.0000	signals-expired	compaction-stale-10min	NEO	SHORT	88.0000					
+1795183500.0000	signals-expired	pump-chain-long-high	COMP	LONG	80.0000					
+1795183500.0000	signals-expired	pump-chain-rsi-max	FIL	LONG	69.0000					
+1795183500.0000	signals-expired	pump-chain-rsi-max	FIL	LONG	69.0000					
+1795183500.0000	signals-expired	pump-chain-long-high	DOGE	LONG	79.0000					
+1795183500.0000	signals-expired	long-neutral-chop	TRX	LONG	69.0000					
+1795183561.0000	signals-expired	rr-engine-hard-block	BIGTIME	SHORT	78.0000					
+1795183620.0000	signals-expired	long-rsi-ceiling	BLUR	LONG	78.0000					
+1795183620.0000	signals-expired	pump-chain-long-high	CAKE	LONG	66.0000					
+1795183620.0000	signals-expired	pump-chain-long-high	CAKE	LONG	66.0000					
+1795183620.0000	signals-expired	confluence-single-not-bypass	ANIME	SHORT	84.8000					
+1795183620.0000	signals-expired	oversold-knife	RESOLV	SHORT	75.0000					
+1795183321.0000	signals-expired	approved-fell-out-of-hotset	ARB	LONG	74.0000					
+1795183740.0000	signals-expired	pump-chain-rsi-max	GRASS	LONG	81.0000					
+1795183740.0000	signals-expired	compaction-stale-10min	GMX	LONG	68.0000					
+1795183740.0000	signals-expired	compaction-stale-10min	BABY	LONG	67.8000					
+1795183740.0000	signals-expired	confluence-single-not-bypass	NEO	LONG	88.0000					
+1795183861.0000	signals-expired	approved-fell-out-of-hotset	ENA	LONG	72.0000					
+1795183529.0000	signals-expired	combo-stale(merge-window)	SOL	LONG	67.3200					
+1795183920.0000	signals-expired	compaction-stale-10min	NEAR	SHORT	77.0000					
+1795183920.0000	signals-expired	short-rsi-hard-floor	PUMP	SHORT	74.0000					
+1795183981.0000	signals-expired	approved-fell-out-of-hotset	CHIP	LONG	86.0000					
+1795183954.0000	signals-expired	combo-stale(merge-window)	BTC	SHORT	78.1000					
+1795184041.0000	signals-expired	approved-fell-out-of-hotset	APT	LONG	72.0000					
+1795184040.0000	signals-expired	vol-gate-override-0	ZORA	LONG	74.0000					
+1795184041.0000	signals-expired	approved-fell-out-of-hotset	BTC	LONG	70.7000					
+1795184040.0000	signals-expired	compaction-stale-10min	HYPE	SHORT	66.5000					
+1795184101.0000	signals-expired	approved-fell-out-of-hotset	CRV	LONG	72.0000					
+1795184161.0000	signals-expired	approved-fell-out-of-hotset	CC	LONG	70.0000					
+1795184161.0000	signals-expired	approved-fell-out-of-hotset	HBAR	LONG	72.0000					
+1795183893.0000	signals-expired	combo-stale(merge-window)	SOL	LONG	78.3000					
+1795183981.0000	signals-expired	approved-fell-out-of-hotset	ARB	LONG	75.0000					
+1795184400.0000	signals-expired	long-rsi-ceiling	BLUR	LONG	87.4000					
+1795184256.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	66.0000					
+1795184437.0000	signals-expired	combo-stale(merge-window)	SOL	LONG	69.9600					
+1795184520.0000	signals-expired	compaction-stale-10min	XPL	SHORT	68.0000					
+1795184256.0000	signals-expired	combo-stale(merge-window)	BTC	SHORT	71.3000					
+1795184821.0000	signals-expired	approved-fell-out-of-hotset	BTC	LONG	70.7000					
+1795184821.0000	signals-expired	approved-fell-out-of-hotset	BTC	LONG	78.3000					
+1795184820.0000	signals-expired	compaction-stale-10min	KBONK	SHORT	71.0000					
+1795184558.0000	signals-expired	combo-stale(merge-window)	BTC	SHORT	70.7000					
+1795184461.0000	signals-expired	approved-fell-out-of-hotset	SOL	SHORT	76.4000					
+1795185121.0000	signals-expired	approved-fell-out-of-hotset	SOL	LONG	71.5000					
+1795184800.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	68.5440					
+1795185121.0000	signals-expired	approved-fell-out-of-hotset	SOL	LONG	81.3000					
+1795184860.0000	signals-expired	combo-stale(merge-window)	BTC	SHORT	66.5000					
+1795185102.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	78.2000					
+1795185162.0000	signals-expired	combo-stale(merge-window)	BTC	LONG	73.7000					
+1795185162.0000	signals-expired	combo-stale(merge-window)	BTC	SHORT	64.7000					
+1795185601.0000	signals-expired	compaction-stale-10min	COMP	LONG	75.0000					
+1795185121.0000	signals-expired	approved-fell-out-of-hotset	SOL	LONG	63.0000					
+1795185361.0000	signals-expired	approved-fell-out-of-hotset	JUP	LONG	81.0000					
+1795185121.0000	signals-expired	approved-fell-out-of-hotset	JUP	LONG	81.0000					
+1795185661.0000	signals-expired	pump-chain-rsi-max	INJ	LONG	82.0000					
+1795185661.0000	signals-expired	approved-fell-out-of-hotset	BLUR	LONG	85.0000					
+1795185121.0000	signals-expired	approved-fell-out-of-hotset	SOL	LONG	65.9000					
+1795185661.0000	signals-expired	rr-engine-hard-block	ETH	LONG	70.4000					
+1795185661.0000	signals-expired	compaction-stale-10min	GMT	SHORT	78.0000					
+1795185661.0000	signals-expired	compaction-stale-10min	TURBO	SHORT	78.0000					
+1795185524.0000	signals-expired	combo-stale(merge-window)	HYPE	SHORT	66.5000					
+1795185403.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	77.6000					
+1795185720.0000	signals-expired	short-regime-gate	HBAR	SHORT	70.0000					
+1795185720.0000	signals-expired	compaction-stale-10min	INJ	SHORT	67.0000					
+1795185780.0000	signals-expired	compaction-stale-10min	WTI	LONG	82.5000					
+1795185542.0000	signals-expired	approved-fell-out-of-hotset	BTC	SHORT	88.0000					
+1795185705.0000	signals-expired	combo-stale(merge-window)	SOL	LONG	72.8000					
+1795185463.0000	signals-expired	combo-stale(merge-window)	BTC	LONG	74.0000					
+1795185960.0000	signals-expired	oversold-knife	COMP	SHORT	78.0000					
+1795185781.0000	signals-expired	approved-fell-out-of-hotset	NXPC	SHORT	78.0000					
+1795185960.0000	signals-expired	compaction-stale-10min	KFLOKI	SHORT	78.0000					
+1795185960.0000	signals-expired	compaction-stale-10min	KNEIRO	SHORT	78.0000					
+1795186020.0000	signals-expired	compaction-stale-10min	PURR	SHORT	67.0000					
+1795186321.0000	signals-expired	approved-fell-out-of-hotset	BTC	LONG	82.2800					
+1795185887.0000	signals-expired	combo-stale(merge-window)	HYPE	SHORT	66.5000					
+1795186201.0000	signals-expired	compaction-stale-10min	BTC	SHORT	64.7000					
+1795186321.0000	signals-expired	approved-fell-out-of-hotset	BTC	LONG	76.7000					
+1795186261.0000	signals-expired	short-rsi-hard-floor	IO	SHORT	75.0000					
+1795186321.0000	signals-expired	approved-fell-out-of-hotset	BTC	LONG	77.0000					
+1795186321.0000	signals-expired	approved-fell-out-of-hotset	BTC	LONG	76.7000					
+1795186008.0000	signals-expired	combo-stale(merge-window)	SOL	LONG	74.5000					
+1795186009.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	81.0000					
+1795186321.0000	signals-expired	approved-fell-out-of-hotset	BTC	LONG	79.7000					
+1795186380.0000	signals-expired	compaction-stale-10min	ETH	LONG	64.3000					
+1795186321.0000	signals-expired	approved-fell-out-of-hotset	BTC	LONG	80.0000					
+1795186321.0000	signals-expired	approved-fell-out-of-hotset	BTC	LONG	76.7000					
+1795186190.0000	signals-expired	combo-stale(merge-window)	HYPE	SHORT	67.5200					
+1795186321.0000	signals-expired	approved-fell-out-of-hotset	BTC	LONG	73.7000					
+1795186312.0000	signals-expired	combo-stale(merge-window)	SOL	LONG	81.7000					
+1795186321.0000	signals-expired	approved-fell-out-of-hotset	BTC	LONG	84.9000					
+1795186321.0000	signals-expired	approved-fell-out-of-hotset	BTC	LONG	88.0000					
+1795186802.0000	signals-expired	compaction-stale-10min	HYPE	SHORT	66.7600					
+1795186860.0000	signals-expired	pump-chain-short-high	CRV	SHORT	88.0000					
+1795186861.0000	signals-expired	approved-fell-out-of-hotset	ZEN	SHORT	75.0000					
+1795186321.0000	signals-expired	approved-fell-out-of-hotset	BTC	LONG	83.3000					
+1795187101.0000	signals-expired	approved-fell-out-of-hotset	SOL	SHORT	80.2000					
+1795186615.0000	signals-expired	combo-stale(merge-window)	SOL	LONG	73.3000					
+1795186980.0000	signals-expired	pump-chain-short-high	AVAX	SHORT	88.0000					
+1795186980.0000	signals-expired	vol-gate-override-0	FIL	SHORT	88.0000					
+1795186675.0000	signals-expired	combo-stale(merge-window)	BTC	LONG	88.0000					
+1795186861.0000	signals-expired	approved-fell-out-of-hotset	USELESS	SHORT	75.0000					
+1795186920.0000	signals-expired	combo-stale(merge-window)	ETH	LONG	64.3000					
+1795187101.0000	signals-expired	approved-fell-out-of-hotset	SOL	SHORT	77.2000					
+1795187101.0000	signals-expired	confluence-single-not-bypass	HBAR	LONG	79.0000					
+1795187101.0000	signals-expired	approved-fell-out-of-hotset	SOL	SHORT	77.2000					
+1795187161.0000	signals-expired	confluence-single-not-bypass	LTC	LONG	79.0000					
+1795186920.0000	signals-expired	combo-stale(merge-window)	SOL	LONG	67.3000					
+1795187220.0000	signals-expired	confluence-single-not-bypass	BIGTIME	LONG	74.8000					
+1795187220.0000	signals-expired	rr-engine-hard-block	MNT	LONG	88.0000					
+1795187281.0000	signals-expired	rr-engine-hard-block	BTC	LONG	82.7200					
+1795187340.0000	signals-expired	pump-chain-rsi-max	CHIP	LONG	88.0000					
+1795187340.0000	signals-expired	pump-chain-long-high	DYDX	LONG	88.0000					
+1795187340.0000	signals-expired	long-rsi-ceiling	GMX	LONG	88.0000					
+1795187340.0000	signals-expired	long-rsi-ceiling	APE	LONG	88.0000					
+1795187400.0000	signals-expired	long-neutral-chop	ENA	LONG	88.0000					
+1795187461.0000	signals-expired	confluence-single-not-bypass	ALT	LONG	79.0000					
+1795187221.0000	signals-expired	approved-fell-out-of-hotset	IO	SHORT	74.0000					
+1795187520.0000	signals-expired	compaction-stale-10min	RESOLV	SHORT	79.0000					
+1795187520.0000	signals-expired	compaction-stale-10min	WLD	SHORT	79.0000					
+1795187403.0000	signals-expired	combo-stale(merge-window)	HYPE	SHORT	66.4000					
+1795187222.0000	signals-expired	combo-stale(merge-window)	SOL	LONG	77.5000					
+1795187222.0000	signals-expired	combo-stale(merge-window)	ETH	LONG	64.3000					
+1795187283.0000	signals-expired	combo-stale(merge-window)	BTC	LONG	86.5000					
+1795187640.0000	signals-expired	spike-filter-long	FARTCOIN	LONG	88.0000					
+1795187700.0000	signals-expired	pump-chain-long-high	GMT	LONG	88.0000					
+1795187700.0000	signals-expired	vol-gate-override-0	SOPH	LONG	76.0000					
+1795187701.0000	signals-expired	approved-fell-out-of-hotset	DYDX	SHORT	77.0000					
+1795187705.0000	signals-expired	combo-stale(merge-window)	ETH	LONG	64.3000					
+1795187585.0000	signals-expired	combo-stale(merge-window)	BTC	LONG	70.2520					
+1795187835.0000	signals-expired	combo-stale(merge-window)	HYPE	SHORT	66.5000					
+1795187770.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	71.9000					
+1795187895.0000	signals-expired	combo-stale(merge-window)	BTC	LONG	80.4000					
+1795187895.0000	signals-expired	combo-stale(merge-window)	SOL	LONG	83.1000					
+1795188360.0000	signals-expired	compaction-stale-10min	ETH	LONG	64.3000					
+1795188262.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	71.5880					
+1795188420.0000	signals-expired	vol-gate-override-0	AIXBT	SHORT	88.0000					
+1795188420.0000	signals-expired	vol-gate-override-0	APT	SHORT	88.0000					
+1795188141.0000	signals-expired	combo-stale(merge-window)	HYPE	SHORT	67.7000					
+1795188540.0000	signals-expired	spike-filter-long	BTC	LONG	73.7722					
+1795188201.0000	signals-expired	combo-stale(merge-window)	SOL	LONG	79.9000					
+1795188601.0000	signals-expired	short-rsi-hard-floor	CELO	SHORT	85.0000					
+1795188601.0000	signals-expired	short-rsi-hard-floor	CFX	SHORT	85.0000					
+1795188601.0000	signals-expired	short-rsi-hard-floor	CRV	SHORT	82.0000					
+1795188601.0000	signals-expired	short-rsi-hard-floor	DOGE	SHORT	85.0000					
+1795188601.0000	signals-expired	compaction-stale-10min	ETH	SHORT	64.7000					
+1795188322.0000	signals-expired	combo-stale(merge-window)	BTC	SHORT	64.7000					
+1795188601.0000	signals-expired	short-rsi-hard-floor	ETC	SHORT	85.0000					
+1795188601.0000	signals-expired	short-rsi-hard-floor	FIL	SHORT	85.0000					
+1795188660.0000	signals-expired	short-rsi-hard-floor	IMX	SHORT	85.0000					
+1795188780.0000	signals-expired	spike-filter-long	ETH	LONG	73.6240					
+1795188684.0000	signals-expired	combo-stale(merge-window)	HYPE	SHORT	66.9000					
+1795188503.0000	signals-expired	combo-stale(merge-window)	SOL	LONG	85.1200					
+1795188503.0000	signals-expired	combo-stale(merge-window)	BTC	LONG	82.5600					
+1795188745.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	65.8000					
+1795188684.0000	signals-expired	combo-stale(merge-window)	BTC	SHORT	71.3000					
+1795188805.0000	signals-expired	combo-stale(merge-window)	BTC	LONG	76.8000					
+1795189261.0000	signals-expired	short-rsi-hard-floor	LDO	SHORT	81.0000					
+1795189261.0000	signals-expired	short-rsi-hard-floor	LINK	SHORT	81.0000					
+1795189321.0000	signals-expired	short-regime-gate	BTC	SHORT	73.7000					
+1795189046.0000	signals-expired	combo-stale(merge-window)	HYPE	SHORT	66.4000					
+1795189380.0000	signals-expired	vol-gate-override-0	BLUR	SHORT	88.0000					
+1795189380.0000	signals-expired	short-rsi-hard-floor	ONDO	SHORT	75.0000					
+1795189107.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	78.2000					
+1795189107.0000	signals-expired	combo-stale(merge-window)	BTC	LONG	83.6800					
+1795189500.0000	signals-expired	vol-gate-override-0	HYPER	SHORT	88.0000					
+1795189500.0000	signals-expired	spike-filter-long	FARTCOIN	LONG	88.0000					
+1795189500.0000	signals-expired	spike-filter-long	JUP	LONG	88.0000					
+1795189500.0000	signals-expired	rr-engine-hard-block	INJ	LONG	88.0000					
+1795189500.0000	signals-expired	short-rsi-hard-floor	WCT	SHORT	75.0000					
+1795189227.0000	signals-expired	combo-stale(merge-window)	ETH	SHORT	73.7000					
+1795189560.0000	signals-expired	vol-gate-override-0	CELO	SHORT	88.0000					
+1795189560.0000	signals-expired	pump-chain-vel	CRV	LONG	88.0000					
+1795189560.0000	signals-expired	spike-filter-long	ICP	LONG	88.0000					
+1795189560.0000	signals-expired	spike-filter-long	GRASS	LONG	88.0000					
+1795189560.0000	signals-expired	short-rsi-hard-floor	TRX	SHORT	78.0000					
+1795189680.0000	signals-expired	short-rsi-hard-floor	IMX	SHORT	80.0000					
+1795189349.0000	signals-expired	combo-stale(merge-window)	HYPE	SHORT	66.2000					
+1795189680.0000	signals-expired	short-rsi-hard-floor	BTC	SHORT	80.8480					
+1795189410.0000	signals-expired	combo-stale(merge-window)	BTC	LONG	77.6368					
+1795189531.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	76.2000					
+1795189593.0000	signals-expired	combo-stale(merge-window)	ETH	SHORT	70.2000					
+1795189835.0000	signals-expired	combo-stale(merge-window)	HYPE	SHORT	75.9800					
+1795189980.0000	signals-expired	confluence-single-not-bypass	STABLE	LONG	77.4400					
+1795190040.0000	signals-expired	short-regime-gate	BTC	SHORT	70.0600					
+1795189714.0000	signals-expired	combo-stale(merge-window)	BTC	LONG	73.0400					
+1795189775.0000	signals-expired	combo-stale(merge-window)	ETH	LONG	64.5000					
+1795190161.0000	signals-expired	short-rsi-hard-floor	AIXBT	SHORT	82.0000					
+1795189835.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	75.3000					
+1795190220.0000	signals-expired	rr-engine-hard-block	ETH	SHORT	70.6000					
+1795190403.0000	signals-expired	compaction-stale-10min	ETH	LONG	64.5000					
+1795190461.0000	signals-expired	vol-gate-override-0	CELO	SHORT	88.0000					
+1795190136.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	78.3000					
+1795190438.0000	signals-expired	combo-stale(merge-window)	BTC	SHORT	76.6000					
+1795190257.0000	signals-expired	combo-stale(merge-window)	HYPE	SHORT	70.6000					
+1795190196.0000	signals-expired	combo-stale(merge-window)	BTC	LONG	75.9000					
+1795190581.0000	signals-expired	vol-gate-override-0	CAKE	SHORT	88.0000					
+1795190581.0000	signals-expired	vol-gate-override-0	ENS	SHORT	88.0000					
+1795190581.0000	signals-expired	vol-gate-override-0	CRV	SHORT	88.0000					
+1795190257.0000	signals-expired	combo-stale(merge-window)	SOL	LONG	68.9000					
+1795190558.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	65.0000					
+1795190881.0000	signals-expired	rr-engine-hard-block	GMX	LONG	88.0000					
+1795190861.0000	signals-expired	combo-stale(merge-window)	HYPE	SHORT	66.7000					
+1795190881.0000	signals-expired	pump-chain-vel	GRASS	LONG	88.0000					
+1795190881.0000	signals-expired	pump-chain-vel	CHIP	LONG	88.0000					
+1795190940.0000	signals-expired	vol-gate-override-0	FIL	SHORT	88.0000					
+1795190940.0000	signals-expired	long-rsi-floor	BTC	LONG	81.5000					
+1795191060.0000	signals-expired	pump-chain-short-high	CC	SHORT	88.0000					
+1795191060.0000	signals-expired	pump-chain-vel	JUP	LONG	88.0000					
+1795190740.0000	signals-expired	combo-stale(merge-window)	BTC	SHORT	66.8000					
+1795190800.0000	signals-expired	combo-stale(merge-window)	SOL	LONG	75.9200					
+1795191180.0000	signals-expired	compaction-stale-10min	KPEPE	SHORT	67.0000					
+1795190861.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	68.8000					
+1795191180.0000	signals-expired	spike-filter-long	INJ	LONG	88.0000					
+1795191300.0000	signals-expired	vol-gate-override-0	APT	SHORT	88.0000					
+1795191121.0000	signals-expired	approved-fell-out-of-hotset	BLUR	LONG	88.0000					
+1795191102.0000	signals-expired	combo-stale(merge-window)	BTC	SHORT	68.5400					
+1795191102.0000	signals-expired	combo-stale(merge-window)	ETH	SHORT	66.4200					
+1795191480.0000	signals-expired	short-rsi-hard-floor	ZRO	SHORT	73.0000					
+1795191061.0000	signals-expired	approved-fell-out-of-hotset	HYPE	SHORT	70.9000					
+1795191162.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	81.2000					
+1795191540.0000	signals-expired	pump-chain-long-high	ALT	LONG	88.0000					
+1795191540.0000	signals-expired	long-rsi-ceiling	APE	LONG	88.0000					
+1795191465.0000	signals-expired	combo-stale(merge-window)	BTC	LONG	64.1000					
+1795191465.0000	signals-expired	combo-stale(merge-window)	HYPE	SHORT	78.7000					
+1795191720.0000	signals-expired	compaction-stale-10min	BTC	SHORT	78.7000					
+1795191720.0000	signals-expired	short-rsi-hard-floor	ETH	SHORT	78.9000					
+1795191720.0000	signals-expired	compaction-stale-10min	WCT	SHORT	65.0000					
+1795191646.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	76.7800					
+1795192020.0000	signals-expired	long-rsi-ceiling	GRASS	LONG	88.0000					
+1795192020.0000	signals-expired	pump-chain-rsi-max	ICP	LONG	88.0000					
+1795192020.0000	signals-expired	long-rsi-ceiling	AR	LONG	88.0000					
+1795192080.0000	signals-expired	pump-chain-rsi-max	AIXBT	LONG	88.0000					
+1795192080.0000	signals-expired	pump-chain-rsi-max	AIXBT	LONG	88.0000					
+1795192080.0000	signals-expired	long-rsi-ceiling	ENA	LONG	88.0000					
+1795191827.0000	signals-expired	combo-stale(merge-window)	BTC	LONG	73.7000					
+1795191888.0000	signals-expired	combo-stale(merge-window)	HYPE	SHORT	66.6600					
+1795192140.0000	signals-expired	long-rsi-ceiling	APT	LONG	88.0000					
+1795192140.0000	signals-expired	long-midband	RESOLV	LONG	72.0000					
+1795192260.0000	signals-expired	pump-chain-rsi-max	BLUR	LONG	88.0000					
+1795192260.0000	signals-expired	long-rsi-ceiling	CFX	LONG	79.0000					
+1795191949.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	76.5320					
+1795192320.0000	signals-expired	compaction-stale-10min	SOL	LONG	62.9000					
+1795192321.0000	signals-expired	approved-fell-out-of-hotset	ONDO	SHORT	79.0000					
+1795192320.0000	signals-expired	short-rsi-hard-floor	USELESS	SHORT	78.0000					
+1795192131.0000	signals-expired	combo-stale(merge-window)	BTC	LONG	74.4000					
+1795192500.0000	signals-expired	compaction-stale-10min	BTC	SHORT	77.9000					
+1795192500.0000	signals-expired	oversold-knife	HYPE	SHORT	79.7000					
+1795192251.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	81.7000					
+1795192561.0000	signals-expired	short-rsi-hard-floor	ETH	SHORT	75.2480					
+1795192620.0000	signals-expired	oversold-knife	AIXBT	SHORT	78.0000					
+1795192620.0000	signals-expired	short-rsi-hard-floor	AVNT	SHORT	77.0000					
+1795192620.0000	signals-expired	short-rsi-hard-floor	CELO	SHORT	79.0000					
+1795192553.0000	signals-expired	combo-stale(merge-window)	SOL	SHORT	72.6000					
+1795176466.0000	decider-skip	DailyFillCap	WLFI	SHORT		0.2222	0.9911	-0.0685	-2.3579	1.2933
+1795176466.0000	decider-skip	DailyFillCap	WLFI	SHORT		0.2222	0.9911	-0.0685	-2.3579	1.2933
+1795176517.0000	decider-skip	DailyFillCap	WLFI	SHORT		0.2222	0.9911	-0.0685	-2.3579	1.2933
+1795176517.0000	decider-skip	DailyFillCap	WLFI	SHORT		0.2222	0.9911	-0.0685	-2.3579	1.2933
+1795177343.0000	decider-skip	DailyFillCap	BIGTIME	SHORT		0.9091	5.8182	0.1779	1.4539	6.1364
+1795177343.0000	decider-skip	DailyFillCap	BIGTIME	SHORT		0.9091	5.8182	0.1779	1.4539	6.1364
+1795177372.0000	decider-skip	DailyFillCap	BIGTIME	SHORT		0.9091	5.8182	0.1779	1.4539	6.1364
+1795177372.0000	decider-skip	DailyFillCap	BIGTIME	SHORT		0.9091	5.8182	0.1779	1.4539	6.1364
+1795177408.0000	decider-skip	DailyFillCap	BIGTIME	SHORT		0.9091	5.8182	0.1779	1.4539	6.1364
+1795177408.0000	decider-skip	DailyFillCap	BIGTIME	SHORT		0.9091	5.8182	0.1779	1.4539	6.1364
+1795177706.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795177706.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795177950.0000	decider-skip	DailyFillCap	JUP	LONG						
+1795177950.0000	decider-skip	DailyFillCap	JUP	LONG						
+1795178131.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178131.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178240.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178240.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178240.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178240.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178273.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178273.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178273.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178273.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178314.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178314.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178314.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178314.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178370.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178370.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178370.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178370.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178433.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178433.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178433.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178433.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178547.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178548.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178548.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178548.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178578.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178578.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178578.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178578.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178610.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178610.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178610.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178610.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178671.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178671.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178671.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178671.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178726.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178726.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178727.0000	decider-skip	DailyFillCap	AERO	SHORT						
+1795178727.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178727.0000	decider-skip	DailyFillCap	AERO	SHORT						
+1795178831.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178831.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178831.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178831.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178865.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178865.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178865.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178865.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178906.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178906.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178906.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178906.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178970.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178971.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795178971.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795178971.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795179032.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179032.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795179032.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179032.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795179148.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179148.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179178.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179178.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179208.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179208.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795179208.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179208.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795179267.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179267.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795179267.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179267.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795179326.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179326.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795179326.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179326.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795179455.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179455.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179507.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179507.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795179507.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179507.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795179567.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795179567.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795179633.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795179633.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179634.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795179634.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179747.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179747.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179807.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179807.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179931.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795179931.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180068.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180068.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180167.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180167.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795180167.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180167.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795180232.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180232.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795180232.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180232.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795180344.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180344.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795180344.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180344.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795180372.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180372.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795180372.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180372.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795180406.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180406.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795180406.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180406.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795180466.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180466.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795180466.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180466.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795180526.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180526.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795180526.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180526.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795180623.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180623.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795180623.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180623.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795180652.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180652.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795180652.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180652.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795180707.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180708.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795180708.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180708.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795180768.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180768.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795180768.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180768.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795180830.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180830.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795180830.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180830.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795180945.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180945.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795180945.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795180945.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795180975.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795180976.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795181009.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795181009.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795181068.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795181068.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795181127.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795181127.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795181127.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795181127.0000	decider-skip	DailyFillCap	ZORA	SHORT						
+1795181227.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795181228.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795181257.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795181258.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795181306.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795181306.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795181367.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795181367.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795181432.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795181432.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795181546.0000	decider-skip	DailyFillCap	SAGA	SHORT						
+1795181546.0000	decider-skip	DailyFillCap	SAGA	SHORT						
+1795181573.0000	decider-skip	DailyFillCap	SAGA	SHORT						
+1795181573.0000	decider-skip	DailyFillCap	SAGA	SHORT						
+1795181606.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795181606.0000	decider-skip	DailyFillCap	SAGA	SHORT						
+1795181606.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795181606.0000	decider-skip	DailyFillCap	SAGA	SHORT						
+1795181665.0000	decider-skip	DailyFillCap	SAGA	SHORT						
+1795181666.0000	decider-skip	DailyFillCap	SAGA	SHORT						
+1795181730.0000	decider-skip	DailyFillCap	SAGA	SHORT						
+1795181730.0000	decider-skip	DailyFillCap	SAGA	SHORT						
+1795181838.0000	decider-skip	DailyFillCap	SAGA	SHORT						
+1795181838.0000	decider-skip	DailyFillCap	SAGA	SHORT						
+1795181868.0000	decider-skip	DailyFillCap	SAGA	SHORT						
+1795181868.0000	decider-skip	DailyFillCap	SAGA	SHORT						
+1795181910.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795181910.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182035.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182035.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182148.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182148.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795182148.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182148.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795182206.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182206.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182266.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182267.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795182267.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182267.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795182329.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182329.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182430.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182430.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182461.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182461.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182506.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182506.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795182506.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182506.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795182567.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182567.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182629.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182629.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795182629.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795182629.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795183031.0000	decider-skip	DailyFillCap	KAS	SHORT						
+1795183031.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795183031.0000	decider-skip	DailyFillCap	KAS	SHORT						
+1795183031.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795183060.0000	decider-skip	DailyFillCap	KAS	SHORT						
+1795183060.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795183060.0000	decider-skip	DailyFillCap	KAS	SHORT						
+1795183060.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795183108.0000	decider-skip	DailyFillCap	KAS	SHORT						
+1795183108.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795183108.0000	decider-skip	DailyFillCap	KAS	SHORT						
+1795183108.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795183166.0000	decider-skip	DailyFillCap	KAS	SHORT						
+1795183166.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795183166.0000	decider-skip	DailyFillCap	KAS	SHORT						
+1795183166.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795183235.0000	decider-skip	DailyFillCap	KAS	SHORT						
+1795183235.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795183235.0000	decider-skip	DailyFillCap	KAS	SHORT						
+1795183235.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795183531.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795183531.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795183713.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795183713.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795183713.0000	decider-skip	DailyFillCap	HBAR	LONG						
+1795183713.0000	decider-skip	DailyFillCap	ENA	LONG						
+1795183713.0000	decider-skip	DailyFillCap	CRV	LONG						
+1795183713.0000	decider-skip	DailyFillCap	APT	LONG						
+1795183713.0000	decider-skip	DailyFillCap	CC	LONG						
+1795183713.0000	decider-skip	DailyFillCap	APT	LONG						
+1795183713.0000	decider-skip	DailyFillCap	CC	LONG						
+1795183773.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795183773.0000	decider-skip	DailyFillCap	HBAR	LONG						
+1795183773.0000	decider-skip	DailyFillCap	ENA	LONG						
+1795183773.0000	decider-skip	DailyFillCap	CRV	LONG						
+1795183773.0000	decider-skip	DailyFillCap	APT	LONG						
+1795183773.0000	decider-skip	DailyFillCap	CC	LONG						
+1795183773.0000	decider-skip	DailyFillCap	CC	LONG						
+1795183832.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795183832.0000	decider-skip	DailyFillCap	HBAR	LONG						
+1795183832.0000	decider-skip	DailyFillCap	ENA	LONG						
+1795183832.0000	decider-skip	DailyFillCap	CRV	LONG						
+1795183832.0000	decider-skip	DailyFillCap	APT	LONG						
+1795183832.0000	decider-skip	DailyFillCap	CC	LONG						
+1795183832.0000	decider-skip	DailyFillCap	CC	LONG						
+1795183947.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795183947.0000	decider-skip	DailyFillCap	HBAR	LONG						
+1795183947.0000	decider-skip	DailyFillCap	CRV	LONG						
+1795183947.0000	decider-skip	DailyFillCap	APT	LONG						
+1795183947.0000	decider-skip	DailyFillCap	CC	LONG						
+1795183947.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795183947.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795183978.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795183978.0000	decider-skip	DailyFillCap	HBAR	LONG						
+1795183978.0000	decider-skip	DailyFillCap	CRV	LONG						
+1795183978.0000	decider-skip	DailyFillCap	APT	LONG						
+1795183978.0000	decider-skip	DailyFillCap	CC	LONG						
+1795183978.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795183978.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184009.0000	decider-skip	DailyFillCap	HBAR	LONG						
+1795184009.0000	decider-skip	DailyFillCap	CRV	LONG						
+1795184010.0000	decider-skip	DailyFillCap	APT	LONG						
+1795184010.0000	decider-skip	DailyFillCap	CC	LONG						
+1795184010.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184010.0000	decider-skip	DailyFillCap	CC	LONG						
+1795184010.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184069.0000	decider-skip	DailyFillCap	HBAR	LONG						
+1795184069.0000	decider-skip	DailyFillCap	CRV	LONG						
+1795184069.0000	decider-skip	DailyFillCap	CC	LONG						
+1795184069.0000	decider-skip	DailyFillCap	CRV	LONG						
+1795184069.0000	decider-skip	DailyFillCap	CC	LONG						
+1795184128.0000	decider-skip	DailyFillCap	HBAR	LONG						
+1795184128.0000	decider-skip	DailyFillCap	CC	LONG						
+1795184128.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184129.0000	decider-skip	DailyFillCap	HBAR	LONG						
+1795184129.0000	decider-skip	DailyFillCap	CC	LONG						
+1795184129.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184231.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184231.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184259.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184259.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184307.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184307.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184366.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184366.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184430.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184430.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795184430.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184430.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795184545.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184545.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184545.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184545.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184573.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184573.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184573.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184573.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184607.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184607.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184607.0000	decider-skip	DailyFillCap	ETH	LONG						
+1795184607.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184607.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184607.0000	decider-skip	DailyFillCap	ETH	LONG						
+1795184668.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184668.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184668.0000	decider-skip	DailyFillCap	ETH	LONG						
+1795184668.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184668.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184668.0000	decider-skip	DailyFillCap	ETH	LONG						
+1795184729.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184729.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184729.0000	decider-skip	DailyFillCap	ETH	LONG						
+1795184729.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795184729.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184729.0000	decider-skip	DailyFillCap	ETH	LONG						
+1795184833.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184833.0000	decider-skip	DailyFillCap	ETH	LONG						
+1795184833.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184833.0000	decider-skip	DailyFillCap	ETH	LONG						
+1795184863.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184863.0000	decider-skip	DailyFillCap	ETH	LONG						
+1795184863.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184863.0000	decider-skip	DailyFillCap	ETH	LONG						
+1795184911.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184911.0000	decider-skip	DailyFillCap	ETH	LONG						
+1795184911.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184911.0000	decider-skip	DailyFillCap	ETH	LONG						
+1795184968.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184968.0000	decider-skip	DailyFillCap	ETH	LONG						
+1795184968.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795184968.0000	decider-skip	DailyFillCap	ETH	LONG						
+1795185038.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795185038.0000	decider-skip	DailyFillCap	ETH	LONG						
+1795185038.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795185038.0000	decider-skip	DailyFillCap	ETH	LONG						
+1795185165.0000	decider-skip	DailyFillCap	JUP	LONG						
+1795185165.0000	decider-skip	DailyFillCap	JUP	LONG						
+1795185212.0000	decider-skip	DailyFillCap	JUP	LONG						
+1795185212.0000	decider-skip	DailyFillCap	JUP	LONG						
+1795185268.0000	decider-skip	DailyFillCap	JUP	LONG						
+1795185268.0000	decider-skip	DailyFillCap	JUP	LONG						
+1795185334.0000	decider-skip	DailyFillCap	JUP	LONG						
+1795185334.0000	decider-skip	DailyFillCap	JUP	LONG						
+1795185458.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795185458.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795185517.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795185517.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795185577.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795185577.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795185578.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795185578.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795185641.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795185641.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795185641.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795185641.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795185762.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795185762.0000	decider-skip	DailyFillCap	NXPC	SHORT						
+1795185762.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795185762.0000	decider-skip	DailyFillCap	NXPC	SHORT						
+1795185808.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795185808.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795185870.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795185870.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795185927.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795185927.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795185987.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795185987.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795186047.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795186047.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795186106.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795186106.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795186168.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795186168.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795186233.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795186233.0000	decider-skip	DailyFillCap	BTC	LONG						
+1795186353.0000	decider-skip	DailyFillCap	ZEN	SHORT						
+1795186353.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186353.0000	decider-skip	DailyFillCap	ZEN	SHORT						
+1795186353.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186408.0000	decider-skip	DailyFillCap	ZEN	SHORT						
+1795186408.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186409.0000	decider-skip	DailyFillCap	ZEN	SHORT						
+1795186409.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186468.0000	decider-skip	DailyFillCap	ZEN	SHORT						
+1795186468.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186468.0000	decider-skip	DailyFillCap	USELESS	SHORT						
+1795186468.0000	decider-skip	DailyFillCap	ZEN	SHORT						
+1795186468.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186468.0000	decider-skip	DailyFillCap	USELESS	SHORT						
+1795186529.0000	decider-skip	DailyFillCap	ZEN	SHORT						
+1795186529.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186529.0000	decider-skip	DailyFillCap	USELESS	SHORT						
+1795186529.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186529.0000	decider-skip	DailyFillCap	USELESS	SHORT						
+1795186634.0000	decider-skip	DailyFillCap	ZEN	SHORT						
+1795186634.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186634.0000	decider-skip	DailyFillCap	USELESS	SHORT						
+1795186634.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186634.0000	decider-skip	DailyFillCap	USELESS	SHORT						
+1795186667.0000	decider-skip	DailyFillCap	ZEN	SHORT						
+1795186667.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186667.0000	decider-skip	DailyFillCap	USELESS	SHORT						
+1795186667.0000	decider-skip	DailyFillCap	ZEN	SHORT						
+1795186667.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186667.0000	decider-skip	DailyFillCap	USELESS	SHORT						
+1795186708.0000	decider-skip	DailyFillCap	ZEN	SHORT						
+1795186708.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186708.0000	decider-skip	DailyFillCap	USELESS	SHORT						
+1795186708.0000	decider-skip	DailyFillCap	ZEN	SHORT						
+1795186708.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186708.0000	decider-skip	DailyFillCap	USELESS	SHORT						
+1795186767.0000	decider-skip	DailyFillCap	ZEN	SHORT						
+1795186767.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186767.0000	decider-skip	DailyFillCap	USELESS	SHORT						
+1795186767.0000	decider-skip	DailyFillCap	ZEN	SHORT						
+1795186767.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186767.0000	decider-skip	DailyFillCap	USELESS	SHORT						
+1795186836.0000	decider-skip	DailyFillCap	ZEN	SHORT						
+1795186836.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186836.0000	decider-skip	DailyFillCap	USELESS	SHORT						
+1795186836.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186836.0000	decider-skip	DailyFillCap	USELESS	SHORT						
+1795186961.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186961.0000	decider-skip	DailyFillCap	IO	SHORT						
+1795186961.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795186961.0000	decider-skip	DailyFillCap	IO	SHORT						
+1795187008.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795187008.0000	decider-skip	DailyFillCap	IO	SHORT						
+1795187008.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795187008.0000	decider-skip	DailyFillCap	IO	SHORT						
+1795187068.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795187068.0000	decider-skip	DailyFillCap	IO	SHORT						
+1795187068.0000	decider-skip	DailyFillCap	SOL	SHORT						
+1795187068.0000	decider-skip	DailyFillCap	IO	SHORT						
+1795187131.0000	decider-skip	DailyFillCap	IO	SHORT						
+1795187131.0000	decider-skip	DailyFillCap	IO	SHORT						
+1795187254.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795187254.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795187290.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795187290.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795187323.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795187323.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795187375.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795187376.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795187435.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795187435.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795187487.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795187488.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795187547.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795187547.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795187607.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795187607.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795187667.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795187667.0000	decider-skip	DailyFillCap	DYDX	SHORT						
+1795190888.0000	decider-skip	DailyFillCap	HYPE	SHORT						
+1795190888.0000	decider-skip	DailyFillCap	HYPE	SHORT						
+1795190926.0000	decider-skip	DailyFillCap	HYPE	SHORT						
+1795190927.0000	decider-skip	DailyFillCap	HYPE	SHORT						
+1795190976.0000	decider-skip	DailyFillCap	HYPE	SHORT						
+1795190976.0000	decider-skip	DailyFillCap	HYPE	SHORT						
+1795191038.0000	decider-skip	DailyFillCap	HYPE	SHORT						
+1795191038.0000	decider-skip	DailyFillCap	HYPE	SHORT						
+1795191267.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795191268.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795191327.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795191327.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795191327.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795191327.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795191433.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795191433.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795191433.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795191433.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795191463.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795191463.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795191463.0000	decider-skip	DailyFillCap	SOL	LONG						
+1795191463.0000	decider-skip	DailyFillCap	ARB	LONG						
+1795176002.0000	gate-shadow	LONG-NEUTRAL	USUAL	LONG		1.2524	-0.3854	1.6144	3.8902	3.0829
+1795176002.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	ONDO	LONG		-1.1270	-5.6199	-0.7650	-1.3443	0.3074
+1795176002.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	HYPER	LONG		-0.9479	-2.3697	-0.5859	1.9059	2.3697
+1795176002.0000	gate-shadow	LONG-NEUTRAL	FIL	LONG		0.2337	-6.1100	0.5957	-1.8344	1.0426
+1795176002.0000	gate-shadow	RR-ENGINE	BTC	LONG		0.1210	-3.5654	0.4830	0.7102	0.9870
+1795176003.0000	gate-shadow	RR-ENGINE	SOL	LONG		-0.5318	-3.7483	-0.1698	0.5273	0.3778
+1795176003.0000	gate-shadow	SHORT-REGIME-GATE	BTC	SHORT		-0.1210	3.5654	-0.4830	-0.7102	4.2426
+1795176003.0000	gate-shadow	SPIKE-FILTER	ZORA	LONG		1.2755	-0.9141	1.6375	3.3615	3.2526
+1795176003.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	AVNT	SHORT						
+1795176003.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	ENS	SHORT		-0.0000	5.1578	-0.3620	0.8822	6.5856
+1795176003.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	SOL	SHORT		0.5318	3.7483	0.1698	-0.5273	4.9678
+1795176420.0000	gate-shadow	LONG-RSI-BLOCK	BTC	LONG		0.0905	-3.0005	0.3812	0.3486	1.1255
+1795176481.0000	gate-shadow	LONG-RSI-BLOCK	ETH	LONG		-0.1221	-4.7130	0.1687	-1.3639	1.3203
+1795176541.0000	gate-shadow	SHORT-REGIME-GATE	SOL	SHORT		0.3514	2.8131	0.0606	-0.5360	4.5538
+1795176541.0000	gate-shadow	OVERSOLD-SHORT	WLFI	SHORT		0.2222	0.9911	-0.0685	-2.3579	1.2933
+1795176541.0000	gate-shadow	PRESERVE-SPIKE-BLOCK	WLFI	SHORT		0.2222	0.9911	-0.0685	-2.3579	1.2933
+1795176601.0000	gate-shadow	LONG-RSI-BLOCK	ETH	LONG		0.1903	-5.1757	0.4763	-1.0957	1.4968
+1795176601.0000	gate-shadow	RR-ENGINE	BTC	LONG		0.2576	-3.3158	0.5436	0.7642	1.2347
+1795176601.0000	gate-shadow	RR-ENGINE	SOL	LONG		-0.0563	-3.2988	0.2297	0.7812	1.0139
+1795176601.0000	gate-shadow	RR-ENGINE	BTC	SHORT		-0.2576	3.3158	-0.5436	-0.7642	4.0077
+1795176601.0000	gate-shadow	SHORT-REGIME-GATE	SOL	SHORT		0.0563	3.2988	-0.2297	-0.7812	4.3656
+1795176601.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	BCH	SHORT						
+1795176661.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	YGG	SHORT		0.1085	3.0369	-0.1775	-1.0431	4.8265
+1795176661.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	SUPER	SHORT		0.2517	3.9555	-0.0343	-0.1245	5.5327
+1795176661.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	BANANA	SHORT		0.2363	3.8992	-0.0497	-0.1809	4.8838
+1795176661.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	SUSHI	SHORT		0.5369	4.5503	0.2509	0.4703	5.9060
+1795176661.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	SOL	SHORT		0.0563	3.2988	-0.2297	-0.7812	4.3656
+1795176661.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	ALT	SHORT		-0.2268	3.6735	-0.5128	-0.4066	5.4422
+1795176752.0000	gate-shadow	BTC-CRASH	BTC	LONG		0.2576	-3.3158	0.5436	0.7642	1.2347
+1795176752.0000	gate-shadow	BTC-CRASH	SOL	LONG		-0.0563	-3.2988	0.2297	0.7812	1.0139
+1795176841.0000	gate-shadow	RR-ENGINE	ETH	LONG		0.1903	-5.1757	0.4763	-1.0957	1.4968
+1795176900.0000	gate-shadow	LONG-RSI-BLOCK	SOL	LONG		-0.0563	-3.2988	0.2297	0.7812	1.0139
+1795176901.0000	gate-shadow	PUMP-CHAIN-VEL	CHIP	LONG		0.3667	-4.9982	0.9681	-0.8539	1.5402
+1795176961.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	BTC	SHORT		0.1105	3.5632	-0.4909	-0.5811	4.2162
+1795176961.0000	gate-shadow	SPIKE-FILTER	ETH	LONG		-0.3318	-5.6121	0.2696	-1.4678	1.1805
+1795177021.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	HYPE	SHORT						
+1795177021.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	BIGTIME	SHORT		0.9070	5.4422	0.3056	1.2979	6.3492
+1795177080.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	SAGA	LONG		-0.2965	-4.2254	0.3049	-0.0811	0.5930
+1795177141.0000	gate-shadow	SHORT-REGIME-GATE	ETH	SHORT		0.3318	5.6121	-0.2696	1.4678	6.5971
+1795177201.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	SAGA	LONG		-0.4451	-4.3027	0.2861	0.0616	0.6677
+1795177201.0000	gate-shadow	RR-ENGINE	BTC	LONG		-0.0870	-3.8840	0.6441	0.4803	1.0105
+1795177202.0000	gate-shadow	SHORT-REGIME-GATE	SOL	SHORT		0.5899	3.5119	-0.1413	-0.8524	4.6208
+1795177202.0000	gate-shadow	SHORT-REGIME-GATE	ETH	SHORT		0.3438	5.8197	-0.3873	1.4554	6.6062
+1795177202.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	HYPE	SHORT						
+1795177202.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	BIGTIME	SHORT		0.9091	5.8182	0.1779	1.4539	6.1364
+1795177202.0000	gate-shadow	PUMP-CHAIN-VEL	CHIP	LONG		-0.2564	-5.2857	0.4748	-0.9214	1.4286
+1795177202.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	YGG	SHORT		0.5952	3.3009	-0.1359	-1.0634	5.0325
+1795177202.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	SUSHI	SHORT		1.0724	4.6247	0.3412	0.2604	6.0322
+1795177202.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	SUPER	SHORT		0.5038	3.8707	-0.2274	-0.4936	5.4534
+1795177202.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	BANANA	SHORT		0.5507	4.2290	-0.1804	-0.1353	4.9961
+1795177202.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	ALT	SHORT		0.2262	3.8688	-0.5049	-0.4955	5.6561
+1795177202.0000	gate-shadow	SPIKE-FILTER	SOL	LONG		-0.5899	-3.5119	0.1413	0.8524	0.7444
+1795177261.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	SOL	SHORT		0.5899	3.5119	-0.1413	-0.8524	4.6208
+1795177261.0000	gate-shadow	LONG-MIDBAND	BTC	LONG		-0.0870	-3.8840	0.6441	0.4803	1.0105
+1795177261.0000	gate-shadow	SPIKE-FILTER	ETH	LONG		-0.3438	-5.8197	0.3873	-1.4554	1.1706
+1795177343.0000	gate-shadow	BTC-CRASH	CHIP	LONG		-0.2564	-5.2857	0.4748	-0.9214	1.4286
+1795177343.0000	gate-shadow	BTC-CRASH	SOL	LONG		-0.5899	-3.5119	0.1413	0.8524	0.7444
+1795177380.0000	gate-shadow	VOL-GATE-BYPASS	INJ	SHORT		2.6870	4.6174	1.9558	0.2531	4.6512
+1795177380.0000	gate-shadow	PUMP-CHAIN-HIGH	ICP	LONG		-1.3378	-4.1734	-0.6066	0.1909	0.2867
+1795177380.0000	gate-shadow	PUMP-CHAIN-RSI-MAX	GRASS	LONG		-0.3779	-3.5814	0.3532	0.7829	2.2346
+1795177381.0000	gate-shadow	RR-ENGINE	JUP	LONG		-0.2613	-3.5605	0.4698	0.8038	2.6132
+1795177381.0000	gate-shadow	RR-ENGINE	BTC	SHORT		0.0870	3.8840	-0.6441	-0.4803	4.2203
+1795177381.0000	gate-shadow	SPIKE-FILTER	APT	LONG		-0.5958	-5.9583	0.1353	-1.5940	0.9186
+1795177441.0000	gate-shadow	PUMP-CHAIN-HIGH	BIGTIME	LONG		-0.9091	-5.8182	-0.1779	-1.4539	0.0000
+1795177441.0000	gate-shadow	PUMP-CHAIN-HIGH	ADA	LONG		-0.8180	-4.4751	-0.0868	-0.1108	0.4772
+1795177441.0000	gate-shadow	PUMP-CHAIN-HIGH	ACE	LONG		-0.6637	-4.8673	0.0674	-0.5030	0.4425
+1795177441.0000	gate-shadow	BTC-CHOP-GATE	ETH	LONG		-0.3438	-5.8197	0.3873	-1.4554	1.1706
+1795177561.0000	gate-shadow	VOL-GATE-BYPASS	CHIP	SHORT						
+1795177620.0000	gate-shadow	PUMP-CHAIN-SHORT-HIGH	DYDX	SHORT						
+1795177741.0000	gate-shadow	LONG-RSI-FLOOR	SOL	LONG						
+1795177766.0000	gate-shadow	EXEC-BLOCK	SOL	LONG						
+1795177801.0000	gate-shadow	VOL-GATE-BYPASS	INJ	SHORT						
+1795177801.0000	gate-shadow	PUMP-CHAIN-HIGH	ICP	LONG						
+1795177801.0000	gate-shadow	PUMP-CHAIN-RSI-MAX	GRASS	LONG						
+1795177801.0000	gate-shadow	PUMP-CHAIN-SHORT-HIGH	DYDX	SHORT						
+1795177801.0000	gate-shadow	PUMP-CHAIN-HIGH	BIGTIME	LONG						
+1795177801.0000	gate-shadow	PUMP-CHAIN-HIGH	ADA	LONG						
+1795177801.0000	gate-shadow	PUMP-CHAIN-HIGH	ACE	LONG						
+1795177801.0000	gate-shadow	VOL-GATE-BYPASS	CHIP	SHORT						
+1795177802.0000	gate-shadow	RR-ENGINE	JUP	LONG						
+1795177802.0000	gate-shadow	RR-ENGINE	BTC	SHORT						
+1795177802.0000	gate-shadow	BTC-CHOP-GATE	ETH	LONG						
+1795177802.0000	gate-shadow	SHORT-REGIME-GATE	SOL	SHORT						
+1795177802.0000	gate-shadow	SPIKE-FILTER	APT	LONG						
+1795177802.0000	gate-shadow	LONG-MIDBAND	BTC	LONG						
+1795177802.0000	gate-shadow	SPIKE-FILTER	SOL	LONG						
+1795177861.0000	gate-shadow	RR-ENGINE	BLUR	LONG						
+1795177861.0000	gate-shadow	RR-ENGINE	BTC	LONG						
+1795177861.0000	gate-shadow	PUMP-CHAIN-VEL	APT	LONG						
+1795177861.0000	gate-shadow	LONG-RSI-FLOOR	SOL	LONG						
+1795177980.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	NXPC	LONG						
+1795178068.0000	gate-shadow	BTC-CRASH	JUP	SHORT						
+1795178101.0000	gate-shadow	RR-ENGINE	ETH	LONG						
+1795178161.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	SOL	SHORT						
+1795178161.0000	gate-shadow	LONG-RSI-CEILING	BLUR	LONG						
+1795178221.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	AERO	SHORT						
+1795178280.0000	gate-shadow	LONG-NEUTRAL-CHOP	NXPC	LONG						
+1795178401.0000	gate-shadow	LONG-NEUTRAL-CHOP	NXPC	LONG						
+1795178401.0000	gate-shadow	RR-ENGINE	BTC	SHORT						
+1795178401.0000	gate-shadow	RR-ENGINE	ETH	LONG						
+1795178401.0000	gate-shadow	LONG-RSI-CEILING	BLUR	LONG						
+1795178401.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	AERO	SHORT						
+1795178460.0000	gate-shadow	PUMP-CHAIN-HIGH	GMX	LONG						
+1795178461.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	ME	SHORT						
+1795178461.0000	gate-shadow	LONG-HIGH-70	ETH	LONG						
+1795178726.0000	gate-shadow	BTC-CRASH	AERO	SHORT						
+1795179000.0000	gate-shadow	PUMP-CHAIN-HIGH	GMX	LONG						
+1795179001.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	ME	SHORT						
+1795179061.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	SOL	SHORT						
+1795179180.0000	gate-shadow	RR-ENGINE	BTC	SHORT						
+1795179360.0000	gate-shadow	SHORT-NEUTRAL	ALGO	SHORT						
+1795179361.0000	gate-shadow	BTC-CHOP-GATE	MET	SHORT						
+1795179361.0000	gate-shadow	SHORT-REGIME-GATE	SOL	SHORT						
+1795179421.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	MET	SHORT						
+1795179425.0000	gate-shadow	BTC-CRASH	BTC	LONG						
+1795179425.0000	gate-shadow	BTC-CRASH	SOL	LONG						
+1795179541.0000	gate-shadow	BTC-CHOP-GATE	PENDLE	LONG						
+1795179602.0000	gate-shadow	SHORT-NEUTRAL	ALGO	SHORT						
+1795179602.0000	gate-shadow	RR-ENGINE	PENDLE	LONG						
+1795179602.0000	gate-shadow	BTC-CHOP-GATE	MET	SHORT						
+1795179661.0000	gate-shadow	PUMP-CHAIN-HIGH	GOAT	LONG						
+1795179661.0000	gate-shadow	PUMP-CHAIN-RSI-MAX	BLUR	LONG						
+1795179661.0000	gate-shadow	RR-ENGINE	BTC	LONG						
+1795179661.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	SOL	SHORT						
+1795179661.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	MET	SHORT						
+1795179781.0000	gate-shadow	SHORT-BB-DEAD-ZONE	MET	SHORT						
+1795179866.0000	gate-shadow	BTC-CRASH	SOL	LONG						
+1795179961.0000	gate-shadow	OVERSOLD-SHORT	ACE	SHORT						
+1795180040.0000	gate-shadow	BTC-CRASH	BTC	LONG						
+1795180200.0000	gate-shadow	PUMP-CHAIN-HIGH	GOAT	LONG						
+1795180200.0000	gate-shadow	PUMP-CHAIN-RSI-MAX	BLUR	LONG						
+1795180201.0000	gate-shadow	OVERSOLD-SHORT	ACE	SHORT						
+1795180261.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	ATOM	SHORT						
+1795180560.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	GOAT	LONG						
+1795180623.0000	gate-shadow	BTC-CRASH	ZORA	SHORT						
+1795180800.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	GOAT	LONG						
+1795180801.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	ATOM	SHORT						
+1795180861.0000	gate-shadow	RR-ENGINE	BTC	LONG						
+1795180945.0000	gate-shadow	BTC-CRASH	ZORA	SHORT						
+1795180975.0000	gate-shadow	BTC-ACCEL	SOL	LONG						
+1795180975.0000	gate-shadow	BTC-ACCEL	ZORA	SHORT						
+1795180975.0000	gate-shadow	BTC-CRASH	SOL	LONG						
+1795181161.0000	gate-shadow	SHORT-BB-DEAD-ZONE2	MERL	SHORT						
+1795181402.0000	gate-shadow	SHORT-BB-DEAD-ZONE2	MERL	SHORT						
+1795181546.0000	gate-shadow	BTC-CRASH	SOL	LONG						
+1795181546.0000	gate-shadow	BTC-CRASH	BTC	LONG						
+1795181580.0000	gate-shadow	VOL-GATE-BYPASS	INJ	SHORT						
+1795181580.0000	gate-shadow	VOL-GATE-BYPASS	FIL	SHORT						
+1795181606.0000	gate-shadow	BTC-CRASH	SAGA	SHORT						
+1795181760.0000	gate-shadow	RR-ENGINE	BTC	LONG						
+1795181881.0000	gate-shadow	OVERSOLD-SHORT	SAGA	SHORT						
+1795181940.0000	gate-shadow	PUMP-CHAIN-SHORT-HIGH	BIGTIME	SHORT						
+1795182001.0000	gate-shadow	VOL-GATE-BYPASS	INJ	SHORT						
+1795182001.0000	gate-shadow	VOL-GATE-BYPASS	FIL	SHORT						
+1795182001.0000	gate-shadow	PUMP-CHAIN-SHORT-HIGH	BIGTIME	SHORT						
+1795182001.0000	gate-shadow	RR-ENGINE	BTC	LONG						
+1795182061.0000	gate-shadow	VOL-GATE-BYPASS	IO	SHORT						
+1795182121.0000	gate-shadow	SHORT-REGIME-GATE	BCH	SHORT						
+1795182181.0000	gate-shadow	SHORT-REGIME-GATE	SOL	SHORT						
+1795182300.0000	gate-shadow	LONG-NEUTRAL	IO	LONG						
+1795182360.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	XTEN	SHORT						
+1795182600.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	XTEN	SHORT						
+1795182600.0000	gate-shadow	VOL-GATE-BYPASS	IO	SHORT						
+1795182600.0000	gate-shadow	LONG-NEUTRAL	IO	LONG						
+1795182601.0000	gate-shadow	SHORT-REGIME-GATE	BCH	SHORT						
+1795182601.0000	gate-shadow	SHORT-REGIME-GATE	SOL	SHORT						
+1795182661.0000	gate-shadow	RR-ENGINE	BTC	LONG						
+1795182721.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	KAS	SHORT						
+1795182721.0000	gate-shadow	LONG-MIDBAND	SOL	LONG						
+1795182746.0000	gate-shadow	EXEC-BLOCK	SOL	LONG						
+1795182780.0000	gate-shadow	SHORT-NEUTRAL	NEO	SHORT						
+1795182780.0000	gate-shadow	PUMP-CHAIN-HIGH	CC	LONG						
+1795182780.0000	gate-shadow	VOL-GATE-BYPASS	ZORA	LONG						
+1795182781.0000	gate-shadow	LONG-RSI-CEILING	INJ	LONG						
+1795182781.0000	gate-shadow	SHORT-RSI-CEILING	BTC	SHORT						
+1795182870.0000	gate-shadow	BTC-CRASH	BTC	SHORT						
+1795182900.0000	gate-shadow	PUMP-CHAIN-HIGH	COMP	LONG						
+1795182900.0000	gate-shadow	PUMP-CHAIN-HIGH	DOGE	LONG						
+1795182961.0000	gate-shadow	SHORT-RSI-CEILING	BIGTIME	SHORT						
+1795183020.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	ANIME	SHORT						
+1795183021.0000	gate-shadow	PUMP-CHAIN-HIGH	CAKE	LONG						
+1795183021.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	RESOLV	SHORT						
+1795183021.0000	gate-shadow	LONG-RSI-CEILING	BLUR	LONG						
+1795183031.0000	gate-shadow	BTC-CRASH	KAS	SHORT						
+1795183080.0000	gate-shadow	LONG-NEUTRAL-CHOP	COMP	LONG						
+1795183081.0000	gate-shadow	LONG-NEUTRAL-CHOP	TRX	LONG						
+1795183081.0000	gate-shadow	LONG-NEUTRAL-CHOP	FIL	LONG						
+1795183081.0000	gate-shadow	LONG-NEUTRAL-CHOP	ALGO	LONG						
+1795183081.0000	gate-shadow	LONG-NEUTRAL-CHOP	CAKE	LONG						
+1795183081.0000	gate-shadow	SHORT-REGIME-GATE	BTC	SHORT						
+1795183140.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	NEO	LONG						
+1795183141.0000	gate-shadow	RR-ENGINE	GRASS	LONG						
+1795183202.0000	gate-shadow	SHORT-NEUTRAL	NEO	SHORT						
+1795183202.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	NEO	LONG						
+1795183202.0000	gate-shadow	PUMP-CHAIN-HIGH	CC	LONG						
+1795183202.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	ANIME	SHORT						
+1795183202.0000	gate-shadow	PUMP-CHAIN-RSI-MAX	GRASS	LONG						
+1795183202.0000	gate-shadow	PUMP-CHAIN-HIGH	COMP	LONG						
+1795183202.0000	gate-shadow	PUMP-CHAIN-HIGH	DOGE	LONG						
+1795183202.0000	gate-shadow	VOL-GATE-BYPASS	ZORA	LONG						
+1795183202.0000	gate-shadow	PUMP-CHAIN-RSI-MAX	FIL	LONG						
+1795183202.0000	gate-shadow	PUMP-CHAIN-HIGH	CAKE	LONG						
+1795183203.0000	gate-shadow	RR-ENGINE	BTC	LONG						
+1795183203.0000	gate-shadow	RR-ENGINE	BIGTIME	SHORT						
+1795183203.0000	gate-shadow	SHORT-REGIME-GATE	SOL	SHORT						
+1795183203.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	RESOLV	SHORT						
+1795183203.0000	gate-shadow	LONG-RSI-CEILING	INJ	LONG						
+1795183203.0000	gate-shadow	LONG-RSI-CEILING	BLUR	LONG						
+1795183204.0000	gate-shadow	LONG-MIDBAND	SOL	LONG						
+1795183235.0000	gate-shadow	BTC-CRASH	BTC	SHORT						
+1795183235.0000	gate-shadow	BTC-CRASH	KAS	SHORT						
+1795183235.0000	gate-shadow	EXEC-BLOCK	SOL	LONG						
+1795183261.0000	gate-shadow	LONG-NEUTRAL	TRX	LONG						
+1795183261.0000	gate-shadow	LONG-NEUTRAL	BABY	LONG						
+1795183261.0000	gate-shadow	BTC-CHOP-GATE	ARB	LONG						
+1795183261.0000	gate-shadow	RR-ENGINE	ENA	LONG						
+1795183261.0000	gate-shadow	LONG-RSI-CEILING	GRASS	LONG						
+1795183321.0000	gate-shadow	SHORT-BB-DEAD-ZONE	PUMP	SHORT						
+1795183321.0000	gate-shadow	SHORT-BB-DEAD-ZONE	NEAR	SHORT						
+1795183321.0000	gate-shadow	LONG-HIGH-70	SOL	LONG						
+1795183321.0000	gate-shadow	SHORT-RSI-CEILING	BTC	SHORT						
+1795183381.0000	gate-shadow	LONG-RSI-CEILING	CHIP	LONG						
+1795183381.0000	gate-shadow	SHORT-BB-DEAD-ZONE	BTC	SHORT						
+1795183441.0000	gate-shadow	BTC-CHOP-GATE	APT	LONG						
+1795183500.0000	gate-shadow	LONG-NEUTRAL	CRV	LONG						
+1795183501.0000	gate-shadow	OVERSOLD-SHORT	RESOLV	SHORT						
+1795183531.0000	gate-shadow	BTC-CRASH	SOL	SHORT						
+1795183561.0000	gate-shadow	SHORT-NEUTRAL	ANIME	SHORT						
+1795183561.0000	gate-shadow	BTC-CHOP-GATE	HBAR	LONG						
+1795183562.0000	gate-shadow	BTC-CHOP-GATE	CC	LONG						
+1795183620.0000	gate-shadow	LONG-RSI-BLOCK	NEO	LONG						
+1795183620.0000	gate-shadow	PUMP-CHAIN-RSI-MAX	CHIP	LONG						
+1795183681.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	PUMP	SHORT						
+1795183741.0000	gate-shadow	LONG-HIGH-70	ARB	LONG						
+1795183800.0000	gate-shadow	VOL-GATE-BYPASS	ZORA	LONG						
+1795183801.0000	gate-shadow	VOL-GATE-BYPASS	BLUR	LONG						
+1795183801.0000	gate-shadow	RR-ENGINE	BTC	SHORT						
+1795183801.0000	gate-shadow	LONG-HIGH-70	ARB	LONG						
+1795183801.0000	gate-shadow	SHORT-BB-DEAD-ZONE	NEAR	SHORT						
+1795183801.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	PUMP	SHORT						
+1795183801.0000	gate-shadow	LONG-MIDBAND	SOL	LONG						
+1795183832.0000	gate-shadow	EXEC-BLOCK	SOL	LONG						
+1795183861.0000	gate-shadow	SHORT-BB-DEAD-ZONE	PUMP	SHORT						
+1795183981.0000	gate-shadow	SHORT-REGIME-GATE	BTC	SHORT						
+1795183981.0000	gate-shadow	LONG-RSI-CEILING	BLUR	LONG						
+1795184340.0000	gate-shadow	VEL-FILTER	SOL	SHORT						
+1795184366.0000	gate-shadow	BTC-CRASH	BTC	LONG						
+1795184401.0000	gate-shadow	SHORT-REGIME-GATE	BTC	SHORT						
+1795184430.0000	gate-shadow	BTC-CRASH	BTC	LONG						
+1795184520.0000	gate-shadow	SHORT-CONTINUUM	SOL	SHORT						
+1795184520.0000	gate-shadow	SHORT-CONTINUUM	BTC	SHORT						
+1795184881.0000	gate-shadow	LONG-RSI-CEILING	BTC	LONG						
+1795185001.0000	gate-shadow	SHORT-CONTINUUM	SOL	SHORT						
+1795185001.0000	gate-shadow	LONG-NEUTRAL	COMP	LONG						
+1795185001.0000	gate-shadow	SHORT-CONTINUUM	BTC	SHORT						
+1795185002.0000	gate-shadow	LONG-RSI-CEILING	BTC	LONG						
+1795185060.0000	gate-shadow	SHORT-CONTINUUM	TURBO	SHORT						
+1795185060.0000	gate-shadow	SHORT-CONTINUUM	GMT	SHORT						
+1795185061.0000	gate-shadow	RR-ENGINE	INJ	LONG						
+1795185061.0000	gate-shadow	LONG-MIDBAND	ETH	LONG						
+1795185121.0000	gate-shadow	SHORT-CONTINUUM	HBAR	SHORT						
+1795185121.0000	gate-shadow	SHORT-CONTINUUM	INJ	SHORT						
+1795185121.0000	gate-shadow	SHORT-CONTINUUM	HYPE	SHORT						
+1795185121.0000	gate-shadow	PRESERVE-MERGE-BLOCK	JUP	LONG						
+1795185164.0000	gate-shadow	EXEC-BLOCK	ETH	LONG						
+1795185181.0000	gate-shadow	LONG-MIDBAND	BTC	LONG						
+1795185360.0000	gate-shadow	PUMP-CHAIN-RSI-MAX	INJ	LONG						
+1795185360.0000	gate-shadow	PUMP-CHAIN-RSI-MAX	JUP	LONG						
+1795185360.0000	gate-shadow	SHORT-CONTINUUM	NXPC	SHORT						
+1795185360.0000	gate-shadow	SHORT-CONTINUUM	COMP	SHORT						
+1795185361.0000	gate-shadow	RR-ENGINE	BTC	LONG						
+1795185421.0000	gate-shadow	RR-ENGINE	NXPC	SHORT						
+1795185421.0000	gate-shadow	RR-ENGINE	SOL	LONG						
+1795185421.0000	gate-shadow	SHORT-REGIME-GATE	HBAR	SHORT						
+1795185421.0000	gate-shadow	SHORT-BB-DEAD-ZONE	TURBO	SHORT						
+1795185421.0000	gate-shadow	SHORT-BB-DEAD-ZONE2	GMT	SHORT						
+1795185421.0000	gate-shadow	OVERSOLD-SHORT	COMP	SHORT						
+1795185541.0000	gate-shadow	RR-ENGINE	ETH	LONG						
+1795185542.0000	gate-shadow	OVERSOLD-SHORT	BTC	SHORT						
+1795185601.0000	gate-shadow	PUMP-CHAIN-RSI-MAX	INJ	LONG						
+1795185601.0000	gate-shadow	RR-ENGINE	NXPC	SHORT						
+1795185602.0000	gate-shadow	RR-ENGINE	SOL	LONG						
+1795185602.0000	gate-shadow	RR-ENGINE	ETH	LONG						
+1795185602.0000	gate-shadow	SHORT-REGIME-GATE	HBAR	SHORT						
+1795185602.0000	gate-shadow	SHORT-BB-DEAD-ZONE	TURBO	SHORT						
+1795185602.0000	gate-shadow	SHORT-BB-DEAD-ZONE2	GMT	SHORT						
+1795185602.0000	gate-shadow	OVERSOLD-SHORT	COMP	SHORT						
+1795185641.0000	gate-shadow	BTC-CRASH	BLUR	LONG						
+1795185641.0000	gate-shadow	BTC-CRASH	BTC	LONG						
+1795185661.0000	gate-shadow	BTC-CHOP-GATE	COMP	SHORT						
+1795185661.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	IO	SHORT						
+1795185721.0000	gate-shadow	LONG-RSI-BLOCK	SOL	LONG						
+1795185721.0000	gate-shadow	RR-ENGINE	SOL	SHORT						
+1795185762.0000	gate-shadow	EXEC-BLOCK	SOL	SHORT						
+1795185780.0000	gate-shadow	SHORT-NEUTRAL	NXPC	SHORT						
+1795185781.0000	gate-shadow	OVERSOLD-SHORT	SOL	SHORT						
+1795186201.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	IO	SHORT						
+1795186233.0000	gate-shadow	BTC-ACCEL	BTC	LONG						
+1795186233.0000	gate-shadow	BTC-ACCEL	SOL	SHORT						
+1795186233.0000	gate-shadow	BTC-CRASH	SOL	SHORT						
+1795186261.0000	gate-shadow	PUMP-CHAIN-SHORT-HIGH	CRV	SHORT						
+1795186261.0000	gate-shadow	LONG-RSI-BLOCK	ETH	LONG						
+1795186261.0000	gate-shadow	SPIKE-FILTER	SOL	LONG						
+1795186321.0000	gate-shadow	SPIKE-FILTER	BTC	LONG						
+1795186380.0000	gate-shadow	VOL-GATE-BYPASS	FIL	SHORT						
+1795186380.0000	gate-shadow	PUMP-CHAIN-SHORT-HIGH	AVAX	SHORT						
+1795186500.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	HBAR	LONG						
+1795186529.0000	gate-shadow	BTC-CRASH	BLUR	LONG						
+1795186561.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	LTC	LONG						
+1795186561.0000	gate-shadow	PRESERVE-MERGE-BLOCK	BLUR	LONG						
+1795186620.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	BIGTIME	LONG						
+1795186621.0000	gate-shadow	RR-ENGINE	MNT	LONG						
+1795186740.0000	gate-shadow	PUMP-CHAIN-RSI-MAX	DYDX	LONG						
+1795186740.0000	gate-shadow	PUMP-CHAIN-RSI-MAX	CHIP	LONG						
+1795186741.0000	gate-shadow	RR-ENGINE	GMX	LONG						
+1795186741.0000	gate-shadow	LONG-RSI-CEILING	APE	LONG						
+1795186741.0000	gate-shadow	LONG-MIDBAND	BTC	LONG						
+1795186802.0000	gate-shadow	VOL-GATE-BYPASS	FIL	SHORT						
+1795186802.0000	gate-shadow	PUMP-CHAIN-RSI-MAX	DYDX	LONG						
+1795186802.0000	gate-shadow	PUMP-CHAIN-SHORT-HIGH	CRV	SHORT						
+1795186802.0000	gate-shadow	PUMP-CHAIN-RSI-MAX	CHIP	LONG						
+1795186803.0000	gate-shadow	PUMP-CHAIN-SHORT-HIGH	AVAX	SHORT						
+1795186803.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	LTC	LONG						
+1795186803.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	HBAR	LONG						
+1795186803.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	BIGTIME	LONG						
+1795186803.0000	gate-shadow	RR-ENGINE	MNT	LONG						
+1795186803.0000	gate-shadow	RR-ENGINE	GMX	LONG						
+1795186804.0000	gate-shadow	LONG-RSI-CEILING	ENA	LONG						
+1795186804.0000	gate-shadow	LONG-MIDBAND	BTC	LONG						
+1795186804.0000	gate-shadow	LONG-RSI-CEILING	APE	LONG						
+1795186861.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	ALT	LONG						
+1795186861.0000	gate-shadow	BTC-CHOP-GATE	MNT	LONG						
+1795186861.0000	gate-shadow	RR-ENGINE	BTC	LONG						
+1795186861.0000	gate-shadow	SHORT-RSI-CEILING	USELESS	SHORT						
+1795186921.0000	gate-shadow	PUMP-CHAIN-HIGH	DYDX	LONG						
+1795186921.0000	gate-shadow	BTC-CHOP-GATE	RESOLV	SHORT						
+1795186922.0000	gate-shadow	SHORT-RSI-CEILING	WLD	SHORT						
+1795186922.0000	gate-shadow	LONG-MIDBAND	SOL	LONG						
+1795186981.0000	gate-shadow	LONG-NEUTRAL-CHOP	ENA	LONG						
+1795186981.0000	gate-shadow	LONG-RSI-CEILING	GMX	LONG						
+1795186981.0000	gate-shadow	SHORT-RSI-CEILING	RESOLV	SHORT						
+1795187042.0000	gate-shadow	SPIKE-FILTER	FARTCOIN	LONG						
+1795187101.0000	gate-shadow	PUMP-CHAIN-HIGH	GMT	LONG						
+1795187101.0000	gate-shadow	VOL-GATE-BYPASS	SOPH	LONG						
+1795187221.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	IO	SHORT						
+1795187401.0000	gate-shadow	PUMP-CHAIN-HIGH	GMT	LONG						
+1795187401.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	ALT	LONG						
+1795187401.0000	gate-shadow	VOL-GATE-BYPASS	SOPH	LONG						
+1795187401.0000	gate-shadow	RR-ENGINE	BTC	LONG						
+1795187401.0000	gate-shadow	SPIKE-FILTER	FARTCOIN	LONG						
+1795187401.0000	gate-shadow	LONG-MIDBAND	SOL	LONG						
+1795187401.0000	gate-shadow	SHORT-RSI-CEILING	WLD	SHORT						
+1795187401.0000	gate-shadow	SHORT-RSI-CEILING	RESOLV	SHORT						
+1795187521.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	SOL	SHORT						
+1795187547.0000	gate-shadow	BTC-CRASH	SOL	LONG						
+1795187641.0000	gate-shadow	SHORT-REGIME-GATE	SOL	SHORT						
+1795187700.0000	gate-shadow	LONG-RSI-BLOCK	BTC	LONG						
+1795187701.0000	gate-shadow	OVERSOLD-SHORT	DYDX	SHORT						
+1795187761.0000	gate-shadow	LONG-RSI-BLOCK	SOL	LONG						
+1795187820.0000	gate-shadow	VOL-GATE-BYPASS	APT	SHORT						
+1795187820.0000	gate-shadow	VOL-GATE-BYPASS	AIXBT	SHORT						
+1795188001.0000	gate-shadow	VOL-GATE-BYPASS	APT	SHORT						
+1795188001.0000	gate-shadow	VOL-GATE-BYPASS	AIXBT	SHORT						
+1795188001.0000	gate-shadow	LONG-RSI-BLOCK	BTC	LONG						
+1795188001.0000	gate-shadow	LONG-RSI-BLOCK	SOL	LONG						
+1795188001.0000	gate-shadow	LONG-RSI-BLOCK	ETH	LONG						
+1795188002.0000	gate-shadow	SHORT-REGIME-GATE	SOL	SHORT						
+1795188002.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	FIL	SHORT						
+1795188002.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	CRV	SHORT						
+1795188002.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	ETC	SHORT						
+1795188002.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	DOGE	SHORT						
+1795188002.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	CFX	SHORT						
+1795188002.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	CELO	SHORT						
+1795188061.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	IMX	SHORT						
+1795188301.0000	gate-shadow	SPIKE-FILTER	BTC	LONG						
+1795188361.0000	gate-shadow	SHORT-REGIME-GATE	BTC	SHORT						
+1795188421.0000	gate-shadow	RR-ENGINE	DOGE	SHORT						
+1795188601.0000	gate-shadow	LONG-RSI-BLOCK	SOL	LONG						
+1795188601.0000	gate-shadow	LONG-RSI-BLOCK	ETH	LONG						
+1795188601.0000	gate-shadow	SHORT-REGIME-GATE	BTC	SHORT						
+1795188601.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	IMX	SHORT						
+1795188601.0000	gate-shadow	SPIKE-FILTER	BTC	LONG						
+1795188661.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	LDO	SHORT						
+1795188661.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	LINK	SHORT						
+1795188661.0000	gate-shadow	SPIKE-FILTER	ETH	LONG						
+1795188780.0000	gate-shadow	VOL-GATE-BYPASS	BLUR	SHORT						
+1795188781.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	ONDO	SHORT						
+1795188781.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	SOL	SHORT						
+1795188809.0000	gate-shadow	BTC-CRASH	SOL	LONG						
+1795188900.0000	gate-shadow	VOL-GATE-BYPASS	HYPER	SHORT						
+1795188901.0000	gate-shadow	RR-ENGINE	JUP	LONG						
+1795188901.0000	gate-shadow	RR-ENGINE	INJ	LONG						
+1795188901.0000	gate-shadow	SHORT-REGIME-GATE	ETH	SHORT						
+1795188901.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	WCT	SHORT						
+1795188901.0000	gate-shadow	SPIKE-FILTER	FARTCOIN	LONG						
+1795188960.0000	gate-shadow	VOL-GATE-BYPASS	CELO	SHORT						
+1795188962.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	TRX	SHORT						
+1795188962.0000	gate-shadow	SPIKE-FILTER	CRV	LONG						
+1795188962.0000	gate-shadow	SPIKE-FILTER	ICP	LONG						
+1795188962.0000	gate-shadow	SPIKE-FILTER	GRASS	LONG						
+1795189021.0000	gate-shadow	RR-ENGINE	BTC	SHORT						
+1795189021.0000	gate-shadow	PUMP-CHAIN-VEL	CRV	LONG						
+1795189201.0000	gate-shadow	VOL-GATE-BYPASS	HYPER	SHORT						
+1795189201.0000	gate-shadow	VOL-GATE-BYPASS	CELO	SHORT						
+1795189201.0000	gate-shadow	VOL-GATE-BYPASS	BLUR	SHORT						
+1795189201.0000	gate-shadow	RR-ENGINE	INJ	LONG						
+1795189202.0000	gate-shadow	RR-ENGINE	BTC	SHORT						
+1795189202.0000	gate-shadow	SHORT-REGIME-GATE	ETH	SHORT						
+1795189202.0000	gate-shadow	SHORT-REGIME-GATE	BTC	SHORT						
+1795189202.0000	gate-shadow	SHORT-REGIME-GATE	SOL	SHORT						
+1795189202.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	WCT	SHORT						
+1795189202.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	TRX	SHORT						
+1795189202.0000	gate-shadow	SPIKE-FILTER	ICP	LONG						
+1795189202.0000	gate-shadow	SPIKE-FILTER	GRASS	LONG						
+1795189202.0000	gate-shadow	SPIKE-FILTER	FARTCOIN	LONG						
+1795189202.0000	gate-shadow	PUMP-CHAIN-VEL	CRV	LONG						
+1795189202.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	LINK	SHORT						
+1795189202.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	LDO	SHORT						
+1795189202.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	IMX	SHORT						
+1795189202.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	ONDO	SHORT						
+1795189262.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	SOL	SHORT						
+1795189262.0000	gate-shadow	SPIKE-FILTER	JUP	LONG						
+1795189380.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	STABLE	LONG						
+1795189410.0000	gate-shadow	BTC-CRASH	SOL	LONG						
+1795189500.0000	gate-shadow	LONG-RSI-BLOCK	BTC	LONG						
+1795189561.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	AIXBT	SHORT						
+1795189561.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	HYPE	SHORT						
+1795189621.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	BTC	SHORT						
+1795189741.0000	gate-shadow	LONG-RSI-FLOOR	BTC	LONG						
+1795189801.0000	gate-shadow	CONFLUENCE-GATE-BLOCK	STABLE	LONG						
+1795189801.0000	gate-shadow	SHORT-REGIME-GATE	BTC	SHORT						
+1795189801.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	AIXBT	SHORT						
+1795189801.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	HYPE	SHORT						
+1795189801.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	SOL	SHORT						
+1795189833.0000	gate-shadow	BTC-CRASH	SOL	LONG						
+1795189860.0000	gate-shadow	VOL-GATE-BYPASS	CELO	SHORT						
+1795189860.0000	gate-shadow	LONG-RSI-BLOCK	STABLE	LONG						
+1795189861.0000	gate-shadow	RR-ENGINE	ETH	SHORT						
+1795189861.0000	gate-shadow	SHORT-RSI-HARD-FLOOR	BTC	SHORT						
+1795189921.0000	gate-shadow	RR-ENGINE	BTC	SHORT						
+1795189921.0000	gate-shadow	LONG-RSI-FLOOR	BTC	LONG						
+1795189971.0000	gate-shadow	EXEC-BLOCK	BTC	LONG						
+1795189980.0000	gate-shadow	VOL-GATE-BYPASS	ENS	SHORT						
+1795189980.0000	gate-shadow	VOL-GATE-BYPASS	CRV	SHORT						
+1795189980.0000	gate-shadow	VOL-GATE-BYPASS	CAKE	SHORT						
+1795190252.0000	gate-shadow	BTC-CRASH	BTC	LONG						
+1795190281.0000	gate-shadow	RR-ENGINE	GMX	LONG						
+1795190281.0000	gate-shadow	PUMP-CHAIN-VEL	CHIP	LONG						
+1795190281.0000	gate-shadow	SPIKE-FILTER	AR	LONG						
+1795190281.0000	gate-shadow	PUMP-CHAIN-VEL	GRASS	LONG						
+1795190287.0000	gate-shadow	BTC-CRASH	ICP	LONG						
+1795190287.0000	gate-shadow	BTC-CRASH	FARTCOIN	LONG						
+1795190287.0000	gate-shadow	BTC-CRASH	ENA	LONG						
+1795190341.0000	gate-shadow	VOL-GATE-BYPASS	FIL	SHORT						

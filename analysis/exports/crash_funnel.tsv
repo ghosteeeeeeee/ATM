@@ -1,0 +1,51 @@
+source	cause	n	cov_ex1h	ex1h_mean	cov_ex4h	ex4h_mean
+decider-skip	DailyFillCap	507	10	0.07935624379586781	10	-0.07084557992105758
+signals-expired	combo-stale(merge-window)	81	0		0	
+gate-shadow	SHORT-RSI-HARD-FLOOR	69	17	-0.1059592964087478	17	-0.13648579615740095
+gate-shadow	RR-ENGINE	52	9	0.16545599203945385	9	0.19186719178565326
+signals-expired	approved-fell-out-of-hotset	44	0		0	
+signals-expired	compaction-stale-10min	41	0		0	
+gate-shadow	BTC-CRASH	35	4	0.34732111444761515	4	0.3690887626907632
+signals-expired	short-rsi-hard-floor	34	5	-0.14148317778075326	5	-0.3855035397268397
+gate-shadow	VOL-GATE-BYPASS	33	1	1.9558272813954383	1	0.253083580388922
+gate-shadow	SHORT-REGIME-GATE	27	6	-0.24171070652147797	6	0.007245093555366067
+gate-shadow	CONFLUENCE-GATE-BLOCK	23	4	-0.18999236517679013	4	0.13553806098985588
+gate-shadow	SPIKE-FILTER	23	5	0.5142149438937194	5	-0.06067804370922873
+gate-shadow	PUMP-CHAIN-HIGH	23	4	-0.20098703535192297	4	-0.4692028251780167
+signals-expired	vol-gate-override-0	20	0		0	
+gate-shadow	LONG-RSI-BLOCK	16	4	0.31396884716871676	4	-0.33245006732903326
+gate-shadow	LONG-RSI-CEILING	15	0		0	
+signals-expired	pump-chain-long-high	14	0		0	
+gate-shadow	PUMP-CHAIN-RSI-MAX	14	1	0.3532388356111369	1	0.7829024371271003
+signals-expired	rr-engine-hard-block	13	0		0	
+signals-expired	long-rsi-ceiling	13	0		0	
+gate-shadow	BTC-CHOP-GATE	12	1	0.3873396252491177	1	-1.4553875439166504
+signals-expired	confluence-single-not-bypass	11	0		0	
+signals-expired	pump-chain-rsi-max	11	0		0	
+gate-shadow	LONG-MIDBAND	11	1	0.6441375652809453	1	0.4802782328163362
+gate-shadow	SHORT-CONTINUUM	11	0		0	
+signals-expired	spike-filter-long	10	1	0.3873396252491177	1	-1.4553875439166504
+gate-shadow	OVERSOLD-SHORT	10	1	-0.06850270389542062	1	-2.3579435372879227
+gate-shadow	LONG-NEUTRAL	8	2	1.1050539833412882	2	1.0278898411013424
+gate-shadow	PUMP-CHAIN-SHORT-HIGH	8	0		0	
+gate-shadow	LONG-NEUTRAL-CHOP	8	0		0	
+gate-shadow	SHORT-BB-DEAD-ZONE	8	0		0	
+gate-shadow	SHORT-RSI-CEILING	8	0		0	
+gate-shadow	PUMP-CHAIN-VEL	7	2	0.7214236324275103	2	-0.8876546068422271
+gate-shadow	EXEC-BLOCK	7	0		0	
+gate-shadow	SHORT-NEUTRAL	6	0		0	
+signals-expired	short-regime-gate	5	0		0	
+signals-expired	pump-chain-vel	5	0		0	
+signals-expired	pump-chain-short-high	5	0		0	
+signals-expired	oversold-knife	5	0		0	
+gate-shadow	LONG-RSI-FLOOR	4	0		0	
+gate-shadow	LONG-HIGH-70	4	0		0	
+gate-shadow	BTC-ACCEL	4	0		0	
+gate-shadow	SHORT-BB-DEAD-ZONE2	4	0		0	
+signals-expired	long-midband	3	0		0	
+signals-expired	long-neutral-chop	3	0		0	
+gate-shadow	PRESERVE-MERGE-BLOCK	2	0		0	
+signals-expired	long-high-70	1	0		0	
+signals-expired	long-rsi-floor	1	0		0	
+gate-shadow	PRESERVE-SPIKE-BLOCK	1	1	-0.06850270389542062	1	-2.3579435372879227
+gate-shadow	VEL-FILTER	1	0		0	
