@@ -167,7 +167,11 @@ def run_h(rows, trend, sw, side, style, stop_pct, delay, flat_only,
             continue
         # find the touch after availability (and after the swing's own bar)
         touch = None
-        for i in range(max(avail, li + 1), min(li + 400, len(rows))):
+        # F-1 (bug-hunter): the swing is knowable only at the confirm
+        # bar's CLOSE — earliest entry is the NEXT bar (li+delay+1);
+        # entering on the confirm bar itself used that bar's own close
+        # (53% of confirmable episodes — one-directional optimistic bias).
+        for i in range(max(avail + 1, li + 1), min(li + 400, len(rows))):
             if side == "SHORT":
                 # fade a rally INTO the swing-high zone (retest fails)
                 if rows[i][2] >= lval * (1 - ZONE):
@@ -230,10 +234,10 @@ def run_h(rows, trend, sw, side, style, stop_pct, delay, flat_only,
         else:
             pnl_px = (exit_px - entry) / entry
         margin = pnl_px * 100 * 10
-        if outcome == "STOP" or outcome == "TP":
-            margin -= (FEE_RT + SLIP_RT) * 100 * 10 if costs else 0.0
-        else:
-            margin -= (FEE_RT + SLIP_RT) * 100 * 10 if costs else 0.0
+        if costs and outcome in ("STOP", "TP"):
+            # F-7: OPEN marks are unresolved — no round trip paid yet
+            # (charging them was pessimistic by <=7.6 margin pts/row).
+            margin -= (FEE_RT + SLIP_RT) * 100 * 10
         results.append((ti, outcome, margin))
         if flat_only:
             open_until = ei + 1
@@ -301,8 +305,12 @@ def main():
     cls = clusters(rows, sw)
     span = (datetime.datetime.utcfromtimestamp(rows[0][0]).strftime("%Y-%m-%d"),
             datetime.datetime.utcfromtimestamp(rows[-1][0]).strftime("%Y-%m-%d"))
+    import hashlib
+    digest = hashlib.sha256(
+        repr([(r[0], r[4]) for r in rows]).encode()).hexdigest()[:12]
     print(f"retest-fade harness | {TF} {span[0]} → {span[1]} | "
-          f"{len(rows)} bars | pinned constants (see module docstring)")
+          f"{len(rows)} bars | data-sha {digest} | "
+          f"pinned constants (see module docstring)")
     print(f"detector: {len(sw)} swing-lows, {len(sw_h)} swing-highs, "
           f"{len(cls)} support clusters | costs: "
           f"{(FEE_RT+SLIP_RT)*100:.2f}% price/RT")
