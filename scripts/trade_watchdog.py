@@ -1383,6 +1383,20 @@ def _monitor_pending_orders_impl(btc_price):
             "FAIL-CLOSED until a writer repairs it", "ERROR")
         return steers
     changed = False
+    # F3 (agent-2): waiting-state hygiene — first_break/retested/rejected
+    # never reclaimed age out after 7d and re-qualify from scratch (the
+    # CONFIG order persists; only the wait-state is dropped). one-shot
+    # guards (fired/error/triggered) are NEVER pruned — double-fire
+    # safety stays. 71 entries were live at audit, oldest 2026-10-18.
+    _now = time.time()
+    for _pk in [k for k, v in state.items()
+                if isinstance(v, dict)
+                and v.get("status") in ("first_break", "retested", "rejected")
+                and (_now - float(v.get("ts") or 0)) > 7 * 86400]:
+        del state[_pk]
+        changed = True
+        log(f"pending order {_pk}: waiting-state pruned after 7d without "
+            f"reclaim — re-qualifies fresh (config order persists)")
     seen_ids = set()
     serial_claimed = False   # one serial-ladder rung fires per cycle
     for order in cfg["orders"]:
@@ -1501,17 +1515,19 @@ def _monitor_pending_orders_impl(btc_price):
             if _ps == "rejected":
                 if crossed:
                     continue
-                state[oid] = {"status": "retested", "ts": time.time(),
-                              "price": trigger_price}
-                changed = True
+                if PENDING_ORDERS_CAN_PERSIST:   # F4: dry-run never mutates
+                    state[oid] = {"status": "retested", "ts": time.time(),
+                                  "price": trigger_price}
+                    changed = True
                 log(f"pending order {oid}: rejected rung retested after "
                     f"trigger reclaim (no-burn) — armed for the re-cross")
                 continue
             if _ps == "first_break":
                 if not crossed:
-                    state[oid] = {"status": "retested", "ts": time.time(),
-                                  "price": trigger_price}
-                    changed = True
+                    if PENDING_ORDERS_CAN_PERSIST:   # F4
+                        state[oid] = {"status": "retested", "ts": time.time(),
+                                      "price": trigger_price}
+                        changed = True
                     log(f"pending order {oid}: level reclaimed after first "
                         f"break — armed for the re-cross (multi-touch)")
                     continue
@@ -1521,9 +1537,10 @@ def _monitor_pending_orders_impl(btc_price):
                     continue
                 # cross#2 — fall through to stacking/steer = the fill
             elif crossed:
-                state[oid] = {"status": "first_break", "ts": time.time(),
-                              "price": trigger_price}
-                changed = True
+                if PENDING_ORDERS_CAN_PERSIST:   # F4
+                    state[oid] = {"status": "first_break", "ts": time.time(),
+                                  "price": trigger_price}
+                    changed = True
                 log(f"pending order {oid}: FIRST break seen — no fill "
                     f"(multi-touch: wait for reclaim + re-cross)")
                 continue
@@ -1666,7 +1683,8 @@ def _execute_pending_order_impl(order):
                 "auto_executed": False,
                 "hl_result": "error: one-shot state corrupt"}
     _prev = _pre_state.get(oid)
-    if isinstance(_prev, dict) and _prev.get("status") in ("fired", "error", "rejected"):
+    if isinstance(_prev, dict) and _prev.get("status") in (
+            "fired", "error", "rejected", "first_break", "retested"):
         log(f"AUTO-EXEC {oid}: already {_prev.get('status')} — one-shot "
             f"re-entry refused", "WARN")
         return {"type": "pending_order", "order_id": oid,
@@ -1724,11 +1742,22 @@ def _execute_pending_order_impl(order):
         # opened — that is not an execution failure. Status 'rejected'
         # keeps the rung alive; the monitor re-arms it once price
         # reclaims the trigger (the §11 re-cross with RSI recovered).
-        # Real failures (timeout, API error, non-zero without the
-        # REJECTED marker) keep terminal 'error' — no double-fire.
+        # Taxonomy (F6a, intended scope): ALL pre-open brain rejections
+        # — RSI knife/floor, blacklist, vacation/live-trading, delisted,
+        # HL_MIN, DUPLICATE, STALE ORPHAN (F6b now carries the marker) —
+        # are retryable 'rejected': rejection != failure, and each retries
+        # only after a level reclaim (throttled by construction). Only
+        # non-marker failures (timeout, API error, tracebacks) stay
+        # terminal 'error' — no double-fire (open requires rc==0 + the
+        # added-trade line; verified unreachable-by-marker).
         # Reuses `state` loaded at claim time — same lock hold, no reload
         # (F1: interleaved reloads were the race window).
-        _rejected = "REJECTED" in out
+        # F1 (agent-2): bare 'REJECTED' in out is demonstrably broad —
+        # mirror_open FAILED-lines, tracebacks quoting a brain REJECTED
+        # source line, and incidental warnings all matched. Exact marker:
+        # only brain's own gate lines make a rejection retryable.
+        _rejected = any(ln.startswith("[brain.py] \u274c REJECTED")
+                        for ln in out.splitlines())
         state[oid] = {
             "status": ("fired" if success
                        else ("rejected" if _rejected else "error")),

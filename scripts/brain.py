@@ -708,7 +708,7 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         if orphan_row:
             oid, paper_val, hl_ep, open_time = orphan_row
             age_hrs = (datetime.now() - open_time).total_seconds() / 3600 if open_time else 0
-            print(f"[brain.py] 🏚️ STALE ORPHAN: {token} id={oid} hl_ep={hl_ep} age={age_hrs:.1f}h — rejecting to prevent double-entry")
+            print(f"[brain.py] \u274c REJECTED: {token} — STALE ORPHAN: {token} id={oid} hl_ep={hl_ep} age={age_hrs:.1f}h — rejecting to prevent double-entry")
             return None
     except Exception as orphan_err:
         print(f"[brain.py] stale orphan check error for {token}: {orphan_err} — proceeding anyway")
