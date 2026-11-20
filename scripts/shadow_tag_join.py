@@ -1,11 +1,23 @@
 #!/usr/bin/env python3
-"""shadow_tag_join.py — join-builder for the 5 SHORT-side shadow log tags.
+"""shadow_tag_join.py — join-builder for the 5 SHORT-side shadow log tags
+PLUS the DailyFillCap brake store (registry `brake-counterfactual-shadow`).
 
 Registry: data/shadow_disposition.json id `short-shadow-join-builder`
 (pulled forward to deadline 2026-11-08 — must EXIST before the 2026-11-10
-bear-single-source flip read).  LOG/ANALYTICS ONLY: reads pipeline.log and
-data/candles.db, writes one JSON artifact.  Zero code in the live trading
-path (same freeze-safe standalone pattern as gate_shadow.py / expiry_shadow.py).
+bear-single-source flip read).  LOG/ANALYTICS ONLY: reads pipeline.log,
+data/candles.db and brain/brake_shadow.db, writes one JSON artifact.  Zero
+code in the live trading path (same freeze-safe standalone pattern as
+gate_shadow.py / expiry_shadow.py).
+
+BRAKE SOURCE (registry `brake-counterfactual-shadow`, CEO 20261120T1548Z):
+the 5 tags below come from log lines; BRAKE-FILLCAP-SHADOW comes from the
+append-only store decider_run._brake_shadow_record writes when the
+DailyFillCap brake blocks a candidate (one row per token|direction|UTC-hour).
+The store rows are token-day deduped here (keep earliest — same convention
+as the log tags) and joined with the SAME fwd_4h engine, so the
+brake-during-crash EV question reads off the same table: n token-days,
+joinable, WR, gross, fee, net vs the entry's bar (net >= +$1.00/14d at
+n>=30).
 
 What it does, per tag (TOKEN-DAY DEDUP first — registry
 `gate-shadow-dedup-convention`: event n is 7-10x pseudo-replicated, so raw
@@ -72,15 +84,24 @@ from gate_shadow import log_sources, open_log_text
 LOG_PATH = os.path.join(HERMES_LOG_DIR, 'pipeline.log')
 CANDLES_DB = os.path.join(HERMES_DATA, 'candles.db')
 OUT_JSON = os.path.join(HERMES_DATA, 'shadow_tag_join_latest.json')
+# brain/ next to data/ — same layout as gate_shadow.SHADOW_DB (gate_shadow.py:67)
+BRAKE_DB = os.path.join(os.path.dirname(HERMES_DATA), 'brain', 'brake_shadow.db')
 
-# ── the 5 shadow tags this registry entry covers ──────────────────────────────
+# ── the shadow tags this registry entry covers ───────────────────────────────
+# The first 5 parse pipeline.log; BRAKE-FILLCAP-SHADOW reads the brake store.
 TAGS = (
     'SHORT-REGIME-EXEMPT-SHADOW',
     'FLIP1-OVERRIDE-SHADOW',
     'BEAR-SINGLE-SOURCE-SHADOW',
     'VOLGATE-SHORT-EXEMPT-SHADOW',
     'MAXXED-SHORT-EXEMPT-SHADOW',
+    'BRAKE-FILLCAP-SHADOW',
 )
+
+# The brake tag has no log-line source: its events live in brain/brake_shadow.db
+# (decider_run._brake_shadow_record). Kept in TAGS so a plain
+# `python3 scripts/shadow_tag_join.py` run reports it alongside the log tags.
+BRAKE_TAG = 'BRAKE-FILLCAP-SHADOW'
 
 # Registry bars are worded "14d shadow-joined n>=..." — so the join defaults to
 # the same 14d window (code-review M1). The shadows only started 2026-11-03, so
@@ -238,6 +259,54 @@ def _iter_lines(sources):
                     yield line
         except (OSError, EOFError) as e:
             log(f'skipping unreadable log source {path}: {e}')
+
+
+def load_brake_events(db_path=BRAKE_DB, since=None):
+    """brain/brake_shadow.db rows -> join events (brake-counterfactual-shadow).
+
+    Returns (events, n_rows_in_window).  Rows are already deduped per
+    token|direction|UTC-hour by the writer; the join applies the house
+    TOKEN-DAY dedup here (tag|token|direction|UTC-day, keep earliest — same
+    key as collect_events) because the registry bars are worded in token-days.
+    `since` filters BEFORE dedup so an out-of-window row cannot evict an
+    in-window sighting (collect_events M1 rule).  Read-only URI: a missing
+    store yields 0 events and never creates a file (load_candles L4 pattern);
+    a missing/corrupt store must not abort the run.
+    """
+    events = []
+    n_rows = 0
+    try:
+        conn = sqlite3.connect(f'file:{db_path}?mode=ro', uri=True, timeout=10)
+        try:
+            rows = conn.execute(
+                'SELECT ts, token, direction, source, fee_net_24h, opens_24h '
+                'FROM events ORDER BY ts').fetchall()
+        finally:
+            conn.close()
+        picked = {}
+        for ts, token, direction, source, fee_net, opens in rows:
+            if since is not None and ts < since:
+                continue
+            n_rows += 1
+            ev = {
+                'ts': ts, 'tag': BRAKE_TAG,
+                'token': (token or '').upper(), 'direction': (direction or '').upper(),
+                'signal_type': None, 'source': source, 'conf': None, 'regime_4h': None,
+                'parsed': True, 'day': (ts or '')[:10],
+                'fee_net_24h': fee_net, 'opens_24h': opens,
+            }
+            key = (ev['tag'], ev['token'], ev['direction'], ev['day'])
+            prev = picked.get(key)
+            if prev is None or ev['ts'] < prev['ts']:
+                picked[key] = ev
+        events = sorted(picked.values(), key=lambda e: (e['ts'], e['token']))
+    except Exception as e:
+        # fail-silent like join_events (bug_hunter F1): one corrupt row or a
+        # schema drift degrades the brake tag to 0 events, it must never abort
+        # the run before the JSON artifact is written.
+        log(f'brake store unreadable ({e}) — {BRAKE_TAG} reads 0 events this run')
+        return [], 0
+    return events, n_rows
 
 
 # ── forward-return engine (verbatim mirror of gate_shadow._fwd_4h) ───────────
@@ -400,6 +469,7 @@ TAG_REGISTRY_ID = {
     'BEAR-SINGLE-SOURCE-SHADOW': 'bear-single-source-shadow',
     'VOLGATE-SHORT-EXEMPT-SHADOW': 'volgate-short-exempt-shadow',
     'MAXXED-SHORT-EXEMPT-SHADOW': 'maxxed-short-exempt-shadow',
+    'BRAKE-FILLCAP-SHADOW': 'brake-counterfactual-shadow',
 }
 RAW_STATS = {}
 
@@ -415,6 +485,9 @@ BAR_TEXT = {
     'VOLGATE-SHORT-EXEMPT-SHADOW':
         'n>=100 joinable tokdays AND avg fwd>=+0.15 AND >=2/3 positive days',
     'MAXXED-SHORT-EXEMPT-SHADOW': 'n>=20 joinable tokdays',
+    'BRAKE-FILLCAP-SHADOW':
+        'n>=30 joinable tokdays AND net>=$1.00/14d (brake-during-crash EV, '
+        'read 2026-11-24)',
 }
 
 
@@ -452,6 +525,10 @@ def eval_bar(tag, m):
             m['pos_day_ratio'] is not None and m['pos_day_ratio'] >= 2.0 / 3.0)
     elif tag == 'MAXXED-SHORT-EXEMPT-SHADOW':
         add('n_joinable >= 20', 20, n, n >= 20)
+    elif tag == 'BRAKE-FILLCAP-SHADOW':
+        # registry brake-counterfactual-shadow: "net >= +$1.00/14d at n>=30"
+        add('n_joinable >= 30', 30, n, n >= 30)
+        add('net >= +$1.00', 1.0, m['net_usd'], (m['net_usd'] or 0) >= 1.0)
     else:
         # M3: all([]) is True, so an unhandled tag would otherwise print
         # "BAR MET" with zero limbs. Fail closed instead.
@@ -727,6 +804,58 @@ def selfcheck():
     finally:
         _shutil.rmtree(tmpdir, ignore_errors=True)
 
+    # 7) BRAKE store source (registry brake-counterfactual-shadow): window
+    #    filter before dedup, token-day dedup keep earliest, missing store is
+    #    0-events and read-only (never creates a file), bar limbs at the
+    #    registered boundary (n>=30 AND net>=$1.00).
+    import tempfile as _tf
+    tmp_brake = _tf.mkdtemp(prefix='stj_brake_')
+    try:
+        tmpdb = os.path.join(tmp_brake, 'brake.db')
+        conn = sqlite3.connect(tmpdb)
+        try:
+            conn.execute('CREATE TABLE events (id INTEGER PRIMARY KEY '
+                         'AUTOINCREMENT, ts TEXT, token TEXT, direction TEXT, '
+                         'source TEXT, fee_net_24h REAL, opens_24h INTEGER, '
+                         'dedup_key TEXT UNIQUE)')
+            conn.executemany(
+                'INSERT INTO events (ts,token,direction,source,fee_net_24h,'
+                'opens_24h,dedup_key) VALUES (?,?,?,?,?,?,?)',
+                [('2026-11-19 09:07:31', 'FART', 'LONG', 'r2', -0.66, 15,
+                  'FART|LONG|2026-11-19T09'),
+                 # same token-day, later HOUR: writer allows it (hour dedup),
+                 # the join must collapse it to one token-day, earliest kept
+                 ('2026-11-19 10:08:01', 'FART', 'LONG', 'r2', -0.66, 15,
+                  'FART|LONG|2026-11-19T10'),
+                 ('2026-11-20 13:00:00', 'HYPE', 'SHORT', 'jup', -0.24, 16,
+                  'HYPE|SHORT|2026-11-20T13'),
+                 ('2026-11-18 13:00:00', 'OLD', 'SHORT', 'x', -0.5, 15,
+                  'OLD|SHORT|2026-11-18T13')])
+            conn.commit()
+        finally:
+            conn.close()
+        bev, brows = load_brake_events(db_path=tmpdb, since='2026-11-19 00:00:00')
+        chk(brows == 3, f'brake window drops pre-window rows (got {brows})')
+        chk(len(bev) == 2 and bev[0]['tag'] == BRAKE_TAG
+            and bev[0]['token'] == 'FART' and bev[0]['ts'] == '2026-11-19 09:07:31'
+            and bev[0]['day'] == '2026-11-19' and bev[0]['parsed']
+            and bev[0]['fee_net_24h'] == -0.66 and bev[0]['opens_24h'] == 15,
+            f'brake load: token-day dedup keep earliest + identity fields ({len(bev)})')
+        missing = os.path.join(tmp_brake, 'no-such-brake.db')
+        bev2, brows2 = load_brake_events(db_path=missing)
+        chk(bev2 == [] and brows2 == 0 and not os.path.exists(missing),
+            'missing brake store -> 0 events, file NOT created (mode=ro)')
+        met_b, limbs_b = eval_bar(BRAKE_TAG, {'n_joinable': 30, 'net_usd': 1.0})
+        chk(met_b and len(limbs_b) == 2
+            and all(l['limb'] for l in limbs_b),
+            'brake bar MET at n=30/net=+$1.00 (2 limbs)')
+        chk(not eval_bar(BRAKE_TAG, {'n_joinable': 29, 'net_usd': 5.0})[0],
+            'brake bar fails below n=30')
+        chk(not eval_bar(BRAKE_TAG, {'n_joinable': 30, 'net_usd': 0.99})[0],
+            'brake bar fails below +$1.00')
+    finally:
+        _shutil.rmtree(tmp_brake, ignore_errors=True)
+
     print('SELFCHECK ' + ('PASS' if ok else 'FAIL'), flush=True)
     return 0 if ok else 1
 
@@ -751,7 +880,17 @@ def run(log_path=LOG_PATH, out_json=OUT_JSON, tags=TAGS,
         + (f' for window {since} .. {window_end.strftime("%Y-%m-%d %H:%M:%S")}'
            if since else ' (all available history)')
         + f' -> {", ".join(os.path.basename(p) for p in sources)}')
-    events, stats = collect_events(_iter_lines(sources), tags=tags, since=since)
+    log_tags = tuple(t for t in tags if t != BRAKE_TAG)
+    events, stats = collect_events(_iter_lines(sources), tags=log_tags, since=since)
+    for t in tags:   # collect_events only keyed the log-sourced tags
+        stats.setdefault(t, {'raw_lines': 0, 'unparsed': 0})
+    if BRAKE_TAG in tags:
+        brake_evs, brake_rows = load_brake_events(since=since)
+        events.extend(brake_evs)
+        events.sort(key=lambda e: (e['ts'], e['token']))
+        stats[BRAKE_TAG]['raw_lines'] = brake_rows
+        log(f'brake store {os.path.basename(BRAKE_DB)}: {brake_rows} row(s) in '
+            f'window -> {len(brake_evs)} token-days after dedup')
     RAW_STATS = stats
     log(f'{sum(s["raw_lines"] for s in stats.values())} raw tag lines in window -> '
         f'{len(events)} token-days after dedup; joining to {CANDLES_DB} ...')

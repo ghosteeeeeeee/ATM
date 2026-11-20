@@ -119,32 +119,51 @@ def _recent_packets(limit=8):
     return hits[-limit:][::-1]
 
 
-# ── fill_cap (DailyFillCap / Cap D visibility, CEO consult 20261110T184624Z) ──
-# Bounded backward scan of pipeline.log for DailyFillCap SKIP events dated
-# today (UTC). ONLY single-timestamp lines count as events: pipeline
-# double-logs every log() line as a stdout echo ('TS   TS SKIP: ...'), so
-# counting both would double the event count (registry evidence: 12 events =
-# 24 lines). The Cap D skip path is stateless by design (no PG/SQLite record),
-# so the log is the only source for last_skip_ts / blocked_candidates_today.
+# ── fill_cap (DailyFillCap / Cap D visibility, CEO consult 20261110T184624Z;
+# parity bar registry `brake-counterfactual-shadow` 2026-11-20) ──
+# Backward scan of pipeline.log for DailyFillCap SKIP lines dated today (UTC).
+# ONLY date-leading lines count: pipeline double-logs every log() line as a
+# stdout echo ('TS   TS SKIP: ...' — run_pipeline's last-8 replay), so both
+# forms of the SAME event are present. PARITY (the registry bar): blocked_
+# candidates_today == the RAW SKIP count — every line carrying the marker in
+# either form, because that is the unit the CEO measured (502 tower vs 898
+# raw, 2026-11-20; the verdict's own 13:00=184/14:00=228 are line counts).
+# The echo makes raw lines ~1.8x events, so blocked_events_today (distinct
+# event-ts+message, echo-deduped = true block decisions) is reported beside
+# it — that is the number that matches "candidates actually held".
+# The Cap D skip path stays stateless (no PG/SQLite record of blocks: the
+# brain/brake_shadow.db hook dedups per token|direction|hour and starts at
+# ship, so it can never equal the raw count — log stays the count source).
+# _FC_SCAN_MAX is a LATENCY guard only: the day-boundary break is the real
+# stopping rule, so it was raised 64MB->512MB — today's region must never be
+# truncated (a >64MB day silently undercounted before).
 _FC_SCAN_CHUNK = 4 * 1024 * 1024    # per-iteration backward read
-_FC_SCAN_MAX = 64 * 1024 * 1024     # hard cap (~2.4 days at the current ~27MB/day)
+_FC_SCAN_MAX = 512 * 1024 * 1024    # latency guard only; day boundary stops the scan
 _FC_TS_RE = re.compile(r'^\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')
-_FC_SKIP_RE = re.compile(r'^\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) SKIP: DailyFillCap')
+# both forms: 'TS SKIP: DailyFillCap ...' and echo 'TS   TS SKIP: DailyFillCap ...'
+_FC_SKIP_RE = re.compile(r'^\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*SKIP: DailyFillCap')
+# inner timestamp of an echo line, used to dedup echoes back to their event
+_FC_ECHO_RE = re.compile(r'^\s+(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')
 
 
 def _skip_events_today(path, day_prefix):
-    """(events_today_utc, last_event_ts_iso_or_None) from pipeline.log.
+    """(raw_lines_today, distinct_events_today, last_event_ts_iso_or_None).
 
-    Scans backward from EOF (bounded to _FC_SCAN_MAX bytes) and stops at the
-    first line dated before day_prefix (the log is chronological). Never
-    raises: any read failure returns what was counted so far.
+    raw = every today-dated line carrying 'SKIP: DailyFillCap' (both logged
+    forms) — the parity unit. events = distinct (event-ts, message) pairs,
+    which collapses each run_pipeline echo onto its direct-write twin (they
+    share the event ts byte-for-byte), i.e. the true number of block
+    decisions. Scans backward from EOF (bounded to _FC_SCAN_MAX bytes) and
+    stops at the first line dated before day_prefix (the log is chronological).
+    Never raises: any read failure returns what was counted so far.
     """
-    count = 0
+    raw = 0
+    events = set()
     last = None
     try:
         size = os.path.getsize(path)
     except OSError:
-        return 0, None
+        return 0, 0, None
     pos = size
     scanned = 0
     carry = b''
@@ -163,8 +182,8 @@ def _skip_events_today(path, day_prefix):
                     carry = b''
                 # decode only lines whose first non-space bytes are a date
                 txts = []
-                for raw in parts:
-                    s = raw.lstrip()
+                for raw_line in parts:
+                    s = raw_line.lstrip()
                     txts.append(s.decode('utf-8', 'replace') if s[:4].isdigit() else None)
                 j = -1                      # last index of a pre-today line
                 for i, txt in enumerate(txts):
@@ -173,21 +192,28 @@ def _skip_events_today(path, day_prefix):
                     m = _FC_TS_RE.match(txt)
                     if m and m.group(1) < day_prefix:
                         j = i
-                chunk_last = None
                 for txt in txts[j + 1:]:    # today's region of this chunk
                     if txt is None:
                         continue
                     m = _FC_SKIP_RE.match(txt)
-                    if m:
-                        count += 1
-                        chunk_last = m.group(1)
-                if last is None and chunk_last is not None:
-                    last = chunk_last       # chunks arrive newest-first
+                    if not m:
+                        continue
+                    raw += 1
+                    rest = txt[m.end(1):]
+                    me = _FC_ECHO_RE.match(rest)
+                    ev_ts = me.group(1) if me else m.group(1)
+                    ev_msg = rest[me.end():] if me else rest
+                    if ev_ts >= day_prefix:  # cross-midnight echo of a pre-today event
+                        events.add((ev_ts, ev_msg))
+                        # last_skip_ts = newest EVENT ts (echo lines can lag
+                        # their event by the whole step runtime)
+                        if last is None or ev_ts > last:
+                            last = ev_ts
                 if j >= 0:
                     break                   # boundary hit: older bytes are pre-today
     except Exception:
         pass
-    return count, (last.replace(' ', 'T') + 'Z' if last else None)
+    return raw, len(events), (last.replace(' ', 'T') + 'Z' if last else None)
 
 
 def _fill_cap():
@@ -195,13 +221,14 @@ def _fill_cap():
 
     engaged/opens_24h/fee_net_24h come from ONE cheap PG read (same SQL as
     decider_run._daily_fill_cap_block); max from DAILY_FILL_CAP_MAX.
-    last_skip_ts / blocked_candidates_today come from a bounded scan of
-    pipeline.log (see _skip_events_today). Any failure degrades that field
-    to null — a broken feed must never break the tower.
+    blocked_candidates_today = RAW SKIP line count (parity bar, see
+    _skip_events_today); blocked_events_today = echo-deduped true events;
+    last_skip_ts from the same scan. Any failure degrades that field to
+    null — a broken feed must never break the tower.
     """
     out = {'engaged': None, 'opens_24h': None, 'max': None,
            'fee_net_24h': None, 'last_skip_ts': None,
-           'blocked_candidates_today': None}
+           'blocked_candidates_today': None, 'blocked_events_today': None}
     cap_max = None
     try:
         from hermes_constants import DAILY_FILL_CAP_MAX
@@ -248,9 +275,10 @@ def _fill_cap():
     except Exception as e:
         log(f'WARN: fill_cap PG read failed: {e}')
     try:
-        cnt, last = _skip_events_today(os.path.join(HERMES_LOG_DIR, 'pipeline.log'),
-                                       datetime.now(timezone.utc).strftime('%Y-%m-%d '))
-        out['blocked_candidates_today'] = cnt
+        cnt, ev_cnt, last = _skip_events_today(os.path.join(HERMES_LOG_DIR, 'pipeline.log'),
+                                               datetime.now(timezone.utc).strftime('%Y-%m-%d '))
+        out['blocked_candidates_today'] = cnt     # RAW lines (parity bar)
+        out['blocked_events_today'] = ev_cnt      # echo-deduped true events
         out['last_skip_ts'] = last
     except Exception as e:
         log(f'WARN: fill_cap log scan failed: {e}')
@@ -278,7 +306,8 @@ def main():
             log(f'DailyFillCap RELEASED {_now.strftime("%H:%M")}Z (tower) — '
                 f'opens {fill_cap.get("opens_24h")} < {fill_cap.get("max")} (roll-off) '
                 f'or fee-net {float(fill_cap.get("fee_net_24h") or 0):+.2f} >= 0 — '
-                f'{fill_cap.get("blocked_candidates_today")} candidates held today')
+                f'{fill_cap.get("blocked_events_today")} candidates held today'
+                f' ({fill_cap.get("blocked_candidates_today")} raw SKIP lines)')
     except Exception:
         pass  # visibility only — a log failure must never break the feed
     reg = _load(REGISTRY, None)

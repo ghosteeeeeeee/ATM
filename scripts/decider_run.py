@@ -892,6 +892,63 @@ def _daily_fill_cap_state_line(blocked, n, net, cap_max):
         return
 
 
+# ── Brake counterfactual shadow (registry `brake-counterfactual-shadow`,
+# CEO 20261120T1548Z crash-shorts verdict) — LOG-ONLY persistence, no behavior.
+# brain_auditor #231 gave the SKIP line a candidate identity, but a log line
+# joins nothing: this records the blocked identity + brake state so
+# scripts/shadow_tag_join.py can join every block to fwd_4h and answer "what
+# did the brake cost during the crash". Own NEW SQLite file
+# (brain/brake_shadow.db) — zero schema risk to hot DBs (spec: least
+# invasive). Dedup per (token,direction,UTC-hour) via dedup_key UNIQUE +
+# INSERT OR IGNORE: the raw line flood is ~1,144 SKIP lines/day (registry:
+# counts != lines). DOUBLE-GUARDED: this function never raises (whole body in
+# try/except, the _ctx_rules_shadow_agree pattern) AND the call site wraps it
+# in its own try/except — a DB/IO failure can never change
+# _daily_fill_cap_block's decision or SKIP bytes.
+# Never reached when DAILY_FILL_CAP_ENABLED=False (the helper returns before
+# the blocked branch). Revert: drop this helper + its one call site.
+_BRAKE_SHADOW_DB = '/root/.hermes/brain/brake_shadow.db'
+
+
+def _brake_shadow_record(token, direction, source, opens_24h, fee_net_24h):
+    """Append one deduped brake-block row to brain/brake_shadow.db.
+
+    Never raises (whole body in try/except); ts is UTC 'YYYY-MM-DD HH:MM:SS'
+    — the same shape as pipeline.log timestamps, so shadow_tag_join's
+    window/dedup/entry_ts machinery reads it verbatim. Rows with no identity
+    cannot join an outcome, so they are not written (the log SKIP line still
+    carries the raw count).
+    """
+    try:
+        if not token or not direction:
+            return
+        import sqlite3 as _sq
+        from datetime import datetime as _dt, timezone as _tz
+        _now = _dt.now(_tz.utc)
+        _conn = _sq.connect(_BRAKE_SHADOW_DB, timeout=5)
+        try:
+            _c = _conn.cursor()
+            _c.execute("""
+                CREATE TABLE IF NOT EXISTS events (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ts TEXT, token TEXT, direction TEXT, source TEXT,
+                    fee_net_24h REAL, opens_24h INTEGER,
+                    dedup_key TEXT UNIQUE
+                )""")
+            _c.execute(
+                "INSERT OR IGNORE INTO events "
+                "(ts, token, direction, source, fee_net_24h, opens_24h, dedup_key) "
+                "VALUES (?,?,?,?,?,?,?)",
+                (_now.strftime('%Y-%m-%d %H:%M:%S'), token, direction, source,
+                 fee_net_24h, opens_24h,
+                 f'{token}|{direction}|{_now.strftime("%Y-%m-%dT%H")}'))
+            _conn.commit()
+        finally:
+            _conn.close()
+    except Exception:
+        return  # shadow only — a write failure must never surface
+
+
 def _daily_fill_cap_block(token=None, direction=None, source=None):
     """DailyFillCap / Cap D (CEO SHIP 2026-11-04, consult 20261104T172347Z
     "SHIP (a)+(e). REJECT (b),(c),(d)" — the working capital brake).
@@ -907,7 +964,10 @@ def _daily_fill_cap_block(token=None, direction=None, source=None):
 
     Contract: STATELESS (log + return only — no mark_signal_executed, no state
     write) and FAIL-OPEN (any exception -> WARN + False, never raises; callers
-    therefore never see a PG outage as "block").
+    therefore never see a PG outage as "block"). The brake-counterfactual-
+    shadow row (_brake_shadow_record) is append-only telemetry for
+    scripts/shadow_tag_join.py, not decision state: it runs after the SKIP
+    line, is double-guarded, and cannot change this function's return value.
 
     token/direction/source are OPTIONAL LOG CONTEXT ONLY (brain_auditor #231
     2026-11-07): the SKIP line used to carry no candidate identity, so the
@@ -968,6 +1028,14 @@ def _daily_fill_cap_block(token=None, direction=None, source=None):
             _ctx = ' '.join(str(x) for x in (token, direction, source) if x)
             log(f'SKIP: DailyFillCap — {_n} opens in last 24h (max {DAILY_FILL_CAP_MAX}) while fee-net {_net:+.2f} < 0 — brake until first green 24h'
                 + (f' [blocked {_ctx}]' if _ctx else ''))
+            # brake-counterfactual-shadow: persistence AFTER the SKIP line is
+            # emitted; both guards wrap ONLY this call, so neither a slow nor
+            # a failing store write can reach the decision (return True below)
+            # or change the SKIP bytes above.
+            try:
+                _brake_shadow_record(token, direction, source, _n, _net)
+            except Exception:
+                pass
             return True
         try:
             _daily_fill_cap_state_line(False, _n, _net, DAILY_FILL_CAP_MAX)
