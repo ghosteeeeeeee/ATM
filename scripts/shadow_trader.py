@@ -290,6 +290,10 @@ def _get_signal_context(token, direction, signal_type, source, created_at):
                 ctx['btc_score'] = meta.get('btc_score')
                 ctx['btc_regime'] = meta.get('btc_regime')
                 ctx['btc_linreg_bias'] = meta.get('btc_linreg_bias')
+                # touch-probability research (CEO 2026-11-20)
+                ctx['rs_level'] = meta.get('rs_level')
+                ctx['rs_touches'] = meta.get('rs_touches')
+                ctx['rs_bounce'] = meta.get('rs_bounce')
             except (json.JSONDecodeError, TypeError):
                 pass
         

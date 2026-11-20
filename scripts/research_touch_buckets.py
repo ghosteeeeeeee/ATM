@@ -206,6 +206,128 @@ def part3_real():
                       f"{w:>5.1f}% {sum(sel)/len(sel):>+8.3f}")
 
 
+
+def part4():
+    """Trade-side probabilities from the shadow troves (CEO 2026-11-20):
+    source strings embed the touch count for the bounce fires
+    ('rs-s{tc}' / 'rs-r{tc}'); 'rs-s-broken' rows = the breakdown events.
+    A. outcomes by tc bucket (bounce fires)
+    B. P(same-token breakdown within 24h | bounce at tc bucket) — the
+       'more touches -> confirmed vs breaks' gradient on TRADE data
+       (token-level pairing approximation: any rs-s-broken on that token;
+       level pairing needs the new instrumentation going forward)
+    C. breakdown-event ('rs-s-broken') outcomes = the ride-the-breakdowns
+       performance itself.
+    tc gate: detect() enforces 30<=tc<=200 at fire (RS_MIN_TOUCHES/HARD_CAP)
+    so tradeable buckets are 30-49 / 50-99 / 100-199 / 200+ (blocked)."""
+    import re, bisect
+    sh = sqlite3.connect("/root/.hermes/brain/shadow_trades.db")
+    sc = sh.cursor()
+    sc.execute("""SELECT token, direction, source, created_at, net_pnl_pct,
+        first_exit_reason FROM shadow_trades
+        WHERE signal_type='support_resistance' AND net_pnl_pct IS NOT NULL""")
+    rows = sc.fetchall()
+    sc.execute("""SELECT token, direction, created_at, net_pnl_pct
+        FROM shadow_trades
+        WHERE signal_type='support_resistance' AND source='rs-s-broken'
+        AND net_pnl_pct IS NOT NULL""")
+    broken = sc.fetchall()
+    sh.close()
+    pat = re.compile(r"^rs-[sr](\d+)$")
+    bounces, unparsed = [], 0
+    for tok, direc, srcv, created, pnl, exit_r in rows:
+        m = pat.match(srcv or "")
+        if not m:
+            unparsed += 1
+            continue
+        bounces.append((int(m.group(1)), tok, direc, created, pnl))
+    # broken timestamps per token (sorted)
+    from collections import defaultdict
+    bt = defaultdict(list)
+    for tok, direc, created, pnl in broken:
+        bt[tok].append(created)
+    for k in bt:
+        bt[k].sort()
+    print(f"\n--- PART 4: shadow SR trade-side (source-parsed tc) ---")
+    print(f"bounce rows: {len(bounces)} parsed, {unparsed} unparsed "
+          f"(rs-s-broken etc.); breakdown events: {len(broken)}")
+    def bucket_rows(sel):
+        out = {}
+        for tc, tok, direc, created, pnl in sel:
+            b = bucket_of(tc)
+            out.setdefault(b, []).append(pnl)
+        return out
+    print("\nA. bounce-fire outcomes by tc bucket (30+ = the detect gate):")
+    print(f"{'bucket':>9} {'n':>5} {'win%':>6} {'avg net%':>9} {'med net%':>9}")
+    for lo, hi in BUCKETS:
+        vals = [p for tc, *_ , p in
+                [(t, k, d, c, p) for t, k, d, c, p in bounces if lo <= t < hi]]
+        # (kept simple below)
+    for bname, vals in sorted(bucket_rows(bounces).items()):
+        if len(vals) >= 5:
+            vals_s = sorted(vals)
+            print(f"{bname:>9} {len(vals):>5} "
+                  f"{100.0*sum(1 for v in vals if v>0)/len(vals):>5.1f}% "
+                  f"{sum(vals)/len(vals):>+8.3f} {vals_s[len(vals_s)//2]:>+8.3f}")
+    print("\nB. breakdown within 24h of a bounce (same token), by tc bucket:")
+    print(f"{'bucket':>9} {'n':>5} {'P(break24h)':>12}")
+    for lo, hi in BUCKETS:
+        sel = [(tok, created) for tc, tok, direc, created, pnl in bounces
+               if lo <= tc < hi]
+        if len(sel) < 5:
+            continue
+        from datetime import datetime, timedelta
+        hits = 0
+        for tok, created in sel:
+            lst = bt.get(tok, [])
+            i = bisect.bisect_right(lst, created)
+            if i >= len(lst):
+                continue
+            try:
+                t0 = datetime.strptime(created, "%Y-%m-%d %H:%M:%S")
+                t1 = (t0 + timedelta(hours=24)).strftime("%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                continue
+            # created_at formats may include microseconds/TZ — compare on
+            # the date-truncated prefix both sides share
+            if lst[i][:19] <= t1 and lst[i][:19] >= created[:19]:
+                hits += 1
+        # CONTROL: same pairing anchored 24h EARLIER (prior-day window)
+        # — does a bounce raise the odds vs an arbitrary moment?
+        chits = 0
+        for tok, created in sel:
+            lst = bt.get(tok, [])
+            try:
+                t0 = datetime.strptime(created, "%Y-%m-%d %H:%M:%S")
+                a = (t0 - timedelta(hours=24)).strftime("%Y-%m-%d %H:%M:%S")
+                b = t0.strftime("%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                continue
+            i = bisect.bisect_left(lst, a)
+            if i < len(lst) and lst[i][:19] <= b:
+                chits += 1
+        print(f"{bucket_of(lo):>9} {len(sel):>5} {100.0*hits/len(sel):>11.1f}%"
+              f"   control(prior-24h) {100.0*chits/len(sel):>5.1f}%")
+    print("\nC. breakdown events (rs-s-broken) outcomes:")
+    bd = {}
+    for tok, direc, created, pnl in broken:
+        bd.setdefault(direc, []).append(pnl)
+    for direc, vals in sorted(bd.items()):
+        vals_s = sorted(vals)
+        print(f"  {direc:>6} n={len(vals):>5} win%={100.0*sum(1 for v in vals if v>0)/len(vals):>5.1f} "
+              f"avg={sum(vals)/len(vals):+.3f} med={vals_s[len(vals_s)//2]:+.3f}")
+    # time-split for C (regime dependence, plan item15)
+    print("  C by era:")
+    for era_lo, era_hi, name in (("2026-10-07", "2026-11-05", "early"),
+                                 ("2026-11-05", "2026-11-21", "recent")):
+        vals = [p for tok, direc, created, p in broken
+                if era_lo <= created < era_hi]
+        if len(vals) >= 5:
+            print(f"    {name} {era_lo}..: n={len(vals)} "
+                  f"win%={100.0*sum(1 for v in vals if v>0)/len(vals):.1f} "
+                  f"avg={sum(vals)/len(vals):+.3f}")
+
+
 def main():
     print(f"touch-bucket research | RS constants: LOOKBACK={RS_LEVEL_LOOKBACK} "
           f"CLUSTER_ATR={RS_CLUSTER_ATR} BOUNCE_ATR={RS_BOUNCE_THRESH_ATR} "
@@ -221,6 +343,8 @@ def main():
                             .timestamp()))
     if "--trades" in sys.argv:
         part3_real()
+    if "--part4" in sys.argv or "--trades" in sys.argv:
+        part4()
     print("\nnote: overlapping episodes (n = levels, not independent trades) "
           "— read block splits; single 30-90d window, one asset (plan §8 G1).")
 

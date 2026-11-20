@@ -1118,6 +1118,14 @@ def scan_rs_signals(prices_dict: dict) -> tuple[int, list[str]]:
             price=price,
             exchange='hyperliquid',
             timeframe='1m',
+            # touch-probability research (CEO 2026-11-20): stamp the
+            # level + its touch count so every shadow/live row becomes
+            # bucketable (shadow_trader whitelist carries them to ctx)
+            signal_metadata={
+                'rs_level': sig.get('level'),
+                'rs_touches': sig.get('touches'),
+                'rs_bounce': sig.get('bounce'),
+            },
         )
         if sid:
             added += 1
