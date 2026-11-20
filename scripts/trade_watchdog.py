@@ -1556,7 +1556,29 @@ def _monitor_pending_orders_impl(btc_price):
                     log(f"pending order {oid}: level reclaimed after first "
                         f"break — armed for the re-cross (multi-touch)")
                     continue
-                continue
+                # STRAIGHT-LINE ESCAPE (CEO takeoff thesis 2026-11-20:
+                # 'when btc takes off it will prob do so in a straight
+                # line, all the way back to 70k, 80k and beyond — be
+                # ready'): price ran MULTI_TOUCH_ESCAPE_PCT past the level
+                # WITHOUT ever reclaiming = the retest isn't coming (the
+                # rare slice the ~70% retest stat leaves out). Qualify the
+                # entry (retested) and fill instead of starving — the
+                # 58736-class death on a one-way move, both directions.
+                try:
+                    import hermes_constants as hc
+                    _esc = float(hc.MULTI_TOUCH_ESCAPE_PCT)
+                except Exception:
+                    _esc = 0.5
+                if ((direction == "long"
+                     and px >= trigger_price * (1 + _esc / 100.0)) or
+                        (direction == "short"
+                         and px <= trigger_price * (1 - _esc / 100.0))):
+                    log(f"pending order {oid}: STRAIGHT-LINE escape "
+                        f"({_esc:.2f}% past the level, no retest) — "
+                        f"qualifying to fill")
+                    _ps = "retested"   # fall through below → the fill
+                else:
+                    continue
             if _ps == "first_break" and _cont:
                 _ps = None    # legacy continuation rung (armed pre-flag)
             if _ps == "retested":

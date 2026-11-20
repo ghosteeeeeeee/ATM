@@ -2137,6 +2137,16 @@ VB_TRAIL_ARM_TIMEOUT_MIN = 45         # vb- armed winners avg hold 34m; catches 
 MFE_CUT_SHADOW_ENABLED = False  # KILLED 2026-11-14 brain_auditor #259 (default fired #258): candle OOS net-cost ~$9.90/30d, UGB-PT enforced live, no remaining consumer. Revert: set True.
 MFE_CUT_SHADOW_MIN = 45        # minutes hold before stall check
 MFE_CUT_SHADOW_MFE_MAX = 0.20  # live_pnl % below this at T => would-fire
+# ── MULTI-TOUCH STRAIGHT-LINE ESCAPE (CEO takeoff thesis 2026-11-20) ──
+# 'when btc takes off from this floor it will prob do so in a straight
+# line, all the way back to 70k, 80k and beyond — we need to be ready.'
+# The retest-wait fills the ~70% of levels that get retested; this
+# escapes the rare STRAIGHT slice: price runs the escape distance past
+# the level without ever reclaiming -> fill instead of starving (the
+# 58736-class starvation, both directions, both entry styles).
+# ADDED VALUE (flagged): new constant, default 0.5% price past trigger.
+MULTI_TOUCH_ESCAPE_PCT = 0.5
+
 # ── MFE-GIVEBACK EXIT (T 2026-10-31) ─────────────────────────────────────────
 # Close the trade when price gives back MFE_EXIT_GIVEBACK_PCT of its peak
 # favorable move (MFE). Proportional sibling of UGB-PT (fixed 0.45% giveback
