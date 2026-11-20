@@ -1,0 +1,17 @@
+# OpenMemory — cross-session memory for every DSH session.
+# Key lives in the DSH credential store ($DSH_HOME/.credentials.yaml, refs.OM_API_KEY);
+# never hardcode it here. Tools appear as mcp__openmemory__openmemory_{query,store,list}.
+- insert:
+    - id: openmemory-mcp
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: openmemory
+        transport: streamable-http
+        url: http://localhost:8080/mcp
+        expandTemplates: true
+        headers:
+          x-api-key: '${credential:OM_API_KEY}'
+        reconnect:
+          # default 10 attempts (~2.5min) gives up and unregisters the tools;
+          # 60 ≈ 30min of retrying so a longer container outage self-heals.
+          maxAttempts: 60

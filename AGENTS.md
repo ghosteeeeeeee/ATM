@@ -160,16 +160,25 @@ The daily timer catches anything missed, but **immediate commits are the default
 
 ## OpenMemory (MCP)
 
-Explicit memory system — no background collection. Query before tasks, store after discoveries.
+Explicit memory system — no background collection. **Query at session start** (before real work: "what do we already know about this?"), **store at session end** (what was done, decisions made, files changed, lessons). This is how the system compounds instead of starting blind every session.
 
-### MCP Function Calls (when MCP is available)
+### Native DSH tools (preferred — installed 2026-11-20)
 
-```
-openmemory_openmemory_query(query="topic of current task")
-openmemory_openmemory_store(content="...", tags=["topic", "context"])
-```
+DSH sessions have OpenMemory as first-class tools — use them, no curl needed:
 
-### Direct HTTP API (when MCP functions aren't available)
+| Tool | When |
+|------|------|
+| `mcp__openmemory__openmemory_query` | Session/task start — pull prior context, decisions, past attempts |
+| `mcp__openmemory__openmemory_store` | Session end — global lessons, outcomes, cross-project knowledge |
+| `mcp__openmemory__openmemory_store_project` | Project-scoped decisions/patterns (use `project_id: "hermes"`) |
+| `mcp__openmemory__openmemory_list` / `_get` | Browse or fetch a specific memory |
+| `mcp__openmemory__openmemory_reinforce` | Boost a memory that keeps proving right |
+| `mcp__openmemory__openmemory_delete` | Remove a wrong/outdated memory |
+
+- Bundle: `/root/.hermes/dsh-bundles/openmemory-mcp/` (profile bundle `@local/openmemory-mcp`)
+- Key: `dev-key-123` — lives in the DSH credential store `$DSH_HOME/.credentials.yaml` (`refs.OM_API_KEY`), referenced by the bundle via `${credential:OM_API_KEY}`. Never hardcode it in the bundle; rotate by editing the credential store only.
+
+### Direct HTTP API (OpenCode, scripts, or when native tools are absent)
 
 Endpoint: `POST http://localhost:8080/mcp`
 Auth: `x-api-key: dev-key-123`
@@ -203,14 +212,14 @@ curl -s -X POST http://localhost:8080/mcp \
 
 - MCP config: `/root/.hermes/config/shared-mcp.json`
 - Full docs: `brain/openmemory-mcp-access.md`
-- Must be running: `curl -s http://localhost:8080/mcp` (check with `systemctl status openmemory`)
+- Must be running: docker container `openmemory-openmemory-1` (NOT a systemd unit — `systemctl status openmemory` is not-found). Check: `docker ps | grep openmemory`. Probe: `curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/mcp` → `401` = up (auth is checked before anything else), `000` = down.
 
 ## Default Final Step: Update Memory
 
 **Every session must end with an OpenMemory store.** After completing any task, store a summary of what was done, decisions made, and files changed. This is not optional — it's how cross-session continuity works.
 
 ```
-openmemory_openmemory_store(
+mcp__openmemory__openmemory_store(
     content="What was done: [summary]. Files changed: [list]. Decisions: [list].",
     tags=["topic", "date"],
     type="contextual"
@@ -283,21 +292,23 @@ All dashboards served by nginx on port 54321.
 
 ## Reference (query OpenMemory for details)
 
+All via `mcp__openmemory__openmemory_query(query="...")` (or the curl fallback above):
+
 | Topic | Query |
 |-------|-------|
-| Pipeline steps | `openmemory_openmemory_query(query="pipeline steps hermes")` |
-| Database schema | `openmemory_openmemory_query(query="database quick facts hermes")` |
-| Kill switch | `openmemory_openmemory_query(query="kill switch architecture hermes")` |
-| Systemd timers | `openmemory_openmemory_query(query="systemd timers hermes")` |
-| Debugging | `openmemory_openmemory_query(query="debugging pipeline issues hermes")` |
-| Key files | `openmemory_openmemory_query(query="key files quick reference hermes")` |
-| Trade data | `openmemory_openmemory_query(query="trade data sources hermes")` |
-| Hebbian memory | `openmemory_openmemory_query(query="hebbian memory brain.db hermes")` |
-| Trading rules | `openmemory_openmemory_query(query="trading rules hermes")` |
-| TPSL params | `openmemory_openmemory_query(query="tpsl parameters trailing rules hermes")` |
-| Context gate | `openmemory_openmemory_query(query="context gate ai decision hermes")` |
-| Surfing philosophy | `openmemory_openmemory_query(query="surfing principles trading philosophy hermes")` |
-| Winrate plan | `openmemory_openmemory_query(query="winrate improvement filter results hermes")` |
+| Pipeline steps | `pipeline steps hermes` |
+| Database schema | `database quick facts hermes` |
+| Kill switch | `kill switch architecture hermes` |
+| Systemd timers | `systemd timers hermes` |
+| Debugging | `debugging pipeline issues hermes` |
+| Key files | `key files quick reference hermes` |
+| Trade data | `trade data sources hermes` |
+| Hebbian memory | `hebbian memory brain.db hermes` |
+| Trading rules | `trading rules hermes` |
+| TPSL params | `tpsl parameters trailing rules hermes` |
+| Context gate | `context gate ai decision hermes` |
+| Surfing philosophy | `surfing principles trading philosophy hermes` |
+| Winrate plan | `winrate improvement filter results hermes` |
 
 ## graphify
 
