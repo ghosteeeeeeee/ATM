@@ -23,7 +23,7 @@
       "notes": "Do NOT cite raw shadow n without dedup (#239 pseudo-replication). Signal uses atr exit management (:2357)."
     }
   ],
-  "updated": "2026-11-19T14:57:22.559830+00:00",
+  "updated": "2026-11-20T01:11:53.201714+00:00",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -1537,7 +1537,7 @@
       "created_at": "2026-11-08T04:46:58Z",
       "done_at": "2026-11-08",
       "action_taken": "STOP_TIGHTEN_SOURCES = ('jup_yolo_mirrored', 'volume-buildup-', 'pump-chain+', 'pump-chain-', 'bb-squeeze+', 'volume-breakout-long+', 'bb-bounce-v2-long+', 'r2v2-long3') — scripts/hermes_constants.py:761, top-6 in verdict order, each verified against PG SELECT DISTINCT signal; scope check changed from exact membership to substring membership (scripts/tpsl_utils.py:1138: if not any(name and name in (source or '') for name in STOP_TIGHTEN_SOURCES)); walk re-run on ship day 2026-11-08 ALL BARS PASS (n=55, bleed -$5.69, ceiling +$1.13/14d, net +$0.88/14d, fk 3.9%, 5/5 weeks same-sign); probe suite brain/analysis/payoff_fix_probes_2026-11-08.py ALL PASS; day-0 live proof: trade id=16826 (bb-squeeze+, opened 2026-11-08 18:37:33Z) had its SL written at exactly the 0.75% cap (1.54482625 vs entry 1.5565) with [STOP-TIGHTEN-ENFORCE] at 18:37:35Z = first new-scope-source clamp; gates re-run after review: py_compile + stale_comment_linter --strict + shadow_disposition --selfcheck clean, probe suite 48/48 PASS, walk re-run 2026-11-08 ALL BARS PASS (n=56, ceiling +$1.14/14d, net +$0.89/14d, fk 3.9%, 5/5wk); adversarial code review VERDICT: APPROVE-WITH-FIXES and bug_hunter VERDICT: PASS-WITH-FIXES (both findings applied: comments corrected, guardian restart executed, this registry patched); CANDLE-WALK (threshold limb i) NOT run in this session — owed before 2026-11-21, covered-population net limb $0.88/30d pace vs $1.00/30d bar is recorded in disposition/notes; code commit 6740b6fb3f1409f6615b5ad9df8c5537ce35a3ae",
-      "notes": "PLACEMENT-SITE COVERAGE (threshold item v, verified 2026-11-08): all 6 stop_tighten_sl sites pass a source through — decider_open (execute_trade, runs for EVERY trade with sl>0 at open), decider_slfix x2, pm_collect_atr (pos signal), guardian_selfclose + scw_open (PG signal column) — so every scope source reaches the helper. | SUBSTRING OVER-MATCH (bug_hunter 2026-11-08 SHOULD-FIX 2, accepted + documented, not a blocker): 'pump-chain-' is a literal substring of the versioned family, so 'pump-chain-v5' (12T/90d), 'pump-chain-v6-' (4T/90d), 'pump-chain-v6+' (1T/90d), 'btc-pump-rider+,pump-chain-v6+' (1T/90d) and 'pump-chain-v5,rs-s32' (1T/90d) = 19 trades/90d (5/30d) are clamped WITHOUT being on the CEO top-6 list — all same pump-chain family, and the walk bars were computed over ALL out-of-scope stop-family bleed, so ceiling/fk already price this collateral in (fk 3.9% = 4 winners / $0.25 at risk). No OTHER scope name embeds in any larger token (335 distinct signals/90d scanned). If the CEO wants token-exact scope instead of substring: switch scripts/tpsl_utils.py:1138 to `name in (source or '').split(',')` — that satisfies every required probe and drops only the v5/v6 over-match. | EVIDENCE CAVEAT (adversarial review MUST-FIX 3, independently re-verified by main-session 2026-11-08): the walk's n=56 (14d out-of-scope stop-family, re-run 18:5xZ) decomposes as 27 trades in the new 6 (-$2.61) + 4 jup combos fixed by the substring change (-$0.42) + 25 that stay out of scope after the change (-$2.75: hl_copy_trader, warrior-sr-confirm+, hh-hl+, continuation+, continuum-osc-, r2v2-long18, grind-breakout-v2+ ...). Covered population alone: n=31 losers, ceiling $0.62, winners 67 / fk 2 (3.0%, $0.21) -> net $0.41/14d = $0.88/30d pace — BELOW the threshold's >= +$1.00/30d limb under that stricter reading (weekly same-sign 5/5 still holds), while the script's own bar over ALL out-of-scope trades = $1.88/30d pace PASSES and is the number the CEO verdict quoted. The 1m/5m candle-walk (limb i) was NOT run in this session — owed before 2026-11-21; default if it fails: REVERT = drop the 6 appended tuple entries."
+      "notes": "PLACEMENT-SITE COVERAGE (threshold item v, verified 2026-11-08): all 6 stop_tighten_sl sites pass a source through — decider_open (execute_trade, runs for EVERY trade with sl>0 at open), decider_slfix x2, pm_collect_atr (pos signal), guardian_selfclose + scw_open (PG signal column) — so every scope source reaches the helper. | SUBSTRING OVER-MATCH (bug_hunter 2026-11-08 SHOULD-FIX 2, accepted + documented, not a blocker): 'pump-chain-' is a literal substring of the versioned family, so 'pump-chain-v5' (12T/90d), 'pump-chain-v6-' (4T/90d), 'pump-chain-v6+' (1T/90d), 'btc-pump-rider+,pump-chain-v6+' (1T/90d) and 'pump-chain-v5,rs-s32' (1T/90d) = 19 trades/90d (5/30d) are clamped WITHOUT being on the CEO top-6 list — all same pump-chain family, and the walk bars were computed over ALL out-of-scope stop-family bleed, so ceiling/fk already price this collateral in (fk 3.9% = 4 winners / $0.25 at risk). No OTHER scope name embeds in any larger token (335 distinct signals/90d scanned). If the CEO wants token-exact scope instead of substring: switch scripts/tpsl_utils.py:1138 to `name in (source or '').split(',')` — that satisfies every required probe and drops only the v5/v6 over-match. | EVIDENCE CAVEAT (adversarial review MUST-FIX 3, independently re-verified by main-session 2026-11-08): the walk's n=56 (14d out-of-scope stop-family, re-run 18:5xZ) decomposes as 27 trades in the new 6 (-$2.61) + 4 jup combos fixed by the substring change (-$0.42) + 25 that stay out of scope after the change (-$2.75: hl_copy_trader, warrior-sr-confirm+, hh-hl+, continuation+, continuum-osc-, r2v2-long18, grind-breakout-v2+ ...). Covered population alone: n=31 losers, ceiling $0.62, winners 67 / fk 2 (3.0%, $0.21) -> net $0.41/14d = $0.88/30d pace — BELOW the threshold's >= +$1.00/30d limb under that stricter reading (weekly same-sign 5/5 still holds), while the script's own bar over ALL out-of-scope trades = $1.88/30d pace PASSES and is the number the CEO verdict quoted. The 1m/5m candle-walk (limb i) was NOT run in this session — owed before 2026-11-21; default if it fails: REVERT = drop the 6 appended tuple entries. | Phase3 integration: no further scope extension before the 11-21 eval read (CEO 20261120T002223Z)"
     },
     {
       "id": "amplify-winner-cell-drop-pcplus",
@@ -1862,7 +1862,8 @@
       "early_label": "EARLY — n=8 <10 per AMPLIFY early-cell rule; emitted for offense coverage of the only UNCOVERED positive n>=5 30d cell",
       "evidence": "PG fresh 2026-11-14 12:45Z 30d winner-cell rank: ('pump-chain-,pump-chain-v6-','EXTREME','SHORT') n=8 net +0.35 WR 37.5% arm 75.0% — trend-rider profile (low WR, high arm, positive net = few big trail winners). No open amplify entry covers this cell (watch-contrarian-live = pc- LONG fade; pc-plus-weight = pc+ LONG weight).",
       "threshold": "Promote to clone-hunt ONLY IF: 30d n>=15 AND net >= +0.50 AND arm >= 60% AND 7d/14d same sign (units = pnl_usdt). Else close as no-cell at deadline. EARLY n=8, default NO CHANGE.",
-      "default_action": "no change — early cell, watch-only"
+      "default_action": "no change — early cell, watch-only",
+      "notes": "CEO 20261120T002223Z: PUMP_CHAIN_V6_ENABLED=False HOLD 24h pending this cell's 11-21 adjudication; if no-cell closes → disable; if T wants it dead now, kill ..._PLUS (LONG) only"
     },
     {
       "id": "amplify-short-rsi-hard-ceiling-85-walk",
@@ -1963,8 +1964,8 @@
       "threshold": "counterfactual: enforce disable only if would-skip cohort keeps LONG net-of-fee negative at n>=10 with any regime ≥55% WR n≥8 as the documented revert",
       "default_action": "keep enabled until counterfactual reads",
       "evidence": "CEO 20261116T153048Z ranked action 2",
-      "notes": "log-only shadow; HL_COPY_SIGNAL_PLUS_ENABLED stays True. ADD-only flag HL_COPY_PLUS_SHADOW=True (ENFORCE=False). 14d LONG 11T 18.2% WR -$0.33, HIGH 0% n=4. | #271 context for 11-30 adjudication: freq_deviation_shadow (hourly, consumer chain verified: error_alerts.md -> ceo_dashboard_api.get_error_alerts -> ceo_dashboard.html) shows hl_copy_trader OVER-fire sustained 3.73x baseline (0.167/h vs 0.045/h, n_cur=4 n_base=15) at 20:00Z; error_alerts logged 2.80x on 11-15 18:00 (24h dedup suppresses repeats). 14d all-dir 15T 26.7% -0.30 arm 33.3%; arm-axis vs rest fisher p=0.185 = NOT significant (pre-reg #194 arm-dampen bar fails). 24h 4 closes +0.03 of which 3 are <5s phantoms (COPY-STALE guard fired, log-only). Rate axis is ORTHOGONAL to the PLUS-LONG direction counterfactual — report BOTH at adjudication.",
-      "updated": "2026-11-16T20:48:34Z"
+      "notes": "log-only shadow; HL_COPY_SIGNAL_PLUS_ENABLED stays True. ADD-only flag HL_COPY_PLUS_SHADOW=True (ENFORCE=False). 14d LONG 11T 18.2% WR -$0.33, HIGH 0% n=4. | #271 context for 11-30 adjudication: freq_deviation_shadow (hourly, consumer chain verified: error_alerts.md -> ceo_dashboard_api.get_error_alerts -> ceo_dashboard.html) shows hl_copy_trader OVER-fire sustained 3.73x baseline (0.167/h vs 0.045/h, n_cur=4 n_base=15) at 20:00Z; error_alerts logged 2.80x on 11-15 18:00 (24h dedup suppresses repeats). 14d all-dir 15T 26.7% -0.30 arm 33.3%; arm-axis vs rest fisher p=0.185 = NOT significant (pre-reg #194 arm-dampen bar fails). 24h 4 closes +0.03 of which 3 are <5s phantoms (COPY-STALE guard fired, log-only). Rate axis is ORTHOGONAL to the PLUS-LONG direction counterfactual — report BOTH at adjudication. | bypass removal APPROVED executed 2026-11-20 per CEO 20261120T002223Z; if still bleeding7d → flip HL_COPY_SIGNAL_PLUS/MINUS_ENABLED=False; feeds ugb-bypass-hole12-15",
+      "updated": "2026-11-20T01:11:53Z"
     },
     {
       "id": "hotset-pin-approved-shadow",
@@ -2044,7 +2045,33 @@
       "requires": "CEO label + T sign-off before any gate exempt",
       "not_a_duplicate_of": "amplify-jup-short-walk (SHORT leg, due 11-21), amplify-jup-long-flat-cell (FLAT regime sizing, closed 11-18), amplify-jup-short-high-cell (HIGH SHORT cell, closed sign-flip)",
       "created_by": "brain_auditor #280"
+    },
+    {
+      "id": "stop-family-entry-filter-shadow",
+      "stream": "stop-family entry filter SHADOW — shadow-block direction=LONG on detect-time rsi_exec 55-70 / gap_pct 0.5-1.0 cells + exec-time RSI drift re-validation (CEO 20261120T002223Z Phase 2 sign-mover); sources: PG trades + signals_hermes_runtime rsi/gap fields",
+      "kind": "shadow",
+      "status": "open",
+      "started": "2026-11-20",
+      "deadline": "2026-11-27T00:00:00Z",
+      "owner": "CEO",
+      "threshold": "shadow-block entry when direction=LONG AND ((detect-time rsi_exec in [55,70]) OR (gap_pct in [0.5,1.0])) PLUS exec-time re-validation block if |exec_rsi - detect_rsi| > 10. Bar: n_blocked >=100 AND blocked cohort would-be net saved >= +$1.00/14d AND Fisher p<0.05 AND fk <=20% AND both 7d halves same-sign",
+      "default_action": "NO-SHIP (bar set deliberately strict: #261 shows rsi/gap/momentum do NOT predict never-armed bleed; jup's rsi>=55 gate already failed Fisher p=0.379)",
+      "evidence": "CEO 20261120T002223Z Phase2 sign-mover: cells rsi55-70 n=134 −$2.59, gap0.5-1 n=88 −$2.29, exec-drift median6.1pts 23/86>10",
+      "updated": "2026-11-20T01:11:53Z"
+    },
+    {
+      "id": "ai-trader-pending-tag-split",
+      "stream": "ai-trader-pending tag SPLIT eval — separate ai-trader-pending vs ai-trader-pending-auto cohorts so the auto-ladder fills are judged independently (CEO 20261120T002223Z Phase1 item3 SPLIT ruling); sources: PG trades signal tag split",
+      "kind": "eval",
+      "status": "open",
+      "started": "2026-11-20",
+      "deadline": "2026-11-24T00:00:00Z",
+      "owner": "signal_analyst",
+      "threshold": "split tag ai-trader-pending vs -auto so the auto-ladder cohort is judged separately; gate ONLY the auto cohort if it stays <40% WR at n>=30; blanked-prune REJECTED (CEO-armed domain, winner cell amplify-ai-trader-pending-normal-short-btc-cell 26T46.2% +$0.64 due11-22)",
+      "default_action": "no change to armed pending path",
+      "evidence": "CEO 20261120T002223Z Phase1 item3 (SPLIT ruling)",
+      "updated": "2026-11-20T01:11:53Z"
     }
   ],
-  "updated_at": "2026-11-20T01:05:00Z"
+  "updated_at": "2026-11-20T01:11:53Z"
 }
