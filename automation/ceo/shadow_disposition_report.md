@@ -1,4 +1,4 @@
-# Shadow disposition report — 2026-11-20T18:20:55.078339+00:00
+# Shadow disposition report — 2026-11-20T20:37:02.438425+00:00
 registry: 132 entries (open=36)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
@@ -124,7 +124,7 @@ registry: 132 entries (open=36)
 - OPEN hl-copy-plus-shadow: deadline=2026-11-30T00:00:00Z | (no parseable source)
 - OPEN hotset-pin-approved-shadow: deadline=2026-11-25T00:00:00Z | (no parseable source)
 - OPEN amplify-pumpchain-normal-short-early: deadline=2026-12-02T00:00:00Z | (no parseable source)
-- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 1452 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 1.1d
+- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 1540 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 1.2d
 - OPEN amplify-rider-fade-threshold-walk: deadline=2026-11-22T00:00:00Z | (no parseable source)
 - OPEN amplify-jup-long-blocked-clonehunt: deadline=2026-11-23T00:00:00Z | (no parseable source)
 - OPEN stop-family-entry-filter-shadow: deadline=2026-11-27T00:00:00Z | (no parseable source)
