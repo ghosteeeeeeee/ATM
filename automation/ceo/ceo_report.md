@@ -1602,3 +1602,28 @@ Rotating Q (idx 10 = "new signals this week?"): 0 SHIPPED (matches 15381Z run), 
 
 **NOT touched:** hermes_constants values, exit code, signal flags, live gates.
 **Commits (local, no push):** `d3c8dd55` (registry + result-1 md), `e119bf14` (study + result-2 md).
+
+## CEO Status — 20261119T233823Z
+### Health: pipeline=ok (timer active, last run 23:38:37Z exit 0) guardian=active open_pos=0
+### Numbers: 24h 15T -0.34 46.7% | 7d 108T +0.44 49.1%
+### Findings: disk 86% used (WARN threshold 85%) recurring 3x today; 7d PnL ~flat after recovering from prior -1.5 to -2 levels
+### Recommendation: schedule disk cleanup before it hits 90% (weekly deep run)
+
+## CEO Deep Run — 20261119T225832Z (incomplete rc=124 at closeout; decision checkpoint survived; dispatches completed by orchestrator)
+
+**Directed brief:** `brief-atr-trend-exit-trial-20261119.md` — atr_trend_accel exits after the shadow engine-comparison study (n=1,807 paired).
+
+**Ruling (checkpoint written pre-dispatch): A = option 1, ride_it-style 24h hold, pre-registered + trial wiring SHIPPED OFF.**
+- Ride_it chosen: strongest engine (mean +0.363 vs live pm_trail +0.183; paired +0.179pp, t=5.8, p=5.6e-9, both halves +0.344/+0.388), triangulated with stop-cluster study + audited 24h backtest. universal_hold dominated → rejected; stop-only → rejected (result-2 had no robust width); mfe_exit → rejected (sim −0.127pp; also never scoped to atr-trend).
+- **Flip to True is PRE-AUTHORIZED by this run but ONLY:** at/after 2026-12-06 reckoning, AND (a) fresh shadow ride_it-vs-pm edge holds on post-11-19 rows, (b) bug_hunter ON-path passes, (c) T notified — this checkpoint/report is the ask. If the 12-06 bar KILLs on entry limbs (n/WR), flip is moot; it matters only when entries pass and the net limb fails (current state: n ✓, WR ✓, net ✗).
+- Flag False through 12-06 ⇒ 12-06 as-is collection continues uncontaminated; shadow_trades.db per-engine replay = the counterfactual collector.
+
+**result-1 ✅ `a037e7a0`** (+225/−0, exactly 3 files): `ATR_TREND_EXIT_TRIAL_ENABLED = False` (hermes_constants:4723) + module-level conditional block (after bypass :2262 and config :2352) appending all 5 atr-trend variants to PROFIT_MONSTER_BYPASS_SIGNALS and mapping all 5 → 'ride_it' in SIGNAL_EXIT_CONFIG (explicit direction keys, schema mirrored from existing ride_it entries: trend-ride+/volume-breakout+/mover-); gated `_is_ride_it` universal-hold exemption in position_manager (+8, function-local flag import, existing style). Selfcheck 32/32: OFF path byte-identical (additions-only, every existing name == baseline, matcher default for atr-trend, readers see original tuple), ON path proven in patched-copy subprocess, on-disk flag never True. Deviations followed the code (matcher returns None-unmatched ⇒ pm_trail fall-through; `_is_ride_it` is a local). Also reverted a third orphaned partial pre-edit from the timed-out run.
+
+**result-2 ✅ `1c29e4ac`** (bug_hunter audit) — **SHIP-with-fixes**, 39/39 independent checks:
+- OFF-path identity PASS (451 historical signal strings replayed → changed=[]); ON-path PASS (all 6 reader sites across 4 live consumers traced: profit_monster :86, cut_loser :81/:342, position_manager :4632, shadow_trader :805/:900 — SQL LIKE matches observed trades.signal `atr-trend+/-`, zero collateral across 451 signals, confluence pairs behave, V8 linreg pairing intact); import/timing PASS (readers import post-block; no 5th live consumer); danger paths PASS (all exit readers are fresh processes → flip auto-pickups, no restart needed; hl-sync-guardian unaffected); rollback PASS (clean `git apply --check -R`).
+- **Bug fixed:** result-1's selfcheck pinned its baseline to git HEAD (post-commit = the wiring itself → false FAIL at 12-06 re-verification). Re-pinned to `a037e7a0^`; now 35/35 PASS.
+- **Residual risks logged for 12-06:** (1) shadow_trader hardcodes ride_it substrings without atr-trend → post-flip shadow live-equivalent still 8h-clocks atr-trend ⇒ adjudicate on **per-engine replay columns**, not the live-equivalent prediction; (2) substring-gate vs exact-matcher naming asymmetry (zero current impact); (3) sim-vs-live single-layer gap — flip trades away the currently-winning pm_trail (28T 92.9% +$1.12) = the A/B; selfcheck is a pre-flip OFF verifier only.
+
+**NOT touched:** any existing constants value, stop/exit constants, signal flags, shadow_disposition.json (12-06 3-limb bar stands).
+**Commits (local, no push):** `a037e7a0` (wiring), `1c29e4ac` (audit + fixes).

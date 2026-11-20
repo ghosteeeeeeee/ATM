@@ -4519,5 +4519,27 @@
     "after": "committed as shadow (log-only) with adoption note",
     "rationale": "orphaned mid-run work would have been lost or double-worked; selfcheck PASS, mode=shadow cannot block a trade",
     "impact": "0 trading behavior; fade-entry guard starts logging [BTC-PUMP-RIDER-FADE-SHADOW] reads"
+  },
+  {
+    "timestamp": "2026-11-20T00:50:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #280: registered amplify-rider-fade-threshold-walk in data/shadow_disposition.json (threshold robustness walk + enforce-read bar for BTC_PUMP_RIDER_FADE_BLOCK_MODE shadow->enforce)",
+    "type": "tweak",
+    "file": "data/shadow_disposition.json",
+    "before": "fade guard enforce bar lived only in a hermes_constants.py comment (untracked by checkpoint/disposition readers)",
+    "after": "tracked entry with threshold limbs, measurement plan, default NO FLIP, deadline 2026-11-22",
+    "rationale": "0 trading-constant changes this run; the adopted shadow guard's flip decision needs a tracked owner and deadline or it drifts unadjudicated",
+    "impact": "measurement/registry only — zero trading behavior (mode stays 'shadow')"
+  },
+  {
+    "timestamp": "2026-11-20T01:05:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #280: corrected gate_shadow clone-hunt dedup (date(unixepoch) artifact per #278 -> substr key), appended evidence note to amplify-jup-short-walk, emitted amplify-jup-long-blocked-clonehunt (default NO SHIP)",
+    "type": "tweak",
+    "file": "data/shadow_disposition.json",
+    "before": "first-pass buggy-key numbers (bb+ 77.8/pc+ 74.2/vb- 73.9) briefly in draft outputs",
+    "after": "corrected numbers everywhere (bb+ 65.6/pc+ 39.8/vb- 64.4 below bar; jup 89.5 n=57 new), LONG-leg jup walk registered deadline 11-23 with provenance caveat",
+    "rationale": "jup LONG blocked-setups were uncovered by any open entry; provenance dispute (#276) makes walk-only the safe shape",
+    "impact": "measurement/registry only — zero trading behavior"
   }
 ]

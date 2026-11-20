@@ -11847,5 +11847,32 @@
     "status": "suggested",
     "risk": "low",
     "agent": "brain_auditor #279"
+  },
+  {
+    "date": "2026-11-20T00:40:00Z",
+    "idea": "Extend pc+ fade-drift guard to whole LONG book — MEASURED, REJECTED-WITH-DATA (30d n=407 both cohorts net-negative, 0.00-split inverts, per-family p>=0.05; prior art 2026-09-07 pre15 verdict + displacement #143 p=0.510)",
+    "rationale": "every loser looks like a wrong-side/fade entry until you join the candles book-wide",
+    "expected_impact": "closes a future re-proposal path",
+    "category": "entry sniper",
+    "status": "rejected_with_data",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-20T00:45:00Z",
+    "idea": "Gate-side clone-hunt scans must cross-walk registry + own-conclusions verdict BEFORE any emit (3 signals >=70% would-win this run, all previously adjudicated)",
+    "rationale": "Raw gate_shadow with the KNOWN #278 buggy key (date(unixepoch) on ISO text) surfaced 3 signals >=70% — re-ran corrected: bb+ 65.6/pc+ 39.8/vb- 64.4 all BELOW bar; corrected key ALSO surfaces the real uncovered candidate jup 89.5% n=57 -> rule: correct key FIRST, then cross-walk registry + own-conclusions verdict before any emit",
+    "expected_impact": "no duplicate emits",
+    "category": "process",
+    "status": "adopted",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-20T00:48:00Z",
+    "idea": "Report pc- flip edge TAPE-SPLIT (BELOW 64.6% n=48) not aggregate (51.7% n=87 after 30d roll)",
+    "rationale": "aggregate decayed while the actionable slice held; watch-contrarian reads this 11-25",
+    "expected_impact": "avoids premature pc- fade demote/promote",
+    "category": "monitoring",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

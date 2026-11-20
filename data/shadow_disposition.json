@@ -622,7 +622,8 @@
       "measurement": "per-window net (pnl_usdt), WR, fk; compare against live jup SHORT conversion (currently 1).",
       "guard": "NOT runnable before ~2026-11-13 (jup born 10-30 -> zero OOS days; same INSUFFICIENT class as the 11-07 jup chaser band). Do not report a result before the deadline.",
       "notes": "clone-hunt on bb-squeeze+ blocked singles measured this run and KILLED: 329 deduped blocked rows 51.7% WR -32.45pp (NORMAL 34T 41.2% -3.06pp, HIGH 134T 49.3% -14.66pp) = gates correctly reject; do not re-propose.",
-      "disposition": "EXTEND — guard honored: walk NOT run before/without OOS days (signal born 10-30; OOS past ~11-13 = ~1 day; bars need 7d/14d/30d same-sign). Default NO SHIP stands. Fresh context 11-14: jup SHORT 30d 47T 29W net -0.08 (conversion up from 1T on 10-31), jup LONG 107T -0.91. Re-register read at >=7 OOS days (11-21). adjudicated_by brain_auditor #258"
+      "disposition": "EXTEND — guard honored: walk NOT run before/without OOS days (signal born 10-30; OOS past ~11-13 = ~1 day; bars need 7d/14d/30d same-sign). Default NO SHIP stands. Fresh context 11-14: jup SHORT 30d 47T 29W net -0.08 (conversion up from 1T on 10-31), jup LONG 107T -0.91. Re-register read at >=7 OOS days (11-21). adjudicated_by brain_auditor #258",
+      "evidence_note_280": "brain_auditor #280 2026-11-20T01:05Z: CORRECTED token-day dedup (substr key) gate_shadow 30d jup SHORT blocked = 76.6% would-win n=47 (top gates: SHORT-MIDBAND 87.5 n=8, EXEC-RSI-HARD-FLOOR 81.8 n=11, CONTINUUM-BULL/OVERSOLD 80.0 n=45, EXEC-BLOCK 77.8 n=36) avg would_pnl +0.023 — supports the 11-21 walk; note #276 provenance dispute (gate_shadow vs shadow_trader) applies; candle-walk + fk + units bars unchanged."
     },
     {
       "id": "atrtrail-clip-12",
@@ -2007,7 +2008,43 @@
       "evidence": "Decision 20261108T023937Z row I OAK-SHADOW; registry derived 2026-11-19 from 90d realized trades (60d train/30d validate, streak_analysis split, data-anchored anchor 2026-11-19T12:29Z): 45 lines, 254 thin-skipped. First reading: r2v2-long3 CROSS 143.5% (dd 0.66 vs line 0.46) logged+alerted, NO action taken (shadow).",
       "notes": "Built D5 run 20261119T141548Z: scripts/kill_line_shadow.py (SELECT-only, fail-open exit 0, no hermes_constants import, ALERT at >=80% of line consumed per pre-reg 'shadow logs approach always' limb) + config/hermes-kill-line-shadow.{service,timer} hourly ENABLED + verified (status=0/SUCCESS, Deactivated successfully). Companion checkpoint kill-line-enforce-review-20261203 in data/checkpoint_registry.json surfaces the review into ceo_kanban via hermes-checkpoint-watch. No auto_flip_flag on this entry — no code path can flip enforcement itself.",
       "updated": "2026-11-19T14:57:22.559830+00:00"
+    },
+    {
+      "id": "amplify-rider-fade-threshold-walk",
+      "stream": "BTC_PUMP_RIDER fade-entry guard: threshold robustness walk + shadow->enforce read (FADE_MIN_DRIFT_PCT 0.10)",
+      "kind": "amplify",
+      "proposal_type": "(a) param-widen counterfactual on a validated cohort (pc+ fire-level pre15 drift, n=1392 Fisher p=0.008 per guard adoption note)",
+      "status": "open",
+      "created_at": "2026-11-20T00:50:00Z",
+      "deadline": "2026-11-22T00:00:00Z",
+      "owner": "brain_auditor #280 AMPLIFY (weekly emit)",
+      "evidence": "Guard live in shadow since 2026-11-19 16:53Z (adopted #279): 9 [RIDER-FADE-SHADOW] would-block lines in logs/signals.log by 00:35Z (~6 distinct tokens: NEAR/INJ/PENDLE/APT/HYPER/NXPC; pace ~9/7.5h => 15-line bar reachable ~11-21 if held). Adoption-note cohort: pre15>+0.10 WR 62.0% avg_net +0.034% vs <=+0.10 WR 54.6% avg_net -0.132%, Fisher p=0.008, EXECUTED n=83 55.2% vs 29.6% p=0.033. Cross-family check this run (#280) REJECTED generalizing the drift guard to the wider LONG book: 30d LONG trade-join n=407 both cohorts net-negative (>0.10: 188T WR55.3% -1.54; <=0.10: 219T WR48.4% -1.83; 0.00-split inverts; per-family Fisher p>=0.05 all) => guard stays pc+-scoped. Prior art: brain/verdicts/2026-09-07-pre15-filter-audit-verdict.md (accel-short pre15 variant no-ship, overfit) + displacement gate #143 rejected (p=0.510, fk 42.7%).",
+      "threshold": "WALK LIMB: reconstruct fire-level cohort (pc+ fires 30d x candles_1m pre15) and walk thresholds {0.05,0.10,0.15,0.20}: keep 0.10 unless an adjacent threshold beats it in BOTH split-halves with same-sign and would-block count stays within [10,40]/30d (knife-edge or no-op guard). ENFORCE-READ LIMB (from constants comment, formalized here): grep -a RIDER-FADE-SHADOW /var/www/hermes/logs/signals.log for >=15 lines AND joined would-block outcomes net-negative AND 0 would-blocked live winners AND review-queue sign-off => propose enforce; else stay shadow. Units guard: outcome join in pnl_usdt (never raw price move vs stored pnl_pct, #193).",
+      "measurement": "brain/analysis/rider_fade_threshold_walk.py --selfcheck then run; outcome join by token+fire-window to signals/trades; report per-threshold n/WR/net + split halves + fk (winners that would have been blocked)",
+      "default_action": "NO FLIP — keep BTC_PUMP_RIDER_FADE_BLOCK_MODE='shadow'; walk is pre-ship robustness only",
+      "risk": "low",
+      "requires": "review-queue sign-off before enforce (standing bar)",
+      "not_a_duplicate_of": "watch-contrarian-live (pc- LONG fade, different signal), amplify-pc-fade-cell-split (closed NO CHANGE 11-02, cell-split not threshold-walk)",
+      "created_by": "brain_auditor #280"
+    },
+    {
+      "id": "amplify-jup-long-blocked-clonehunt",
+      "stream": "jup_yolo_mirrored LONG-leg blocked-setups clone-hunt (gate_shadow token-day 86.5% would-win n=37)",
+      "kind": "amplify",
+      "proposal_type": "(c) clone-hunt: mine gate_shadow BLOCKED jup LONG setups + counterfactual-walk candles",
+      "status": "open",
+      "created_at": "2026-11-20T01:05:00Z",
+      "deadline": "2026-11-23T00:00:00Z",
+      "owner": "brain_auditor #280 AMPLIFY (weekly emit; uncovered LONG leg — jup-short-walk owns SHORT)",
+      "evidence": "CORRECTED substr(blocked_at,1,10) dedup (NOT the #278 unixepoch artifact) 30d: jup LONG blocked 86.5% would-win n=37 token-days, avg would_pnl +0.064; by gate n>=5: RR-ENGINE 100% n=9, LONG-HIGH-70 93.8 n=16, EXEC-BLOCK 88.5 n=26, SPIKE-FILTER 88.5 n=26, LONG-NEUTRAL 88.0 n=25, CONTINUUM-BLOCK 85.7 n=35. ANOMALY FLAG: live jup LONG 30d WR = 62.5% (112T '-0.73') — blocked cohort reading HETTER than traded cohort across EVERY gate thesis = suspect provenance (#276 SIDE-FIND: gate_shadow would_win/pnl vs shadow_trader replay opposite signs, ~13% follow-on coverage) until candle-walk proves it.",
+      "threshold": "SHIP only if ALL: (i) correct-key token-day n>=15 maintained (have 37); (ii) 1m/5m candle-walk of blocked LONG first-fires with live exit engine net >= +$0.50 pnl_usdt UNITS GUARD (never pnl_pct #193); (iii) fk <=20% of jup LONG live winners in 30d window (112T, list ids); (iv) split-half same-sign AND gates heterogeneous-thesis reconciliation: walk result must hold on >=2 distinct gate classes (provenance sanity vs #276 dispute); (v) 7d/14d/30d same-sign on any live-collected subset.",
+      "measurement": "brain/analysis/jup_long_blocked_walk.py (to write): corrected-key pull -> first-fire-per-token-day -> replay candles with pm_trail; reconcile totals vs shadow_trader gate replay direction",
+      "default_action": "NO SHIP — provenance suspect (blocked>bested vs live WR); walk only, no gate exempt until (ii)+(iv)",
+      "risk": "medium (uniform 85-100% across opposite gate theses is an artifact smell, not evidence)",
+      "requires": "CEO label + T sign-off before any gate exempt",
+      "not_a_duplicate_of": "amplify-jup-short-walk (SHORT leg, due 11-21), amplify-jup-long-flat-cell (FLAT regime sizing, closed 11-18), amplify-jup-short-high-cell (HIGH SHORT cell, closed sign-flip)",
+      "created_by": "brain_auditor #280"
     }
   ],
-  "updated_at": "2026-11-19T21:03:34Z"
+  "updated_at": "2026-11-20T01:05:00Z"
 }
