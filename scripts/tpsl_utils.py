@@ -1050,15 +1050,15 @@ def compute_fallback_tp(current_price: float, direction: str) -> float:
 #   True — the clamp is WRITTEN live at every site above. The log line keeps
 #   firing with enforce=True so the bar audit stays fed.
 # SCOPE AS OF 2026-11-08 (CEO consult 20261108T180116Z, SCOPE-WIDEN): the tuple
-#   is now 8 sources (was 2) and is matched by SUBSTRING — combo sources such as
-#   'continuum+,jup_yolo_mirrored' no longer escape the clamp. Walk-SCRIPT bars
-#   PASS on re-run 2026-11-08 (brain/analysis/stop_tighten_scope_cf_2026-11-08.py:
-#   n=55, ceiling +$1.13/14d, net +$0.88/14d, fk 3.9%, 5/5 weeks same-sign —
-#   ceiling math over ALL out-of-scope stop-family trades; the 1m/5m candle-walk
-#   was NOT re-run this session and the covered-population split is $0.88/30d
-#   pace vs the $1.00/30d limb — caveats recorded in registry
-#   amplify-stoptighten-scope-widen, due 2026-11-21).
-#   REVERT = remove the 6 appended names from STOP_TIGHTEN_SOURCES.
+#   was 8 sources matched by SUBSTRING (combo sources such as
+#   'continuum+,jup_yolo_mirrored' no longer escape the clamp — substring
+#   matching STAYS after the revert below).
+# SCOPE REVERTED 2026-11-20 (brain_auditor #282): owed candle-walk
+#   brain/analysis/stop_tighten_scope_walk_2026-11-20.py FAILed limb (i)
+#   (net +$0.29/30d vs +$1.00 bar; fk 1.1% / n=45 / 5-5wk PASS) -> the
+#   pre-registered REVERT clause fired: tuple back to ('jup_yolo_mirrored',
+#   'volume-buildup-'). Clamp behavior for those two UNCHANGED (cap 0.75,
+#   ENFORCE True). Registry amplify-stoptighten-scope-widen carries the read.
 # CAP-0.50 SHADOW (same consult, payoff-fix item 4): additional LOG-ONLY
 #   [STOP-TIGHTEN-CAP050-SHADOW] lines when ENFORCE=True and 0.50 < dist <=
 #   live cap — counterfactual for the 0.75 -> 0.50 flip, NEVER changes the

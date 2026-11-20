@@ -4552,5 +4552,38 @@
     "after": "--selfcheck PASS (drift replica vs module, threshold split, fk) + full run: keep 0.10, enforce-read FAIL-fk (2 blocked live winners) => NO FLIP | bug_hunter round 1: FIX-FIRST (HIGH round(None) on empty halves, MED: hardcoded FADE_THR/selfcheck-no-enforce_read/unbounded fwd gap, 4 LOW) -> ALL FIXED; round 2 verdict SHIP (selfcheck PASS, full run identical numbers, units guard intact, connections closed)",
     "rationale": "AMPLIFY mandate: walk the fade-guard threshold before any enforce flip; pre-read must exist before the 11-22 deadline",
     "impact": "0 trading behavior (analysis only); disposition gains measured pre-read; guard stays shadow; bug_hunter SHIP"
+  },
+  {
+    "timestamp": "2026-11-20T08:42:26Z",
+    "agent": "brain_auditor",
+    "change": "New analysis script brain/analysis/stop_tighten_scope_walk_2026-11-20.py — the owed 1m candle-walk for amplify-stoptighten-scope-widen (limb i/ii/iii/iv), 0 config changes",
+    "type": "creative",
+    "file": "brain/analysis/stop_tighten_scope_walk_2026-11-20.py",
+    "before": "script did not exist; ship recorded with candle-walk caveat due 11-21 (REVERT risk)",
+    "after": "--selfcheck PASS; walk verdict FAIL limb (i) net +$0.31/30d (slip) / +$0.61 noslip vs +$1.00 bar; PASS ii/iii/iv; only 14/47 cohort bindable",
+    "rationale": "Registry pre-registered the candle-walk as the ship bar; ceiling math overstated by ~3x because 18+ exits fire below the 0.75 cap (ATR SL/HML)",
+    "impact": "Corrected expectation +$0.16/30d after fk; escalate to CEO ratify-with-correction vs revert"
+  },
+  {
+    "timestamp": "2026-11-20T12:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #282: STOP_TIGHTEN_SOURCES scope-widen REVERTED — tuple back to 2 sources per pre-registered clause (walk limb i FAIL)",
+    "type": "config",
+    "file": "scripts/hermes_constants.py",
+    "before": "('jup_yolo_mirrored', 'volume-buildup-', 'pump-chain+', 'pump-chain-', 'bb-squeeze+', 'volume-breakout-long+', 'bb-bounce-v2-long+', 'r2v2-long3')",
+    "after": "('jup_yolo_mirrored', 'volume-buildup-')",
+    "rationale": "Owed 1m candle-walk stop_tighten_scope_walk_2026-11-20.py: net +$0.29/30d vs +$1.00 bar (fk 1.1% PASS, n=45 PASS, 5/5wk PASS) -> FAIL limb (i). Blind-spot correction (ENFORCE-log original proposals + no-clamp replay of 9 post-widen clamp-bound losers): value straddles -$0.55..+$0.56 per 12d live window, 6 of 9 stopped trades on recovery paths — no variant robustly >= $1.00/30d. Pre-registered REVERT clause of registry amplify-stoptighten-scope-widen (CEO consult 20261108T180116Z package) fired. jup/vb- clamp UNCHANGED (cap 0.75, ENFORCE True). Guardian restarted 12:41Z for import-time binding.",
+    "impact": "NEW6 sources (pump-chain±, bb-squeeze+, volume-breakout-long+, bb-bounce-v2-long+, r2v2-long3) return to native ATR/HML stops; jup/vb clamp intact; removes a sub-materiality feature whose net sign was modeling-dependent"
+  },
+  {
+    "timestamp": "2026-11-20T12:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #282: payoff_fix_probes_2026-11-08.py docstring marked HISTORICAL SHIP GATE (post-revert expected FAILs documented)",
+    "type": "tweak",
+    "file": "brain/analysis/payoff_fix_probes_2026-11-08.py",
+    "before": "docstring implied ship-day gate still current",
+    "after": "docstring documents A3/A4/A7/A8/C6 FAIL-by-design post-revert + C1/C3 stale baseline 6740b6fb^ since ship-day",
+    "rationale": "15 FAILs after revert are expected (13 pre-existing stale-baseline + A7/A8/C6 by design) — document instead of rewriting a dated historical gate",
+    "impact": "zero behavior; future runs not confused by red probes"
   }
 ]

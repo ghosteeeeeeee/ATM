@@ -11901,5 +11901,23 @@
     "category": "governance",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-20T12:50:00Z",
+    "idea": "CLAMP-RECOVERY KPI: after any stop-tighten-clamped exit, measure whether price recovered to entry within 8h (post-exit recovery) per family — if recovery rate >50% at n>=15, that family's cap is stopping recoverable trades and should be widened (or excluded), not kept",
+    "rationale": "Run #282 found 6 of 9 post-widen clamp-bound NEW6 losers were on recovery paths when stopped (4 recovered to entry, 3 r2v2 trail-armed to would-be wins in no-clamp replay) — the 0.75 cap turned recoveries into realized losses; this is the mirror image of the trail-family win pattern (recovery_replay: 11/14 48h losers recover after adverse). The walk script cannot see this class because clamped trades read as no_bind.",
+    "expected_impact": "prevents killing recoverable trades; would have flipped the scope-widen sign question from ambiguous to measurable",
+    "category": "exit sniper",
+    "status": "suggested",
+    "risk": "low (measurement only, no code path changes)"
+  },
+  {
+    "date": "2026-11-20T12:50:00Z",
+    "idea": "Stop-tighten counterfactuals must read ORIGINAL pre-clamp proposals from [STOP-TIGHTEN-ENFORCE] log lines (first line per id), never the stored stop_loss — stored SL is exactly 0.750 on every clamped trade, which every existing walk classifies as 'tighter_sl_no_bind' and scores delta 0 (undercounts the feature's own value to zero)",
+    "rationale": "Run #282 blind-spot: walk_limb(i) measured +$0.29 while 19 distinct NEW6 trades were clamped live (stored sl_dist=0.750, ENFORCE lines in rotated archives); corrected measurement required log join + no-clamp replay. Any future stop-tighten eval on post-11-08 trades inherits the same blindness.",
+    "expected_impact": "correct limb (i) reads for any future cap/scope retune of the 2 remaining sources (jup/vb-)",
+    "category": "measurement fix",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
