@@ -1388,15 +1388,27 @@ def _monitor_pending_orders_impl(btc_price):
     # CONFIG order persists; only the wait-state is dropped). one-shot
     # guards (fired/error/triggered) are NEVER pruned — double-fire
     # safety stays. 71 entries were live at audit, oldest 2026-10-18.
-    _now = time.time()
-    for _pk in [k for k, v in state.items()
-                if isinstance(v, dict)
-                and v.get("status") in ("first_break", "retested", "rejected")
-                and (_now - float(v.get("ts") or 0)) > 7 * 86400]:
-        del state[_pk]
-        changed = True
-        log(f"pending order {_pk}: waiting-state pruned after 7d without "
-            f"reclaim — re-qualifies fresh (config order persists)")
+    # Gated on CAN_PERSIST (agent-1's call): dry-run must not reset a
+    # retested rung (a non-authoritative mode deciding entries) nor
+    # force changed=True (a write failure then drops that cycle's steers
+    # — hiding the very steers dry-run exists to show). N1: the whole
+    # prune sits in try/except — a non-numeric ts (the orphan alert
+    # invites hand-edits of this file) must never kill the monitor
+    # cycle (armed rungs stop firing = the original incident class).
+    if PENDING_ORDERS_CAN_PERSIST:
+        try:
+            _now = time.time()
+            for _pk in [k for k, v in state.items()
+                        if isinstance(v, dict)
+                        and v.get("status") in ("first_break", "retested", "rejected")
+                        and (_now - float(v.get("ts") or 0)) > 7 * 86400]:
+                del state[_pk]
+                changed = True
+                log(f"pending order {_pk}: waiting-state pruned after 7d "
+                    f"without reclaim — re-qualifies fresh (config order "
+                    f"persists)")
+        except Exception as _pe:
+            log(f"pending-state prune skipped (non-fatal): {_pe}", "WARN")
     seen_ids = set()
     serial_claimed = False   # one serial-ladder rung fires per cycle
     for order in cfg["orders"]:
