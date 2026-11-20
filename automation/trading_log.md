@@ -30073,3 +30073,29 @@ BY: auto_1hr
 - 24h -0.34 red at 46.7% WR; 7d +0.44 positive — edge thin but stable
 - Unarmed WR 20% (-$0.54) vs armed 100% (+$0.20) — stall stack still owns the fix
 BY: auto_1hr
+
+## [2026-11-20 00:55] Hourly Analysis
+
+**Trades:** 1 closed last hour, 0 open | 24h: 16 closed (8W 8L)
+**PnL:** $+0.05 (hour) | 24h $-0.29 (WR: 50.0%) | 7d 109T 54W $+0.49 POSITIVE — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** no storm — window-min +0.00% / at-run +0.25% (both inside gate)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Kill check: 1 close last hour (SOL jup_yolo_mirrored SHORT mfe_exit +0.05); no 0%-WR signal with 3+ trades; atr-trend- 24h 5T 40% -$0.28 not 0%
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/16 = 18.8% (<40%); tpsl_utils deployed
+- Boost: none eligible — jup_yolo_mirrored 4T 100% +$0.26 needs 5+ trades; atr-trend- 5T 40% -$0.28
+- Arm rate: unarmed 11/16 = 68.8% below 70%, WR 27.3% -$0.49 vs armed 5/5 100% +$0.20 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 19:00 -0.12, 20:00 +0.08 BREAK, 00:00 +0.05 — not 3 consecutive → no size cut
+- Frequency: 1 close/hr — under 20
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- storm-confl-waiver deadline 2026-11-26 (shadow_disposition.json is truth) — default KEEP shadow; no storm
+- 24h -0.29 red at 50.0% WR; 7d +0.49 positive — edge thin but stable
+- Unarmed WR 27.3% (-$0.49) vs armed 100% (+$0.20) — stall stack still owns the fix
+BY: auto_1hr
