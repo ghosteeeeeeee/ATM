@@ -4685,10 +4685,20 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # unproven, direction positive. Re-measure protocol in the verdict.
         # Scope = MFE_EXIT_SIGNALS (mirror book). Revert = MFE_EXIT_ENABLED
         # False (hermes_constants).
-        if MFE_EXIT_ENABLED and not is_ceo_trade and not is_linreg_fade_pos:
+        # CEO 2026-11-20 (#17005: peak +5.4% margin ROUND-TRIPPED to
+        # −2.07% — this proven giveback exit existed since 2026-10-31
+        # (audited, backtest +78pp, sign-p 0.00000) but was gated
+        # `not is_ceo_trade` + jup_yolo-scope = OFF for exactly the
+        # trades that needed it). Structure-governed managed trades (the
+        # SAME predicate as the maxhold/stale/TP gates) now get the
+        # peak-giveback too: fires only while GIVING BACK >=30% of a
+        # >=0.40% peak → first-touch on the bounce, strictly before any
+        # loss (losers/blips with peak < 0.40% stay on floor exits).
+        _mfe_gov = structure_governed(_pos_signal, pos.get('stop_loss'))
+        if MFE_EXIT_ENABLED and (not is_ceo_trade or _mfe_gov) and not is_linreg_fade_pos:
             try:
                 _mfe_sig_l = (_pos_signal or '').lower()
-                if any(_s in _mfe_sig_l for _s in MFE_EXIT_SIGNALS):
+                if _mfe_gov or any(_s in _mfe_sig_l for _s in MFE_EXIT_SIGNALS):
                     _mfe_en = float(pos.get('entry_price') or 0) or 0
                     _mfe_hi = float(pos.get('highest_price') or 0) or 0
                     _mfe_lo = float(pos.get('lowest_price') or 0) or 0
