@@ -23,7 +23,7 @@
    "notes": "Do NOT cite raw shadow n without dedup (#239 pseudo-replication). Signal uses atr exit management (:2357)."
   }
  ],
- "updated": "2026-11-20T16:20:00Z",
+ "updated": "2026-11-20T18:00:00Z",
  "entries": [
   {
    "id": "flip-contrarian-pc",
@@ -2112,6 +2112,34 @@
    "default_action": "brake unchanged (LEAVE ruling 20261120T1548Z stands; margin option fee_net<-$0.50 awaits T)",
    "owner": "main-session",
    "evidence": "CEO 20261120T1548Z ranked items 3+4: brake owned the clock09:17->15:46 incl steepest legs (13:00=184,14:00=228 SKIPs) but 23 unique blocked; EV unjoinable today"
+  },
+  {
+   "id": "other-gate-short-withhold-review",
+   "stream": "approval-block SHORTs NOT attributable to floor/regime/vol (rr-engine, pump-chain-short-high, oversold-knife, confluence single-type, rep)",
+   "kind": "eval",
+   "disposition": "EVAL",
+   "status": "open",
+   "started": "2026-11-20",
+   "deadline": "2026-11-27T00:00:00Z",
+   "threshold": "Per-gate split of the 'none' cell (n=526 token-days, +$14.48, WR58.2%, p=0.0002, both halves positive, LOO +$13.69): each gate's own bar (token-day dedup fwd4h, n>=30, net>=$1.50/14d, p<0.05, OOS same-sign) before ANY relax; knife/confluence stay protected unless their own bars flip",
+   "default_action": "no change \u2014 KEEP rulings stand (cross-tab cell is aggregate, not per-gate)",
+   "owner": "signal_analyst",
+   "evidence": "agent-4 interaction cross-tab 2026-11-20 (fixed window b301abf4): the non-three-gate approval blocks collectively withheld the most profitable shorts of the window \u2014 first time this aggregate has been measured; marginals OUT OF SCOPE of gate-interaction-cross-tab, hence this entry",
+   "notes": "reconcile with: short-relax0/25 KEEP, regime-gate KEEP, pc-high KEEP \u2014 the cross-tab may be window-specific (14d incl crash legs); OOS + pre-register before proposing anything"
+  },
+  {
+   "id": "regime-gate-tension-check",
+   "stream": "short-regime-gate withheld value under SHIPPED behavior (A1 exempt never fires) vs A1's own tag-join verdict",
+   "kind": "eval",
+   "disposition": "EVAL",
+   "status": "open",
+   "started": "2026-11-20",
+   "deadline": "2026-11-24T00:00:00Z",
+   "threshold": "RECONCILE two disagreeing reads: (a) A1 tag-join 11-17: exempting SHORT_BIAS singles = net -$0.83 (bar NOT met, keep kill) vs (b) agent-4 cross-tab: regime gate under shipped behavior withheld n=329 dedup net +$10.40 p=0.0004 (A1-exempt cohort alone +$9.43 n=187 p=0.0007). Different cohorts (NORMAL/HIGH-conf<75 vs SHORT_BIAS) \u2014 prove which is decision-relevant, why they diverge, and whether any part of the regime-gate KEEP ruling was measured on the wrong cohort; bar: same token-day engine, both cohorts side-by-side, 14d OOS",
+   "default_action": "keep A1 ENFORCE=False + regime-gate as-is (both prior readings stand until reconciled \u2014 do NOT flip on either alone)",
+   "owner": "signal_analyst",
+   "evidence": "agent-4 cross-tab 2026-11-20 R-cell + 'regime gate under shipped behavior' section; tension flagged explicitly as out-of-scope marginal requiring its own adjudication",
+   "notes": "highest-priority reconciliation: two credibly-run analyses disagree on the same gate family"
   }
  ],
  "updated_at": "2026-11-20T01:11:53Z"
