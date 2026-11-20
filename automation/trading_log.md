@@ -30350,3 +30350,31 @@ BY: auto_1hr
 - storm-confl-waiver deadline 2026-11-26 (shadow_disposition.json truth, status open, default KEEP shadow) — no storm this run
 - Unarmed WR 30.0% (-$0.49) vs armed 100% (+$0.35) — stall stack still owns the fix
 BY: auto_1hr
+
+## [2026-11-20 10:55] Hourly Analysis
+
+**Trades:** 0 closed last hour | 0 open
+**PnL NET:** $0.00 (hour) | 24h NET $-0.13 (n=17, gross +0.11, fees 0.24, payoff 0.74, WR 58.8%) | 7d NET $-0.96 (112T, gross +0.62, fees 1.58, WR 50.0%) — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** no storm — window-min -0.32% / at-run +0.52% (both inside gate)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Kill check: 0 closes last hour; no 0%-WR signal with n>=3 in 24h → no kill
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/17 = 5.9% (<40%); tpsl_utils deployed
+- Boost: none eligible — jup_yolo_mirrored 4T 100% net +0.17 (n=4 < 5, 1 token); atr-trend- 9T 66.7% net -0.03 (net negative)
+- Arm rate: unarmed 10/17 = 58.8% below 70%, WR 30.0% net -$0.49 vs armed 7/7 100% net +$0.35 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 08 -0.17, 09 -0.01 then 0 closes this hour — not 3 consecutive → no size cut
+- Frequency: 0 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.371% < 0.5% (max 0.734) — OK
+- No constants change → no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.13 at 58.8% WR / payoff 0.74 — payoff <1, fee drag (fees 0.24 vs gross 0.11)
+- 7d NET -0.96 (fees $1.58) — fee-drag persists; 1 change/hr rule → no action
+- storm-confl-waiver deadline 2026-11-26 (shadow_disposition.json is truth) — default KEEP shadow; no storm this run
+- Unarmed WR 30.0% (-$0.49) vs armed 100% (+$0.35) — stall stack still owns the fix
+BY: auto_1hr
