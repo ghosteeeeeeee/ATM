@@ -852,13 +852,18 @@ def _ladder_keeper(decision, summary):
                     'amount_usdt': round(11.1 * _side_mult('SHORT'), 2), 'leverage': 10,   # CEO trial 2026-11-14: next orders at 10x (revert when called)
                     'sl': sl, 'target': tp, 'confidence': 60,
                     'serial': True, 'dynamic_sl': False,
+                    'entry_style': ('continuation' if fresh_air else 'retest'),
                     'note': (f"Rule-13 LADDER KEEPER auto-arm ({time.strftime('%Y-%m-%d %H:%M')} "
                              f"UTC): no unfired BTC short rung within reach (≤3·ATR1h) below price "
                              f"{price:.0f}. {_src}, TP {tp} = 3·ATR1h "
                              f"DISASTER depth AT ARM TIME (structure-break-only exits — TP is a "
-                             f"circuit breaker, never a take-profit, never moved). Fills only on the "
-                             f"reclaim+re-cross (multi-touch — first break never fills). serial + "
-                             f"dynamic_sl:false.")})
+                             f"circuit breaker, never a take-profit, never moved). "
+                             + ("Fills ON CROSS (CONTINUATION — air has nothing to reclaim; "
+                                "structure stop = the conviction bound)."
+                                if fresh_air else
+                                "Fills only on the reclaim+re-cross (multi-touch — "
+                                "first break never fills).")
+                             + " serial + dynamic_sl:false.")})
                 appended.append(('ladder_keeper', oid, f"short @ {trig} ({_ev}, SL {sl}, TP {tp})"))
 
         # ── LONG side: an unfired BTC rung within reach (≤3·ATR1h) = ready.

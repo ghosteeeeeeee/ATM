@@ -674,6 +674,13 @@ six-trade sequence is the proof case:
    when price reclaims the level → `retested`; only the NEXT cross
    (the failed-retest re-cross, §11's CONFIRM shape) fills — a
    brain-vetoed fill maps its reclaim to `retested` too (no burn).
+   **Exception — continuation rungs** (`entry_style: continuation`, the
+   fresh-air price×0.997 arms): air has no prior level to reclaim, so
+   the retest-wait starves them in a straight slide (58736: first_break
+   18:45, price fell to 58,162, zero fills — 'falling like a rock').
+   They fill ON CROSS with their structure stop — #17004's sin was the
+   arbitrary 0.6% stop, not the fill itself. Retest-style (structure)
+   rungs keep first-break-never-fills.
    Why: #17004 was a first-tick catch with a `price×1.006` stop — no
    level broken, no thesis — and lost −6.89% margin in 3 minutes on the
    bounce; the sims had already scored first-break entries with

@@ -1522,16 +1522,19 @@ def _monitor_pending_orders_impl(btc_price):
             seen_ids.add(oid)
             crossed = (px >= trigger_price) if trigger == "above" \
                 else (px <= trigger_price)
-            # ── MULTI-TOUCH ENTRY + NO-BURN (CEO 2026-11-20: 'apply the
-            # multiple touch theory — DO NOT take the first break'; after
-            # #17004 lost in 3 minutes on an arbitrary fresh-air stop):
-            #   fresh rung  --cross#1-->  first_break   (NEVER fills)
-            #   first_break --reclaim-->  retested      (level reclaimed)
-            #   retested    --cross#2-->  fill (the failed-retest entry,
-            #                            §11 — the sims' CONFIRM shape)
-            #   rejected (brain veto at a fill) --reclaim--> retested
-            #       (no burn; next cross#2 fills with RSI recovered)
-            # FIRST BREAK NEVER FILLS. Stays in state until the re-cross.
+            # ── MULTI-TOUCH ENTRY + NO-BURN, TWO STYLES (CEO 2026-11-20):
+            # RETEST style (structure rungs — the hammered-level theory):
+            #   cross#1 -> first_break (NEVER fills) -> reclaim ->
+            #   retested -> cross#2 = fill (the failed-retest entry, §11).
+            #   rejected (brain veto) -> reclaim -> retested (no burn).
+            # CONTINUATION style (fresh-air rungs, entry_style flag):
+            #   fills ON CROSS — price x0.997 is AIR, there is no prior
+            #   level to reclaim, so the retest-wait starves it in a
+            #   rock-fall (58736: first_break 18:45, price 58162, zero
+            #   fills — CEO: 'BTC falling like a rock, make this work').
+            #   #17004's sin was the arbitrary 0.6% STOP, not the fill —
+            #   continuation rungs carry structure stops (conviction).
+            _cont = order.get("entry_style") == "continuation"
             _st_prev = state.get(oid)
             _ps = _st_prev.get("status") if isinstance(_st_prev, dict) else None
             if _ps == "rejected":
@@ -1544,7 +1547,7 @@ def _monitor_pending_orders_impl(btc_price):
                 log(f"pending order {oid}: rejected rung retested after "
                     f"trigger reclaim (no-burn) — armed for the re-cross")
                 continue
-            if _ps == "first_break":
+            if _ps == "first_break" and not _cont:
                 if not crossed:
                     if PENDING_ORDERS_CAN_PERSIST:   # F4
                         state[oid] = {"status": "retested", "ts": time.time(),
@@ -1554,18 +1557,23 @@ def _monitor_pending_orders_impl(btc_price):
                         f"break — armed for the re-cross (multi-touch)")
                     continue
                 continue
+            if _ps == "first_break" and _cont:
+                _ps = None    # legacy continuation rung (armed pre-flag)
             if _ps == "retested":
                 if not crossed:
                     continue
                 # cross#2 — fall through to stacking/steer = the fill
             elif crossed:
-                if PENDING_ORDERS_CAN_PERSIST:   # F4
-                    state[oid] = {"status": "first_break", "ts": time.time(),
-                                  "price": trigger_price}
-                    changed = True
-                log(f"pending order {oid}: FIRST break seen — no fill "
-                    f"(multi-touch: wait for reclaim + re-cross)")
-                continue
+                if not _cont:
+                    if PENDING_ORDERS_CAN_PERSIST:   # F4
+                        state[oid] = {"status": "first_break",
+                                      "ts": time.time(),
+                                      "price": trigger_price}
+                        changed = True
+                    log(f"pending order {oid}: FIRST break seen — no fill "
+                        f"(multi-touch: wait for reclaim + re-cross)")
+                    continue
+                # continuation + crossed → fall through = the fill
             if crossed and (str(oid).startswith("btc-auto-")
                             or order.get("serial") is True):
                 # Same-coin stacking guard (CEO lesson 2026-11-10: two AUTO
