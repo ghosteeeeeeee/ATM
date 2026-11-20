@@ -2026,7 +2026,16 @@
       "risk": "low",
       "requires": "review-queue sign-off before enforce (standing bar)",
       "not_a_duplicate_of": "watch-contrarian-live (pc- LONG fade, different signal), amplify-pc-fade-cell-split (closed NO CHANGE 11-02, cell-split not threshold-walk)",
-      "created_by": "brain_auditor #280"
+      "created_by": "brain_auditor #280",
+      "pre_read_20261120": {
+        "ran_at": "2026-11-20T04:42:59Z",
+        "script": "brain/analysis/rider_fade_threshold_walk.py --selfcheck PASS",
+        "threshold_walk": "keep 0.10 — no adjacent threshold beats it in both split-halves same-sign (fwd30 all halves negative; fwd60 halves NOT same-sign older +0.16/newer -0.59 = recency-driven edge); fire-level blocked counts 89-128/30d are outside the pre-registered [10,40] range for ALL thresholds (bar miscalibrated at fire level — log-line pace is the intended scale)",
+        "enforce_read": "lines 45 (28 distinct tokens) >=15 PASS; live pc+ trades 30d 16, would-blocked 8, blocked net -0.35 pnl_usdt PASS (net-EV positive); fk-live FAIL — 2 would-blocked live winners (CHIP #16921 +0.26 mfe 3.14, ARB #16895 +0.01); review-queue sign-off absent",
+        "verdict": "NO FLIP — stays shadow (bar as written requires 0 would-blocked live winners). Net-EV tension noted: constants FK-note says fk not gating, enforce limb says 0 winners; stricter written limb honored.",
+        "caveat": "fk uses rolling 30d — CHIP/ARB age out ~12-13/12-15 and the limb could re-pass on window aging alone (pre-registered revert condition proposed)"
+      },
+      "evidence_run281": "walk executed 2026-11-20 (2 days before deadline); formal deadline read 11-22 re-checks counts"
     },
     {
       "id": "amplify-jup-long-blocked-clonehunt",

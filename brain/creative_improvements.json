@@ -11874,5 +11874,32 @@
     "category": "monitoring",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-20T04:42:59Z",
+    "idea": "Count RIDER-FADE-SHADOW bars as distinct token-events, not raw lines (45 raw lines = 28 distinct tokens; guard logs before cooldown so re-scans duplicate)",
+    "rationale": "line-count enforce bars can be satisfied by duplicates of the same fire",
+    "expected_impact": "bar honesty, zero behavior",
+    "category": "monitoring",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-20T04:42:59Z",
+    "idea": "ai-trader-pending MFE giveback cap (report to CEO): 30d manual_sl_hit 18T 0W -1.68; 5 of last 10 manual-SL losers had MFE>=0.40 (max 1.407%); pending orders have NO trail exits at all",
+    "rationale": "armed-then-stopped = giveback class the trail family already solves for signals; session hit 'ai-trader btc auto trader' 2026-10-21 shows exit-config ownership was discussed (RR engine), 'ugb_pt exit' 2026-10-31 confirms ai-trader in PROFIT_MONSTER_BYPASS",
+    "expected_impact": "could recover part of -1.68/30d; needs CEO ruling (pending orders are CEO-domain)",
+    "category": "exit quality",
+    "status": "suggested",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-11-20T04:42:59Z",
+    "idea": "Rider-fade enforce fk bar is rolling-30d — CHIP/ARB blocked winners age out ~12-13/12-15, so fk_live_zero can re-pass without any behavior change; pre-register 'no blocked winner in trailing 30d' as a standing revert condition rather than a one-time gate",
+    "rationale": "prevents a bar that silently re-opens on window aging",
+    "expected_impact": "gate honesty",
+    "category": "governance",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

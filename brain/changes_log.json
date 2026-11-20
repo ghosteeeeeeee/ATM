@@ -4541,5 +4541,16 @@
     "after": "corrected numbers everywhere (bb+ 65.6/pc+ 39.8/vb- 64.4 below bar; jup 89.5 n=57 new), LONG-leg jup walk registered deadline 11-23 with provenance caveat",
     "rationale": "jup LONG blocked-setups were uncovered by any open entry; provenance dispute (#276) makes walk-only the safe shape",
     "impact": "measurement/registry only — zero trading behavior"
+  },
+  {
+    "timestamp": "2026-11-20T04:42:59Z",
+    "agent": "brain_auditor",
+    "change": "New analysis script rider_fade_threshold_walk.py (threshold robustness walk + enforce-read limb for BTC_PUMP_RIDER_FADE guard) — owed by amplify-rider-fade-threshold-walk (11-22), shipped 2 days early",
+    "type": "creative",
+    "file": "brain/analysis/rider_fade_threshold_walk.py",
+    "before": "script did not exist (walk limb unrunnable)",
+    "after": "--selfcheck PASS (drift replica vs module, threshold split, fk) + full run: keep 0.10, enforce-read FAIL-fk (2 blocked live winners) => NO FLIP | bug_hunter round 1: FIX-FIRST (HIGH round(None) on empty halves, MED: hardcoded FADE_THR/selfcheck-no-enforce_read/unbounded fwd gap, 4 LOW) -> ALL FIXED; round 2 verdict SHIP (selfcheck PASS, full run identical numbers, units guard intact, connections closed)",
+    "rationale": "AMPLIFY mandate: walk the fade-guard threshold before any enforce flip; pre-read must exist before the 11-22 deadline",
+    "impact": "0 trading behavior (analysis only); disposition gains measured pre-read; guard stays shadow; bug_hunter SHIP"
   }
 ]
