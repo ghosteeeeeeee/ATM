@@ -31158,3 +31158,32 @@ BY: auto_1hr
 - Hour losses: both BTC ai-trader-pending LONGs entered at RSI 66.8 / 83.4 (high) then manual_sl_hit; new BTC SHORT opened 15:17:39 — CEO pending-order flow, not auto-signal
 - 2 open: BTC ai-trader-pending SHORT (15:17), WCT atr-trend+ LONG (15:12)
 BY: auto_1hr
+
+## [2026-11-21 16:52] Hourly Analysis
+
+**Storm:** no storm — window-min -0.74% / at-run +0.28%
+
+**Trades:** 2 closed last hour (1 win, 1 loss) | 24h 28 closed
+**PnL NET:** hour $-0.09 (WCT atr-trend+ profit-monster-trail +0.04 net, BTC ai-trader-pending SHORT manual_sl_hit -0.13 net) | 24h NET $+0.52 (gross +1.07, fees 0.55, payoff 1.33, WR 64.3%) | 7d NET $-1.06 (gross +0.83, fees 1.89, WR 50.8%) | 14d NET $-3.81 (fees 3.29) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Last hour: 2 closes, 1/2 wins — no 0%-WR n>=3 kill candidate (ai-trader-pending 1T, atr-trend+ 1T 100%)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/28 = 3.6% (<40%); tpsl_utils deployed. Top loss bucket: manual_sl_hit 5T net -0.52 (BTC ai-trader-pending)
+- Kill: pump-chain+ 24h 3T 0% net -0.13 all BLUR but 0 closes last hour (window rule not met; monitor)
+- Boost: none new — btc-pump-rider+ 6T 100% net +0.40 still at 1.3 (verified combo_weights.json); jup_yolo_mirrored 4T 75% n<5; nothing else meets all criteria
+- Arm rate: unarmed 12/28 = 42.9% below 70%, WR 16.7% net -$0.41 vs armed 16/16 100% net +$0.93 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly nets 12 +0.15, 13 +0.09, 14 +0.22, 15 -0.16, 16 -0.09 — 2 consecutive negatives, not 3 -> no size cut
+- Frequency: 2 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.240% < 0.5% (max 0.996)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d NET -1.06 / 14d NET -3.81 fee-drag (7d fees 1.89 vs gross 0.83) — 24h still +0.52
+- pump-chain+ all-BLUR 3T 0% — run regime kill check if it repeats with n>=3 in one hour
+- BTC ai-trader-pending 10T 40% net -0.19 (all manual, CEO flow — entries at RSI 66.8/83.4 last hour)
+- 0 open trades at 16:52
+BY: auto_1hr
