@@ -30823,3 +30823,30 @@ BY: auto_1hr
 - Storm streak 2/3 — one more positive counterfactual packet flips enforce bar (deadline 2026-11-26)
 - Unarmed WR 18.2% (-$0.48) vs armed 100% (+$0.24) — stall stack still owns the fix
 BY: auto_1hr
+
+## [2026-11-21 04:53] Hourly Analysis
+
+**Trades:** 0 closed | 1 open (BTC ai-trader-pending SHORT, opened 03:54)
+**PnL NET:** hour $0.00 (0 closes) | 24h NET $-0.24 (n=16, gross +0.03, fees 0.27, payoff 0.91, WR 43.8%) | 7d NET $-0.98 (n=112, gross +0.63, fees 1.61) — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** 🌩️ [STORM-READINESS] window-min -4.43% / at-run -0.51% | blocked 174 (combo_key-stale 79, short-rsi-hard-floor 30, compaction_stale_10min 18, expired-hotset 17, vol-gate-override-0.0 14, pump-chain-rsi-max-long 5, confluence single-type 4, spike-filter-long 3, rr-engine-hard-block 2, long-rsi-floor 1, long-rsi-ceiling 1) | true-starvation 18 RSI>=35 (174 raw expired, deduped first-fire-per-token 18; 18 walked, 0 skipped) | counterfactual $+1.03 (touch 18/18) | waiver: SHADOW=True ENFORCE=False — counterfactual POSITIVE -> **streak 3/3 BAR MET** (19:54 +$0.03, 03:56 +$2.21, 04:53 +$1.03; deadline 2026-11-26 file truth) — bar met does NOT auto-flip: default KEEP shadow + CEO NO-CONVERT 2026-11-08 stands; conversion needs CEO sign-off; split: blocked SHORTs $+1.77 (9, touch 9/9) = gates suppressed dump SHORT winners, blocked LONGs $-0.74 (9, touch 9/9) = gates correctly kept dump LONG losers out
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes
+- Kill check: no 0%-WR signal with n>=3 last hour (0 closes) -> no kill
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/16 = 6.25% (<40%); tpsl_utils deployed
+- Boost: none eligible — jup_yolo_mirrored 3T n<5; atr-trend- 6T 66.7% but net -0.15 (losing); ai-trader-pending 5T 20% net -0.20 (losing)
+- Arm rate: unarmed 11/16 = 68.75% below 70%, WR 18.2% net -$0.48 vs armed 5/5 100% net +$0.24 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly nets 23 +0.02, 01 -0.08, 03 -0.02 (02/04 zero closes) — not 3 consecutive negatives -> no size cut
+- Frequency: 0 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.149% < 0.5% (max 0.734) — OK
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.24 (WR 43.8%, payoff 0.91) — fee drag (fees 0.27 vs gross 0.03); 7d NET -0.98 persists
+- Storm bar MET 3/3 — conversion still blocked by CEO NO-CONVERT (floor bottleneck, linreg-fade band owns fix); needs CEO sign-off, no auto action
+BY: auto_1hr
