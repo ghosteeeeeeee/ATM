@@ -2020,6 +2020,16 @@ def _check_hard_stops(prices: dict):
         cur.close()
         conn.close()
 
+        # STACK-LEADER STOP (same rule as pm, CEO 2026-11-21 + F-2):
+        # while a coin has >1 open row only the OLDEST row's hard-stop
+        # triggers — an add row's tight stop must not close the whole
+        # stack at its own breakeven.
+        _leader = {}
+        for _r in rows:
+            _t = str(_r[1] or '').upper()
+            if _t and (_t not in _leader or _r[0] < _leader[_t]):
+                _leader[_t] = _r[0]
+
         for trade_id, token, direction, entry_px, sl, tp, lev, amt, paper, atr_managed, signal in rows:
             token = token.upper()
             cur_price = prices.get(token)
@@ -2069,7 +2079,7 @@ def _check_hard_stops(prices: dict):
                 # TP is BELOW entry. Price falling TO or BELOW TP = profit target.
                 # Safety margin: reduced from 0.5% to 0.1% — was causing 1.5-2.5% extra leveraged loss
                 _margin = 0.001 if (atr_managed) else 0.0
-                if cur_price >= sl * (1 + _margin):
+                if cur_price >= sl * (1 + _margin) and (_leader.get(token, trade_id) == trade_id):
                     hit_reason = 'hard_sl'
                 # Skip hard_tp for RR engine-managed signals — let RR engine handle exits
                 if tp > 0 and cur_price <= tp * (1 - _margin):
@@ -2079,7 +2089,7 @@ def _check_hard_stops(prices: dict):
                 # LONG: SL is BELOW entry. Price falling TO or BELOW SL = loss.
                 # TP is ABOVE entry. Price rising TO or ABOVE TP = profit target.
                 _margin = 0.001 if (atr_managed) else 0.0
-                if cur_price <= sl * (1 - _margin):
+                if cur_price <= sl * (1 - _margin) and (_leader.get(token, trade_id) == trade_id):
                     hit_reason = 'hard_sl'
                 # Skip hard_tp for RR engine-managed signals
                 if tp > 0 and cur_price >= tp * (1 + _margin):
