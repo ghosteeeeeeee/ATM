@@ -11964,5 +11964,41 @@
     "category": "measurement",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-21T08:50:00Z",
+    "idea": "MAKER-ENTRY (ALO post-only) counterfactual walk — pipeline sends taker Market while Limit+ALO already exists in hyperliquid_exchange + brain.py --order-type",
+    "rationale": "Fees are 158% of 7d gross profit (1.787 vs 1.13) and 30d net improves ~25% at maker rates. Session prior art 2026-10-29 identified the lever; wiring was never done.",
+    "expected_impact": "+$1.62/14d measured net (fee save +1.37, avoided misses +0.25), halves same-sign, fk 11.3%",
+    "category": "fee lever",
+    "status": "registered (amplify-maker-entry-fill-walk, deadline 11-28, default NO SHIP)",
+    "risk": "medium (execution path; ALO fill-miss on momentum entries; needs retry rule + CEO sign-off)"
+  },
+  {
+    "date": "2026-11-21T08:50:00Z",
+    "idea": "Post-loss opposite-direction churn gate — block taking the FLIP side on a token within 24h of a loss",
+    "rationale": "48h autopsy showed BLUR LONG lost then BLUR SHORT lost 17h later; tested the pattern book-wide instead of anecdotally.",
+    "expected_impact": "NONE — REFUTED: 30d n=118 churn trades net -1.14 WR 52.5% vs non-churn 53.1%, Fisher p=0.919; jup owns 69/118.",
+    "category": "entry filter",
+    "status": "refuted",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-11-21T08:50:00Z",
+    "idea": "Fee-sink weekly line: per source, fees paid by never-armed trades vs their gross (auto_1hr report extension)",
+    "rationale": "all 3 n>=20 sources show the unarmed class owning -1.36..-1.78 gross/14d plus its fees while armed WR is 59-100% — quantifies exactly where the fee budget is wasted.",
+    "expected_impact": "visibility only, no gate",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-21T08:50:00Z",
+    "idea": "SPLIT-BRAIN signals.log NOTE shipped (scripts/signals/btc_pump_rider.py:37)",
+    "rationale": "audit #283 grepped /root/.hermes/logs/signals.log and reported the rider-fade collector dead; 138 lines were live in /var/www/hermes/logs/signals.log",
+    "expected_impact": "prevents a third wrong-path investigation",
+    "category": "ops",
+    "status": "shipped",
+    "risk": "none"
   }
 ]

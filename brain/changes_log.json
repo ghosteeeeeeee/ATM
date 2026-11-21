@@ -4620,5 +4620,27 @@
     "rationale": "Registry recorded step (i) as NEVER SHIPPED because 0 lines existed in pipeline.log — the measurement artifact was that raw print never reaches the log. Zero behavior change (logging only); unblocks amplify-bbsqueeze-module-rsi-reband step (ii) accumulation.",
     "impact": "Verified 38 timestamped [bb-squeeze] BLOCKED lines in logs/pipeline.log, 0 bare-print lines, py_compile PASS, no downstream line-parser breakage (volatility_gate_v2 matches signal NAME). 2 of the needed >=10 events already carry module RSI 65-70.",
     "note": "APPLIED by the interrupted run #284; VERIFIED + LOGGED by completing run #284b. bug_hunter self-check (subagent call was permission-denied in this session): py_compile 6 files PASS, import smoke PASS, evidence counts run directly."
+  },
+  {
+    "timestamp": "2026-11-21T08:52:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #285: zero-behavior NOTE at scripts/signals/btc_pump_rider.py:37 documenting split-brain signals.log (root cause of #283 wrong-file rider-fade grep)",
+    "type": "tweak",
+    "file": "scripts/signals/btc_pump_rider.py",
+    "before": "_SIGNAL_LOG = /var/www/hermes/logs/signals.log (no path note)",
+    "after": "same path + 4-line comment naming the second live file /root/.hermes/logs/signals.log and the correct grep path",
+    "rationale": "audit #283 reported rider-fade dead after grepping the wrong file; 138 lines were live in /var/www",
+    "impact": "no behavior change; prevents repeat wrong-path investigations"
+  },
+  {
+    "timestamp": "2026-11-21T08:52:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #285: +1 amplify entry amplify-maker-entry-fill-walk (fee-axis, deadline 11-28, default NO SHIP); amplify-ai-trader-pending-normal-short-btc-cell disposed NO-SHIP (replication/2-token/amount-floor bars fail); last_read on rider-fade (FAIL-fk) + win-capture (0.600/0.581 vs 0.70)",
+    "type": "data",
+    "file": "data/shadow_disposition.json",
+    "before": "133 entries, ai-trader cell open, no maker-entry proposal",
+    "after": "134 entries, ai-trader cell done, maker-entry registered",
+    "rationale": "AMPLIFY weekly mandate — no fresh winner cell cleared the bar so offense went to the unused fee axis; fees = 158% of 7d gross",
+    "impact": "measurement-only; zero trading behavior change"
   }
 ]

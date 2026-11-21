@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-21T04:47:48.606430+00:00
-registry: 133 entries (open=32)
+# Shadow disposition report — 2026-11-21T08:41:58.928466+00:00
+registry: 134 entries (open=32)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -117,14 +117,14 @@ registry: 133 entries (open=32)
 - DONE amplify-pcv6-extreme-short-cell: CLOSED NO-CELL + KILL EXECUTED (CEO pre-registration 20261120T002223Z: 'if no-cell -> disable'). Independent re-measure 2026-11-21T04:40Z: rolling 30d pump-chain* EXTREME SHORT (v6-combo) = 0 rows -> the n>=15 bar is unreachable, cell only fired 10-09..10-21; v6 30d opens = 9, ALL LONG, net -0.29 (so the master kill forfeits nothing positive). PUMP_CHAIN_V6_ENABLED True->False applied by the INTERRUPTED run #284 at 00:42:45Z (died 00:46 before logging; swept into commit 02357b3a 03:58Z), verified live by completing run #284b: import reads False, 0 v6 opens since 00:42, py_compile PASS, NOT in CEO_PROTECTED_FLAGS, PUMP_CHAIN_V6_PLUS/MINUS stay True (revert = one line), no rotator auto-reenable path. Revert = set PUMP_CHAIN_V6_ENABLED = True. CEO ratify/veto open in kanban. (?)
 - DONE amplify-short-rsi-hard-ceiling-85-walk: NO-SHIP REINFORCED by criterion (3) outright (2026-11-21T04:40Z): the realized leaked SHORT RSI 75-85 cohort has crossed n>=15 = 18T/30d but net -0.10 (WR 61.1%) — criterion (3) requires net>0, so it now FAILS on substance, not sample. The adverse-selection gap stands (shadow fwd +0.38% vs realized -0.10): the blocked 75-85 prints that LEAK are not the ones the shadow tracks. Doctrine (bf96d7cd 2026-10-03 'oversold/bounce-risk even in bear' -> no bear override) unchanged. Route CLOSED: do not re-open without a new instrument. (?)
 - DONE floor-admit-same-sign-verdict: NO-SHIP, route CLOSED. Join re-ran 00:31Z: floor_only n=1835 decided 49.1% vs always_admit n=344 43.9% (blocked n=0); bars: n>=200 PASS, 30d same-sign PASS, fisher p=0.0877 FAIL (>0.05). p trajectory across runs: 0.138 -> 0.0321 -> 0.0442 -> 0.0545 -> 0.0877 = significance DECAYING as n grows (early small-n artifact, classic). Directional edge persists (+5.2pp) but house rule = p>0.05 is noise. Prior-art cite: [calwndar, 2026-10-31, 'census exact where cohort matches... single uncorrected p<0.05 among 20 tests flagged as weak'] = same class of weak-significance caution. Do NOT re-propose without a NEW pre-registered bar; any future ask needs CEO. (2026-11-15T00:40:00Z)
-- OPEN amplify-ai-trader-pending-normal-short-btc-cell: deadline=2026-11-22T00:00:00Z | (no parseable source)
+- DONE amplify-ai-trader-pending-normal-short-btc-cell: NO-SHIP (default exercised) at early read 2026-11-21 08:45Z, 15h before deadline. Bars (i)/(ii)/(iii) ALL FAIL on substance, not on time: (i) REPLICATION FAIL — weekly split 10-19 week 2T +0.08 / 11-09 week 22T +1.36 / 11-16 week 2T -0.14 = not same-sign positive (concentration confirmed: 22/26 trades in one week). (ii) 2-token FAIL — 26/26 BTC, single-token cell. (iii) amount floor FAIL — 20/26 (77%) at the HL floor vs <50% requirement => notional axis unusable, confidence path would be the only axis and still needs CEO sign-off. Fresh cell numbers 30d 26T net +1.30 WR 46.2% / 7d 6T +1.16 / 14d 24T +1.22 (still net>0, so NOT killed — RE-READ at 2026-12-05 if the cell survives two more weeks outside the 11-09 week). Sibling cells untouched; signal-level steer (37-46% WR) still stands. Owner: CEO (manual-trade domain) per [ai-trader btc auto trader, 2026-10-21]. (2026-11-21T08:45:00Z)
 - OPEN tape-at-long-remeasure-1129: deadline=2026-11-29T00:00:00Z | (no parseable source)
 - OPEN amplify-pcfade-windowfix-repromote-review: deadline=2026-11-25T00:00:00Z | (no parseable source)
 - OPEN long-rsi-floor30-shadow: deadline=2026-11-30T00:00:00Z | (no parseable source)
 - OPEN hl-copy-plus-shadow: deadline=2026-11-30T00:00:00Z | (no parseable source)
 - OPEN hotset-pin-approved-shadow: deadline=2026-11-25T00:00:00Z | (no parseable source)
 - OPEN amplify-pumpchain-normal-short-early: deadline=2026-12-02T00:00:00Z | (no parseable source)
-- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 1892 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 1.6d
+- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 2068 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 1.7d
 - OPEN amplify-rider-fade-threshold-walk: deadline=2026-11-22T00:00:00Z | (no parseable source)
 - OPEN amplify-jup-long-blocked-clonehunt: deadline=2026-11-23T00:00:00Z | (no parseable source)
 - OPEN stop-family-entry-filter-shadow: deadline=2026-11-27T00:00:00Z | (no parseable source)
@@ -134,3 +134,4 @@ registry: 133 entries (open=32)
 - OPEN other-gate-short-withhold-review: deadline=2026-11-27T00:00:00Z | (no parseable source)
 - OPEN regime-gate-tension-check: deadline=2026-11-24T00:00:00Z | (no parseable source)
 - OPEN amplify-longbypass-dual-basis-reconcile: deadline=2026-11-28T00:00:00Z | (no parseable source)
+- OPEN amplify-maker-entry-fill-walk: deadline=2026-11-28T00:00:00Z | (no parseable source)

@@ -34,7 +34,10 @@ from signal_schema import add_signal, price_age_minutes, get_cooldown, set_coold
 from paths import HERMES_DATA
 
 _CANDLES_DB = os.path.join(HERMES_DATA, 'candles.db')
-_SIGNAL_LOG = '/var/www/hermes/logs/signals.log'
+_SIGNAL_LOG = '/var/www/hermes/logs/signals.log'   # NOTE (#285): canonical shadow-tag path. A SECOND
+# live signals.log exists at /root/.hermes/logs/signals.log (mtf_macd + signal_confluence write there) —
+# audits that grep it for [RIDER-FADE-SHADOW]/other tags read 0 lines and wrongly conclude the collector
+# is dead (#283). Grep tags in /var/www/hermes/logs/signals.log.
 os.makedirs(os.path.dirname(_SIGNAL_LOG), exist_ok=True)
 
 # ── Parameters ────────────────────────────────────────────────────────────────
