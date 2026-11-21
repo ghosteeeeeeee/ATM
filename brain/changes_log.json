@@ -4642,5 +4642,27 @@
     "after": "134 entries, ai-trader cell done, maker-entry registered",
     "rationale": "AMPLIFY weekly mandate — no fresh winner cell cleared the bar so offense went to the unused fee axis; fees = 158% of 7d gross",
     "impact": "measurement-only; zero trading behavior change"
+  },
+  {
+    "timestamp": "2026-11-21T16:52:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #286: stranded shadow_disposition registry entry relocated out of _doc into entries (amplify-ema300-breakthrough-underdeploy, open deadline 2026-11-20 -> done/CLOSED SUPERSEDED)",
+    "type": "data",
+    "file": "data/shadow_disposition.json",
+    "before": "_doc = 6 strings + 1 dict entry the daily runner never reads (main() iterates only reg['entries'])",
+    "after": "_doc = 6 strings; 135 entries; moved entry status=done with disposition pointing at sibling amplify-ema300-underdeploy (CLOSED NO-SHIP 2026-11-18)",
+    "rationale": "A past-due AMPLIFY entry was invisible to kanban packets, control tower and calendar — deadline passed in silence (root-cause guard shipped same run)",
+    "impact": "Zero trading behavior; restores visibility of one offense-mandate entry. bug_hunter PASS."
+  },
+  {
+    "timestamp": "2026-11-21T16:52:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #286: _stranded_entries() guard + 6 selfcheck fixtures + live canary in shadow_disposition.py",
+    "type": "tweak",
+    "file": "scripts/shadow_disposition.py",
+    "before": "no _doc inspection anywhere; entry_errors hard-coded 0",
+    "after": "pure _stranded_entries(reg) (isinstance-guarded, never raises); main() emits \"- ERROR: STRANDED in _doc\" report line + log ERROR + seeds entry_errors; selfcheck asserts live _doc clean + 5 fixtures",
+    "rationale": "Make the stranded-entry hole loud instead of silent (file's own MED-1 lesson: one bad JSON value must not kill the run)",
+    "impact": "Report-only, zero trading behavior. py_compile PASS, --selfcheck SELFCHECK PASS, bug_hunter PASS (1 MED + 3 LOW all fixed)."
   }
 ]

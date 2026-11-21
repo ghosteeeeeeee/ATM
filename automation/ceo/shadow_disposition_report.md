@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-21T12:42:11.521300+00:00
-registry: 134 entries (open=32)
+# Shadow disposition report — 2026-11-21T16:41:57.156327+00:00
+registry: 135 entries (open=32)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -124,7 +124,7 @@ registry: 134 entries (open=32)
 - OPEN hl-copy-plus-shadow: deadline=2026-11-30T00:00:00Z | (no parseable source)
 - OPEN hotset-pin-approved-shadow: deadline=2026-11-25T00:00:00Z | (no parseable source)
 - OPEN amplify-pumpchain-normal-short-early: deadline=2026-12-02T00:00:00Z | (no parseable source)
-- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 2244 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 1.9d
+- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 2420 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 2.1d
 - OPEN amplify-rider-fade-threshold-walk: deadline=2026-11-22T00:00:00Z | (no parseable source)
 - OPEN amplify-jup-long-blocked-clonehunt: deadline=2026-11-23T00:00:00Z | (no parseable source)
 - OPEN stop-family-entry-filter-shadow: deadline=2026-11-27T00:00:00Z | (no parseable source)
@@ -135,3 +135,4 @@ registry: 134 entries (open=32)
 - OPEN regime-gate-tension-check: deadline=2026-11-24T00:00:00Z | (no parseable source)
 - OPEN amplify-longbypass-dual-basis-reconcile: deadline=2026-11-28T00:00:00Z | (no parseable source)
 - OPEN amplify-maker-entry-fill-walk: deadline=2026-11-28T00:00:00Z | (no parseable source)
+- DONE amplify-ema300-breakthrough-underdeploy: CLOSED SUPERSEDED 2026-11-21 (brain_auditor #286): this entry was appended into _doc instead of entries by #257 (commit 919f4d50), so shadow_disposition.py (:570 reads only reg["entries"]) NEVER surfaced it and its 2026-11-20 deadline silently passed. The same work was properly registered and disposed as "amplify-ema300-underdeploy" (deadline 2026-11-19, CLOSED NO-SHIP 2026-11-18, audit #274: bar (i) counterfactual-walk FAIL). No measurement is owed. Root-cause guard shipped same run: main() now reports dict entries stranded in _doc. (2026-11-21T16:45:00Z)

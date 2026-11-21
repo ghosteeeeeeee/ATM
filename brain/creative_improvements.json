@@ -12000,5 +12000,35 @@
     "category": "ops",
     "status": "shipped",
     "risk": "none"
+  },
+  {
+    "date": "2026-11-21T16:52:00Z",
+    "id": "C1-audit286",
+    "idea": "Pre-register the --prearmed knife-cohort bar (n>=40 AND |t|>=2 AND family stays net>0 after removal AND winner-kill <20% AND 14d/30d same-sign), else MONITOR",
+    "rationale": "Cohort is 28T -0.80 39.3% WR with t=-0.94 over 30d — not significant, but the watchdog re-derived an RSI rule from it this cycle and the CEO carve-out is 1 day old. A written bar converts an opinion loop into a scheduled measurement.",
+    "expected_impact": "Prevents an unearned reversal of a CEO directive; +0.80-1.60/30d if it ever trips",
+    "category": "guard discipline",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-21T16:52:00Z",
+    "id": "C2-audit286",
+    "idea": "Watchdog pattern alerts must cite ENTRY-time tape stamps (_signal_metadata::btc_ema300_position), not window-end tape",
+    "rationale": "PATTERN-1 derived 'do not arm BTC SHORT at rsi<35 while 1m above EMA300' from a window claim that all 3 cited entries refute (BELOW, -2.9..-3.9%). The rule would have blocked 0/3; entry-route also CLOSED by #192 (0/10 Bonferroni).",
+    "expected_impact": "Removes a class of mis-specified steers before they become duplicate gate proposals",
+    "category": "steer quality",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-21T16:52:00Z",
+    "id": "C3-audit286",
+    "idea": "Stranded-registry canary — shadow_disposition.py now errors on any dict in _doc",
+    "rationale": "amplify-ema300-breakthrough-underdeploy sat unread in _doc with a 2026-11-20 deadline; the 08:15Z runner could never surface it.",
+    "expected_impact": "Silent past-due-offense failure becomes an ERROR line on the next daily run",
+    "category": "audit infrastructure",
+    "status": "shipped",
+    "risk": "low"
   }
 ]

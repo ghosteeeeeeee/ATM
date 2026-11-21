@@ -125,6 +125,27 @@ def _load(path, default):
         return default
 
 
+def _stranded_entries(reg):
+    """Registry entries appended into _doc instead of entries.
+
+    main() only ever iterates reg['entries'] (raw_entries, a few lines above),
+    so a dict parked in _doc never reaches a packet, the tower, or the
+    calendar — its deadline passes in silence (brain_auditor #286,
+    amplify-ema300-breakthrough-underdeploy). Pure so selfcheck can exercise
+    it with a fixture, not just live data.
+
+    bug_hunter #286 MED: _doc is only ever supposed to be a list of strings,
+    but a scalar/dict there must degrade to [] — main() reads this OUTSIDE any
+    try, so a TypeError would kill the whole run before a single packet
+    (the file's own MED-1 lesson)."""
+    if not isinstance(reg, dict):
+        return []
+    doc = reg.get('_doc')
+    if not isinstance(doc, (list, tuple)):
+        return []
+    return [x for x in doc if isinstance(x, dict) and x.get('id')]
+
+
 def _save(path, obj):
     # review MED-4: pid-unique tmp so overlapping runs can't interleave into
     # one fixed path and atomically publish a corrupted file.
@@ -577,12 +598,23 @@ def main():
         + (f" | SKIPPED non-dict entries: {n_nondict}" if n_nondict else ''),
         ''
     ]
+    # brain_auditor #286: an entry appended into _doc instead of entries is a
+    # silent no-op — main() only ever iterates reg['entries'] (raw_entries, a
+    # few lines above), so its deadline passes with no packet and no tower line
+    # (amplify-ema300-breakthrough-underdeploy stranded this way by #257,
+    # deadline 11-20 unreported). Make the hole loud instead of invisible.
+    stranded = _stranded_entries(reg)
+    if stranded:
+        _sids = ', '.join(str(x.get('id')) for x in stranded)
+        report.insert(2, f'- ERROR: STRANDED in _doc (never surfaced): {_sids}')
+        log(f'ERROR: {len(stranded)} registry entry/entries stranded in _doc — '
+            f'{_sids}')
     kanban_lines = []
     # (eid, state_key, value) pairs applied ONLY after a successful kanban append
     # (review MED-4: recording dedupe keys on a failed append loses the packet forever)
     pending_state = []
     problems = 0
-    entry_errors = 0
+    entry_errors = len(stranded)
 
     for e in entries:
         eid = '?'
@@ -1078,6 +1110,24 @@ def selfcheck():
     chk('_tower' not in {x.get('id') for x in reg.get('entries', [])
                          if isinstance(x, dict)},
         "reserved state key '_tower' is not used as a registry id (review LOW-5)")
+    # brain_auditor #286: canary + fixture for the stranded-in-_doc class.
+    _stranded = _stranded_entries(reg)
+    chk(not _stranded,
+        f'no registry entry stranded in _doc (stranded={ [x.get("id") for x in _stranded] })')
+    chk(_stranded_entries({'_doc': ['text', {'id': 'x', 'status': 'open'}],
+                           'entries': []}) == [{'id': 'x', 'status': 'open'}],
+        'fixture: dict in _doc is detected as stranded')
+    chk(_stranded_entries({'_doc': ['text'], 'entries': [{'id': 'y'}]}) == [],
+        'fixture: normal _doc strings are not stranded')
+    chk(_stranded_entries({'_doc': [42, None, {}]}) == [],
+        'fixture: non-dict / id-less junk in _doc is ignored')
+    # bug_hunter #286 MED: scalar/dict _doc must degrade, never raise — this
+    # helper runs outside main()'s try.
+    chk(_stranded_entries({'_doc': 42}) == [],
+        'fixture: scalar _doc degrades to [] (no TypeError)')
+    chk(_stranded_entries({'_doc': {'id': 'x'}}) == [],
+        'fixture: dict-shaped _doc degrades to [] (no false positive)')
+    chk(_stranded_entries(None) == [], 'fixture: reg=None degrades to []')
     m = _RE_TIME_EXT.search('  Extended: WR improvement = +4.9pp, trades = 17079')
     chk(m is not None and m.group(1) == '4.9' and m.group(2) == '17079',
         'extended-time parses POSITIVE improvement +4.9pp (bug_hunter NEW-1)')

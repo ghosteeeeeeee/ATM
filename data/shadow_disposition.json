@@ -5,25 +5,9 @@
     "Runner: scripts/shadow_disposition.py (daily hermes-shadow-disposition.timer, 08:15 UTC (was weekly — day-scale deadlines, #190 2026-10-27)).",
     "Rules: deadline reached -> default_action fires via kanban packet with 24h CEO clock (silence = default).",
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
-    "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope.",
-    {
-      "id": "amplify-ema300-breakthrough-underdeploy",
-      "stream": "ema300-breakthrough: ENABLED signal with 0 live fills in 30d while shadow shows +0.24 avg (n=14)",
-      "kind": "amplify",
-      "proposal_type": "(c) clone-hunt / underdeploy audit",
-      "status": "open",
-      "created": "2026-11-13T16:45:00Z",
-      "deadline": "2026-11-20T00:00:00Z",
-      "owner": "brain_auditor #257",
-      "evidence": "EMA300_BREAKTHROUGH_ENABLED=True (hermes_constants:2890, list :2249) but PG live fills 30d=0; signals_hermes_runtime 30d detections=10 ALL EXPIRED (compaction_stale_10min x majority, 1x rr-engine-hard-block); shadow_trader signal-quality n=14 WR 42.9% avg +0.24 (fat-tail profile). Enabled-but-zero-conversion = same class as grind-breakout-underdeploy.",
-      "threshold": "Diagnose conversion leak (detection->approval latency vs named-gate blocks) with dedup guard (#239: dedup source+token+created_at). Ship bar: deduped blocked/expired set n>=15 AND counterfactual candle-walk net positive (pnl_usdt basis, units guard) AND split-half same-sign AND fk<20%. If detections are simply too rare (<15/30d sustained), close as TRICKLE-NO-DEPLOY.",
-      "measurement": "runtime signals DB decision breakdown + gate_shadow join for ema300-breakthrough-; report at 11-20 run",
-      "default_action": "NO SHIP — measurement only",
-      "risk": "low",
-      "notes": "Do NOT cite raw shadow n without dedup (#239 pseudo-replication). Signal uses atr exit management (:2357)."
-    }
+    "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-21T08:45:00Z",
+  "updated": "2026-11-21T16:41:57+00:00",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -2192,6 +2176,24 @@
       "measurement": "Re-run the fill walk at deadline: 14d/30d closed trades x candles_1m min(low)/max(high) vs entry within 180s; report fill%, fee save (sum amount_usdt x 0.0006 for filled), missed cohort net pnl_usdt, fk, both halves. Limit window scope to a CEO-chosen source subset if full-book ALO fill risk is unacceptable (momentum entries where a miss costs more than 0.06% RT).",
       "notes": "Caveat honesty: the fill proxy assumes a post-only order resting AT our recorded (market-filled) entry price; a real ALO would rest at the touch and fill only on a taker hit — fill rate could be lower than 82% if price runs away without revisiting. Proxy is therefore best-estimate, not measured fills. Also: maker fills can be WORSE price-wise only by the spread we already pay. Fee lever session cite: [Build New Linear Regression Signal, 2026-10-29] + [calwndar, 2026-10-31] ('headline net negative is gross of fees; true 30d ~= -9.21'). Cross-ref: fee-net KPI already tracked by auto_1hr (OPEN: 7d fee-drag).",
       "created_at": "2026-11-21T08:45:00Z"
+    },
+    {
+      "id": "amplify-ema300-breakthrough-underdeploy",
+      "stream": "ema300-breakthrough: ENABLED signal with 0 live fills in 30d while shadow shows +0.24 avg (n=14)",
+      "kind": "amplify",
+      "proposal_type": "(c) clone-hunt / underdeploy audit",
+      "status": "done",
+      "created": "2026-11-13T16:45:00Z",
+      "deadline": "2026-11-20T00:00:00Z",
+      "owner": "brain_auditor #257",
+      "evidence": "EMA300_BREAKTHROUGH_ENABLED=True (hermes_constants:2890, list :2249) but PG live fills 30d=0; signals_hermes_runtime 30d detections=10 ALL EXPIRED (compaction_stale_10min x majority, 1x rr-engine-hard-block); shadow_trader signal-quality n=14 WR 42.9% avg +0.24 (fat-tail profile). Enabled-but-zero-conversion = same class as grind-breakout-underdeploy.",
+      "threshold": "Diagnose conversion leak (detection->approval latency vs named-gate blocks) with dedup guard (#239: dedup source+token+created_at). Ship bar: deduped blocked/expired set n>=15 AND counterfactual candle-walk net positive (pnl_usdt basis, units guard) AND split-half same-sign AND fk<20%. If detections are simply too rare (<15/30d sustained), close as TRICKLE-NO-DEPLOY.",
+      "measurement": "runtime signals DB decision breakdown + gate_shadow join for ema300-breakthrough-; report at 11-20 run",
+      "default_action": "NO SHIP — measurement only",
+      "risk": "low",
+      "notes": "Do NOT cite raw shadow n without dedup (#239 pseudo-replication). Signal uses atr exit management (:2357).",
+      "done_at": "2026-11-21T16:45:00Z",
+      "disposition": "CLOSED SUPERSEDED 2026-11-21 (brain_auditor #286): this entry was appended into _doc instead of entries by #257 (commit 919f4d50), so shadow_disposition.py (:570 reads only reg[\"entries\"]) NEVER surfaced it and its 2026-11-20 deadline silently passed. The same work was properly registered and disposed as \"amplify-ema300-underdeploy\" (deadline 2026-11-19, CLOSED NO-SHIP 2026-11-18, audit #274: bar (i) counterfactual-walk FAIL). No measurement is owed. Root-cause guard shipped same run: main() now reports dict entries stranded in _doc."
     }
   ],
   "updated_at": "2026-11-21T12:42:11Z"
