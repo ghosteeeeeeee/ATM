@@ -31354,3 +31354,32 @@ BY: auto_1hr
 - pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
 - 1 open: BTC continuum-osc+ LONG (20:03)
 BY: auto_1hr
+
+## [2026-11-21 23:52] Hourly Analysis
+
+**Storm:** no storm — window-min -0.57% / at-run +0.15%
+
+**Trades:** 1 closed last hour (0 wins, 1 loss) | 24h 30 closed
+**PnL NET:** hour $-0.07 | 24h NET $+0.13 (gross +0.66, fees 0.53, payoff 1.56, WR 53.3%) | 7d NET $-1.42 (gross +0.50, fees 1.92) | 14d NET $-3.98 (fees 3.34) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Last hour: 1 close BTC continuum-osc+ LONG atr_sl_hit net -0.07 -> no kill trigger (n=1 < 3), no 0% n>=3 signal
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/30 = 6.7% (<40%); tpsl_utils deployed. Top 24h buckets: profit-monster-trail 13T net +0.73 (earner), prearm_lock 7T net -0.17, manual_sl_hit 3T net -0.33
+- Kill: pump-chain+ 24h 6T 0% net -0.19; 14d regime EXTREME 10T 10% net -0.50 / NORMAL 1T 0% net -0.05, n=11 < 20 and no regime n>=20 -> no kill, monitor
+- Boost: none eligible — btc-pump-rider+ 6T 100% net +0.40 already at 1.3; jup_yolo_mirrored 4T n<5; pump-chain+ 0% losing
+- Arm rate: unarmed 15/30 = 50.0% below 70%, WR 6.7% net -$0.68 vs armed 15/15 100% net +$0.81 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 23:00 -0.07 but 22:00 +0.06 breaks streak (not 3 consecutive); regime HIGH not NEUTRAL -> no size cut
+- Frequency: 1 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.260% < 0.5% (max 0.996)
+- 0 open trades
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d NET -1.42 fee-drag (fees 1.92 vs gross 0.50); 14d -3.98
+- pump-chain+ 24h 0% 6T, 14d n=11 of 20 kill threshold — revisit if n reaches 20
+- 24h net eroding +0.22 -> +0.13
+BY: auto_1hr
