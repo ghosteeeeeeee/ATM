@@ -1860,6 +1860,45 @@
       "root_cause": "two writers computing net independently at different rounding points.",
       "found_by": "agent-1 MoE Phase0 build 2026-11-20 (sideways LOW)",
       "fix": "one canonicalization ruling: pick the basis (control_tower fee_net_24h = canonical), make the other derive from it or document the rounding contract in both readers."
+    },
+    {
+      "id": "BUG-102",
+      "title": "Copy-trader live SELL path broken: getTokenAccountsByOwner 403 on publicnode + string mint passed where PublicKey required",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "bot.js"
+      ],
+      "symptom": "First live sell would fail: ourTokenBalance threw either TypeError (filter.mint.toBase58 is not a function - mint is a string from decodeTrade) or 403 Indexed requests require a personal token (publicnode blocks owner-indexed RPC). Dry run never called act(), so the path was never exercised; selftest only builds quotes and never sells.",
+      "root_cause": "bot.js ourTokenBalance used conn.getTokenAccountsByOwner(wallet, {mint}) - method is blocked (403) on the free publicnode endpoint, and web3.js requires filter.mint as PublicKey, not the raw mint string decodeTrade returns.",
+      "found_by": "bug-hunter (Solana copy-trader build verification)",
+      "fix": "Rewrote ourTokenBalance to derive the ATA locally with PublicKey.findProgramAddressSync for both SPL token programs (classic + Token-2022; only one can exist) and read it via getParsedAccountInfo, which publicnode serves. An absent account = genuine zero; an RPC failure throws so a flaky read never sells or forgets the position. Verified: method-matrix probe (publicnode getAccountInfo/getParsedAccountInfo/getSignatureStatuses ok; getTokenAccountsByOwner/getTokenAccountBalance/getParsedTokenAccountsByOwner 403), positive control read target wallet USDC ATA amount=759515130, npm test + npm run selftest pass, bot restarted LIVE."
+    },
+    {
+      "id": "BUG-103",
+      "title": "Silent getTransaction drop hid a 30-minute total detection outage (no counter, no log line)",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "bot.js"
+      ],
+      "symptom": "For 13+ minutes after going live the bot logged nothing and detected 0 trades while its websocket received ~85 mentions/s. Root cause (100% HTTP 429 on getTransaction from api.mainnet-beta.solana.com) was only findable by probing the RPC by hand.",
+      "root_cause": "bot.js getTx retries a 429 four times then returns null, and handle() did if (!tx) return; - every rate-limited mention vanished with no trace, so counts stayed 0 and the log stayed empty.",
+      "found_by": "bug-hunter (Solana copy-trader build verification)",
+      "fix": "Null results now increment a new state.counts.dropped counter (dashboard renders counters generically, so it appears with no view change). Endpoint-level root cause already mitigated by splitting endpoints: reads to solana-rpc.publicnode.com (20/20 getTransaction ok), websocket to wss://api.mainnet-beta.solana.com (5926 mentions/70s; publicnode logsSubscribe mentions filter is dead)."
+    },
+    {
+      "id": "BUG-104",
+      "title": "selftest hard-asserts dryRun===true, making the money-path pre-flight unrunnable once deliberately flipped live",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "selftest.mjs"
+      ],
+      "symptom": "npm run selftest aborted at line 18 (dryRun must ship as true) after config was intentionally flipped to live, so quotes, swap build/sign and priority-fee checks never ran - the exact checks needed before live trading.",
+      "root_cause": "The shipping guard was written as a hard assert with no post-flip path, contradicting the file header which calls it the pre-flight for going live.",
+      "found_by": "bug-hunter (Solana copy-trader build verification)",
+      "fix": "Replaced the assert with a warning that continues: live configs can run the full pre-flight (nothing is broadcast), shipped configs still default to dry-run. Verified: selftest passes all 7 checks incl. both Jupiter quotes, 706-byte signed swap tx, priority fee 1999999 lamports within tolerance."
     }
   ],
   "schema": {
