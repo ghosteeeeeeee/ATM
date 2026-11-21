@@ -31101,3 +31101,32 @@ BY: auto_1hr
 - 3 open: BTC ai-trader-pending LONG x2 (13:28, 13:39), SAND btc-pump-rider+ LONG (13:18)
 - Sideways: hourly entries since 07:53 hit trading_log + recent_changes but NOT automation/ceo_kanban.md (last auto_1hr line there is 06:59) — kanban appends appear to have been skipped by 5 consecutive runs
 BY: auto_1hr
+
+## [2026-11-21 14:55] Hourly Analysis
+
+**Storm:** no storm — window-min -0.53% / at-run -0.46%
+
+**Trades:** 3 closed last hour (2 wins, 1 loss) | 24h 24 closed
+**PnL NET:** hour $+0.22 (SAND btc-pump-rider+ +0.24, AIXBT btc-pump-rider+ +0.01, BLUR pump-chain+ -0.03) | 24h NET $+0.60 (gross +1.10, fees 0.50, payoff 1.41, WR 66.7%) | 7d NET $-0.72 (gross +1.15, fees 1.87, WR 51.7%) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. **BOOST: combo_weights.json btc-pump-rider+ 0.6 -> 1.3** (effective source weight verified via `_get_source_weight` = 1.3) — meets all boost criteria: 24h 6T 100% WR net +0.40 across 6 tokens; 7d 18T 61.1% net +0.45; 14d 20T 60.0% net +0.31 across 17 tokens (regime 14d: EXTREME 68.8% +0.59). **Root cause of the boost:** static weight 1.3 in signal_compactor.py:469 was SHADOWED by stale learner value 0.6 (auto combo weights take priority, signal_compactor.py:758) — signal was winning while suppressed. Next self_learner recalc returns None (7d signal_outcomes 56.25% avg -0.0036 → no-change branch) so 1.3 survives. signal_versions.json: btc-pump-rider+ v1.
+
+**No Change Needed:**
+- Last hour: 3 closes, 2/3 wins — no 0% WR n>=3 kill candidate (btc-pump-rider+ 2T 100%, pump-chain+ 1T)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/24 = 4.2% (<40%); tpsl_utils deployed. Top loss bucket: manual_sl_hit 3T net -0.36 (all BTC ai-trader-pending SHORTs from 11-20)
+- Kill: none — pump-chain+ 24h 3T 0% net -0.13 but ALL BLUR, last-hour n=1 (window rule not met; monitor)
+- Arm rate: unarmed 10/24 = 41.7% below 70%, WR 20.0% net -$0.25 vs armed 14/14 100% net +$0.85 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly nets 07 +0.25, 09 +0.01, 12 +0.15, 13 +0.09, 14 +0.22 — not 3 consecutive negatives -> no size cut
+- Frequency: 3 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.226% < 0.5% (max 0.996)
+- No hermes_constants change (combo_weights.json data edit only)
+
+**Open Questions:**
+- 7d NET -0.72 fee-drag (fees 1.87 vs gross 1.15); 24h NET +0.60 improving
+- pump-chain+ all-BLUR 3T 0% — if it repeats with n>=3 in one hour, run regime kill check
+- signal_outcomes 7d (16T 56.3% avg -$0.0036) disagrees with PostgreSQL trades 7d (18T 61.1% net +0.45) for btc-pump-rider+ — attribution mismatch between stores, worth a separate look
+- 3 open: BTC ai-trader-pending LONG x2 (13:28, 13:39), SOL jup_yolo_mirrored LONG (14:47)
+- Kanban appends resumed at 13:53 after 07:53-12:51 gap — this run appends too
+BY: auto_1hr
