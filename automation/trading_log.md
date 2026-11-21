@@ -31130,3 +31130,31 @@ BY: auto_1hr
 - 3 open: BTC ai-trader-pending LONG x2 (13:28, 13:39), SOL jup_yolo_mirrored LONG (14:47)
 - Kanban appends resumed at 13:53 after 07:53-12:51 gap — this run appends too
 BY: auto_1hr
+
+## [2026-11-21 15:52] Hourly Analysis
+
+**Storm:** no storm — window-min -0.73% / at-run -0.63%
+
+**Trades:** 3 closed last hour (1 win, 2 losses) | 24h 27 closed
+**PnL NET:** hour $-0.16 (SOL jup_yolo_mirrored +0.04 net, BTC ai-trader-pending LONG x2 manual_sl_hit -0.10 each) | 24h NET $+0.44 (gross +0.98, fees 0.54, payoff 1.27, WR 63.0%) | 7d NET $-0.95 (gross +0.91, fees 1.86, WR 51.2%) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants/config change)
+
+**No Change Needed:**
+- Last hour: 3 closes, 1/3 wins — no 0%-WR n>=3 kill candidate (jup 1T, ai-trader-pending 2T 0% n=2<3)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/27 = 3.7% (<40%); tpsl_utils deployed. Top loss bucket: manual_sl_hit 5T net -0.56 (BTC ai-trader-pending)
+- Kill: pump-chain+ 24h 3T 0% net -0.13 all BLUR but 0 closes last hour (window rule not met; monitor)
+- Boost: none new — btc-pump-rider+ 6T 100% net +0.40 already boosted to 1.3 last hour (verified still 1.3 in combo_weights.json); jup_yolo_mirrored 4T 75% net +0.20 n<5; ai-trader-pending 10T 40% net -0.23 losing
+- Arm rate: unarmed 12/27 = 44.4% below 70%, WR 16.7% net -$0.45 vs armed 15/15 100% net +$0.89 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly nets 12 +0.15, 13 +0.09, 14 +0.22, 15 -0.16 — not 3 consecutive negatives -> no size cut
+- Frequency: 3 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.214% < 0.5% (max 0.996)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 7d NET -0.95 fee-drag (fees 1.86 vs gross 0.91) — worst 7d net this week; 24h still +0.44
+- Hour losses: both BTC ai-trader-pending LONGs entered at RSI 66.8 / 83.4 (high) then manual_sl_hit; new BTC SHORT opened 15:17:39 — CEO pending-order flow, not auto-signal
+- 2 open: BTC ai-trader-pending SHORT (15:17), WCT atr-trend+ LONG (15:12)
+BY: auto_1hr
