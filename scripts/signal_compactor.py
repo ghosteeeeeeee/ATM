@@ -2837,6 +2837,13 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
 
         # ── Step 2: Pre-filter ─────────────────────────────────────────────────
         signals = []
+        # CEO D4 Batch-1 2026-11-20 (automation/ceo/checkpoints/20261120T221647Z-decision.md):
+        # demoted-gate carrier {(token, direction): PENALTY_MULT}. The four Batch-1
+        # gates (SHORT-RSI-HARD-FLOOR, LONG-NEUTRAL-CHOP, LONG-NEUTRAL,
+        # SHORT-NEUTRAL) stopped hard-killing — each records its ×0.7 here and
+        # Step 5 multiplies the ranking SCORE by it. NEVER `conf`: the compactor
+        # SELECT floor (confidence >= 60, L2775) must keep admitting these rows.
+        _d4_gate_mult = {}
         for row in rows:
             token, direction, stype, conf, source, created = row[0], row[1], row[2], row[3], row[4], row[5]
             # bug_hunter 2026-10-31: central helper — Option D jup_yolo_mirrored
@@ -3392,7 +3399,7 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     log(f"  ✅ [SHORT-NEUTRAL-BYPASS] {token} SHORT — 4h NEUTRAL but strong confluence ({unique_signal_types} types), allowed")
                 else:
                     if not _btc_mom_ok_for_bypass:
-                        log(f"  🚫 [SHORT-NEUTRAL] {token} SHORT blocked — 4h NEUTRAL, BTC flat, standalone bypass denied")
+                        log(f"  📊 [SHORT-NEUTRAL] {token} SHORT WOULD-BLOCK — 4h NEUTRAL, BTC flat, standalone bypass denied — demoted 2026-11-20, ×0.7, review 2026-12-04 (D4 Batch-1)")
                         # ── [BTC-CHOP-STANDALONE-SHADOW] CEO consult 20261106T035547Z
                         # (FLOW RECOVERY PLAN, standing delegation = CEO label = go):
                         # LOG-ONLY counterfactual for the flat-deny immediately above —
@@ -3409,8 +3416,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         except Exception:
                             pass
                     else:
-                        log(f"  🚫 [SHORT-NEUTRAL] {token} SHORT blocked — 4h regime NEUTRAL, no SHORT edge")
-                    continue
+                        log(f"  📊 [SHORT-NEUTRAL] {token} SHORT WOULD-BLOCK — 4h regime NEUTRAL, no SHORT edge — demoted 2026-11-20, ×0.7, review 2026-12-04 (D4 Batch-1)")
+                    _d4_gate_mult[(token.upper(), direction.upper())] = PENALTY_MULT
             # ── BTC Regime Alignment (CEO-approved 2026-10-08, plans/align-with-btc-regime.md) ──
             # Bullish continuum (BULL_TREND/RANGING_BULL, score>=60) bypasses the LONG-NEUTRAL
             # block. Default OFF: shadow-log the would-allow counterfactual only (non-bullish =
@@ -3492,15 +3499,14 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                     if _ln_coin_mom:
                         log(f"  ✅ [LONG-NEUTRAL-CHOP-BYPASS] {token} LONG — BTC AT EMA300 but coin has own momentum, allowed")
                     else:
-                        log(f"  🚫 [LONG-NEUTRAL-CHOP] {token} LONG blocked — 4h NEUTRAL, 1m LONG_BIAS but BTC {_btc_ema_pos or 'unknown'} EMA300 (chop, no trend)")
-                        continue
+                        log(f"  📊 [LONG-NEUTRAL-CHOP] {token} LONG WOULD-BLOCK — 4h NEUTRAL, 1m LONG_BIAS but BTC {_btc_ema_pos or 'unknown'} EMA300 (chop, no trend) — demoted 2026-11-20, ×0.7, review 2026-12-04 (D4 Batch-1)")
+                        _d4_gate_mult[(token.upper(), direction.upper())] = PENALTY_MULT
                 elif unique_signal_types >= 2 or ((bare_source in STANDALONE_BYPASS_SIGNALS or _src_stripped in STANDALONE_BYPASS_SIGNALS) and _btc_mom_ok_for_bypass):
                     if _btc_in_trend or _ln_coin_mom:
                         log(f"  ✅ [LONG-NEUTRAL-BYPASS] {token} LONG — 4h NEUTRAL but strong confluence ({unique_signal_types} types) + {'BTC ABOVE EMA300' if _btc_in_trend else 'coin momentum'}, allowed")
                     else:
-                        log(f"  🚫 [LONG-NEUTRAL-CHOP] {token} LONG blocked — confluence but BTC {_btc_ema_pos or 'unknown'} EMA300 (chop, no trend)")
-                        _tombstone_pending(token, direction, 'long-neutral-chop', dry)  # FIX-A (autopsy 20261030): last-lying gate
-                        continue
+                        log(f"  📊 [LONG-NEUTRAL-CHOP] {token} LONG WOULD-BLOCK — confluence but BTC {_btc_ema_pos or 'unknown'} EMA300 (chop, no trend) — demoted 2026-11-20, ×0.7, review 2026-12-04 (D4 Batch-1)")
+                        _d4_gate_mult[(token.upper(), direction.upper())] = PENALTY_MULT
                 else:
                     # Continuum score exception (2026-10-01): 60≤score<80 + mean-reversion only
                     # Audit: n=102, 61.8% WR, +$3.96 (best bucket in dataset)
@@ -3522,8 +3528,9 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         pass
                     if _cont_score_ok and _is_mean_reversion:
                         log(f"  ✅ [LONG-NEUTRAL-CONTINUUM] {token} LONG — BTC score 60-80 + mean-reversion signal, allowed")
+                        continue  # D4 Batch-1: this ✅ path fell through to the shared block `continue` below pre-demotion — behavior preserved exactly
                     elif not _btc_mom_ok_for_bypass:
-                        log(f"  🚫 [LONG-NEUTRAL] {token} LONG blocked — 4h NEUTRAL, BTC flat, standalone bypass denied")
+                        log(f"  📊 [LONG-NEUTRAL] {token} LONG WOULD-BLOCK — 4h NEUTRAL, BTC flat, standalone bypass denied — demoted 2026-11-20, ×0.7, review 2026-12-04 (D4 Batch-1)")
                         # ── [BTC-CHOP-STANDALONE-SHADOW] LONG leg of the same flat-deny
                         # (CEO consult 20261106T035547Z): LOG-ONLY counterfactual, same
                         # contract as the SHORT leg above — deny line byte-unchanged,
@@ -3535,8 +3542,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                         except Exception:
                             pass
                     else:
-                        log(f"  🚫 [LONG-NEUTRAL] {token} LONG blocked — 4h regime NEUTRAL, no LONG edge")
-                    continue
+                        log(f"  📊 [LONG-NEUTRAL] {token} LONG WOULD-BLOCK — 4h regime NEUTRAL, no LONG edge — demoted 2026-11-20, ×0.7, review 2026-12-04 (D4 Batch-1)")
+                    _d4_gate_mult[(token.upper(), direction.upper())] = PENALTY_MULT
             # ── EXTREME/FLAT regime blocks for v3 signals ──────────────────────
             # v3 SHORT: EXTREME 42% WR, FLAT 33% WR — no edge
             # v3 LONG: EXTREME 42% WR, FLAT 33% WR — no edge
@@ -4230,6 +4237,13 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             # Opposing signal penalty: check if opposing direction is firing for this token
             opp_penalty = _get_opposing_penalty(RUNTIME_DB, token, direction)
             score = base_score * opp_penalty
+            # CEO D4 Batch-1 2026-11-20: ×0.7 for demoted gates — applied to the
+            # ranking score alongside the other multipliers; stored `conf` untouched.
+            _d4_mult = _d4_gate_mult.get((token.upper(), direction.upper()))
+            if _d4_mult:
+                _score_pre_d4 = score
+                score = score * _d4_mult
+                log(f"  📉 [D4-SCORE-PENALTY] {token} {direction}: score {_score_pre_d4:.2f}→{score:.2f} (×{_d4_mult} D4 Batch-1 demoted gate)")
 
             if verbose:
                 log(f"  Score {token} {direction}: conf={conf} age_m={age_m:.2f} cr={cr} "
@@ -4830,9 +4844,8 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
                                             _rsh_floor, dry)
                                     except Exception:
                                         pass  # shadow must never alter the block
-                                    log(f"  🚫 [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT blocked at approval — RSI {_rsh_rsi:.2f} < {_rsh_floor} (exec-time floor would reject anyway)")
-                                    _tombstone_pending(tkn, direction, 'short-rsi-hard-floor', dry)
-                                    continue
+                                    log(f"  📊 [SHORT-RSI-HARD-FLOOR] {tkn}: SHORT WOULD-BLOCK at approval — RSI {_rsh_rsi:.2f} < {_rsh_floor} (exec-time floor would reject anyway) — demoted 2026-11-20, ×0.7, review 2026-12-04 (D4 Batch-1)")
+                                    entry['score'] = entry['score'] * PENALTY_MULT
                 except Exception:
                     pass  # non-fatal
                 finally:

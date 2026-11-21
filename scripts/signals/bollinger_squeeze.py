@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from signal_schema import add_signal
 from paths import RUNTIME_DB, STATIC_DB
 import hermes_constants as hc
+from hermes_log import log
 
 # ── Pull all constants from hermes_constants ──────────────────────────────────
 BB_PERIOD       = hc.BOLLINGER_SQUEEZE_PERIOD
@@ -194,10 +195,14 @@ def scan_bollinger_squeeze():
             except Exception:
                 rsi_val = None
             if rsi_val is not None and rsi_val < LONG_RSI_MIN:
-                print(f'  [bb-squeeze] {token} LONG BLOCKED — RSI {rsi_val:.1f} < {LONG_RSI_MIN} (squeeze-break in weakness)')
+                # hermes_log (not print): raw print never reaches pipeline.log —
+                # run_all_signals doesn't capture stdout, so the 2026-10-11
+                # print-only instrumentation was invisible (registry wrongly
+                # recorded it as "NEVER SHIPPED"). brain_auditor #284.
+                log(f'[bb-squeeze] {token} LONG BLOCKED — RSI {rsi_val:.1f} < {LONG_RSI_MIN} (squeeze-break in weakness)')
                 continue
             if rsi_val is not None and rsi_val > LONG_RSI_MAX:
-                print(f'  [bb-squeeze] {token} LONG BLOCKED — RSI {rsi_val:.1f} > {LONG_RSI_MAX} (squeeze already ran, exhaustion zone)')
+                log(f'[bb-squeeze] {token} LONG BLOCKED — RSI {rsi_val:.1f} > {LONG_RSI_MAX} (squeeze already ran, exhaustion zone)')
                 continue
 
         if _in_cooldown(token, direction):

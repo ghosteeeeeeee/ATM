@@ -33,12 +33,13 @@ from datetime import datetime, timezone, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import HERMES_DATA, HERMES_LOG_DIR
-# Reuse gate_shadow's exact block-line patterns (BLOCK_RE + CONF_RE + RR_BLOCK_RE)
-# and its rotated-log discovery (archive_paths + open_log_text) so this check can
-# never drift from what the recorder actually captures, nor from the rotation
-# that moves history into logs/archive/*.gz.
+# Reuse gate_shadow's exact block-line patterns (BLOCK_RE + CONF_RE + RR_BLOCK_RE),
+# its block-vs-telemetry classification (is_block_event — D6 result-4), and its
+# rotated-log discovery (archive_paths + open_log_text) so this check can never
+# drift from what the recorder actually stores, nor from the rotation that moves
+# history into logs/archive/*.gz.
 from gate_shadow import (BLOCK_RE, CONF_RE, RR_BLOCK_RE,
-                         archive_paths, open_log_text)
+                         archive_paths, open_log_text, is_block_event)
 
 SHADOW_DB = os.path.join(os.path.dirname(HERMES_DATA), 'brain', 'gate_shadow.db')
 PIPELINE_LOG = os.path.join(HERMES_LOG_DIR, 'pipeline.log')
@@ -61,9 +62,11 @@ def log(msg):
 
 
 def _parse_gate_line(line):
-    """Same match order + 10-min dedup bucket as gate_shadow.record()."""
+    """Same match order, classification, and 10-min dedup bucket as record()."""
     m = BLOCK_RE.search(line)
     if m:
+        if not is_block_event(line, m):
+            return None
         gate, token, direction = m.group(1), m.group(2).upper(), m.group(3).upper()
     else:
         # must mirror gate_shadow.record()'s order exactly, or the db<=dedup

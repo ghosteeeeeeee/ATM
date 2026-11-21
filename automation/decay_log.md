@@ -2385,3 +2385,7 @@
 [2026-11-20 19:43 UTC]   🟢 OK: atr-trend-: 8 trades, 75.0% WR, PnL=2.67
 [2026-11-20 19:43 UTC] Done. Rapid-disabled 0 signals.
 [2026-11-20 19:43 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-11-21 01:43 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-11-21 01:43 UTC]   🟢 OK: atr-trend-: 7 trades, 71.4% WR, PnL=2.25
+[2026-11-21 01:43 UTC] Done. Rapid-disabled 0 signals.
+[2026-11-21 01:43 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

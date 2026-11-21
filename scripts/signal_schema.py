@@ -550,6 +550,18 @@ def _enrich_indicators(token):
     except Exception:
         return {}
 
+def _clamp_inherit_created(pred_created, now=None):
+    # P1 merge-window age inheritance (D1 2026-11-20): successor inherits pred
+    # created_at, clamped to <=9min old so it never crosses signal_compactor's
+    # 10-min windows (stale expiry ~L2740 / compaction SELECT ~L2774).
+    import datetime as _dt
+    if now is None:
+        now = _dt.datetime.utcnow()
+    pred = _dt.datetime.strptime(str(pred_created), '%Y-%m-%d %H:%M:%S')
+    floor = now - _dt.timedelta(minutes=9)
+    return max(pred, floor).strftime('%Y-%m-%d %H:%M:%S')
+
+
 def add_signal(token, direction, signal_type, source, confidence, value=None, price=None,
                exchange='hyperliquid', timeframe='1h', z_score=None, z_score_tier=None,
                momentum_state=None, rsi_14=None, macd_value=None, macd_signal=None,
@@ -2598,6 +2610,7 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             LIMIT 1
         ''', (combo_key,))
         _stale_row = c.fetchone()
+        _inherit_created = None
         if _stale_row:
             _stale_id, _stale_created = _stale_row[0], _stale_row[1]
             _age_s = None
@@ -2616,6 +2629,14 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
                         updated_at = CURRENT_TIMESTAMP
                     WHERE id = ? AND decision = 'PENDING' AND executed = 0
                 ''', (_stale_id,))
+                # P1 (D1 2026-11-20): successor inherits pred age clock (clamped
+                # to <=9min) so re-fires don't reset the identity's age every 300s.
+                if _age_s is not None:
+                    try:
+                        _inherit_created = _clamp_inherit_created(_stale_created)
+                        print(f'  📊 [INHERIT-AGE] {token} {direction} INHERIT age {_age_s:.0f}s → successor created_at shifted (review 2026-12-04)', flush=True)
+                    except Exception:
+                        _inherit_created = None  # fail-safe → fresh created_at
                 # fall through to INSERT below
             else:
                 # concurrent-insert race: row <5min old, merge SELECT missed it
@@ -2629,14 +2650,15 @@ def add_signal(token, direction, signal_type, source, confidence, value=None, pr
             (token, direction, signal_type, source, signal_types, confidence, value, price,
              exchange, timeframe, z_score, z_score_tier, momentum_state,
              rsi_14, macd_value, macd_signal, macd_hist, decision, executed, leverage,
-             hot_cycle_count, counter_detected, combo_key, signal_metadata)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', 0, ?, 0, 0, ?, ?)
+             hot_cycle_count, counter_detected, combo_key, signal_metadata, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDING', 0, ?, 0, 0, ?, ?, COALESCE(?, CURRENT_TIMESTAMP))
         ''', (token, direction, signal_type, source, signal_type,
               min(100, confidence), value, price, exchange, timeframe,  # FIX: cap at 100
               z_score, z_score_tier, momentum_state,
               rsi_14, macd_value, macd_signal, macd_hist, leverage,
               combo_key,
-              json.dumps(metadata, default=str) if metadata else '{}'))
+              json.dumps(metadata, default=str) if metadata else '{}',
+              _inherit_created))
         conn.commit()
         sid = c.lastrowid
         conn.close()

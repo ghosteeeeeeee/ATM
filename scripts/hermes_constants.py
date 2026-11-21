@@ -5471,7 +5471,7 @@ PUMP_CHAIN_V5_SHORT_RISE_1M_THRESHOLD = 2  # block SHORT when 2+ consecutive ris
 # RSI/momentum computed by signal_schema._enrich_indicators (exact historical 1m formula).
 # Audits: brain/verdicts/2026-10-08-pump-chain-v6-verdict.md (FIX SPEC FIRST, 10 fixes
 # applied) + 2026-10-08-pump-chain-v6-rev1-verdict.md (PASS HIGH confidence).
-PUMP_CHAIN_V6_ENABLED = True          # master kill-switch
+PUMP_CHAIN_V6_ENABLED = False         # master kill-switch — DISABLED 2026-11-21 brain_auditor #284 per CEO pre-registration (20261120T002223Z "HOLD 24h pending 11-21 cell adjudication; if no-cell -> disable"): amplify-pcv6-extreme-short-cell CLOSED NO-CELL (rolling 30d pump-chain* SHORT EXTREME v6-combo n=0 — cell only fired 10-09..10-21, 30d n>=15 bar unreachable; v6 LONG legs 30d -0.15). ROTATOR: not auto-reenabled (signal_rotator has no v6 reference). REVERT = True (CEO ratify/veto open in kanban).
 PUMP_CHAIN_V6_PLUS_ENABLED = True     # LONG direction
 PUMP_CHAIN_V6_MINUS_ENABLED = True    # SHORT direction
 PUMP_CHAIN_V6_LONG_RSI_MIN = 40       # LONG RSI floor — RSI<40 = 15.4%WR -$1.01 (13T)

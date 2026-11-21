@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-11-20 15:48:23",
+  "timestamp": "2026-11-20 23:48:22",
   "total_checks": 20,
-  "passed": 12,
+  "passed": 13,
   "critical_count": 7,
-  "warning_count": 1,
+  "warning_count": 0,
   "criticals": [
     {
       "name": "sqlite_leaks",
@@ -31,7 +31,7 @@
     },
     {
       "name": "connection_leaks",
-      "msg": "56 files with sqlite3.connect but no finally block: ceo_dashboard_api.py, study_winning_combos.py, session_brain.py, apply_fixes.py, pump_flow_engine.py",
+      "msg": "57 files with sqlite3.connect but no finally block: ceo_dashboard_api.py, study_winning_combos.py, session_brain.py, apply_fixes.py, pump_flow_engine.py",
       "file": "",
       "fix": "Use 'with _db_cursor(path) as (conn, cur):' from signal_schema or add try/finally"
     },
@@ -48,12 +48,5 @@
       "fix": "Use 'from _secrets import BRAIN_DB_DICT' instead of inline passwords"
     }
   ],
-  "warnings": [
-    {
-      "name": "trade_frequency",
-      "msg": "0 trades in 6h (0.0/hr)",
-      "file": "",
-      "fix": "Enable more signals or reduce filters if rate < 0.5/hr"
-    }
-  ]
+  "warnings": []
 }

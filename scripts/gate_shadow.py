@@ -269,6 +269,28 @@ def _write_offset(pos):
     os.replace(tmp, OFFSET_FILE)
 
 
+def is_block_event(line, m):
+    """Classify a BLOCK_RE match: real block event vs pass/shadow telemetry.
+
+    CEO D6 result-4 (2026-11-20): a shape-matched line is a BLOCK iff the gate
+    name contains BLOCK or the line carries a block marker; WOULD/shadow/
+    allowed lines are telemetry, never events. Shared with gate_shadow_health
+    so its capture-ratio denominator cannot drift from what record() stores.
+    bug_hunter BLOCKER fix 2026-11-20: bare-word exclusions apply only when
+    the line carries no hard marker — reason text like "floor would reject
+    anyway" must not drop real blocks (17,269 events, SHORT-RSI-HARD-FLOOR).
+    """
+    ll = line.lower()
+    _has_marker = any(k in ll for k in ('blocked', 'hard block', 'denied'))
+    if (not _has_marker and any(
+            w in ll for w in ('would', 'shadow', 'skipped', 'allowed'))):
+        return False
+    _g = m.group(1).upper()
+    if 'BLOCK' not in _g and not _has_marker and 'skip' not in ll:
+        return False
+    return True
+
+
 def record(since_hours):
     """Parse pipeline.log block lines into shadow events."""
     if not os.path.exists(PIPELINE_LOG):
@@ -297,25 +319,7 @@ def record(since_hours):
             for line in f:
                 m = BLOCK_RE.search(line)
                 if m:
-                    # port (CEO D6 result-4, 2026-11-20): classify — a
-                    # shape-matched line is a BLOCK iff the gate name contains
-                    # BLOCK or the line carries a block marker; WOULD/shadow/
-                    # allowed lines are pass/shadow telemetry, never events.
-                    # Fail-silent by construction (unparsable -> continue).
-                    ll = line.lower()
-                    # bug_hunter BLOCKER fix 2026-11-20: bare-word exclusions
-                    # dropped real blocks whose REASON TEXT contains 'would'
-                    # (e.g. "floor would reject anyway" — 17,269 events, all
-                    # SHORT-RSI-HARD-FLOOR). Exclusions now apply only when the
-                    # line carries no hard marker; telemetry lines (shadow/would)
-                    # have no marker and stay excluded.
-                    _has_marker = any(
-                        k in ll for k in ('blocked', 'hard block', 'denied'))
-                    if (not _has_marker and any(
-                            w in ll for w in ('would', 'shadow', 'skipped', 'allowed'))):
-                        continue
-                    _g = m.group(1).upper()
-                    if 'BLOCK' not in _g and not _has_marker and 'skip' not in ll:
+                    if not is_block_event(line, m):
                         continue
                     gate, token, direction = m.group(1), m.group(2).upper(), m.group(3).upper()
                 else:
