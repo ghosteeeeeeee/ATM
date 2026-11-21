@@ -1,14 +1,6 @@
 {
-  "timestamp": "2026-11-21T07:09:22.201868+00:00",
+  "timestamp": "2026-11-21T07:39:22.699799+00:00",
   "steers": [
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: BTC + XPL",
-      "detail": "Both opened within 21 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-001"
-    },
     {
       "severity": "info",
       "category": "profit_lock",
@@ -22,7 +14,7 @@
         "new_stop": 56923.0
       },
       "auto_executable": true,
-      "id": "steer-002"
+      "id": "steer-001"
     }
   ],
   "portfolio_health": "good",
@@ -30,15 +22,19 @@
     "btc_15m": "LONG_BIAS",
     "btc_4h": "SHORT_BIAS",
     "continuum": "ABOVE",
-    "volatility": "NORMAL",
-    "zscore_tier": "STRONG_POS",
-    "velocity_state": "RISING",
+    "volatility": "LOW",
+    "zscore_tier": "POS",
+    "velocity_state": "SLOW",
     "acceleration_state": "POSITIVE",
-    "volume_regime": "NORMAL",
+    "volume_regime": "LOW",
     "linreg_alignment": 1.0,
-    "wyckoff_phase": "MARKUP",
-    "market_phase": "DECLINING",
+    "wyckoff_phase": "UNKNOWN",
+    "market_phase": "CALM",
     "trend_quality": "STRONG_UP"
   },
-  "open_count": 2
+  "open_count": 1,
+  "deep_analysis": "MARKET: Regime flipped LONG at ~06:44 UTC (continuum 1m crossed above EMA300; 50 consecutive bars above, price 58235 vs EMA300 57253). Sources disagree and must be cited: 5m aggregate LONG_BIAS (102L/0S/25N of 127 tokens), BTC 15m LONG_BIAS, BTC 4h SHORT_BIAS, auto_trader regime=CHOP (score_long 0 / score_short -40, MANAGE_ONLY). Flip rate last 24h: aggregate 24 (normal, p50~19), BTC 29 (>= p95 26 = unusually unstable tail). Trend quality STRONG_UP, wyckoff MARKUP, zscore STRONG_POS (2.37), velocity RISING \u2014 but 4h market_phase DECLINING and BTC meta_rsi 90.2 = extended pump, not a fresh one.\n\nOPEN TRADES (2, both long, 0 short):\n- BTC LONG #17016, opened 06:42 on the flip, entry 56923, now 58235 = +2.31%, meta_rsi 90.2, stop auto-tightened 56191 -> 56866.08 (still -0.10% below entry), TP 58952. Thesis = follow the pump; VALID and we are on the winning side (BTC ran 55.7k -> 58.3k while we were shorting it earlier). At RSI 90.2 I would NOT open this fresh \u2014 but holding it with a breakeven lock is correct. Enforced rule: +2% up = breakeven stop required; current stop is not at breakeven.\n- XPL LONG #17017, opened 07:03, +0.25%, meta_rsi 44.1, signal btc-pump-rider+, vol_regime EXTREME, 1h ATR 1.15%. Stop now 0.045498 = only -0.27% from entry. For EXTREME volatility that stop is inside the noise floor \u2014 one 5m candle at this ATR can wick it without the thesis being wrong. Would open fresh? Yes, aligned with LONG_BIAS and RSI mid-band.\n\nCORRELATION: 2/2 positions are long, opened 21 minutes apart. One BTC dump hits both. No new LONG until one closes.\n\nRIGHT-SIDE CHECK ON RECENT LOSSES: all 5 losses in 24h were SHORTs. BTC ai-trader-pending shorts entered at meta_rsi 18.7 / 28.7 / 29.9 lost -$0.30 combined (manual_sl_hit, mae 0.60-0.76). The winning side was LONG the bounce \u2014 BTC pumped straight through those entries. We are now long BTC, i.e. on the correct side since 06:44.",
+  "agent_timestamp": "2026-11-21T07:17:12.137757+00:00",
+  "regime_context": "LONG_BIAS on every short-horizon source (5m aggregate 102/0/25, BTC 15m LONG_BIAS, continuum ABOVE EMA300 for 50x1m bars since 06:44). Conflicting: BTC 4h SHORT_BIAS and auto_trader CHOP/MANAGE_ONLY. Flip rate aggregate 24/24h (normal), BTC 29/24h (>= p95 26, unstable tail) \u2014 direction-flavored steers below are condition-keyed and re-tested next cycle, not standing calls.\n\nImplication for positions: the 2 open longs are aligned with the 15m/aggregate tape and the continuum cross. They are NOT aligned with the 4h. That mismatch plus BTC meta_rsi 90.2 means: ride, do not add. Regime says this is a markup leg inside a still-declining 4h structure \u2014 the exit discipline (breakeven lock) matters more than the entry conviction.",
+  "pattern_alerts": "VERIFIED (PostgreSQL, run this cycle):\n\n1) SHORTING OVERSOLD BTC = WRONG SIDE (n=3 losers / 24h, -$0.30). ids 17004/17005/17008, ai-trader-pending SHORT, meta_rsi 18.7 / 28.7 / 29.9, all manual_sl_hit with mae 0.60-0.76. WINNING SIDE = LONG: BTC ran 55.7k -> 58.3k through those entries. Session-brain cross-check (score 0.81, 2026-10-15): RSI<40 shorts 77T 31% WR -$4.66 vs RSI 40-60 shorts 46T 59% WR +$0.61. Note the 24h sample also has 3 wins on the same setup (+$0.18) so 24h net is only -$0.12 \u2014 the standing rule, not this window, is what carries it: never short below RSI 35. Already on the right side now (long).\n\n2) atr-trend- IS BLEEDING (7d: 29T, 58.6% WR, -$0.37 \u2014 watchdog window shows 48T/62.5%/-$0.36, same conclusion). High win rate + negative PnL = losses bigger than wins, not a chop-entry problem. Today's IMX SHORT -$0.12 at meta_rsi 60, mfe 0.10 (never armed), exit hard_max_loss. Family ENABLED=True with live traffic (ATR_TREND_ACCEL_MINUS_ENABLED) \u2014 NOT a dead signal. Route to brain_auditor for exit/R:R ownership, do not re-propose a kill.\n\n3) CHOP-BLEED SHARE (dollar share, sum_loss(mfe<0.40)/sum_all_loss): 7d 83.0% (41 of 49 losers, -$3.82 of -$4.60), 14d 88.4% (83/97, -$8.16 of -$9.23), 30d 92.2% (241/271, -$24.63 of -$26.70). NULL-mfe loser count = 0 in all three windows (no backfill distortion). Same-day arm rate 66.7% (6 closes, 0 NULL). Baselines from 2026-10-25 were 84.1/85.6/80.6 but those windows have rolled 27 days, so only same-window readings are comparable: 7d is BELOW the 92% tripwire and near baseline; 30d is AT the >=92% tripwire = entry-quality deterioration concentrated in days 8-30, not this week. Measure used: dollar share.\n\n4) DEAD-SIGNAL CHECKS (all cleared, no action): btc-pump-rider+ 7d 13T 46.2% +$0.34 (the watchdog's -0.37 figure is a different, older window \u2014 do NOT flag); pump-chain+ 7d only 2T -$0.16, too small to flag, still emitting live PENDING signals this hour; PUMP_CHAIN_V6_ENABLED=False killed 2026-11-21 (brain_auditor #284) \u2014 already shipped, stale-window, NO action; HL_COPY_TRADING_ENABLED=False is disabled-by-design, sibling HL_COPY_SIGNAL_* is the live path (answered 2026-10-25) \u2014 do not re-flag; ai-trader-pending 7d 20T 35% WR but +$0.53 net (winners bigger than losers), jup_yolo_mirrored 20T 80% +$0.72 = best family.\n\nACTIONABLE STEERS (condition-keyed):\n- \ud83d\udd34 BTC LONG #17016: move stop 56866 -> 56923 (breakeven) NOW while 1m holds above continuum EMA300 (~57253). RETRACT if 1m closes back below EMA300 for 15-30m \u2014 then take the +2.3% rather than ride a retrace to breakeven. age=0 cycles. (Matches auto steer-002, auto_executable=true.)\n- \ud83d\udfe1 XPL #17017: stop -0.27% is inside noise for vol_regime=EXTREME (1h ATR 1.15%). Widen to ~-0.6% (~0.5 ATR) while ATR>1.0%, or accept elevated premature-stop-out risk.\n- \ud83d\udfe1 CLUSTER: hold off new LONG entries while open longs = 2 of 2 slots used within one BTC dump of each other (condition: long_count >= 2).\n- \ud83d\udfe2 Supersedes the 05:15Z SUSHI SHORT watchlist pick \u2014 that pick keyed on a SHORT_BIAS regime that reversed at 06:44."
 }
