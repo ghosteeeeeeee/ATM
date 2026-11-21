@@ -30963,3 +30963,30 @@ BY: auto_1hr
 - Storm bar 3/3 MET + 5th positive cf ($+1.56) — conversion still blocked by CEO NO-CONVERT; deadline 2026-11-26 (file truth)
 - 1 open HYPE jup_yolo_mirrored SHORT (opened 08:47)
 BY: auto_1hr
+
+## [2026-11-21 09:55] Hourly Analysis
+
+**Storm:** no storm (window-min -0.35% / at-run -0.35%) — gate not fired
+
+**Trades:** 1 closed (1 win, 0 losses) — HYPE jup_yolo_mirrored SHORT profit-monster-trail net +0.01 (+0.89%)
+**PnL NET:** hour $+0.01 | 24h NET $+0.14 (gross +0.53, fees 0.39, payoff 1.10, WR 60.0%) | 7d NET $-0.66 (gross +1.14, fees 1.80) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 1 close, a win -> no kill
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/15 = 6.7% (<40%); tpsl_utils deployed
+- Boost: none eligible — jup_yolo_mirrored 3T 66.7% net +0.16 (n<5); ai-trader-pending 8T 50% net -0.03 (losing)
+- Arm rate: unarmed 8/15 = 53.3% below 70% threshold, WR 25.0% net -$0.19 vs armed 7/7 100% net +$0.33 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly nets 03 -0.02, 06 -0.02, 07 +0.25, 09 +0.01 — not 3 consecutive negatives -> no size cut
+- Frequency: 1 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.251% < 0.5% (max 0.996 — one winner rode deep, watch)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET +0.14 (WR 60.0%, payoff 1.10) — fee drag persists (fees 0.39 vs gross 0.53); 7d NET -0.66 (fees 1.80)
+- Unarmed cohort net -$0.19 vs armed +$0.33 — stall stack still owns the fix
+- 0 open trades
+BY: auto_1hr
