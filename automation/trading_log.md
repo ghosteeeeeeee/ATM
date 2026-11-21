@@ -31215,3 +31215,59 @@ BY: auto_1hr
 - pump-chain+ 3 new LONGs open while 14d WR 0% in NORMAL / 14.3% EXTREME — revisit kill check if they close 0% or 14d n reaches 20
 - 3 open: CRV, CHIP, APT pump-chain+ LONG (all 17:45-17:47)
 BY: auto_1hr
+
+## [2026-11-21 18:52] Hourly Analysis
+
+**Storm:** no storm — window-min -0.21% / at-run +0.14%
+
+**Trades:** 3 closed last hour (0 wins, 3 losses) | 24h 29 closed
+**PnL NET:** hour $-0.06 | 24h NET $+0.35 (gross +0.89, fees 0.54, payoff 1.56, WR 58.6%) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Last hour: 3 closes ALL pump-chain+ LONG prearm_lock (CRV/CHIP/APT, net -$0.02 each) = 0% WR n=3 -> mandatory regime check RUN: 14d EXTREME 10T 10% net -0.50, NORMAL 2T 0% net -0.11, total n=12 < 20, no regime n>=20 -> no kill possible, monitor (kill recommendation threshold not met)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/29 = 3.4% (<40%); tpsl_utils deployed. Top loss buckets: manual_sl_hit 4T net -0.47 (BTC ai-trader-pending), prearm_lock 6T net -0.13 (pump-chain+)
+- Boost: none eligible — btc-pump-rider+ 6T 100% net +0.40 already at 1.3; jup_yolo_mirrored 3T n<5; ai-trader-pending 9T 44.4% net -0.14 losing
+- Arm rate: unarmed 14/29 = 48.3% below 70%, WR 14.3% net -$0.42 vs armed 15/15 100% net +$0.77 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly nets 14 +0.22, 15 -0.16, 16 -0.09, 17 no closes, 18 -0.06 — 3 negative hours with closes, but regime is EXTREME (14/15 closes in 6h), NOT NEUTRAL -> no size cut per rule
+- Frequency: 3 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.248% < 0.5% (max 0.996)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- pump-chain+ now 24h 6T 0% net -0.19 (14d n=12, both regimes negative) — revisit if 14d n reaches 20 -> auto kill recommendation
+- 7d/14d fee-drag persists (prior: 7d net -1.06, 14d -3.81)
+- ai-trader-pending 9T 44.4% net -0.14 — all BTC manual/CEO flow
+- 1 open: ETC r2v2-long3 LONG (18:39)
+BY: auto_1hr
+
+## [2026-11-21 19:53] Hourly Analysis
+
+**Storm:** no storm — window-min -0.53% / at-run +0.53%
+
+**Trades:** 2 closed last hour (0 wins, 2 losses) | 24h 29 closed
+**PnL NET:** hour $-0.15 | 24h NET $+0.16 (gross +0.68, fees 0.52, payoff 1.54, WR 55.2%) | 7d NET $-1.36 (gross +0.56, fees 1.92) | 14d NET $-3.97 (fees 3.32) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Last hour: 2 closes both losses — ETC r2v2-long3 hard_max_loss net -0.11 (-4.40% acct, expected at leverage), BLUR atr-trend+ prearm_lock net -0.04. No signal with 3+ closes in hour -> no kill trigger
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/29 = 3.4% (<40%); tpsl_utils deployed. Top loss buckets 24h: prearm_lock 7T net -0.17, manual_sl_hit 3T net -0.33, profit-monster-trail 13T net +0.69 (the earner)
+- Kill: pump-chain+ 24h 6T 0% net -0.19; 14d regime check — EXTREME 10T 10% net -0.50, NORMAL 1T 0% net -0.05, total n=11 < 20 and no regime n>=20 -> no kill, monitor
+- Boost: none eligible — btc-pump-rider+ 6T 100% net +0.40 already at 1.3 (combo_weights verified); jup_yolo_mirrored 3T n<5; ai-trader-pending 7T 42.9% net -0.18 losing
+- Arm rate: unarmed 14/29 = 48.3% below 70%, WR 7.1% net -$0.61 vs armed 15/15 100% net +$0.77 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly nets 15 -0.16, 16 -0.09, 17 no closes, 18 -0.06, 19 -0.15 — 4 negative hours with closes but regime is EXTREME (13/29 closes in 6h), NOT NEUTRAL -> no size cut per rule
+- Frequency: 2 close/hr — under 20
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET eroding: +0.52 (16:52) -> +0.35 (18:52) -> +0.16 (now); 7d NET -1.36 / 14d -3.97 fee-drag (7d fees 1.92 vs gross 0.56)
+- 14d losers with n>=10, watch only: atr-trend- 46T 60.9% WR net -0.91 (fee/loss-size drag despite WR), jup_yolo_mirrored 40T 67.5% net -0.46, hl_copy_trader 11T 18.2% net -0.33
+- pump-chain+ kill threshold: 14d n=11 of 20 — revisit if n reaches 20
+- 0 open trades
+BY: auto_1hr
