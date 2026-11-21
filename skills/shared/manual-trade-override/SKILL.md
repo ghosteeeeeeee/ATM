@@ -435,6 +435,20 @@ authority follows the contract, not the row). Procedure still stands:
 **check the coin is flat first** — the pipeline row's ATR SL/TP still
 participates on a merged position, and attribution corrupts either way.
 
+14. **Stay in until a STOP moves you — profit-locks never close ladder
+    trades** (CEO 2026-11-21, the four-trade night ledger: realized
+    +$0.08 while the moves ran 2,501/1,585/600 pts without us). The
+    ruling, verbatim: *"look at what the drawdown was for these trades,
+    you need to stay in"* — verified: #17007 adverse +5pts, #17010
+    +47pts, #17013 ZERO (exited while completely safe); only #17008's
+    383pt drawdown justified its stop. Doctrine: exits are
+    **drawdown-driven only** (BE-cap, structure-trail, HML, disaster —
+    all stops). `mfe_exit` is reverted to its audited home (mirror
+    book, jup_yolo scope) and does NOT close structure-governed/ladder
+    trades; `prearm_lock` stays as-is on the mirror book (CEO: keep);
+    mid-plunge fill leaks accepted (CEO: accept). A safe trade with no
+    drawdown stays in — the stop is the only thing that takes it out.
+
 ## Related Skills
 
 - `signal-lab` — for testing signal logic
