@@ -30850,3 +30850,31 @@ BY: auto_1hr
 - 24h NET -0.24 (WR 43.8%, payoff 0.91) — fee drag (fees 0.27 vs gross 0.03); 7d NET -0.98 persists
 - Storm bar MET 3/3 — conversion still blocked by CEO NO-CONVERT (floor bottleneck, linreg-fade band owns fix); needs CEO sign-off, no auto action
 BY: auto_1hr
+
+## [2026-11-21 05:53] Hourly Analysis
+
+**Trades:** 0 closed (2 open: BTC ai-trader-pending SHORT x2) | 24h 15 closed
+**PnL NET:** hour $0.00 (0 closes) | 24h NET $-0.22 (gross +0.04, fees 0.26, payoff 0.77, WR 46.7%) | 7d NET $-0.98 (n=112, gross +0.63, fees 1.61) — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** no storm (window-min -1.05% / at-run -1.05%, both inside ±1.5% gate)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes
+- Kill check: no 0%-WR signal with n>=3 last hour -> no kill
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/15 = 6.7% (<40%); tpsl_utils deployed
+- Boost: none eligible — atr-trend- 5T 80% but net -0.13 (losing); jup_yolo_mirrored 3T n<5; ai-trader-pending 5T 20% net -0.20 (losing)
+- Arm rate: unarmed 10/15 = 66.7% below 70%, WR 20.0% net -$0.46 vs armed 5/5 100% net +$0.24 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly nets 01 -0.08, 03 -0.02 (00/02/04 zero closes) — not 3 consecutive negatives -> no size cut
+- Frequency: 0 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.149% < 0.5% (max 0.734) — OK
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.22 (WR 46.7%, payoff 0.77) — fee drag (fees 0.26 vs gross 0.04); 7d NET -0.98
+- Unarmed WR 20% (-$0.46) vs armed 100% (+$0.24) — stall stack still owns the fix
+- 2 open BTC SHORTs (03:54, 05:43) — watch if stacked exposure
+BY: auto_1hr
