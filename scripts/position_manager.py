@@ -4685,20 +4685,23 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # unproven, direction positive. Re-measure protocol in the verdict.
         # Scope = MFE_EXIT_SIGNALS (mirror book). Revert = MFE_EXIT_ENABLED
         # False (hermes_constants).
-        # CEO 2026-11-20 (#17005: peak +5.4% margin ROUND-TRIPPED to
-        # −2.07% — this proven giveback exit existed since 2026-10-31
-        # (audited, backtest +78pp, sign-p 0.00000) but was gated
-        # `not is_ceo_trade` + jup_yolo-scope = OFF for exactly the
-        # trades that needed it). Structure-governed managed trades (the
-        # SAME predicate as the maxhold/stale/TP gates) now get the
-        # peak-giveback too: fires only while GIVING BACK >=30% of a
-        # >=0.40% peak → first-touch on the bounce, strictly before any
-        # loss (losers/blips with peak < 0.40% stay on floor exits).
-        _mfe_gov = structure_governed(_pos_signal, pos.get('stop_loss'))
-        if MFE_EXIT_ENABLED and (not is_ceo_trade or _mfe_gov) and not is_linreg_fade_pos:
+        # CEO RULING 2026-11-21 after the four-trade night ledger
+        # (#17007 mfe +$0.20 / #17008 SL −$0.12 / #17010 prearm $0 /
+        # #17013 mfe $0 — realized +$0.08 while the moves ran
+        # 2,501/1,585/600pts): "look at what the drawdown was for these
+        # trades, you need to stay in." The three profit-lock exits fired
+        # with ZERO-to-tiny drawdown (#17013 adverse = 0pts) — exiting a
+        # safe trade is the violation. Ladder/pending (structure-governed)
+        # trades are therefore NOT mfe-closed: they stay in until a STOP
+        # moves them (BE-cap, structure-trail, HML, disaster — all
+        # drawdown-driven). mfe_exit remains live for its audited home:
+        # the mirror book (jup_yolo scope, non-managed). Reverts the
+        # 2026-11-20 governed gate (ba4c5a2d) — prearm_lock stays
+        # as-is (CEO: keep), fill-leak accepted (CEO: accept).
+        if MFE_EXIT_ENABLED and not is_ceo_trade and not is_linreg_fade_pos:
             try:
                 _mfe_sig_l = (_pos_signal or '').lower()
-                if _mfe_gov or any(_s in _mfe_sig_l for _s in MFE_EXIT_SIGNALS):
+                if any(_s in _mfe_sig_l for _s in MFE_EXIT_SIGNALS):
                     _mfe_en = float(pos.get('entry_price') or 0) or 0
                     _mfe_hi = float(pos.get('highest_price') or 0) or 0
                     _mfe_lo = float(pos.get('lowest_price') or 0) or 0
