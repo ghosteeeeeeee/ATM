@@ -30936,3 +30936,30 @@ BY: auto_1hr
 - Unarmed cohort net -$0.37 vs armed +$0.32 — stall stack still owns the fix
 - No open trades
 BY: auto_1hr
+
+## [2026-11-21 08:52] Hourly Analysis
+
+**Storm Packet:** 🌪️ [STORM-READINESS] window-min -4.14% / at-run +0.15% | blocked 118 (combo-stale 42, compaction_stale_10min 29, hotset-expired 8, spike-filter-long 8, rr-engine 7, long-rsi-ceiling 6, vol-gate 6, oversold-knife 4, short-rsi-floor-knife 4, pump-chain-rsi-max 3, short-rsi-floor 1) | true-starvation 30 RSI>=35 (SHORT-scope 16) | counterfactual '$+1.56' (touch 16/16) | waiver: SHADOW=True ENFORCE=False | deadline 2026-11-26 (file truth) — 5th positive packet, bar 3/3 MET, CEO NO-CONVERT stands, no flip
+
+**Trades:** 0 closed last hour | 24h 16 closed
+**PnL NET:** hour $0.00 | 24h NET '$+0.08' (gross +0.52, fees 0.44, payoff 1.09, WR 56.3%) | 7d NET '$-0.67' (fees 1.79) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes -> no kill candidates
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/16 = 6.25% (<40%); tpsl_utils deployed
+- Boost: none eligible — ai-trader-pending 8T 50% net -0.03 (losing); atr-trend- 3T 100% but n<5 and net -0.02 (losing); jup_yolo_mirrored 2T 50% n<5
+- Arm rate: unarmed 10/16 = 62.5% below 70% threshold, WR 30.0% net '$-0.24' vs armed 6/6 100% net '$+0.32' — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly nets 01 -0.08, 03 -0.02, 06 -0.02, 07 +0.25, 08 zero closes -> not 3 consecutive -> no size cut
+- Frequency: 0 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.302% < 0.5% (max 0.996 — one winner rode deep, watch)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET +0.08 (WR 56.3%, payoff 1.09) — fee drag persists (fees 0.44 vs gross 0.52); 7d NET -0.67
+- Storm bar 3/3 MET + 5th positive cf ($+1.56) — conversion still blocked by CEO NO-CONVERT; deadline 2026-11-26 (file truth)
+- 1 open HYPE jup_yolo_mirrored SHORT (opened 08:47)
+BY: auto_1hr
