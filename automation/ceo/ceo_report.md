@@ -1733,3 +1733,47 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 16T +0.03 43.8% | 7d 112T +0.63 49.1%
 ### Findings: Rotating Q "blocked by confluence?" — confluence floor remains the bottleneck: STORM-CONFL-WAIVER-SHADOW shows single-type signals would pass (ENFORCE=False, NO-CONVERT ruling stands); signals_runner 03:35Z reports 5 slow signals and signal_confluence=0. Disk 87% WARN recurring; no crashes.
 ### Recommendation: Disk usage has been ≥85% for weeks — clean data/ or raise retention policy before it forces candle-DB cuts.
+
+---
+
+## CEO Deep Run — 20261120T221647Z (timed out mid-dispatch; completed by lead agent under pre-dispatch checkpoint)
+
+**Brief:** "GATES KILLING TRADES" (T: "this is getting ridiculous, it should have been resolved weeks ago") — D1–D6 rulings. **No hermes_constants edits by this run's subagents; protected flags intact; no gate removed — four gates DEMOTED (telemetry + ranking-score penalty), reversible by git revert.**
+
+### Decision (from checkpoint 20261120T221647Z-decision.md)
+
+| Item | Ruling |
+|------|--------|
+| D1 merge-window age inheritance | **GO — SHIPPED LIVE** (signal_schema.py: successor inherits pred age clock, clamped ≤9min, `📊 [INHERIT-AGE]` telemetry, review 2026-12-04). Reversible: `git checkout -- scripts/signal_schema.py`. |
+| D2 hotset dwell | **(a) ALREADY BUILT+SHADOW-LIVE** — `HOTSET_PIN_APPROVED=False/SHADOW=True` (constants:4127), 433+ WOULD-PIN lines. Flip = constants edit → **T decision**, data below (result-3). |
+| D3 DailyFillCap | **(a) keep + (d) manual override (exists)** — blocked ≈ market (−0.045%, n=189); carve-out buys ~zero edge at fee cost; cap self-releases; brake telemetry persists every blocked candidate. No code. |
+| D4 Batch-1 demotion | **GO — FOUR gates LIVE**: SHORT-RSI-HARD-FLOOR, LONG-NEUTRAL-CHOP, LONG-NEUTRAL, SHORT-NEUTRAL → `📊 WOULD-BLOCK — demoted 2026-11-20, ×0.7, review 2026-12-04 (D4 Batch-1)` + ×0.7 ranking-score via existing PENALTY_MULT (constants untouched). **CONFLUENCE-GATE-BLOCK = HOLD for T** (it enforces CONFLUENCE_REQUIRED — CEO_PROTECTED; demoting = de-facto flag flip, prohibited without explicit T approval). |
+| D5 R1 extended closer | **KEEP 2026-11-27** (Batch-1 cohort telemetry supplies admitted-cohort quality first). |
+| D6 accountability | **GO — standing Friday gate-reduction status in ceo_kanban.md** (blocks:trades, trades/day, per-batch cohort counterfactuals, loss-rate guard) until funnel healthy. |
+
+### Results dispatched (3 subagents; parent completed after timeout)
+- **result-1 (D1):** shipped live. Consumer census re-verified (bug_hunter re-checked every row: compactor 10/15-min windows, decider STALE-WARN log-only, entry_origin/ACCEL-STALE, shadow/jup/accel/confluence/tl_break 30-min windows — all safe with ≤9min clamp; UTC-only clocks; COALESCE fail-safe to fresh timestamp). LIVE: 166 `📊 [INHERIT-AGE]` lines (jup_yolo.log, post-edit ids), DB shows successors carrying older created_at.
+- **result-2 (D4):** signal_compactor.py 27+/14−, 8 hunks, exactly four gates; score-path carrier `_d4_gate_mult` applied at L4245 next to opp_penalty with `📉 [D4-SCORE-PENALTY]` audit log; zero confidence writes (the `confidence >= 60` SELECT intact — no silent dropout); tombstones removed only on demoted branches; protected gates byte-identical; pre-existing dead-bypass (✅ CONTINUUM-allowed row dropped by shared continue) preserved exactly and flagged for separate ruling. LIVE: demotions firing (SHORT-RSI-HARD-FLOOR first 23:43, 157+ rows; LONG-NEUTRAL-CHOP first 01:35, 12 rows; `📉 D4-SCORE-PENALTY GMX LONG: score 19.35→13.55`), 252+ clean cycles, 0 errors.
+- **result-3 (D2 data):** `analysis/2026-11-20_hotset-pin-cohort-readout.md` — 987 raw → **705 distinct WOULD-PIN events (166/day)**; execution conversion **3.4% (CI 2.3–5.0)** at +60min; fwd1h **−0.053%, win 47.8% (edgeless, NOT toxic)**; leak includes the 47 crash-day fell-out-of-hotset deaths + 9 EXEC-BLOCK rows tonight; risk structurally bounded (≤15min executable life, append-after-top-10-cap so fresh candidates never evicted, fail-safe degrade, one-line revert). **Recommendation: FLIP HOTSET_PIN_APPROVED=True NOW + 7-day watch** — shadow never executes pinned rows (0 attributable executions in 32 observable fates), so more shadow days cannot answer the one open question. First-week monitors enumerated in the doc (📌/⚠️ lines, hotset len>15 alert, >15min-stale SKIPs, WR/net of +15min-after-📌 trades vs 7d baseline 49.1%/+$0.54, fell-out deaths →≈0, Friday blocks:trades + trades/day).
+
+### Mandatory bug_hunter verification (all three diffs): APPROVE ×3, zero BLOCKERs
+- Diff 1 **APPROVE-WITH-NITS** (SHOULD-FIX #1: **D1 success metric moving opposite direction** — combo-stale deaths ≈30/hr in first 5h vs 3/hr baseline; mechanism confirmed by INHERIT age ladder +60s/generation: inherited successors are born outside the 5-min merge window, so re-fires always supersede until the 10-min stale-expiry ends the chain — "deaths→~0" is structurally unachievable while re-fire outpaces approval; buys bounded lifetime + continuous age as coded. SHOULD-FIX #2: census gaps — entry_origin staleness=0 → preserve-path drops inherited successors from hotset persistence; watchdog 5-min count can false-warn).
+- Diff 2 **APPROVE-WITH-NITS** (SHOULD-FIX #3: **SHORT-RSI-HARD-FLOOR demotion ~96% masked** — 318/321 demoted rows immediately re-blocked by the UNDEMOTED soft short-rsi-floor at same thresholds; net release 3 rows; the gate's 2,194 eps will migrate to the soft-floor label → Batch-1 volume reduction for this gate ≈ 0. Scope question for CEO below.)
+- Diff 3 **APPROVE** (gate_shadow shared `is_block_event` refactor — this morning's uncommitted D6 work, mtimes predate checkpoint; 0/20,363 divergence vs committed logic; health ratio denominator fixed: pre-refactor health would false-WARN at 0.53 vs now 0.97).
+- **Process finding:** automated sweep commit `02357b3a` (03:58, "no config change") pre-empted the parent's commit-after-verification step, carrying all three verified diffs PLUS a concurrent session's `PUMP_CHAIN_V6_ENABLED True→False` flip; post-hoc verified == committed, and the flip was later recovered/claimed in `e58d0258` (#284b). Note for automation: sweep messages should not claim "no config change" while carrying constants diffs.
+
+### T-decision queue (nothing done without T's explicit GO)
+1. **HOTSET_PIN_APPROVED flip** — result-3 recommends FLIP NOW + 7-day watch (constants edit, line-2 rule).
+2. **CONFLUENCE-GATE-BLOCK** — Batch-1 scope: HOLD stands, or approve demotion (protected-flag implications)?
+3. **SHORT-RSI-FLOOR scope** (bug_hunter SHOULD-FIX #3): should the soft floor join Batch-2, given it masks 96% of the SHORT-RSI-HARD-FLOOR demotion?
+4. **D1 metric caveat acknowledged** — judge inheritance at the Dec-4 checkpoint, not by early deaths/hr trend.
+
+### Metric checkpoints
+- **Friday gate-reduction status #1** (D6 cadence, starts this Friday): blocks:trades ratio (105.3:1 wk Nov-16 baseline), trades/day (15.4), Batch-1 cohort counterfactuals, loss-rate vs 7d baseline.
+- **2026-12-04:** D1 inheritance review + D4 Batch-1 review (admitted-cohort quality) + CONTINUUM pair removal review.
+- **2026-11-27:** R1 extended closer deep run.
+
+### Rollback
+`git checkout -- scripts/signal_schema.py` (D1) · `git checkout -- scripts/signal_compactor.py` (D4 Batch-1) · pin flip = set HOTSET_PIN_APPROVED back False.
+
+— lead agent (completing CEO deep run 20261120T221647Z under its pre-dispatch checkpoint; verified by mandatory bug_hunter)
