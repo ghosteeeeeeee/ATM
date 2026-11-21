@@ -5097,3 +5097,18 @@
 - **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK TOK: -N.N% in 5m (threshold -N.N%) | MOMENTUM: -N.N% (TOK blocked)`
 - **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — CRITICAL — TOK+TOK+MOMENTUM+BTC_LEVEL`
 - **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — CRITICAL: TOK CRITICAL: -N.N% in 5m (threshold -N.N%) | layers: TOK,TOK,MOMENTUM,BTC_LEVEL | MOMENTUM: -N.N% (TOK blocked)`
+
+## Error Alerts — 2026-11-21 04:54 UTC
+- **[WARN]** (health_monitor): `disk`: disk 87% used (>= 85%)
+
+## Error Alerts — 2026-11-21 05:54 UTC
+- **[WARN]** (health_monitor): `disk`: disk 87% used (>= 85%)
+
+## Error Alerts — 2026-11-21 06:00 UTC
+- **[WARN]** (freq_deviation_shadow): `ai-trader-pending`: FREQ DEVIATION OVER source=ai-trader-pending baseline=0.131/h current=0.292/h ratio=2.23 n_base=44 n_cur=7
+
+## Error Alerts — 2026-11-21 06:39 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: TOK,TOK,MOMENTUM,BTC_LEVEL | vol=N.5x eth_div=-N.N% | MOMENTUM: -N.N% (TOK blocked)`
+
+## Error Alerts — 2026-11-21 06:54 UTC
+- **[WARN]** (health_monitor): `disk`: disk 87% used (>= 85%)
