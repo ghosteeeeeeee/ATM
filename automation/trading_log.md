@@ -30878,3 +30878,34 @@ BY: auto_1hr
 - Unarmed WR 20% (-$0.46) vs armed 100% (+$0.24) — stall stack still owns the fix
 - 2 open BTC SHORTs (03:54, 05:43) — watch if stacked exposure
 BY: auto_1hr
+## [2026-11-21 06:59] Storm Packet
+
+🌩️ [STORM-READINESS] window-min -0.32% / at-run +3.75% | blocked 114 (combo_key-stale 27, compaction_stale_10min 19, expired-hotset 18, vol-gate-override-0.0 10, long-rsi-ceiling 9, pump-chain-rsi-max-long 9, rr-engine-hard-block 6, oversold-knife 4, short-rsi-floor-knife 4, confluence single-type 3, spike-filter-long 1, pump-chain-vel 1, pump-chain-rsi-min-long 1, pump-chain-long-high 1, rep-low-reputation 1) | true-starvation 31 RSI>=35 (114 raw expired, deduped first-fire-per-token 31; 31 walked, 0 skipped) | counterfactual $+3.20 (touch 31/31) | waiver: SHADOW=True ENFORCE=False — counterfactual POSITIVE -> **streak 4/4, BAR MET 3/3 stands** (19:54 +$0.03, 03:56 +$2.21, 04:53 +$1.03, now +$3.20; deadline 2026-11-26 file truth) — bar met does NOT auto-flip: CEO NO-CONVERT 2026-11-08 stands, conversion needs CEO sign-off; split: blocked LONGs $+6.20 (19, touch 19/19) = gates suppressed pump LONG winners, blocked SHORTs $-2.97 (12, touch 12/12) = gates correctly kept dump SHORT losers out — NOTE: this is a PUMP packet (at-run +3.75%), waiver scope is SHORT-side; cf driven by LONGs, count per packet rule but direction differs from prior dump packets — no auto action
+
+## [2026-11-21 06:59] Hourly Analysis
+
+**Trades:** 2 closed (2 wins gross, 0 losses) | 24h 15 closed
+**PnL NET:** hour $-0.02 (gross +0.18, fees 0.20: BTC ai-trader-pending HL_CLOSED +0.09 net, manual_trail_hit +0.09 gross/-0.11 net) | 24h NET $-0.30 (gross +0.13, fees 0.43, payoff 0.91, WR 46.7%) | 7d NET $-0.83 (n=113, fees 1.79) — **size-reduce: file absent -> 1.0x**
+
+**Storm Packet:** 🌪️ FIRED (window-min -0.32% / at-run +3.75% pump, gate on |at-run|>=1.5) — packet above
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 2 closes, both BTC ai-trader-pending SHORT wins (100% WR) -> no kill
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/15 = 6.7% (<40%); tpsl_utils deployed
+- Boost: none eligible — ai-trader-pending 7T 42.9% net -0.22 (losing); atr-trend- 4T 75% but n<5 and net -0.15 (losing); jup_yolo_mirrored 2T n<5
+- Arm rate: **unarmed 11/15 = 73.3% >70% threshold** WR 27.3% net -$0.37 vs armed 4/4 100% net +$0.07 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly nets 01 -0.08, 03 -0.02, 06 -0.02 but 02/04/05 zero closes -> not 3 consecutive -> no size cut
+- Frequency: 2 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.338% < 0.5% (max 0.996 — one winner rode deep, watch)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.30 (WR 46.7%, payoff 0.91) — fee drag (fees 0.43 vs gross 0.13); 7d NET -0.83
+- Unarmed share 73.3% breached 70% — stall stack still owns the fix
+- Storm bar MET + 4th positive packet — conversion still blocked by CEO NO-CONVERT; pump-direction cf (LONGs) differs from waiver SHORT scope, flag for CEO at sign-off
+- 1 open BTC ai-trader-pending LONG (opened 06:42, +0.19 unrealized)
+BY: auto_1hr
