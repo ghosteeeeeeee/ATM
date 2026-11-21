@@ -572,6 +572,18 @@ own wider SL). Never stack TPs at the same level — the add's TP sits BEFORE
 the original's (e.g. add TP 82,600 vs system TP 83,687). Chop-regime adds are
 half-size or skipped.
 
+**Ladder adds (CEO 2026-11-21: 'if it fires and another btc trade is open,
+it should add — same for the long side'):** the ladder adds AS LEVELS —
+each rung that crosses while a SAME-direction BTC position is open fires as
+a second tranche (`--force` second-tranche path, own rung-level SL/TP, one
+rung per pipeline cycle as the throttle). OPPOSITE-direction opens still
+wait (netting would close a live trade = violates the stay-in doctrine, §13;
+no accidental flips). Non-ladder autos keep the 2026-11-10 belt (dup-guard
+fails them safe). Adds-at-a-level carry their own structure stop; the
+tighter-SL rule above governs adds into the SAME level. Worst-case add
+exposure = the armed rungs within reach × rung size — bounded per cycle,
+not per move.
+
 ### 8. Trust protocol — who outranks whom, by regime
 
 | Regime | Direction authority | Evidence |
@@ -681,6 +693,13 @@ six-trade sequence is the proof case:
    They fill ON CROSS with their structure stop — #17004's sin was the
    arbitrary 0.6% stop, not the fill itself. Retest-style (structure)
    rungs keep first-break-never-fills.
+   **Straight-line escape** (CEO takeoff thesis 2026-11-20, `MULTI_
+   TOUCH_ESCAPE_PCT = 0.5`): a first_break rung whose price runs 0.5%
+   PAST the level without ever reclaiming qualifies (`retested`) and
+   FILLS — the rare one-way slice (the ~30% no-retest case) must not
+   starve the ladder ('falling like a rock'; 'when btc takes off it
+   will prob do so in a straight line, all the way to 70k, 80k'). Both
+   directions; continuation rungs unaffected (they fill on cross).
    Why: #17004 was a first-tick catch with a `price×1.006` stop — no
    level broken, no thesis — and lost −6.89% margin in 3 minutes on the
    bounce; the sims had already scored first-break entries with
@@ -772,6 +791,18 @@ model:
 - Exit still means structure broken — measured against the TRADE'S
   timeframe: an 8h hold is invalidated by an 1h/round-level break, not
   by a 15m retest. Minor-structure stops = §11 sweep bait.
+
+**Stay-in ruling (CEO 2026-11-21, after the four-trade night ledger
+realized +$0.08 while moves ran 2,501/1,585/600pts): "look at what the
+drawdown was for these trades, you need to stay in."** Exits are
+DRAWDOWN-DRIVEN ONLY: a safe trade with zero/tiny drawdown stays in
+(evidence: #17007 adverse +5pts, #17010 +47pts, #17013 ZERO — three
+exits while safe; only #17008's 383pts justified its stop). The stops
+that move a trade: BE-cap, structure-trail, HML, disaster — all
+drawdown-driven. `mfe_exit` was REVERTED to its audited home (mirror
+book, jup_yolo scope) and does NOT close structure-governed/ladder
+trades; `prearm_lock` stays on the mirror book (CEO: keep). Full text:
+manual-trade-override rule 14.
 - Pair with ADX rule 4: interior whipsaws at fading ADX peaks are the
   exhaustion signature that PRECEDES the real leg — surviving them is
   the whole trade. Stacking lesson (same day): two AUTO shorts fired
