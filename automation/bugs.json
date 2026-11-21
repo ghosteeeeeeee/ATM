@@ -1899,6 +1899,19 @@
       "root_cause": "The shipping guard was written as a hard assert with no post-flip path, contradicting the file header which calls it the pre-flight for going live.",
       "found_by": "bug-hunter (Solana copy-trader build verification)",
       "fix": "Replaced the assert with a warning that continues: live configs can run the full pre-flight (nothing is broadcast), shipped configs still default to dry-run. Verified: selftest passes all 7 checks incl. both Jupiter quotes, 706-byte signed swap tx, priority fee 1999999 lamports within tolerance."
+    },
+    {
+      "id": "BUG-105",
+      "title": "Copy-trader has no feed-health indicator \u2014 a dead websocket looks identical to target inactivity",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "bot.js"
+      ],
+      "symptom": "User reported no activity with no way to tell whether the bot was receiving mentions at all: counts showed only detected/buys/sells/skips/errors, all zero, whether the ws was live or dead.",
+      "root_cause": "onLogs callback incremented nothing on arrival; only decoded target trades (detected) and failures were counted, so a silent feed stall and a quiet target produce identical dashboards.",
+      "found_by": "own bug test (independent pass over the build, per user request)",
+      "fix": "Added state.counts.mentions++ in the onLogs callback and initialized mentions+dropped in counts. Verified after restart: mentions 12 at t+12s, 25 at t+27s, dropped 0 \u2014 feed and read path both healthy in-process."
     }
   ],
   "schema": {
