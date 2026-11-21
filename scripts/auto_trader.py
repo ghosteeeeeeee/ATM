@@ -392,7 +392,7 @@ def tweak_structure_fixed(decision, open_positions):
     try:
         cur = conn.cursor()
 
-        def _apply_stop(new_val, old, pid):
+        def _apply_stop(new_val, old, pid, rule='R1'):
             """CAS stop write + log. Returns True on rowcount."""
             new_val = round(new_val, 8)
             cur.execute("UPDATE trades SET stop_loss=%s WHERE id=%s "
@@ -401,7 +401,7 @@ def tweak_structure_fixed(decision, open_positions):
             if cur.rowcount:
                 conn.commit()
                 t = {'trade': pid, 'field': 'stop_loss',
-                     'old': old, 'new': new_val, 'rule': 'R1'}
+                     'old': old, 'new': new_val, 'rule': rule}
                 tweaks.append(t)
                 DB.log_event('INFO', f"tweak {t}")
                 return True
@@ -571,12 +571,12 @@ def tweak_structure_fixed(decision, open_positions):
                 import math as _m
                 _rt = _m.ceil(price / 500.0) * 500
                 if _rt > price and _rt < stop and (not _be or _rt <= _be):
-                    if _apply_stop(_rt, stop, pid):
+                    if _apply_stop(_rt, stop, pid, rule='ROUND'):
                         stop = _rt   # later steps see the tightened stop
             else:
                 _rt = int(price // 500.0) * 500
                 if _rt < price and _rt > stop and (not _be or _rt >= _be):
-                    if _apply_stop(_rt, stop, pid):
+                    if _apply_stop(_rt, stop, pid, rule='ROUND'):
                         stop = _rt
             prev_val = prev[f'{fld}{sfx}']
             cur_val = cur_sh if side == 'SHORT' else cur_sl

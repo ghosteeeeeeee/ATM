@@ -3739,7 +3739,13 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
         # ATR TP/SL is the primary exit — run FIRST so standard exits always fire
         # before speculative wave_turn counter-trend exits.
         # close_paper_position() handles internal DB close + market mirror to HL.
-        atr_hits = check_atr_tp_sl_hits([pos])
+        # H-1 (agent-4 HIGH): passing [pos] made the stack-leader map
+        # self-only → the gate never suppressed anything here (the live
+        # success was the guardian's ordering-luck, not this gate). Pass
+        # the FULL list and filter to this row: the leader map sees the
+        # siblings, each iteration still only closes its own row.
+        atr_hits = [h for h in check_atr_tp_sl_hits(positions)
+                    if h.get('trade_id') == pos.get('id')]
         for hit in atr_hits:
             log(f"  [ATR HIT] {token} {direction} {hit['hit_reason']}: "
                   f"price={hit['current_price']:.6f} SL={hit['stop_loss']:.6f} TP={hit['target']:.6f}")
