@@ -30768,3 +30768,30 @@ BY: auto_1hr
 - 24h NET -0.01 flipped barely red (payoff 1.13); 7d NET -0.95 — fee drag (fees 0.26 vs gross 0.25)
 - Unarmed WR 20.0% (-$0.46) vs armed 100% (+$0.45) — stall stack still owns the fix
 BY: auto_1hr
+
+## [2026-11-21 02:53] Hourly Analysis
+
+**Trades:** 0 closed (0 wins, 0 losses) | 0 open
+**PnL NET:** hour $0.00 (0 closes) | 24h NET $-0.22 (n=14, gross +0.02, fees 0.24, payoff 1.04, WR 42.9%) | 7d NET $-0.95 (n=110, gross +0.62, fees 1.57) — **size-reduce: file absent -> 1.0x**
+
+**Storm:** no storm — window-min -0.61% / at-run -0.61% (both inside ±1.5 gate)
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes
+- Kill check: no 0%-WR signal with n>=3 last hour (0 closes) -> no kill
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/14 = 7.1% (<40%); tpsl_utils deployed
+- Boost: none eligible — atr-trend- 5T 60% but net -0.15 (losing); jup_yolo_mirrored 3T n<5; ai-trader-pending 4T 25% net -0.18 losing
+- Arm rate: **unarmed 10/14 = 71.4% > 70% threshold** WR 20.0% net -$0.46 vs armed 4/4 100% net +$0.30 — chop entries dominating; stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly nets 19 +0.04, 23 +0.02, 01 -0.08 (0 closes in hour 02) — not 3 consecutive negatives -> no size cut
+- Frequency: 0 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.174% < 0.5% (max 0.734) — OK
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.22 (WR 42.9%, payoff 1.04) — fee drag (fees 0.24 vs gross 0.02); 7d NET -0.95 persists
+- Unarmed share crossed 70% (71.4%) — first breach; stall stack fix still pending
+BY: auto_1hr
