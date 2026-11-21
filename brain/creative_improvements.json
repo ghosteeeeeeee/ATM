@@ -11937,5 +11937,32 @@
     "category": "measurement discipline",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-21T04:46:00Z",
+    "idea": "FORWARD-VALUE BOUND rule: before spending a run on any exit-clip/param widen walk, multiply the original foregone-$ claim by the path's CURRENT fire rate; if the product is structurally below the +$2/30d bar, close without replaying the cohort.",
+    "rationale": "atrtrail-clip-12 owed a locked 39-winner cohort replay; the path's fire rate collapsed 39/month -> 1/21d under profit-monster-trail ownership, so even a perfect replay could only ever capture ~$0.30/30d. The bound reached the same verdict in one division that a candle replay would reach in an hour.",
+    "expected_impact": "Kills zombie walk obligations early; prevents 'we replayed it and it was obviously tiny' runs. Same shape as the units guard (#193) — a pre-flight arithmetic check.",
+    "category": "process",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-21T04:46:00Z",
+    "idea": "DEAD-RUN RECOVERY sweep: every auditor/agent run should (a) record its own PID+start in a heartbeat file and (b) the next run should diff HEAD against the last logged change_set to find ships that were never logged. This run found 2 unlogged ships from the 00:30 run that sat 4h in the working tree until auto_1hr swept them into a commit titled 'no config change'.",
+    "rationale": "Run #284 (00:30) died at 00:46 after editing 2 files; its kanban/changes_log/disposition writes never happened. Nothing flagged the gap — the changes were invisible for 4h and would have been attributed to nobody if the sweep commit hadn't been greppable by author-comment ('brain_auditor #284').",
+    "expected_impact": "Recovers unlogged ships within one 4h cycle; makes 'no config change' commit messages honest when they carry config changes.",
+    "category": "process",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-21T04:46:00Z",
+    "idea": "PREARM fk read metric: log post-exit upside for prearm_lock exits (best favorable excursion in the 60m AFTER the lock fires) so the 11-28 enforce re-measure can answer false-kill directly instead of inferring it from the 30d candle walk.",
+    "rationale": "First enforce read: 4 exits all at ~breakeven (mfe 0.25-0.30, class correct) but n=4 with no fk signal — the walk's fk 13.9% was computed on replayed candles, and live fk is the only number that matters once money is at stake.",
+    "expected_impact": "Turns the 11-28 read into a real verdict; 1 log line per lock fire.",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

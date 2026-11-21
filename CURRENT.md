@@ -1,47 +1,50 @@
-# Current State — brain_auditor #283 2026-11-20 20:45 UTC
-**Last Updated: 2026-11-20 20:45 UTC**
-**Updated by: brain_auditor #283. Prior: #282 2026-11-20 12:55 UTC (preserved in git history).**
+# Current State — brain_auditor #284b 2026-11-21 04:50 UTC
+**Last Updated: 2026-11-21 04:50 UTC**
+**Updated by: brain_auditor #284b (completing run). Prior: #283 2026-11-20 20:45 UTC (preserved in git history).**
 
-## HEADLINE — atr_trail_hit exit path DEAD since 10-25: atrtrail-clip-12 walk (due 11-21) must replay the locked 10-31 cohort, not trailing-30d (n=2)
+## HEADLINE — run #284 (00:30) died with 2 unlogged ships: v6 kill + bb-squeeze dead-print fix, both recovered from its journal, verified live, logged. atr_trail_hit death root-caused = PM-trail OWNERSHIP (walk closed by forward-value bound). PREARM enforce live, first read delivered.
 
-1. **Side-find**: `atr_trail_hit` fires collapsed from 1-7/day (10-07..10-21) → 1 (10-25) → 1 (11-14) → 0 since. Trailing-30d n=2 vs n=31 at the 10-31 measurement. Likely profit-monster-trail ownership absorption (217 fires/30d), but a stuck one-way gate is not excluded. **COHORT AGING FLAG appended to `data/shadow_disposition.json` atrtrail-clip-12** — tomorrow's walk must replay the original locked 31-winner cohort, and the path's death must be diagnosed before widening any clip.
-2. **#282 REVERT VERIFIED HOLDING**: `STOP_TIGHTEN_SOURCES = ('jup_yolo_mirrored','volume-buildup-')` (constants:761), ENFORCE True, guardian PID 12:41Z, constants git diff EMPTY, payoff HISTORICAL marker logged. CEO ratify/veto still open.
-3. **0 config changes this run** — nothing passed bars; 11-item batch due tomorrow; #282 shipped 8h ago.
+1. **Dead-run recovery**: #284 edited 2 files at 00:42, launched bug_hunter at 00:46, then died with zero logging. Ships: (a) `PUMP_CHAIN_V6_ENABLED True->False` per CEO pre-registration (cell = 0 rows/30d EXTREME SHORT, v6 30d 9T all LONG '-0.29'; import False; 0 opens since; one-line revert; **CEO ratify/veto open**); (b) `[bb-squeeze] BLOCKED print -> hermes_log` (38 timestamped lines now in pipeline.log, 0 bare — the registry's "NEVER SHIPPED" was a stdout artifact). Both logged to `brain/changes_log.json`.
+2. **atrtrail-clip-12 CLOSED NO CHANGE** — ownership transfer, not a gate bug: profit-monster-trail wins the profit-side exit race since 10-26 (weekly atr_trail 22->3->0->0->1->0 vs pm_trail 33->50->87->50->31->24; 14d pm_trail 65T 95.4% '+3.82' vs atr_trail_hit 1T; loss-side atr_sl_hit 31T/14d = ATR check alive). Forward-value bound: 1 exit/21d x old $11.71/30d foregone ≈ $0.30/30d << +$2/30d bar → locked-cohort replay cannot change the verdict; PM widen already REJECTED + CEO_PROTECTED.
+3. **PREARM LOCK ENFORCING LIVE** (CEO GO 20261120T002223Z, `PREARM_LOCK_ENFORCE=True` since 11-20 01:26): first read = 4/4 exits at breakeven, class-correct (mfe 0.251-0.297), net $0.000, n=4 UNDER-POWERED, fk unread → enforce KEEPS, re-measure 11-28 with post-exit-upside fk metric.
+4. **0 trading-constant changes of my own** — session lock absent; STOP_TIGHTEN_SOURCES 2-tuple revert (#282) holding; CEO_PROTECTED untouched; size-reduce file absent = 1.0x.
 
 ### 1. FINDINGS THIS RUN
 | Item | Result |
 |---|---|
-| 24h / 7d | 15T 53.3% **+0.30 gross** (net +0.10) / 109T 49.5% +0.66 gross ≈ -0.85 net (fee-drag) |
-| armed vs unarmed 7d | 55T 85.5% **+4.53** vs 54T 13.0% **-3.87** |
-| chop-bleed 7d | never-armed owns **85%** (-4.08 of -4.80) |
-| 14d exit families | TRAIL 79T 96.2% **+4.75** vs HML 25T 0% -2.64 / ATR_SL 30T 0% -3.31 / manual_sl 19T 0% -1.84 (all ai-trader-pending) |
-| 14d mandate | trail vs HML/stop families unchanged — trend entries win, chop entries lose |
+| 24h / 7d | 16T 43.8% **+0.03 gross** (auto_1hr net '-0.24' fee-drag) / 112T 49.1% '+0.63' gross |
+| 14d / 30d | 205T 47.8% '-1.29' / 631T 52.8% '-3.52' |
+| arm gap 7d | armed 57T 84.2% **+4.39** vs never 55T 12.7% **-3.76** |
+| chop-bleed | 7d **83.6%** dollar (under 92 gate) · 30d **92.2% AT line** — route CLOSED (#96/#190/#192) → MONITOR |
+| 14d families | TRAIL 65T **95.4% +3.82** vs CHOP/STOP 81T **0% -8.59** (other 59T 61% +3.48) |
+| regime 7d | NORMAL 25T 68% '+1.71' · EXTREME 35T 42.9% 0.00 · HIGH 52T 44.2% '-1.08' |
 | kill screen | 14d sub-50 n>=15 net<0 = **0 rows** |
-| worst 7d cells | atr-trend- SHORT 27T -0.41; pc+ LONG 10T -0.24 — all n small/owned |
 
 ### 2. AUTOPSY (48h, recovery_replay adverse-first, selfcheck PASS)
-n=14 = 0 never-adverse / 11 recovered / **3 NEVER** (GOAT r2v2-long7 · IMX atr-trend- HML · ALT atr-trend- atr_sl) → **WRONG-SIDE REFUTED 134th** (#61 p=0.116, #84 t=-0.04). 3 BTC ai-trader manual_sl losses today = CEO levels, recovered on replay.
+n=11 = 0 never-adverse / 9 recovered / **2 NEVER** (IMX atr-trend- hard_max_loss '-0.12' · GOAT r2v2-long7 CL-T1 '-0.12') → **WRONG-SIDE REFUTED 135th** (#61 p=0.116, #84 t=-0.04). Both NEVER = never-armed chop class.
 
 ### 3. SHADOW (mandate re-runs done)
 | Source | Status |
 |---|---|
-| contrarian join | **RE-RAN 20:30Z** — overall flip 47.3% n=2143; **pc-\|BTC-BELOW 64.6% n=48 HOLDS**; pc-\|AT 28.6% never blanket; rider chi2 p=4.9e-40 per-signal only |
-| floor join | **RE-RAN 20:31Z** — 49.2% vs 45.4% p=**0.1517** (decaying) → NO-SHIP stands |
-| shadow_trader | 20:31Z — exit A/B pm_trail **+19,160** vs hard_max **-24,742** = trail-or-nothing; all gates negative-EV (earning keep) |
-| rider-fade guard | **COLLECTING 62 lines / 39 distinct tokens vs 15 bar = MET** (formal read 11-21/22) |
-| jup/vb TAT shadow | only **1 distinct trade** (16987) — under-powered; soak read needs power caveat |
-| oscillator / wyckoff / rr | archived / retired / orphaned = 3/6 + walk |
+| contrarian join | **RE-RAN 04:30Z** — overall flip 47.3% n=2143; pc-\|BELOW 64.6% n=48 HOLDS; pc-\|AT 28.6% never blanket; rider chi2 p=4.9e-40 = per-signal only |
+| floor join | **RE-RAN 04:31Z** — p=0.1688 (floor 49.5% n=1908 vs always 45.8% n=439); route CLOSED 11-15, reproduces |
+| shadow_trader | 127,102 — exit A/B pm_trail **+19,419** vs hard_max -25,121 (0% WR) vs rr_engine -9,414 = trail-or-nothing; all 11 gates negative-EV |
+| prearm enforce | 4 exits since GO, net $0.000, class-correct; 166 log lines |
+| struct-flip | **0 lines ever** — probe never wired (owed 11-25) |
+| rider-fade | **SIDE-FIND: 0 lines in pipeline.log AND archive** — #283's "62/39 MET" unverifiable; re-source before the 11-22 read |
+| oscillator / wyckoff / rr | archived / retired / orphaned = 3/6 answerable |
 
-### 4. REJECTED-WITH-DATA (never re-propose)
-- Floor-admit over always-admit (p now 0.1517, route closed).
-- Generic arm-rate gate (#195); time blocks (standing ban); book-wide drift gate (#280).
-- atr-trend- entry gate / atr-trend TAT: **no prior art found → monitor only**, not proposed (session-brain 7 queries, 4 cited).
+### 4. DUE 11-21 BATCH — 11/11 dispositioned
+pcv6 **DONE-KILL** · atrtrail **DONE-CLOSED** · prearm **DONE-first-read** · bbsqueeze-reband OPEN 11-25 (step i shipped, 2/>=10 ceiling events) · conf-tilt OPEN 11-28 (**cell precondition FAILS: pc+\|EXTREME 14d '-0.16', r2v2 n=0**) · ceiling-85 **DONE-NO-SHIP REINFORCED** (realized 75-85 SHORT now 18T/30d net '-0.10' → criterion 3 fails on substance) · slope-jup **DONE-CLOSED** (live jup SHORT 30d 61T 63.9% '+0.24' without any exempt) · r2v2 OPEN 11-28 (tok_n <<50) · jup-short-walk EXTENDED 11-28 · structure-flip OPEN 11-25 · reentry-study OPEN 11-28 (**prior art in-repo: `brain/analysis/reenter_recovery_cf_2026-10-25.py`, `repeat_after_stop_2026-10-26.py` — extend, don't redesign**).
 
-### 5. LAST-RUN VERIFY (#282) — ALL PASS (10/10)
-constants tuple revert ✓ · ENFORCE True ✓ · guardian 12:41Z ✓ · payoff HISTORICAL marker ✓ · contrarian mandate ✓ · floor join ✓ · rider-fade 62/39 ✓ · session lock absent ✓ · size-reduce absent=1.0x ✓ · checkpoint registry (only kill-line 12-03) ✓ · 0 Tracebacks ✓.
+### 5. AMPLIFY (1 new) + WHY-NOT
+**`amplify-longbypass-dual-basis-reconcile`** — LONG-BYPASS-SHORT-BIAS-BLOCK PRIMARY fwd_4h 30d 63 tok-days **+0.87% pos 68%** / 7d 41 tok-days **+1.02% same-sign** vs adjudicated 11-17 read "gate saves ~$10/14d" = the #237 adverse-selection gap. Measurement-first, **NO trade change**, default NO CHANGE. Why-not: every other 30d n>=10 net>0 winner cell is already in-flight. **Flip-KPI: 0 conversions this week** (rider-fade only candidate, source owed).
 
-### 6. READINESS (2026-11-20 20:45 UTC)
-**0 open = FLAT** — regime 15m **SHORT_BIAS** vs 4h **SHORT_BIAS** (agree = with-tape), continuum BELOW, vol LOW, velocity SLOW, accel NEGATIVE, but trend_quality UP + market_phase RECOVERY (mixed → SHORT_BIAS primary). Short-with-tape under EMA300 preferred; LONGs only on sustained EMA300 reclaim WITH volume; trail-family first; size 1.0x; 0 watchdog steers, health good.
+### 6. LAST-RUN VERIFY (#283/#282) — ALL PASS
+atrtrail side-find confirmed+diagnosed ✓ · STOP_TIGHTEN_SOURCES 2-tuple revert holding (constants:761) ✓ · contrarian+floor mandates ✓ · session lock ABSENT ✓ · size-reduce absent=1.0x ✓ · CEO_PROTECTED untouched ✓ · py_compile 6 files PASS ✓ · checkpoint_registry only kill-line 12-03 pending ✓.
 
-**Queue:** **11-21 batch of 11** (atrtrail walk = locked-cohort replay per flag; prearm soak with TAT power caveat; conf-tilt-floorproof; bbsqueeze-rsi-reband; jup-short-walk; prearm-breakeven-lock; structure-flip-early-exit; slope-jup-exempt; r2v2-clonehunt; pcv6-cell; ceiling-85-walk; reentry-study) → **11-21/22 rider-fade formal read (bar 39/15 MET)** → 11-22 win-side + ai-trader cell + fade threshold walk → 11-23 jup-long clonehunt + formal weekly AMPLIFY + flip-KPI → 11-25 tape-split pc- + pcfade → 11-26 storm waiver.
-CEO: **scope-widen REVERT ratify/veto (open from #282)** · LONG arm tripwire · mult-150 label · exitstack dual-read · slippage BUILD #1 · ai-trader MFE-giveback observation. Flip-KPI: 0 conversions this week (rider-fade the only live candidate).
+### 7. READINESS (2026-11-21 04:47 UTC)
+**1 open — BTC SHORT #17014 ai-trader-pending @56637, age 0.9h, +1.63%, stop R1-moved to 56693.6 (locks ~breakeven), meta_rsi 33.25.** Regime 15m **SHORT_BIAS** + 4h **SHORT_BIAS** AGREE, continuum BELOW, zscore STRONG_NEG, velocity FALLING, wyckoff MARKDOWN, trend STRONG_DOWN, vol NORMAL = **with the tape → HOLD**; exits drawdown-driven only (CEO stay-in doctrine 2026-11-21, skill rule 14 — no profit-lock closes). SHORTs only on bounce to RSI 45-55 (never ≤35 post-dump); LONGs only on a sustained EMA300 reclaim WITH volume; trail-family first; size 1.0x; 0 watchdog steers.
+
+**Queue:** **11-21/22 rider-fade formal read ONLY after re-sourcing its lines** → 11-23 jup-long clonehunt + formal weekly AMPLIFY → 11-25 STRUCT-FLIP probe ship + bb-squeeze ≥10 ceiling events → 11-28 PREARM fk re-measure + conf-tilt cell re-validation + r2v2/jup-walk/reentry reads.
+CEO: **v6 kill RATIFY/VETO (one-line revert)** · PREARM first-read ACKNOWLEDGE · dual-basis reconcile queued · LONG arm tripwire 42.9% (data only) · mult-150 label. Flip-KPI: 0 this week.

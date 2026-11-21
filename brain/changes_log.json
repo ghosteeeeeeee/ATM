@@ -4596,5 +4596,29 @@
     "after": "notes + aging flag appended",
     "rationale": "trailing-30d query would silently fail the n>=30 bar and mis-scope the walk",
     "impact": "prep for 11-21 batch; zero trading behavior change"
+  },
+  {
+    "timestamp": "2026-11-21T04:46:00Z",
+    "agent": "brain_auditor",
+    "type": "kill",
+    "change": "Audit #284: PUMP_CHAIN_V6_ENABLED True -> False (kill executed per CEO pre-registration 20261120T002223Z: 24h HOLD, no-cell -> disable)",
+    "file": "scripts/hermes_constants.py",
+    "before": "PUMP_CHAIN_V6_ENABLED = True",
+    "after": "PUMP_CHAIN_V6_ENABLED = False  (PLUS/MINUS remain True; revert = one line)",
+    "rationale": "amplify-pcv6-extreme-short-cell CLOSED NO-CELL: rolling 30d pump-chain* EXTREME SHORT v6-combo = 0 rows (cell fired only 10-09..10-21, n>=15 unreachable); v6 30d opens 9 ALL LONG net -0.29 so the master kill forfeits nothing positive.",
+    "impact": "0 v6 opens since the 00:42:45Z flip (verified); import reads False; not in CEO_PROTECTED_FLAGS; no rotator auto-reenable. CEO ratify/veto open.",
+    "note": "APPLIED by the interrupted run #284 (00:30-00:46, died before logging; swept into commit 02357b3a 03:58Z). VERIFIED + LOGGED by the completing run #284b."
+  },
+  {
+    "timestamp": "2026-11-21T04:46:00Z",
+    "agent": "brain_auditor",
+    "type": "tweak",
+    "change": "Audit #284: [bb-squeeze] LONG BLOCKED instrumentation print() -> hermes_log.log() (dead-print fix for reband step (i))",
+    "file": "scripts/signals/bollinger_squeeze.py",
+    "before": "print(f'  [bb-squeeze] {token} LONG BLOCKED — RSI ... < / > ...')  # never reached pipeline.log (run_all_signals does not capture stdout)",
+    "after": "log(f'[bb-squeeze] {token} LONG BLOCKED — RSI ... < / > ...')  # hermes_log -> logs/pipeline.log, timestamped",
+    "rationale": "Registry recorded step (i) as NEVER SHIPPED because 0 lines existed in pipeline.log — the measurement artifact was that raw print never reaches the log. Zero behavior change (logging only); unblocks amplify-bbsqueeze-module-rsi-reband step (ii) accumulation.",
+    "impact": "Verified 38 timestamped [bb-squeeze] BLOCKED lines in logs/pipeline.log, 0 bare-print lines, py_compile PASS, no downstream line-parser breakage (volatility_gate_v2 matches signal NAME). 2 of the needed >=10 events already carry module RSI 65-70.",
+    "note": "APPLIED by the interrupted run #284; VERIFIED + LOGGED by completing run #284b. bug_hunter self-check (subagent call was permission-denied in this session): py_compile 6 files PASS, import smoke PASS, evidence counts run directly."
   }
 ]

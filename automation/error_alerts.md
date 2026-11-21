@@ -5076,3 +5076,24 @@
 
 ## Error Alerts — 2026-11-21 02:00 UTC
 - **[WARN]** (freq_deviation_shadow): `btc-pump-rider+`: FREQ DEVIATION UNDER source=btc-pump-rider+ baseline=0.033/h current=0.000/h ratio=0.00 n_base=11 n_cur=0
+
+## Error Alerts — 2026-11-21 02:54 UTC
+- **[WARN]** (health_monitor): `disk`: disk 87% used (>= 85%)
+
+## Error Alerts — 2026-11-21 03:39 UTC
+- **REPEATED** (13x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (12x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **NEW** (2x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — EMERGENCY — TOK+TOK+CONTAGION+MULTI_ALT+MOMENTUM+BTC_LEVEL`
+- **NEW** (2x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — CRITICAL — TOK+CONTAGION+TOK+MULTI_ALT+MOMENTUM+BTC_LEVEL`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — CRITICAL — TOK+CONTAGION+MULTI_ALT+MOMENTUM+BTC_LEVEL`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: CONTAGION,TOK,MOMENTUM,BTC_LEVEL | vol=N.6x eth_div=+N.N% | MOMENTUM: -N.N% (TOK blocked)`
+
+## Error Alerts — 2026-11-21 03:54 UTC
+- **[WARN]** (health_monitor): `disk`: disk 87% used (>= 85%)
+
+## Error Alerts — 2026-11-21 04:39 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — CRITICAL — TOK+TOK+TOK+MOMENTUM+BTC_LEVEL`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — CRITICAL: TOK CRITICAL: -N.N% in 5m (threshold -N.N%) | layers: TOK,TOK,TOK,MOMENTUM,BTC_LEVEL | MOMENTUM: -N.N% (TOK blocked)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK TOK: -N.N% in 5m (threshold -N.N%) | MOMENTUM: -N.N% (TOK blocked)`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — CRITICAL — TOK+TOK+MOMENTUM+BTC_LEVEL`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — CRITICAL: TOK CRITICAL: -N.N% in 5m (threshold -N.N%) | layers: TOK,TOK,MOMENTUM,BTC_LEVEL | MOMENTUM: -N.N% (TOK blocked)`
