@@ -28,6 +28,7 @@ import trade_watchdog as TW     # noqa: E402
 
 TW._acquire_pending_lock = lambda: open(os.path.join(_tmp, '.lk'), 'w')
 TW._release_pending_lock = lambda f: f.close()
+_file_loader = TW._load_orders_state   # real file reader (groups 4/5 patch it)
 
 # --- DB/open-position mock (psycopg2 imported inside the gate) ---------
 import psycopg2  # noqa: E402
@@ -35,17 +36,28 @@ import psycopg2  # noqa: E402
 MODE = ['ok']       # ok | dbdown
 OPEN = [None]       # (id, direction) | None
 COUNT = [0]
+NOTIONAL = [0.0]    # Σ amount_usdt for the heat numerator
+EQUITY = [1000.0]   # account_value for the heat denominator
 
 
 class _SC:
     def execute(self, sql, *a):
-        self._last = ('count',) if 'COUNT(*)' in sql else ('row',)
+        if 'COUNT(*)' in sql:
+            self._last = ('count',)
+        elif 'SUM(amount_usdt)' in sql:
+            self._last = ('sum',)
+        else:
+            self._last = ('row',)
 
     def fetchone(self):
         if MODE[0] == 'dbdown':
             raise RuntimeError('db down')
         # psycopg2 returns tuples: COUNT(*) -> (n,)
-        return (COUNT[0],) if self._last == ('count',) else OPEN[0]
+        if self._last == ('count',):
+            return (COUNT[0],)
+        if self._last == ('sum',):
+            return (NOTIONAL[0],)
+        return OPEN[0]
 
     def close(self):
         pass
@@ -212,6 +224,91 @@ def main():
     solo = [dict(rows[1], current_price=55700)]
     assert any(h[R] == 'atr_sl_hit' for h in prod_hits(solo)), 'flat self-governs'
     print('7 stack-leader: follower ignored / leader fires / flat self-governs ✓')
+
+    # ── 8. D3 heat gate + D2.3 band flag (CEO deep-run 2026-11-21) ─────
+    TW._load_orders_state = _file_loader   # undo group 4/5's closure leak
+    import hyperliquid_exchange as HLE
+    _orig_equity = getattr(HLE, 'get_account_value_curl', None)
+    HLE.get_account_value_curl = lambda: {'account_value': EQUITY[0]}
+    MODE[0] = 'ok'; OPEN[0] = None; COUNT[0] = 0
+    NOTIONAL[0] = 50.0; EQUITY[0] = 1000.0        # heat 0.05 < 0.15
+    # the heat gate is SCOPED to ladder ids (btc-auto-*) by design —
+    # hand-arms bypass; the tests must use a ladder id or they test
+    # nothing (my first version used 'a' and passed for the wrong reason)
+    setup([mk('btc-auto-ladder-h', 57000)])
+    assert len(steers(TW.monitor_pending_orders(56900.0), 'btc-auto-ladder-h')) == 1, \
+        'heat under cap must fire'
+    NOTIONAL[0] = 200.0                           # heat 0.20 > 0.15
+    setup([mk('btc-auto-ladder-h', 57000)])
+    assert not steers(TW.monitor_pending_orders(56900.0), 'btc-auto-ladder-h'), \
+        'heat over cap must defer'
+    HLE.get_account_value_curl = lambda: (_ for _ in ()).throw(RuntimeError('hl down'))
+    NOTIONAL[0] = 50.0
+    setup([mk('btc-auto-ladder-h', 57000)])
+    assert not steers(TW.monitor_pending_orders(56900.0), 'btc-auto-ladder-h'), \
+        'equity failure must defer (fail-safe)'
+    HLE.get_account_value_curl = lambda: {'account_value': 1000.0}
+    # hand-arm (btc-ceo-*) bypasses the heat gate even over cap
+    NOTIONAL[0] = 200.0
+    setup([mk('btc-ceo-x', 57000)])
+    assert len(steers(TW.monitor_pending_orders(56900.0), 'btc-ceo-x')) == 1, \
+        'hand-arms bypass heat'
+    # ADD branch carries the band flag; flat fill does not
+    NOTIONAL[0] = 50.0; OPEN[0] = ('1', 'SHORT'); COUNT[0] = 1
+    setup([mk('a', 57000)])
+    s = TW.monitor_pending_orders(56900.0)
+    assert steers(s, 'a')[0]['action']['order'].get('prearmed_add') is True, \
+        'ADD must carry the band flag'
+    OPEN[0] = None; COUNT[0] = 0
+    setup([mk('a', 57000)])
+    s = TW.monitor_pending_orders(56900.0)
+    assert not steers(s, 'a')[0]['action']['order'].get('prearmed_add'), \
+        'flat first fill must NOT carry the band flag'
+    # executor appends --prearmed-add only for the flagged order
+    st = {}
+    TW._load_orders_state = lambda: st
+    CAPTURE['out'], CAPTURE['rc'] = "✓ Added trade #17101", 0
+    _flagged = mk('btc-auto-ladder-7', 57000)
+    _flagged['prearmed_add'] = True
+    TW._execute_pending_order_impl(_flagged)
+    assert '--prearmed-add' in CAPTURE['cmd'] and '--prearmed' in CAPTURE['cmd']
+    CAPTURE['cmd'] = None
+    TW._execute_pending_order_impl(mk('btc-auto-ladder-8', 57000))
+    assert '--prearmed-add' not in (CAPTURE['cmd'] or []), 'unflagged gets no band flag'
+    if _orig_equity is not None:
+        HLE.get_account_value_curl = _orig_equity
+    print('8 D3 heat gate (under/over/equity-fail/hand-arm-bypass) + D2.3 flag plumbing ✓')
+
+    # ── 9. D2.3 band predicate (brain) ─────────────────────────────────
+    import brain as BRAIN
+    assert BRAIN._prearmed_add_band_ok('SHORT', 24.6) is False   # #17027-class add
+    assert BRAIN._prearmed_add_band_ok('SHORT', 50.0) is True
+    assert BRAIN._prearmed_add_band_ok('LONG', 83.39) is False
+    assert BRAIN._prearmed_add_band_ok('LONG', 70.0) is True
+    assert BRAIN._prearmed_add_band_ok('SHORT', None) is True     # fail-open
+    print('9 D2.3 band predicate: oversold-short blocked / overbought-long blocked / mid+None pass ✓')
+
+    # ── 10. equity parse (the D3 BLOCKER) + band guard (agent-5) ───────
+    # The REAL clearinghouseState shape: accountValue nested under
+    # marginSummary, numeric strings — the old parse read a nonexistent
+    # top-level key and returned None forever (dark ladder).
+    _orig_hl_info = HLE._hl_info
+    HLE._hl_info = lambda q: {
+        'marginSummary': {'accountValue': '16.11', 'withdrawable': '8.02'},
+        'crossMarginSummary': {},
+        'assetPositions': [],
+    }
+    acct = HLE.get_account_value_curl()
+    assert acct['account_value'] == 16.11, acct          # nested + coerced
+    assert acct['withdrawable'] == 8.02, acct
+    HLE._hl_info = lambda q: {}                          # HL rate-limit shape
+    acct = HLE.get_account_value_curl()
+    assert acct.get('account_value') is None, acct       # None -> heat defers
+    HLE._hl_info = _orig_hl_info
+    import brain as BRAIN2
+    assert BRAIN2._prearmed_add_band_ok('SHORT', 'garbage') is True   # fail-open
+    assert BRAIN2._prearmed_add_band_ok('LONG', [1]) is True          # fail-open
+    print('10 equity parse (nested/coerced/None) + band uncoercible-RSI fail-open ✓')
 
     shutil.rmtree(_tmp, ignore_errors=True)
     print('\nALL PENDING-MACHINE TESTS PASS')

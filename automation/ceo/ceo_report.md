@@ -1789,3 +1789,15 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 15T +0.53 60.0% | 7d 112T +1.04 50.0%
 ### Findings: disk 87% used (WARN, repeated hourly); regime Q8 = 15m/4h SHORT_BIAS agreed but continuum ABOVE + zscore STRONG_POS + trend STRONG_UP = mixed tape → dump-side bias with BTC reclaiming; confluence gates passing normally (recent PASS via NEUTRAL-relax standalone bypass).
 ### Recommendation: Disk 87% (warn since 04:54Z) — schedule log/DB retention prune before critical; no trading changes.
+
+## CEO Status — 20261121T153826Z
+### Health: pipeline=active (timer 15:39Z; is-active flaps between oneshot runs) guardian=active open_pos=2
+### Numbers: 24h 27T +0.98 63.0% | 7d 122T +0.69 50.8%
+### Findings: Disk 88% (>=85% warn, 2h repeated); today's question (confluence blocks): rs-s54 MON LONG repeatedly BLOCKED as single-type outside standalone bypass (~1792 block lines vs 19635 pass); btc-pump-rider+ freq 2.15x over baseline.
+### Recommendation: Disk cleanup due soon (88%); assess whether rs-s54 deserves standalone-bypass or a confluence partner.
+
+## CEO Status — 20261121T193827Z
+### Health: pipeline=ok (timer oneshot, last run exit=0 @19:38:41) guardian=active open_pos=0
+### Numbers: 24h 29T +$0.68 55.2% | 7d 126T +$0.56 48.4%
+### Findings: regime=SHORT_BIAS (macro gate LONG=REDUCE / SHORT=FULL); disk 88% WARN repeating; 2 decision items due ≤24h (win-side-capture shadow bar, amplify fade-threshold walk)
+### Recommendation: disk at 88% — schedule a log/data cleanup before it hits 90%.

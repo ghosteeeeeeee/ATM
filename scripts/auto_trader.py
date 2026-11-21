@@ -42,17 +42,52 @@ def get_open_btc():
                                 password=BRAIN_PASSWORD, connect_timeout=5)
         cur = conn.cursor()
         cur.execute("SELECT id, token, direction, entry_price, current_price, "
-                    "stop_loss, target, pnl_pct, signal FROM trades "
+                    "stop_loss, target, pnl_pct, signal, "
+                    "lowest_price, highest_price FROM trades "
                     "WHERE status='open' AND token='BTC'")
         rows = [{'id': r[0], 'token': r[1], 'direction': r[2],
                  'entry_price': r[3], 'current_price': r[4], 'stop_loss': r[5],
-                 'target': r[6], 'pnl_pct': r[7], 'signal': r[8]}
+                 'target': r[6], 'pnl_pct': r[7], 'signal': r[8],
+                 'lowest_price': r[9], 'highest_price': r[10]}
                 for r in cur.fetchall()]
         cur.close()
         conn.close()
         return rows
     except Exception:
         return None  # DB failure — caller decides (fail-safe: no decision)
+
+
+from hermes_constants import PM_TRAIL_ACTIVATE_PCT
+
+# ROUND-ANCHOR shadow dedup — one WOULD-RATCHET line per (pid, round level)
+# per process (same pattern as position_manager's *_shadow_logged sets).
+_round_shadow_logged = set()
+
+
+def _be_armed(entry, price, side, hi=None, lo=None):
+    """BE-cap arm check — CEO D2.2 ruling 2026-11-21: arm ONLY when in
+    profit AND peak favorable since entry >= PM_TRAIL_ACTIVATE_PCT (0.40%).
+    Wick-level in-profit no longer arms (#17026 class). Peak unknown/zero/
+    uncoercible -> False (fail-safe: structure-only). REVERT = drop the
+    peak gate (restore in-profit-at-birth arming)."""
+    if not entry or not price:
+        return False
+    if side == 'SHORT':
+        if not price < entry:
+            return False
+        peak = lo
+    else:
+        if not price > entry:
+            return False
+        peak = hi
+    try:
+        peak = float(peak)
+    except (TypeError, ValueError):
+        return False
+    if peak <= 0:
+        return False
+    return (entry - peak) / entry >= PM_TRAIL_ACTIVATE_PCT if side == 'SHORT' \
+        else (peak - entry) / entry >= PM_TRAIL_ACTIVATE_PCT
 
 
 def track_hypotheticals(cfg, size):
@@ -428,7 +463,7 @@ def tweak_structure_fixed(decision, open_positions):
             _smap = {}                    # raise at .get and abort the cycle
         _st_dirty = [False]           # nonlocal-ish for nested helper
 
-        def _lag_stop(pid, side, s15, s1h, price, stop, entry):
+        def _lag_stop(pid, side, s15, s1h, price, stop, entry, hi=None, lo=None):
             """Structure-lag v3 (favorable=15m always, adverse=1h always,
             BE-cap in profit) — the three-day evolution:
               - FAVORABLE steps: 15m ALWAYS (CEO 2026-11-15, #16913: the
@@ -467,20 +502,22 @@ def tweak_structure_fixed(decision, open_positions):
             sfx = '15'   # state keys: sh15/sl15/sh1h/sl1h (both recorded)
             cur_sh, cur_sl, cur_atr = s15
             fld = 'sh' if side == 'SHORT' else 'sl'
-            # BREAKEVEN-CAP when in profit (CEO 2026-11-15: #16915 'got
-            # pummeled waiting for structure to break' — it sat +9.96%
-            # at the 62006 dip with NO lock: favorable steps need a lower
-            # swing-HIGH which only prints AFTER a bounce, so the V tagged
-            # the loose stop at -24.51%. 'Catch profits with the trailing
-            # SL' = while IN PROFIT the trail never targets past breakeven
-            # (+0.1% hair); UNDERWATER trades keep full structure room
-            # (shakeout protection unchanged) and trail down from there.
+            # BREAKEVEN-CAP when armed — CEO D2.2 ruling 2026-11-21
+            # (option i): _be arms ONLY when peak favorable since entry
+            # >= PM_TRAIL_ACTIVATE_PCT (0.40%) — NOT at birth/instant
+            # profit (wick-level no longer arms). #17026/#17013/#17005
+            # class fix: entry×0.999 cannot survive the expected level
+            # retest; the armed structure stop does. Peak unknown
+            # (hi/lo None/0/uncoercible) -> _be = 0 (unarmed, fail-safe
+            # toward structure-only). REVERT = remove the peak gate
+            # (restore in-profit-at-birth arming). Once armed, clamps
+            # behave as before (CEO 2026-11-15: #16915 'got pummeled
+            # waiting for structure to break' — while IN PROFIT the trail
+            # never targets past breakeven (+0.1% hair); UNDERWATER
+            # trades keep full structure room and trail down from there).
             _be = 0.0
-            if entry and price:
-                if side == 'SHORT' and price < entry:
-                    _be = entry * 1.001
-                elif side == 'LONG' and price > entry:
-                    _be = entry * 0.999
+            if _be_armed(entry, price, side, hi, lo):
+                _be = entry * 1.001 if side == 'SHORT' else entry * 0.999
             if not (s15[2] and s1h[2]) or not (cur_sh and cur_atr):
                 return
             if prev is None:
@@ -557,27 +594,49 @@ def tweak_structure_fixed(decision, open_positions):
                             _smap[key] = _rec; _st_dirty[0] = True
                         return
                     _smap[key] = _rec; _st_dirty[0] = True; return
-            # ROUND-ANCHOR (CEO spec 2026-11-21: 'when price falls below
-            # 55500 the stop for the previous trade is set to the new
-            # structural level of 55500'): a straight slide re-confirms
-            # no 15m swing (no retrace = no zigzag), so the structure
-            # trail starves — #17014 sat at the BE-cap 56693 through a
-            # fall to 55585 (one tweak ever). Rounds are observable in
-            # real time: stop = nearest 500-round AT-OR-ABOVE price for
-            # a short (strictly above price → never an instant close;
-            # fires on the reclaim = the break failed), tighten-only,
-            # BE-capped. Runs EVERY cycle, structure-change-independent.
+            # ROUND-ANCHOR — SHADOW-ONLY as of 2026-11-21 (D1(c) ruling:
+            # break-of-structure-only — rounds are numbers, swings are
+            # structure; zero stop writes, WOULD-RATCHET counterfactuals
+            # collected for the 7d review 2026-11-28). HISTORY — original
+            # CEO spec 2026-11-21: 'when price falls below 55500 the stop
+            # for the previous trade is set to the new structural level of
+            # 55500': a straight slide re-confirms no 15m swing (no
+            # retrace = no zigzag), so the structure trail starves —
+            # #17014 sat at the BE-cap 56693 through a fall to 55585 (one
+            # tweak ever). Rounds are observable in real time: stop =
+            # nearest 500-round AT-OR-ABOVE price for a short (strictly
+            # above price → never an instant close; fires on the reclaim
+            # = the break failed), tighten-only, BE-capped. Ran EVERY
+            # cycle, structure-change-independent.
+            _round_hit = False
+            # The SHADOW's counterfactual must use the LEGACY BE (the
+            # pre-D2.2 in-profit-at-birth formula), not the new
+            # peak-gated _be — otherwise the 7d review compares the old
+            # ROUND behavior against a different BE state and the
+            # 'saved >=$1 -> restore hybrid' decision is biased
+            # (agent-5 MEDIUM: one-way OVER-COUNT).
+            _be_leg = 0.0
+            if entry and price:
+                if side == 'SHORT' and price < entry:
+                    _be_leg = entry * 1.001
+                elif side == 'LONG' and price > entry:
+                    _be_leg = entry * 0.999
             if side == 'SHORT':
                 import math as _m
                 _rt = _m.ceil(price / 500.0) * 500
-                if _rt > price and _rt < stop and (not _be or _rt <= _be):
-                    if _apply_stop(_rt, stop, pid, rule='ROUND'):
-                        stop = _rt   # later steps see the tightened stop
+                _round_hit = (_rt > price and _rt < stop
+                              and (not _be_leg or _rt <= _be_leg))
             else:
                 _rt = int(price // 500.0) * 500
-                if _rt < price and _rt > stop and (not _be or _rt >= _be):
-                    if _apply_stop(_rt, stop, pid, rule='ROUND'):
-                        stop = _rt
+                _round_hit = (_rt < price and _rt > stop
+                              and (not _be_leg or _rt >= _be_leg))
+            if _round_hit and (pid, _rt) not in _round_shadow_logged:
+                _round_shadow_logged.add((pid, _rt))
+                DB.log_event('INFO',
+                             f"📊 [ROUND-ANCHOR-SHADOW] WOULD-RATCHET {pid} "
+                             f"{side} stop={stop} -> {_rt} price={price} — "
+                             f"demoted to shadow 2026-11-21 (D1 structure-only), "
+                             f"review 2026-11-28")
             prev_val = prev[f'{fld}{sfx}']
             cur_val = cur_sh if side == 'SHORT' else cur_sl
             if cur_val == prev_val:
@@ -665,13 +724,17 @@ def tweak_structure_fixed(decision, open_positions):
                 # giant candle between SL updates").
                 _lag_stop(pos['id'], 'SHORT', (sh, sl, atr),
                           (sh_h, sl_h, atr_h), price, stop,
-                          float(pos.get('entry_price') or 0))
+                          float(pos.get('entry_price') or 0),
+                          hi=pos.get('highest_price'),
+                          lo=pos.get('lowest_price'))
             elif d == 'LONG':
                 # STRUCTURE-LAG mirror on 15m, one swing behind; TP =
                 # giant-candle backstop only (R2 removed — see SHORT).
                 _lag_stop(pos['id'], 'LONG', (sh, sl, atr),
                           (sh_h, sl_h, atr_h), price, stop,
-                          float(pos.get('entry_price') or 0))
+                          float(pos.get('entry_price') or 0),
+                          hi=pos.get('highest_price'),
+                          lo=pos.get('lowest_price'))
         # persist structure-lag state (72h prune, atomic — mirrors mxm)
         if _st_dirty[0]:
             _now = time.time()

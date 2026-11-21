@@ -396,6 +396,20 @@ def _fill_time_rsi(token: str):
     except Exception:
         return None
 
+def _prearmed_add_band_ok(direction: str, rsi) -> bool:
+    """D2.3 (CEO 2026-11-21): prearmed ladder-ADD RSI band. False = block."""
+    if rsi is None:
+        return True  # fail-open — matches enrichment-miss behavior
+    from hermes_constants import OVERSOLD_SHORT_RSI_MAX, SIGNAL_FILTER_RSI_MAX
+    try:
+        rsi = float(rsi)
+    except (TypeError, ValueError):
+        return True  # uncoercible RSI fails open (a band block must
+        # never become a terminal error / rung burn — agent-5 LOW)
+    if direction == 'SHORT':
+        return rsi >= OVERSOLD_SHORT_RSI_MAX
+    return rsi <= SIGNAL_FILTER_RSI_MAX
+
 def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float,
                exchange: str = "Hyperliquid", strategy: str = None, paper: bool = False,
                stop_loss: float = None, target: float = None, server: str = "Hermes",
@@ -406,6 +420,7 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                leverage: int = 1, experiment: str = None,
                flipped_from_trade: bool = False,
                prearmed: bool = False,
+               prearmed_add: bool = False,
                regime: str = None,
                volatility_regime: str = None,  # NEW: FLAT/NORMAL/HIGH/EXTREME
                # ── Signal indicator fields (captured at entry from hotset) ──
@@ -447,12 +462,40 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     and the CEO directive 2026-11-20 is 'we need to catch these shorts'.
     Every OTHER gate stays (dup, kill switch, vacation, shape,
     validate_levels, blacklist/penalty paths).
+    prearmed_add=True: ladder ADD on a prearmed level (CEO D2.3 2026-11-21)
+    — re-applies the RSI band first-entry --prearmed skips (SHORT < 35 /
+    LONG > 75 rejected); RSI None fails open.
     """
     import sys, os, random
 
     # ── Normalize direction ──────────────────────────────────────────────
     side_type = side_type.lower() if side_type else 'long'
     direction = 'LONG' if side_type == 'long' else 'SHORT'
+
+    # ── Prearmed ADD RSI band (CEO D2.3 2026-11-21 — band applies to ADDS
+    # only; first entries keep prearmed catchability). RSI resolution
+    # mirrors the SHORT money gate below: caller → signal_metadata →
+    # fill-time enrichment, fail-open when None.
+    if prearmed and prearmed_add:
+        _band_rsi = signal_rsi_14
+        _band_meta = signal_metadata
+        if isinstance(_band_meta, str):
+            try:
+                _band_meta = json.loads(_band_meta)
+            except Exception:
+                _band_meta = None
+        if _band_rsi is None and isinstance(_band_meta, dict):
+            _band_rsi = _band_meta.get('rsi_14', _band_meta.get('rsi'))
+        if _band_rsi is None:
+            _band_rsi = _fill_time_rsi(token)
+        if not _prearmed_add_band_ok(direction, _band_rsi):
+            from hermes_constants import (OVERSOLD_SHORT_RSI_MAX,
+                                          SIGNAL_FILTER_RSI_MAX)
+            if direction == 'SHORT':
+                print(f"[brain.py] ❌ REJECTED: {token} {direction} — prearmed ADD SHORT RSI {_band_rsi} < knife {OVERSOLD_SHORT_RSI_MAX} (D2.3 band: adds need quality, first entries catch)")
+            else:
+                print(f"[brain.py] ❌ REJECTED: {token} {direction} — prearmed ADD LONG RSI {_band_rsi} > ceiling {SIGNAL_FILTER_RSI_MAX} (D2.3 band: adds need quality, first entries catch)")
+            return None
 
     # ── SHORT oversold hard floor (defense-in-depth, all entry paths) ────
     # Root cause 2026-10-06: LTC pump-chain- SHORT entered with entry_rsi_14=9.90
@@ -1653,6 +1696,8 @@ if __name__ == "__main__":
                                 help="Mark this trade as flipped from original signal direction")
         add_parser.add_argument("--prearmed", action="store_true", default=False,
                                 help="Pre-armed level order (ladder rung / CEO arm via pending pipeline) — skips ONLY the SHORT knife/floor RSI gates; all other gates intact (CEO 2026-11-20)")
+        add_parser.add_argument("--prearmed-add", action="store_true", default=False,
+                                help="Ladder ADD on a prearmed level — re-applies the D2.3 RSI band (SHORT <35 / LONG >75 rejected) that first-entry --prearmed skips (CEO 2026-11-21)")
         add_parser.add_argument("--signal-z-score", type=float, dest="signal_z_score",
                                 help="z_score at signal entry")
         add_parser.add_argument("--signal-rsi-14", type=float, dest="signal_rsi_14",
@@ -1745,6 +1790,7 @@ if __name__ == "__main__":
                 is_manual=args.manual,
                 force=args.force,
                 prearmed=args.prearmed,
+                prearmed_add=args.prearmed_add,
                 regime=args.regime,
                 signal_z_score=args.signal_z_score,
                 signal_rsi_14=args.signal_rsi_14,

@@ -517,9 +517,28 @@ def get_account_value_curl():
             "type": "clearinghouseState",
             "user": MAIN_ACCOUNT_ADDRESS,
         })
+        # HL nests the values: clearinghouseState top keys are
+        # marginSummary/crossMarginSummary — a top-level accountValue
+        # does NOT exist (bug_hunter deep-rulings 2026-11-21 BLOCKER:
+        # the old result.get("accountValue") returned None always →
+        # every heat-gated fill deferred = dark ladder). Read the nested
+        # path with a top-level fallback; coerce numeric strings (HL
+        # returns strings) so callers can do arithmetic directly.
+        _ms = result.get("marginSummary") or {}
+        def _num(v):
+            if v is None:
+                return None
+            try:
+                return float(v)
+            except (TypeError, ValueError):
+                return None
         return {
-            "account_value": result.get("accountValue"),
-            "withdrawable": result.get("withdrawable"),
+            "account_value": _num(_ms.get("accountValue")
+                                  if _ms.get("accountValue") is not None
+                                  else result.get("accountValue")),
+            "withdrawable": _num(result.get("withdrawable")
+                                 if result.get("withdrawable") is not None
+                                 else _ms.get("withdrawable")),
             "positions_raw": result.get("assetPositions", []),
         }
     except Exception:

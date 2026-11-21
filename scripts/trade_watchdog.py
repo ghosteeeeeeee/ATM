@@ -1631,6 +1631,14 @@ def _monitor_pending_orders_impl(btc_price):
                         "SELECT COUNT(*) FROM trades WHERE token=%s AND "
                         "status='open'", (coin,))
                     _open_count = int(_cur.fetchone()[0] or 0)
+                    # D3 heat numerator (all open rows, all coins —
+                    # portfolio heat, not per-coin): amount_usdt IS
+                    # notional (hyperliquid_exchange:854), no leverage
+                    # multiplication needed.
+                    _cur.execute(
+                        "SELECT COALESCE(SUM(amount_usdt),0) FROM trades "
+                        "WHERE status='open'")
+                    _heat_notional = float(_cur.fetchone()[0] or 0)
                     _cur.close()
                     _c.close()
                 except Exception as _qerr:
@@ -1653,6 +1661,42 @@ def _monitor_pending_orders_impl(btc_price):
                         f"open >= MAX_OPEN_POSITIONS({_max_open}) — add "
                         f"deferred (F-3 aggregate cap)", "INFO")
                     continue
+                # D3 HEAT GATE (CEO deep-run 2026-11-21 ruling GO): heat =
+                # Σ open amount_usdt / account_value, cap =
+                # MAX_PORTFOLIO_HEAT (0.15 — its FIRST reader). Ladder
+                # auto-fills only (btc-auto-*); hand-arms bypass (the
+                # DailyFillCap-manual pattern). DEFER on breach AND on any
+                # equity-read failure (fail-safe — no blind add). Heat logs
+                # every evaluation for calibration (the ruling's metric:
+                # calibrate the cap if it binds >2×/day).
+                if str(oid).startswith("btc-auto-"):
+                    try:
+                        from hermes_constants import MAX_PORTFOLIO_HEAT
+                        from hyperliquid_exchange import get_account_value_curl
+                        _eq = get_account_value_curl()
+                        if isinstance(_eq, dict):
+                            _eqv = float(_eq.get("account_value") or 0)
+                        else:
+                            _eqv = float(_eq or 0)
+                        _heat = (_heat_notional / _eqv) if _eqv > 0 else None
+                        log(f"pending order {oid}: heat="
+                            f"{_heat if _heat is None else round(_heat, 4)} "
+                            f"(notional={_heat_notional:.2f} equity={_eqv:.2f} "
+                            f"cap={MAX_PORTFOLIO_HEAT}) D3 calibration", "INFO")
+                        if _heat is None:
+                            log(f"pending order {oid}: equity read failed — "
+                                f"heat defer (fail-safe, no blind add)", "WARN")
+                            continue
+                        if _heat > MAX_PORTFOLIO_HEAT:
+                            log(f"pending order {oid}: HEAT-DEFER heat="
+                                f"{_heat:.4f} cap={MAX_PORTFOLIO_HEAT} — add "
+                                f"deferred one cycle (D3)", "INFO")
+                            continue
+                    except Exception as _herr:
+                        log(f"pending order {oid}: heat gate error "
+                            f"({type(_herr).__name__}) — deferring one cycle "
+                            f"(fail-safe)", "WARN")
+                        continue
                 if _open:
                     _open_dir = str(_open[1] or "").lower()
                     if _open_dir == str(direction or "").lower():
@@ -1660,6 +1704,11 @@ def _monitor_pending_orders_impl(btc_price):
                             f"{_open_dir} open — firing as ADD (CEO "
                             f"2026-11-21: adds on winners, both sides)",
                             "INFO")
+                        # D2.3: the ADD carries the band flag so brain
+                        # re-applies the RSI band first-entry --prearmed
+                        # skips (explicit flag > implicit DB check — no
+                        # race, per the ruling's evidence #8).
+                        order["prearmed_add"] = True
                         # fall through → steer (exec gets --force)
                     else:
                         log(f"pending order {oid}: {coin} #{_open[0]} "
@@ -1700,6 +1749,10 @@ def _monitor_pending_orders_impl(btc_price):
                         # never ran (live #16831 got the premature BE-LOCK).
                         # None when absent (is False check stays correct).
                         "dynamic_sl": order.get("dynamic_sl"),
+                        # D2.3 (CEO deep-run 2026-11-21): the band flag —
+                        # rebuilt payload must carry it or the ADD loses
+                        # the gate (the F2 dropped-key class).
+                        "prearmed_add": order.get("prearmed_add"),
                         # Per-order trail profile (CEO 2026-11-09) — same
                         # bridging rule: payload carries them or they're lost.
                         "skip_be_lock": order.get("skip_be_lock"),
@@ -1823,6 +1876,8 @@ def _execute_pending_order_impl(order):
         # kill-switch remain the risk controls). brain skips ONLY those
         # two RSI gates for --prearmed.
         cmd.append("--prearmed")
+        if order.get("prearmed_add"):
+            cmd.append("--prearmed-add")
         log(f"AUTO-EXEC pending order {oid}: {' '.join(cmd[4:])}")
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=120,
                            cwd=SCRIPTS_DIR)
