@@ -1623,10 +1623,36 @@ def _monitor_pending_orders_impl(btc_price):
                         "SELECT id, direction FROM trades WHERE token=%s "
                         "AND status='open' LIMIT 1", (coin,))
                     _open = _cur.fetchone()
+                    # F-3 (agent-3): MAX_OPEN_POSITIONS exists but nothing
+                    # read it on this path — the keeper self-replenishes
+                    # rungs, so the add count was bounded only by margin.
+                    # Enforce the constant as the aggregate stack cap.
+                    _cur.execute(
+                        "SELECT COUNT(*) FROM trades WHERE token=%s AND "
+                        "status='open'", (coin,))
+                    _open_count = int(_cur.fetchone()[0] or 0)
                     _cur.close()
                     _c.close()
+                except Exception as _qerr:
+                    # F-1 (agent-3): a DB error must NOT blind-fire. The
+                    # widened --force belt turned the old fail-open (dup
+                    # REJECT = safe) into a blind add / NETTING fill if
+                    # brain's DB is up while ours is down. Defer one
+                    # cycle instead — a 60s hiccup costs nothing.
+                    log(f"pending order {oid}: open-position query "
+                        f"failed ({type(_qerr).__name__}) — deferring one "
+                        f"cycle (fail-safe, no blind add)", "WARN")
+                    continue
+                try:
+                    _max_open = int(
+                        __import__("hermes_constants").MAX_OPEN_POSITIONS)
                 except Exception:
-                    _open = None
+                    _max_open = 6
+                if _open_count >= _max_open > 0:
+                    log(f"pending order {oid}: {_open_count} {coin} rows "
+                        f"open >= MAX_OPEN_POSITIONS({_max_open}) — add "
+                        f"deferred (F-3 aggregate cap)", "INFO")
+                    continue
                 if _open:
                     _open_dir = str(_open[1] or "").lower()
                     if _open_dir == str(direction or "").lower():
