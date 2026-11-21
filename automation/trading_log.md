@@ -31044,3 +31044,30 @@ BY: auto_1hr
 - Unarmed cohort net -$0.19 vs armed +$0.33 — stall stack still owns the fix
 - 1 open: HYPER btc-pump-rider+ LONG (11:38)
 BY: auto_1hr
+
+## [2026-11-21 12:51] Hourly Analysis
+
+**Storm:** no storm (window-min +0.35% / at-run +1.04%) — gate not fired
+
+**Trades:** 2 closed last hour (2W 0L) | 24h 17 closed
+**PnL NET:** hour $+0.15 (BTC continuum-trend+ +0.06, HYPER btc-pump-rider+ +0.09) | 24h NET $+0.29 (gross +0.70, fees 0.41, payoff 1.07, WR 64.7%) | 7d NET $-0.59 (gross +1.21, fees 1.80) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 2/2 wins, both profit-monster-trail — no kill candidates
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/17 = 5.9% (<40%); tpsl_utils deployed. Biggest loss bucket: manual_sl_hit 3T net -0.36
+- Boost: none eligible — jup_yolo_mirrored 3T 66.7% net +0.16 (n<5); btc-pump-rider+ 2T (n<5); ai-trader-pending 8T 50% net -0.03 (losing)
+- Arm rate: unarmed 8/17 = 47.1% below 70%, WR 25.0% net -$0.19 vs armed 9/9 100% net +$0.48 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly nets 06 -0.02, 07 +0.25, 09 +0.01, 12 +0.15 — not 3 consecutive negatives -> no size cut
+- Frequency: 2 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.236% < 0.5% (max 0.996)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET +0.29 (WR 64.7%, payoff 1.07); fee drag persists on 7d: fees 1.80 vs gross 1.21 -> 7d NET -0.59
+- Unarmed cohort net -$0.19 vs armed +$0.48 — stall stack still owns the fix
+- 2 open: COMP bb-squeeze+ LONG, NXPC btc-pump-rider+ LONG (both 12:39-12:40)
+BY: auto_1hr
