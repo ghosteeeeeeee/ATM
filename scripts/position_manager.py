@@ -586,6 +586,19 @@ def check_atr_tp_sl_hits(open_positions: List[Dict]) -> List[Dict]:
     Skips tokens that guardian is actively closing (race-condition guard).
     """
     hits = []
+    # STACK-LEADER STOP (CEO 2026-11-21 'I don't want it exiting the
+    # whole positions right away at breakeven' + agent-3 F-2: N rows =
+    # ONE HL position — the FIRST stop to fire closes the whole stack).
+    # While a coin has >1 open row, only the LEADING (oldest) row's
+    # stop triggers: the trailing structure/round stop governs the
+    # stack, so an add row's tight BE-cap can never preempt the ride.
+    # TP checks stay per-row; the add's own SL governs again once flat.
+    _leader = {}
+    for _p in open_positions or []:
+        _t = str(_p.get('token', '')).upper()
+        _i = _p.get('id')
+        if _t and _i is not None and (_t not in _leader or _i < _leader[_t]):
+            _leader[_t] = _i
     for pos in open_positions:
         token = str(pos.get('token', '')).upper()
         trade_id = pos.get('id')
@@ -624,13 +637,14 @@ def check_atr_tp_sl_hits(open_positions: List[Dict]) -> List[Dict]:
             continue
 
         hit = None
+        _is_leader = (_leader.get(token, trade_id) == trade_id)
         if direction == 'LONG':
-            if cur <= sl:
+            if cur <= sl and _is_leader:
                 hit = 'atr_sl_hit'
             elif cur >= tp:
                 hit = 'atr_tp_hit'
         elif direction == 'SHORT':
-            if cur >= sl:
+            if cur >= sl and _is_leader:
                 hit = 'atr_sl_hit'
             elif cur <= tp:
                 hit = 'atr_tp_hit'

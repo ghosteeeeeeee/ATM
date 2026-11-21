@@ -557,6 +557,27 @@ def tweak_structure_fixed(decision, open_positions):
                             _smap[key] = _rec; _st_dirty[0] = True
                         return
                     _smap[key] = _rec; _st_dirty[0] = True; return
+            # ROUND-ANCHOR (CEO spec 2026-11-21: 'when price falls below
+            # 55500 the stop for the previous trade is set to the new
+            # structural level of 55500'): a straight slide re-confirms
+            # no 15m swing (no retrace = no zigzag), so the structure
+            # trail starves — #17014 sat at the BE-cap 56693 through a
+            # fall to 55585 (one tweak ever). Rounds are observable in
+            # real time: stop = nearest 500-round AT-OR-ABOVE price for
+            # a short (strictly above price → never an instant close;
+            # fires on the reclaim = the break failed), tighten-only,
+            # BE-capped. Runs EVERY cycle, structure-change-independent.
+            if side == 'SHORT':
+                import math as _m
+                _rt = _m.ceil(price / 500.0) * 500
+                if _rt > price and _rt < stop and (not _be or _rt <= _be):
+                    if _apply_stop(_rt, stop, pid):
+                        stop = _rt   # later steps see the tightened stop
+            else:
+                _rt = int(price // 500.0) * 500
+                if _rt < price and _rt > stop and (not _be or _rt >= _be):
+                    if _apply_stop(_rt, stop, pid):
+                        stop = _rt
             prev_val = prev[f'{fld}{sfx}']
             cur_val = cur_sh if side == 'SHORT' else cur_sl
             if cur_val == prev_val:
