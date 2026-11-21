@@ -1639,8 +1639,10 @@
       "default_action": "NO SHIP (default) — log-only shadow first, zero behavior",
       "owner": "brain_auditor",
       "notes": "AMPLIFY weekly #244 type (a) exit-side param. NOT a duplicate of amplify-prearm-breakeven-lock (11-14, flat-BE on peak) — this fires on STRUCTURE FLIP while prearm fires on TIME+adverse. NOT mfe-cut-arm-be (stall-cut at T>=45, extended 11-14). Why-not on cells: all 4 n>=10 winner cells in-flight; n>=5 early cells (doji-bottom 5T/80%/+0.20, jup-FLAT-LONG 8T/87.5%/+0.10, warrior-NORMAL 6T) = thin, label only. Contra-vs-aligned entry quality REJECTED-WITH-DATA this run: 14d aligned 265T net -1.58 vs contra 113T net -1.54 = no separation (structure-at-entry does not predict outcome; structure-FLIP-mid-hold is the untested axis).",
-      "disposition": "STILL NOT SHIPPED (default NO SHIP) — 0 [STRUCT-FLIP-SHADOW] lines in logs/pipeline.log at 2026-11-21T04:40Z: the log-only probe was never wired. Bar + measurement unchanged. Owed next run (log-only, zero behavior).",
-      "adjudicated_by": " | adjudicated brain_auditor #284b 2026-11-21T04:45:21Z"
+      "disposition": "STEP 1 (log-only probe) WIRED 2026-11-21T13:05Z by brain_auditor #286 — the 'owed next run' item. NEW in scripts/position_manager.py: _btc_ema300_state() (one BTC 1m continuum read per pipeline run, freshness 900s, returns None rather than raising) + _struct_flip_shadow(pos, btc_state), called as the FIRST statement of the per-position loop in check_and_manage_positions(), call site wrapped in try/except so a shadow probe can never take the exit loop down. Detection is STATELESS: continuum_states.ema300_position against entry direction AND last_cross_ts > open_time (= mid-hold flip, contra-entries excluded) — deliberately NOT a module-level dedup set, because position_manager runs as a fresh subprocess every minute (STEPS_EVERY_MIN) and per-process sets reset each run. ZERO BEHAVIOR: one log line '[STRUCT-FLIP-SHADOW] #id ...' with live mfe, armed flag, pnl_pct, signal — no exit, no SL/trail mutation, armed trades untouched by construction. VERIFIED: scripts/test_struct_flip_shadow.py ALL 11 CHECKS PASS (flip logs / contra-entry silent / aligned silent / armed still tagged / no position mutation / junk input silent); py_compile OK; live smoke against the real continuum.db: state ('ABOVE', cross 1795250400, age 3s) -> SHORT-opened-before-cross LOGS, opened-after-cross SILENT, LONG SILENT. STILL OPEN: the measurement itself — >=30 decided never-armed losers, 14d 1m-candle walk, net delta >= +$2.00 pnl_usdt (units guard), fk <20%. Default = NO SHIP unchanged.",
+      "adjudicated_by": " | adjudicated brain_auditor #286 2026-11-21T13:05:00Z",
+      "step1_shipped": "2026-11-21T13:05:00Z",
+      "updated": "2026-11-21T12:42:11Z"
     },
     {
       "id": "amplify-tat-neverarmed-age-widen",
@@ -2192,5 +2194,5 @@
       "created_at": "2026-11-21T08:45:00Z"
     }
   ],
-  "updated_at": "2026-11-21T08:45:00Z"
+  "updated_at": "2026-11-21T12:42:11Z"
 }

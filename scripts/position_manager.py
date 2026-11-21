@@ -3163,6 +3163,83 @@ def _apply_weather_vane_shield(positions: List[Dict]) -> int:
     return shielded
 
 
+def _btc_ema300_state():
+    """One read of the BTC 1m continuum state per pipeline run (shadow probe only).
+
+    ponytail: returns (position, last_cross_ts, ts) or None — no history scan,
+    `last_cross_ts` already tells us whether a cross happened after entry.
+    """
+    conn = None
+    try:
+        import sqlite3
+        conn = sqlite3.connect(os.path.join(HERMES_DATA, 'continuum.db'), timeout=2)
+        row = conn.execute(
+            "SELECT ema300_position, last_cross_ts, ts FROM continuum_states "
+            "WHERE token='BTC' AND timeframe='1m' ORDER BY ts DESC LIMIT 1"
+        ).fetchone()
+    except Exception as _e:
+        log(f"  [STRUCT-FLIP-SHADOW] BTC continuum read failed: {type(_e).__name__} — probe skipped")
+        return None
+    finally:
+        if conn is not None:
+            try:
+                conn.close()
+            except Exception:
+                pass
+    if not row or not row[0] or not row[2] or (time.time() - row[2]) > 900:
+        return None
+    return row
+
+
+def _struct_flip_shadow(pos, btc_state):
+    """LOG-ONLY shadow for amplify-structure-flip-early-exit (brain_auditor #286).
+
+    Fires when BTC 1m ema300_position is AGAINST the open direction AND the last
+    EMA300 cross happened after this trade opened (= a structure flip mid-hold,
+    not a contra entry). Zero behavior: writes a log line and returns nothing —
+    no exit, no SL change, armed trades untouched by construction.
+    """
+    try:
+        if btc_state is None:
+            return
+        trade_id = pos.get('id')
+        direction = str(pos.get('direction') or '').upper()
+        if not trade_id or direction not in ('LONG', 'SHORT'):
+            return
+        cur_pos, last_cross, _ts = btc_state
+        against = (direction == 'LONG' and cur_pos == 'BELOW') or \
+                  (direction == 'SHORT' and cur_pos == 'ABOVE')
+        if not against:
+            return
+        opened = pos.get('open_time')
+        if opened is None or last_cross is None:
+            return
+        try:
+            opened_epoch = (opened.replace(tzinfo=timezone.utc).timestamp()
+                            if opened.tzinfo is None else opened.timestamp())
+        except Exception:
+            return
+        if last_cross <= opened_epoch:
+            return  # cross predates the entry — contra entry, not a mid-hold flip
+        # live MFE from recorded extremes (close-time mfe_pct not written yet)
+        entry = float(pos.get('entry_price') or 0)
+        arm_thr = float(pos.get('trailing_activation') or 0.40)
+        mfe = None
+        if entry > 0:
+            if direction == 'LONG' and pos.get('highest_price'):
+                mfe = (float(pos['highest_price']) - entry) / entry * 100
+            elif direction == 'SHORT' and pos.get('lowest_price'):
+                mfe = (entry - float(pos['lowest_price'])) / entry * 100
+        armed = (mfe is not None and mfe >= arm_thr)
+        log(f"  [STRUCT-FLIP-SHADOW] #{trade_id} {pos.get('token')} {direction} "
+            f"BTC ema300={cur_pos} (cross {int(last_cross)} after open) "
+            f"mfe={'%.3f' % mfe if mfe is not None else 'n/a'} armed={int(armed)} "
+            f"pnl_pct={pos.get('pnl_pct')} signal={pos.get('signal')} "
+            f"— log-only, no exit (amplify-structure-flip-early-exit)")
+    except Exception:
+        pass  # shadow probe must never break the manage loop
+
+
 def check_and_manage_positions() -> Tuple[int, int, int]:
     """
     Called every pipeline run.
@@ -3240,7 +3317,18 @@ def check_and_manage_positions() -> Tuple[int, int, int]:
     adjusted_count = 0
     original_closed = closed_count  # FIX (2026-04-09): track baseline before exit logic
 
+    # STRUCT-FLIP shadow (log-only, amplify-structure-flip-early-exit): one BTC
+    # state read per run, then a log line per open position that flipped against
+    # its direction mid-hold. Never exits anything — and it must never be able to
+    # take the exit loop down with it, so the read is guarded at the call site.
+    _btc_state = None
+    try:
+        _btc_state = _btc_ema300_state()
+    except Exception:
+        _btc_state = None
+
     for pos in positions:
+        _struct_flip_shadow(pos, _btc_state)
         # ── EXIT PRIORITY ORDER ─────────────────────────────────────────────────
         # 1. Wave turn exit      — z-score extreme (>±1.5) + acceleration reversing
         #                          (HIGHEST CONVICTION — fires before ATR if in profit)

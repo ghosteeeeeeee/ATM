@@ -1783,3 +1783,9 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 16T +0.20 50.0% | 7d 112T +0.92 50.0%
 ### Findings: Clean — both windows net-positive at 50% WR, 1 open position. Alerts: disk 87% (recurring WARN since 04:54Z), ai-trader-pending freq deviation 2.23x over baseline (06:00Z). Proactive (confluence-blocked): gate blocks 1,732 of 19,031 evals (9.1%), all one class — "single-type not in standalone bypass" (1,202 on 11-19, 439 on 11-20, 91 today); latest blocked = USUAL LONG, RESOLV LONG. No new error class.
 ### Recommendation: Disk at 87% — schedule a log/retention cleanup before 90%; no trading changes.
+
+## CEO Status — 20261121T113826Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 15T +0.53 60.0% | 7d 112T +1.04 50.0%
+### Findings: disk 87% used (WARN, repeated hourly); regime Q8 = 15m/4h SHORT_BIAS agreed but continuum ABOVE + zscore STRONG_POS + trend STRONG_UP = mixed tape → dump-side bias with BTC reclaiming; confluence gates passing normally (recent PASS via NEUTRAL-relax standalone bypass).
+### Recommendation: Disk 87% (warn since 04:54Z) — schedule log/DB retention prune before critical; no trading changes.

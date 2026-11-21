@@ -1,20 +1,73 @@
 {
-  "timestamp": "2026-11-21T08:39:23.456428+00:00",
-  "steers": [],
-  "portfolio_health": "good",
+  "timestamp": "2026-11-21T13:39:27.734341+00:00",
+  "steers": [
+    {
+      "severity": "urgent",
+      "category": "cluster",
+      "title": "Over-exposed to BTC: 2 trades",
+      "detail": "2 open trades on BTC. Diversify or reduce.",
+      "auto_executable": false,
+      "id": "steer-001"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: NXPC + COMP",
+      "detail": "Both opened within 1 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-002"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: SAND + BTC",
+      "detail": "Both opened within 10 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-003"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: SAND + BTC",
+      "detail": "Both opened within 21 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-004"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: BTC + BTC",
+      "detail": "Both opened within 11 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-005"
+    },
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Portfolio heavily long (5 trades)",
+      "detail": "5 long positions. One BTC dump hits all of them.",
+      "auto_executable": false,
+      "id": "steer-006"
+    }
+  ],
+  "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "SHORT_BIAS",
-    "continuum": "AT",
+    "continuum": "ABOVE",
     "volatility": "LOW",
-    "zscore_tier": "NEG",
-    "velocity_state": "SLOW",
+    "zscore_tier": "STRONG_POS",
+    "velocity_state": "FAST",
     "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.75,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "linreg_alignment": 1.0,
+    "wyckoff_phase": "MARKUP",
+    "market_phase": "DECLINING",
+    "trend_quality": "STRONG_UP"
   },
-  "open_count": 0
+  "open_count": 5,
+  "deep_analysis": "```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 3 (3 long, 0 short)\nUnrealized PnL: ~0.00 USDT (all <35min old)\nRegime: MIXED \u2014 15m LONG_BIAS 76/1/43 + continuum ABOVE EMA300 538x1m STRONG_UP (+1.93%) vs btc_4h SHORT_BIAS, auto_trader=CHOP | Volatility: LOW\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udfe1 [cluster] Hold the 3-long book ONLY while BTC 1m holds above continuum EMA300 (58206, price 59328=+1.93%): exit all three if BTC 1m closes below EMA300 for 15\u201330m. Condition re-tested now: ABOVE holds, 538 consecutive since 08:40. Correlation: all 3 entered inside one 30-min impulse \u2014 one dump hits all.\n\ud83d\udfe1 [profit_lock] COMP #17022 is at +0.40% \u2014 the trail arm line (entry 16.929, arm\u224816.997). Confirm trail activates; once armed, do not let it round-trip below entry. It's the first candidate to join the 86.5% trail family this session.\n\ud83d\udfe1 [health] Chop-bleed dollar share 30d 92.2% AT the \u226592 threshold (7d 83.0%, 14d 88.4%, 0 NULL mfe, today arm 9/11=81.8%) \u2014 age=1 cycle unexecuted, brain-auditor entry-quality item.\n\ud83d\udfe2 [info] BTC flips/24h = 27 (\u226526 = p95 unstable), aggregate 24 \u2014 no snapshot direction stands; every steer above carries a re-tested trigger.\n\ud83d\udfe2 [info] SOPH LONG pick written 13:12 \u2014 PICK (watchlist only \u2014 AI_TRADER_ENABLED=False, will NOT execute).\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nDirection is right: 3/3 longs align with the strongest 15m tape today (76 long-bias of 120 coins) and 538 minutes of continuum ABOVE. The risk is entry quality, not side \u2014 all three sits in losing 14d long RSI bands (BLUR 72.7 \u2192 -0.05, COMP 69.6 \u2192 31%WR -0.22, NXPC 51.9 \u2192 -0.99 worst dollar band), advisory only since the mid-band block is measured-refuted.\n\n24h loss forensics: 4 losers, 3 are ai-trader-pending BTC SHORTs entered meta_rsi 18.7\u201329.9. Winning side on the same tape: short from rsi 46.1 (+0.20), long momentum at rsi 90.2 (+0.20). 14d map: SHORT <45 = 39T/44%WR/-0.52 vs \u226545 positive. We keep shorting oversold while BTC bounces \u2014 wrong side. Fourth loser BLUR #17011 armed then atr_sl_hit (round-trip giveback, exit ownership).\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Keep the book under the EMA300 exit trigger above; no averaging into the cluster.\n2. Confirm COMP trail arm at 16.997 \u2014 pump/bb families only pay once armed (btc-pump-rider+ 7d: 12T/5W, 6 never-armed losers).\n3. Brain-auditor (age=1, re-quoted fresh): (a) 30d chop-bleed 92.2% \u226592 \u2192 entry-quality filters; (b) atr-trend- enabled/live, 7d 27T/11L all never-armed; (c) arm-time RSI floor \u226535\u201340 for manual BTC SHORTs (14d <45 shorts -0.52 vs +0.60 mid-band).\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\nCycle complete: analysis merged into `watchdog_recommendations.json`, SOPH LONG pick written (watchlist-only), memory stored.\n",
+  "agent_timestamp": "2026-11-21T13:14:16.589988+00:00",
+  "regime_context": "Two sources named. Continuum (primary for the EMA300 condition): BTC 1m price 59328 vs EMA300 58206 (+1.93%), ABOVE 538 candles since 08:40 UTC, zscore 2.51 STRONG_POS, velocity RISING, acceleration POSITIVE, linreg BULL/alignment 1.0, trend_quality STRONG_UP, state_score 99.99, position_side LONG. Scanner side: 15m aggregate LONG_BIAS at 13:00 (long 76 / short 1 / neutral 43 of 120), BTC 15m LONG_BIAS \u2014 but btc_4h SHORT_BIAS; regime_5m BTC = NEUTRAL/ranging. auto_trader: CHOP, bracket. Churn: aggregate 24, BTC 27 flips/24h (BTC >= p95 26 = unstable). Volatility LOW, volume NORMAL (continuum) / LOW (scanner). Implication: a strong up-impulse inside a 4h short-bias tape that the live scorer still calls chop \u2014 longs survive only while the above-EMA300 condition holds, which is why every steer here carries a re-tested trigger instead of a level.",
+  "pattern_alerts": "VERIFIED from PostgreSQL this cycle (all numbers re-run now):\n\n1) Oversold BTC shorts remain the wrong side. SHORT meta_rsi<45: 14d n=39, 17W, -0.52. meta_rsi 45-60: n=17, +0.60. >=60: n=56, +0.30. In the last 24h: 3 of 4 losers were ai-trader-pending BTC SHORTs at meta_rsi 18.7/28.7/29.9 (manual_sl_hit, -0.30 total). WINNING SIDE: short from >=45 strength or long the momentum (#17007 rsi 46.1 +0.20, #17016 rsi 90.2 +0.20). WHY NOT ON IT: arm-time entries fired into RSI 18-30 while BTC held above EMA300 and bounced. Action (age=1 cycle unexecuted): floor manual/pending BTC SHORT arms at meta_rsi 35-40 \u2014 brain-auditor item, arm-time guard.\n\n2) Chop-bleed KPI dollar share: 7d 83.0%, 14d 88.4%, 30d 92.2% AT the >=92 threshold vs 80.6% baseline (2026-10-25); 0 NULL mfe (companion), today arm 9/11=81.8%. Measure = dollar share; counts companion 41/49 (7d), 241/271 (30d). Action (age=1 cycle unexecuted): route 30d >=92 reading to brain-auditor as entry-quality work, not exit tweaks.\n\n3) atr-trend- (ATR_TREND_ACCEL_MINUS_ENABLED=True, live traffic): 7d n=27, 15W, -0.41, and ALL 11 losers have mfe_pct<0.40 \u2014 never armed. Enabled with live traffic -> flagged normally (not a dead signal), entry-quality for brain-auditor (age=1 cycle).\n\n4) LONG entry bands 14d (advisory, no block re-issued): <45 n=28 46%WR +0.41 | 45-60 n=38 42%WR -0.99 | 60-72 n=13 31%WR -0.22 | >=72 n=11 45%WR -0.05. All 3 open longs sit in the three losing bands. The compound 'block 45-64 while below EMA300' steer is measured-refuted \u2014 WITHDRAWN standing; this map is context only, not an enforceable rule.\n\n5) pump-chain+ 7d: 2T, 0W, -0.16 (BLUR #17011 armed then atr_sl_hit). btc-pump-rider+ 7d: 12T, 5W, -0.07 with 6 never-armed losers \u2014 wins only when the pump arms the trail (NXPC #17021's family). bb-squeeze+ 7d: 4T 3W +0.10 \u2014 best of the three open families.\n\nDead-signal check run BEFORE flagging: atr-trend- / pump-chain+ / btc-pump-rider+ all ENABLED with live 7d traffic -> flagged normally. PUMP_CHAIN_V6_ENABLED=False killed 2026-11-21 (#284) \u2014 disabled by design, 0 trades, NO action. HL_COPY_TRADER_ENABLED=False answered 2026-10-25 \u2014 sibling HL_COPY_SIGNAL_* live path, NO action. Measured-refuted steer list checked: mid-band LONG block NOT re-issued. AI_TRADER_ENABLED=False -> SOPH pick is watchlist-only."
 }

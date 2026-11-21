@@ -31071,3 +31071,33 @@ BY: auto_1hr
 - Unarmed cohort net -$0.19 vs armed +$0.48 — stall stack still owns the fix
 - 2 open: COMP bb-squeeze+ LONG, NXPC btc-pump-rider+ LONG (both 12:39-12:40)
 BY: auto_1hr
+
+## [2026-11-21 13:53] Hourly Analysis
+
+**Storm:** FIRED — window-min +1.13% / at-run +3.22% (PUMP gate: |at-run| >= 1.5)
+
+**Storm Packet:** 🌩️ [STORM-READINESS] window-min +1.13% / at-run +3.22% | blocked 139 (compaction_stale_10min 57, combo_key-stale 32, expired-hotset 30, pump-chain-rsi-max-long 6, vol-gate-override-0.0 4, spike-filter-long 4, long-rsi-ceiling 3, confluence single-type 2, rr-engine-hard-block 1) | true-starvation 46 RSI>=35 (139 raw expired, deduped first-fire-per-token 46; 41 walked, 5 skipped no 5m candles: FARTCOIN/PENGU/PAXG/CASHCAT/ENA) | counterfactual $+4.28 (touch 9/41) | waiver: SHADOW=True ENFORCE=False — counterfactual POSITIVE -> **streak 6th positive, BAR MET 3/3 stands** (19:54 +$0.03, 03:56 +$2.21, 04:53 +$1.03, 06:59 +$3.20, 08:52 +$1.56, now +$4.28; deadline 2026-11-26 per shadow_disposition.json file truth) — bar met does NOT auto-flip: default_action KEEP shadow + CEO NO-CONVERT 2026-11-08 stands; split: blocked LONGs $+6.57 (33) = gates suppressed PUMP LONG winners, blocked SHORTs $-2.30 (8) = gates correctly kept dump-side losers out — PUMP packet, waiver is SHORT-side scope, cf LONG-driven: flag for CEO at sign-off, no auto action
+
+**Trades:** 4 closed last hour (3 wins, 1 loss) | 24h 21 closed
+**PnL NET:** hour $+0.09 (COMP bb-squeeze+ +0.12, NXPC btc-pump-rider+ +0.02, YGG btc-pump-rider+ -0.02, BLUR pump-chain+ -0.03) | 24h NET $+0.38 (gross +0.85, fees 0.47, payoff 1.16, WR 66.7%) | 7d NET $-0.50 (gross +1.36, fees 1.86, WR 51.7%) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no constants change)
+
+**No Change Needed:**
+- Last hour: 4 closes, 3/4 gross winners — no 0%-WR n>=3 kill candidate (pump-chain+ 1T, btc-pump-rider+ 2T, bb-squeeze+ 1T)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/21 = 4.8% (<40%); tpsl_utils deployed. Top loss bucket: manual_sl_hit 3T net -0.36
+- Boost: none eligible — ai-trader-pending 8T 50% net -0.03 (fails WR+net); btc-pump-rider+ 4T 100% net +0.15 / 4 tokens (n<5); jup_yolo_mirrored 3T 66.7% net +0.16 / 3 tokens (n<5)
+- Arm rate: unarmed 9/21 = 42.9% below 70%, WR 22.2% net -$0.22 vs armed 12/12 100% net +$0.60 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly nets 06 -0.02, 07 +0.25, 09 +0.01, 12 +0.15, 13 +0.09 — not 3 consecutive negatives -> no size cut
+- Frequency: 4 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.249% < 0.5% (max 0.996)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET +0.38 (WR 66.7%, payoff 1.16) improving; fee drag persists on 7d: fees 1.86 vs gross 1.36 -> 7d NET -0.50
+- Storm bar MET 3/3 (6 consecutive positives) but CEO NO-CONVERT 2026-11-08 stands — needs CEO sign-off, deadline 2026-11-26
+- 3 open: BTC ai-trader-pending LONG x2 (13:28, 13:39), SAND btc-pump-rider+ LONG (13:18)
+- Sideways: hourly entries since 07:53 hit trading_log + recent_changes but NOT automation/ceo_kanban.md (last auto_1hr line there is 06:59) — kanban appends appear to have been skipped by 5 consecutive runs
+BY: auto_1hr

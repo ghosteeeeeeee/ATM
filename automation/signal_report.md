@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-21 07:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-21 13:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,907 | **WR:** 51.3% | **PnL:** -122.09%
+- **Total trades (all time):** 3,915 | **WR:** 51.4% | **PnL:** -117.04%
 - **Date range:** 2026-07-29 → 2026-11-21
 
 ---
@@ -21,9 +21,7 @@ None found.
 
 ## MARGINAL (30-50% WR)
 
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| jup_yolo_mirrored | SHORT | 2 | 50.0% | +1.02 | ❓ | Needs more data |
+None found.
 
 ---
 
@@ -41,7 +39,6 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] jup_yolo_mirrored SHORT** — WR=50.0%, PnL=+1.02% over 2 trades. Monitor next cycle.
 
 ---
 
