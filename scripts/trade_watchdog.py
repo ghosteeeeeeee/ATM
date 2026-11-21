@@ -1598,14 +1598,19 @@ def _monitor_pending_orders_impl(btc_price):
                 # continuation + crossed → fall through = the fill
             if crossed and (str(oid).startswith("btc-auto-")
                             or order.get("serial") is True):
-                # Same-coin stacking guard (CEO lesson 2026-11-10: two AUTO
-                # shorts fired 1min apart in one dump → 2× exposure, both
-                # stopped −3.80% on a single spike). Auto AND serial-ladder
-                # orders WAIT until flat (stay armed, no state burn) — the
-                # ladder fires rung-after-rung, never merged. CEO tranches
-                # (btc-ceo-* without serial) keep the merge path.
-                # brain's dup guard blocks ANY same-coin open (no direction
-                # filter) — we mirror that here.
+                # DIRECTION-AWARE STACKING (CEO 2026-11-21: 'if it fires
+                # and another btc trade is open, will it add to the
+                # position? it should, same for the long side'). The old
+                # stay-until-flat guard (2026-11-10 lesson: two AUTO
+                # shorts fired 1min apart → 2× exposure stopped −3.80%×2
+                # on one spike) is overridden for SAME-direction adds:
+                #   flat            → fire (as always)
+                #   same direction  → FIRE AS ADD (the CEO add path)
+                #   opposite dir    → still waits (netting would close a
+                #                      live trade = violates the stay-in
+                #                      doctrine; no accidental flips)
+                # Throttle: serial one-rung-per-cycle below keeps adds to
+                # one per cycle even on a straight slice.
                 try:
                     import psycopg2
                     from _secrets import BRAIN_PASSWORD, BRAIN_HOST
@@ -1615,18 +1620,26 @@ def _monitor_pending_orders_impl(btc_price):
                                           connect_timeout=5)
                     _cur = _c.cursor()
                     _cur.execute(
-                        "SELECT id FROM trades WHERE token=%s AND "
-                        "status='open' LIMIT 1", (coin,))
+                        "SELECT id, direction FROM trades WHERE token=%s "
+                        "AND status='open' LIMIT 1", (coin,))
                     _open = _cur.fetchone()
                     _cur.close()
                     _c.close()
                 except Exception:
                     _open = None
                 if _open:
-                    log(f"pending order {oid}: {coin} #{_open[0]} already "
-                        f"open — auto order stays armed (stacking guard)",
-                        "INFO")
-                    continue
+                    _open_dir = str(_open[1] or "").lower()
+                    if _open_dir == str(direction or "").lower():
+                        log(f"pending order {oid}: {coin} #{_open[0]} "
+                            f"{_open_dir} open — firing as ADD (CEO "
+                            f"2026-11-21: adds on winners, both sides)",
+                            "INFO")
+                        # fall through → steer (exec gets --force)
+                    else:
+                        log(f"pending order {oid}: {coin} #{_open[0]} "
+                            f"opposite {_open_dir} open — stays armed (no "
+                            f"netting: stay-in doctrine)", "INFO")
+                        continue
             if crossed:
                 if order.get("serial") is True:
                     # ONE serial rung per cycle (ladder integrity: with all
@@ -1746,16 +1759,22 @@ def _execute_pending_order_impl(order):
     try:
         # Cmd build INSIDE try — a KeyError on a bad payload must mark the
         # order error, not escape to the caller (bug_hunter LOW).
-        # --force (2026-10-24, scope-narrowed 2026-11-10): ONLY btc-ceo-*
-        # orders get it — CEO-authored tranches are intentional same-coin
-        # adds (skill: "for a CEO-directed add pass --force"). AUTO orders
-        # must NOT: two auto shorts fired 1min apart in one dump → 2×
-        # exposure stopped −3.80%×2 on one spike (stacking lesson). The
-        # monitor's stacking guard (stay-until-flat) is the first layer;
-        # this is the belt — an auto order reaching brain with a position
-        # open hits the dup-guard and fails SAFE (no stack). One-shot
-        # state + orphan steer-only recovery prevent double-fires; the
-        # vacation/kill-switch gate is unaffected (--manual still NOT passed).
+        # --force scope (2026-11-10 narrow → 2026-11-21 re-widened for
+        # ladder ADDS): btc-ceo-* (CEO tranches) AND btc-auto-ladder-*
+        # (the CEO add directive: 'if it fires and another btc trade is
+        # open, it should add — same for the long side') get it, so
+        # brain's dup-guard permits the same-direction second tranche.
+        # The 2026-11-10 lesson (two auto shorts 1min apart → −3.80%×2)
+        # is handled by the monitor's DIRECTION-AWARE gate above (flat /
+        # same-direction add / opposite waits) + serial one-rung-per-
+        # cycle — not by refusing the add. One-shot state + orphan
+        # steer-only recovery still prevent double-fires; vacation/
+        # kill-switch unaffected (--manual still NOT passed).
+        # ponytail: direction re-check not repeated here — the steer is
+        # emitted and executed within one pipeline step (seconds); a
+        # position flip inside that window would net instead of add
+        # (bounded: one rung size). Upgrade path: exec-side direction
+        # assert if flips ever show in the log.
         cmd = [
             sys.executable, os.path.join(SCRIPTS_DIR, "brain.py"),
             "trade", "add",
@@ -1769,7 +1788,8 @@ def _execute_pending_order_impl(order):
             "--sl", f'{float(order["sl"]):.8g}',
             "--target", f'{float(order["target"]):.8g}',
         ]
-        if str(order.get("id", "")).startswith("btc-ceo-"):
+        if str(order.get("id", "")).startswith(("btc-ceo-",
+                                                "btc-auto-ladder-")):
             cmd.append("--force")
         # ALL pending orders are pre-armed structure levels (CEO 2026-11-20:
         # 'we need to catch these shorts' — the knife/floor RSI gates veto
