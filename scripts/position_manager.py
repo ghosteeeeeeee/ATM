@@ -50,7 +50,7 @@ from paths import *
 from _secrets import BRAIN_DB_DICT
 from tpsl_utils import compute_atr_sl_tp
 from signal_schema import record_signal_outcome
-from pnl_utils import compute_live_pnl, compute_hl_pnl_pct, compute_pnl_usdt, compute_close_pnl, Direction
+from pnl_utils import compute_live_pnl, compute_hl_pnl_pct, compute_pnl_usdt, compute_close_pnl, fee_notional, Direction
 
 
 def _match_exit_config(part):
@@ -1345,9 +1345,11 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
         # and defaulted to 10 — inflating pnl_pct by 2x for 5x trades.
         leverage = float(row['leverage']) if row['leverage'] is not None else 10
         entry_fee_paid = float(row.get('entry_fee') or 0)
-        # calc_notional already includes leverage (amount_usdt * leverage when
-        # hl_notional_usdt is NULL, or hl_notional_usdt which is the actual notional).
-        notional = calc_notional
+        # BUG-099 residue fix (2026-11-22): the fee base is NOTIONAL, never the
+        # PnL calc_notional — calc_notional's amount_usdt*leverage fallback (hl
+        # NULL) inflated fee_total by EXACTLY the leverage (3/5/10x) on 76 closes
+        # post-8/22. fee_notional() = hl_notional_usdt else amount_usdt, no lev.
+        notional = fee_notional(row['hl_notional_usdt'], amount_usdt)
 
         # If entry_fee was never recorded, calculate it now
         if entry_fee_paid == 0 and notional > 0:

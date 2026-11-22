@@ -28,7 +28,7 @@ if _SCRIPT_DIR not in sys.path:
 
 from hermes_constants import RUNTIME_DB, FLIP_COUNTS_FILE, LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX, CASCADE_FLIP_ENABLED, DEFAULT_TRADE_SIZE_USDT
 from hermes_file_lock import FileLock
-from pnl_utils import compute_close_pnl, compute_pnl_usdt
+from pnl_utils import compute_close_pnl, compute_pnl_usdt, fee_notional
 
 
 # ── Constants ──────────────────────────────────────────────────────────────────
@@ -151,12 +151,17 @@ def _close_paper_position(trade_id: int, reason: str, exit_detail: str = None) -
         leverage = float(row['leverage'] or 10)
         signal_type = row['signal']
         confidence = row['confidence']
-        notional = amount_usdt * leverage
+        notional = amount_usdt * leverage   # PnL basis — untouched (pnl math)
         TAKER_FEE = 0.00045
-        entry_fee = notional * TAKER_FEE
-        exit_fee = notional * TAKER_FEE
+        # BUG-099 residue (2026-11-22): fee base is NOTIONAL — amount_usdt (this
+        # legacy SELECT has no hl_notional_usdt), NEVER amount*leverage, which
+        # inflated fee_total by exactly the leverage on every close.
+        fee_base = fee_notional(None, amount_usdt)
+        entry_fee = fee_base * TAKER_FEE
+        exit_fee = fee_base * TAKER_FEE
         fee_total = entry_fee + exit_fee
-        pnl_pct, pnl_usdt_val, net_pnl = compute_close_pnl(entry_price, current_price, direction, notional, leverage)
+        pnl_pct, pnl_usdt_val, _ = compute_close_pnl(entry_price, current_price, direction, notional, leverage)
+        net_pnl = pnl_usdt_val - fee_total   # fees-JSON invariant: net + fee == pnl_usdt
         _close_reason_full = f"{reason} {exit_detail}" if exit_detail else reason
         cur.execute("""
             UPDATE trades

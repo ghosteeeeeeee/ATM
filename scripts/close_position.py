@@ -10,7 +10,7 @@ from datetime import datetime
 sys.path.insert(0, '/root/.hermes/scripts')
 from hyperliquid_exchange import close_position, get_open_hype_positions_curl, get_trade_history
 from hermes_constants import DEFAULT_TRADE_SIZE_USDT
-from pnl_utils import fee_blob
+from pnl_utils import fee_blob, fee_notional
 
 from hermes_log import log
 from paths import TRADES_JSON as PAPER_JSON
@@ -97,7 +97,9 @@ def close_brain(coin, exit_price):
                 trade_duration = EXTRACT(EPOCH FROM (NOW() - open_time))
             WHERE id=%s
         """, (exit_price or 0.0, pnl_usdt_calc, pnl_pct,
-              fee_blob(calc_notional, pnl_usdt_calc), trade_id))
+              # BUG-099 residue (2026-11-22): fee base is NOTIONAL (hl_notional
+              # else amount_usdt), never calc_notional = amount*leverage.
+              fee_blob(fee_notional(hl_notional, amount_usdt_raw), pnl_usdt_calc), trade_id))
         conn.commit()
         log(f"Brain: closed trade {trade_id} ({coin} {direction}) entry={entry_price} exit={exit_price}", "PASS")
     finally:

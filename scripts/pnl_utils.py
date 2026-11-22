@@ -113,12 +113,40 @@ def compute_close_pnl(
     return (round(pnl_pct, 4), pnl_usdt, net_pnl)
 
 
-def fee_blob(calc_notional, gross_pnl=None):
+def fee_notional(hl_notional, amount_usdt):
+    """Fee BASE for every fees-JSON write — the single BUG-099 rule.
+
+    Fees are charged on NOTIONAL: `hl_notional_usdt` when recorded, else
+    `amount_usdt`. NEVER amount x leverage. amount_usdt IS the position size
+    sent to HL (hl_notional = total_sz x fill_px ~= amount_usdt, and HL realized
+    pnl matches amount x move, not amount x lev x move), so feeding the
+    calc_notional fallback (amount x lev) into a fee inflated fee_total by
+    exactly the leverage — 3x/5x/10x on all 76 closes with hl_notional_usdt
+    NULL after 2026-08-22 (BUG-099 residue, found 2026-11-22).
+
+    calc_notional stays the PnL basis; do NOT pass it in here. Returns 0.0 when
+    nothing is known (fee_blob turns that into NULL — unknown, never a fee).
+    """
+    try:
+        if hl_notional is not None:
+            return float(hl_notional)
+        if amount_usdt is not None:
+            return float(amount_usdt)
+    except (TypeError, ValueError):
+        pass
+    return 0.0
+
+
+def fee_blob(notional, gross_pnl=None):
     """Fees JSON for the trades.fees TEXT column — the shared writer for close
     paths that had none (guardian paper/orphan/breach close, brain manual_close).
     position_manager, cascade_flip and brain.py build the same blob inline;
-    the rate here is byte-identical to compute_close_pnl (0.045% x 2 sides),
-    so stored fee_total and the pnl_utils net always agree.
+    the rate here is byte-identical to compute_close_pnl (0.045% x 2 sides) and
+    the base is fee_notional(), so stored fee_total is unleveraged on every path.
+
+    `notional` here must be the FEE base from fee_notional(hl_notional,
+    amount_usdt) — NOT the PnL calc_notional (its amount x leverage fallback is
+    the BUG-099 residue that inflated fee_total by the leverage).
 
     WHY THIS EXISTS (#196, re-measured #289): a NULL fees row makes every
     net-of-fee KPI understate cost, because those KPIs are
@@ -131,10 +159,10 @@ def fee_blob(calc_notional, gross_pnl=None):
     "unknown", never a false zero-fee claim.
     """
     try:
-        notional = abs(float(calc_notional or 0))
-        if notional <= 0:
+        base = abs(float(notional or 0))
+        if base <= 0:
             return None
-        side = round(notional * 0.00045, 6)
+        side = round(base * 0.00045, 6)
         total = round(side * 2, 6)
         blob = {'entry_fee': side, 'exit_fee': side, 'fee_total': total}
         if gross_pnl is not None:
@@ -213,9 +241,27 @@ def zero_suspicious_pnl(entry_price: float, exit_price: float) -> tuple[float, f
 
 def _fee_blob_selfcheck():
     """fee_blob must match the compute_close_pnl rate or stored fees and
-    stored net_pnl disagree — the exact class of bug this helper prevents."""
+    stored net_pnl disagree — the exact class of bug this helper prevents.
+    fee_notional must NEVER scale with leverage (BUG-099 residue, 2026-11-22):
+    3x/5x/10x trades all fee on the same notional."""
+    # fee_notional: leverage never enters the fee base — a 3x/5x/10x trade with
+    # the same amount and no recorded hl_notional must produce the SAME base,
+    # so fee_total/amount/0.0009 == 1 (the bug wrote exactly 3/5/10).
+    for lev in (3, 5, 10):
+        base = fee_notional(None, 11.10)          # hl_notional_usdt IS NULL
+        ratio = base * 0.0009 / 11.10 / 0.0009
+        if abs(ratio - 1.0) > 1e-9:
+            raise SystemExit(f'SELFCHECK FAIL: {lev}x fee ratio {ratio} != 1.0 (leverage leaked in)')
+        if base != 11.10:
+            raise SystemExit(f'SELFCHECK FAIL: {lev}x fee base {base} != amount_usdt 11.10')
+    if fee_notional(22.30, 11.10) != 22.30:
+        raise SystemExit('SELFCHECK FAIL: recorded hl_notional must win over amount_usdt')
+    if fee_notional(None, None) != 0.0:
+        raise SystemExit('SELFCHECK FAIL: unknown notional must be 0.0 (-> NULL fee), not a guess')
+    # fee_blob on a leverage-free base == notional * 0.0009 (3x/5x/10x identical)
     for notional in (11.10, 22.30, 16.60):
-        blob = fee_blob(notional, gross_pnl=1.0)
+        base = fee_notional(None, notional)
+        blob = fee_blob(base, gross_pnl=1.0)
         if blob is None:
             raise SystemExit(f'SELFCHECK FAIL: fee_blob({notional}) is None')
         d = json.loads(blob)
@@ -235,7 +281,7 @@ def _fee_blob_selfcheck():
             continue
         if got is not None:
             raise SystemExit(f'SELFCHECK FAIL: fee_blob({bad!r}) must be None, got {got}')
-    print('SELFCHECK PASS: fee_blob matches compute_close_pnl rate (0.045% x 2)')
+    print('SELFCHECK PASS: fee_blob/fee_notional = notional x 0.0009 RT (no leverage)')
     return 0
 
 

@@ -23,7 +23,7 @@ import sys, time, json, subprocess, argparse, os, re, fcntl, math
 sys.path.insert(0, '/root/.hermes/scripts')
 from _secrets import BRAIN_DB_DICT
 from hermes_file_lock import FileLock
-from pnl_utils import compute_close_pnl, compute_live_pnl, fee_blob
+from pnl_utils import compute_close_pnl, compute_live_pnl, fee_blob, fee_notional
 
 # Non-HL tokens that appear in HL data but are not tradeable (phantom positions)
 HL_TOKEN_BLOCKLIST=frozenset({'HILL', 'FIRE', 'FORTH', 'ALPINE', 'DOGET', 'XRP',
@@ -3353,7 +3353,7 @@ def _close_paper_trade_db(trade_id, token, exit_price, reason):
                 trade_duration = EXTRACT(EPOCH FROM (NOW() - open_time))
             WHERE id = %s AND status = 'open'
         """, (exit_price, final_pnl_pct, final_pnl_usdt,
-              fee_blob(calc_notional, final_pnl_usdt),
+              fee_blob(fee_notional(hl_notional_usdt, amount_usdt), final_pnl_usdt),
               reason, reason, reason,
               hype_pnl_usdt, final_pnl_pct if hype_pnl_usdt is not None else None,
               mfe_pct, mae_pct, mfe_price, mae_price,
@@ -3555,7 +3555,9 @@ def _close_orphan_paper_trade_by_id(trade_id, token, direction, entry_px, lev, r
                 trade_duration = EXTRACT(EPOCH FROM (NOW() - open_time))
             WHERE id=%s AND status='open'
         """, (hl_exit_px, computed_pnl_pct, computed_pnl_usdt,
-              fee_blob(calc_notional_orphan, computed_pnl_usdt),
+              # BUG-099 residue (2026-11-22): fee base = HL notional override
+              # else amount_usdt — never amount*leverage (calc_notional_orphan).
+              fee_blob(fee_notional(amount_usdt_override, amount_usdt), computed_pnl_usdt),
               reason, reason, reason,
               realized_pnl if realized_pnl else None,
               computed_pnl_pct if realized_pnl else None,
@@ -4101,7 +4103,7 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                             hl_exit_px,
                             computed_pnl_pct,
                             computed_pnl_usdt,
-                            fee_blob(calc_notional_sc, computed_pnl_usdt),
+                            fee_blob(fee_notional(hl_notional_sc, amount_usdt_sc), computed_pnl_usdt),
                             realized_pnl_value,
                             trade_record['id']
                         ))
@@ -4278,7 +4280,7 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                         hl_exit_px,
                         computed_pnl_pct,
                         computed_pnl_usdt,
-                        fee_blob(calc_notional_db, computed_pnl_usdt),
+                        fee_blob(fee_notional(hl_notional_db, amount_usdt), computed_pnl_usdt),
                         computed_pnl_usdt if realized_pnl is not None else 0,
                         computed_pnl_pct if realized_pnl is not None else None,
                         trade_id

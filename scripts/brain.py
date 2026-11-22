@@ -22,7 +22,7 @@ from datetime import datetime
 # ── Loss cooldown helpers ─────────────────────────────────────────────────────
 from hermes_file_lock import FileLock
 from hermes_constants import LOSS_COOLDOWN_FILE, LOSS_COOLDOWN_BASE, LOSS_COOLDOWN_MAX, DEFAULT_TRADE_SIZE_USDT, HL_MIN_NOTIONAL_USDT, TRAILING_ACTIVATION_PCT, TRAILING_DISTANCE_PCT
-from pnl_utils import compute_close_pnl
+from pnl_utils import compute_close_pnl, fee_notional
 
 def _load_cooldowns() -> dict:
     try:
@@ -1280,14 +1280,18 @@ def _close_trade_impl(trade_id, exit_price, pnl_usdt, notes, close_reason, skip_
     # profit_monster, cut_loser, sniper_exit, hl_fill (guardian does NOT route
     # through this function — it closes via hl_sync_guardian's own UPDATE).
     # Fee model is byte-identical to pnl_utils.compute_close_pnl (0.045% x 2
-    # sides on calc_notional). net = stored pnl - fee verified correct for the
+    # sides) on the NOTIONAL base fee_notional(hl_notional_usdt, amount_usdt) —
+    # BUG-099 residue fix (2026-11-22): was calc_notional, whose amount*leverage
+    # fallback (hl NULL) inflated fee_total by exactly the leverage (3/5/10x,
+    # 76 rows post-8/22 incl. profit-monster-trail). net = stored pnl - fee
+    # verified correct for the
     # HL-ground-truth branch too: 30d empirical, hype_pnl_usdt matches price
     # gross on 190 decisive rows vs gross-fee on 12 (#211 audit) — HL fills
     # closedPnl behaves gross here, so subtracting is not a double-charge.
     # Non-fatal: on any error fees stays NULL, close proceeds.
     _fees_json = None
     try:
-        _fee_side = round(abs(float(calc_notional or 0)) * 0.00045, 6)
+        _fee_side = round(abs(fee_notional(hl_notional_usdt, amount_usdt)) * 0.00045, 6)
         _fee_total = round(_fee_side * 2, 6)
         _fees_json = json.dumps({
             'entry_fee': _fee_side,
