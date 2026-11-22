@@ -104,9 +104,30 @@ function render(d) {
   html += kpi('sharpe', cur.sharpe_30d !== null ? cur.sharpe_30d : 'N/A', 'Sharpe 30d', (cur.sharpe_30d || 0) >= 1.0 ? 'green' : 'red');
   html += '</div>';
 
-  // ── Extended Metrics ──
+  // ── Formal KPIs (CEO verdict 20261122T221140Z, registry kpi-framework-formal) ──
+  const ns1 = cur.ns1_net_per_trade_7d;
+  const ns2 = cur.ns2_net_30d;
+  const r1p = cur.r1_dd30d_pct_of_equity;
+  const hp = cur.health_pass;
+  const ht = cur.health_total || 10;
   html += '<div class="grid grid-4">';
-  html += kpi('wr_30d', ((cur.win_rate_30d || 0) * 100).toFixed(1) + '%', 'WR 30d (target ' + ((tgt.win_rate || 0) * 100) + '%)', (cur.win_rate_30d || 0) >= (tgt.win_rate || 0) ? 'green' : 'orange');
+  html += kpi('ns1', ns1 !== null && ns1 !== undefined ? ns1.toFixed(4) : 'N/A',
+    'NS1 net $/trade 7d (target &gt;0)',
+    ns1 === null || ns1 === undefined ? 'accent' : ns1 > (tgt.ns1_net_per_trade_7d || 0) ? 'green' : 'red');
+  html += kpi('ns2', ns2 !== null && ns2 !== undefined ? '$' + (ns2 >= 0 ? '+' : '') + ns2.toFixed(2) : 'N/A',
+    'NS2 30d net (target &ge; &minus;$2.00)',
+    ns2 === null || ns2 === undefined ? 'accent' : ns2 >= (tgt.ns2_net_30d || -2) ? 'green' : 'red');
+  html += kpi('r1', r1p !== null && r1p !== undefined ? r1p.toFixed(1) + '%' : 'N/A',
+    'R1 30d DD % of equity (target &ge; &minus;50%)',
+    r1p === null || r1p === undefined ? 'accent' : r1p >= (tgt.r1_dd30d_pct_of_equity || -50) ? 'green' : 'red');
+  html += kpi('health', hp !== null && hp !== undefined ? hp + '/' + ht : 'N/A',
+    'Health gates (frozen 10)',
+    hp === null || hp === undefined ? 'accent' : hp >= ht - 1 ? 'green' : hp > ht / 2 ? 'orange' : 'red');
+  html += '</div>';
+
+  // ── Diagnostics — no targets anywhere (WR retired as a goal 2026-11-22) ──
+  html += '<div class="grid grid-4">';
+  html += kpi('wr_30d', ((cur.win_rate_30d || 0) * 100).toFixed(1) + '%', 'WR 30d (diagnostic, no target)', 'accent');
   html += kpi('pnl_30d', '$' + (cur.pnl_30d >= 0 ? '+' : '') + (cur.pnl_30d || 0).toFixed(2), 'PnL 30d', (cur.pnl_30d || 0) >= 0 ? 'green' : 'red');
   html += kpi('trades_30d', cur.total_trades_30d || 0, 'Trades 30d', 'accent');
   html += kpi('consec', cur.consecutive_losses || 0, 'Consec Losses', (cur.consecutive_losses || 0) <= 3 ? 'green' : 'orange');
