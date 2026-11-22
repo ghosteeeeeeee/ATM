@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-11-22T16:39:41.063056+00:00",
+  "timestamp": "2026-11-22T21:39:43.174816+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "health",
-      "title": "Losing streak: 13/20 recent trades lost",
-      "detail": "Win rate 30% over last 20 trades. Total PnL: -0.12 USDT. Something is wrong.",
+      "title": "Losing streak: 12/20 recent trades lost",
+      "detail": "Win rate 35% over last 20 trades. Total PnL: -0.09 USDT. 11/12 losses never armed (MFE<0.40%) = chop cohort, not wrong-side; arm-rate/stall stack owns the fix. Exits: prearm_lock x5, hard_max_loss x2, atr_sl_hit x2.",
       "auto_executable": false,
       "id": "steer-001"
     },
@@ -16,14 +16,6 @@
       "detail": "Net -0.17 USDT over last 20 trades (window losses: -0.21). Consider disabling or tuning this signal.",
       "auto_executable": false,
       "id": "steer-002"
-    },
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "Signal 'pump-chain+' losing streak: 3 consecutive losses",
-      "detail": "Net -0.03 USDT over last 20 trades (window losses: -0.03). 3/3 streak exits are prearm_lock breakeven caps (guard live 2026-11-20) \u2014 cap working, NOT a disable/tune candidate.",
-      "auto_executable": false,
-      "id": "steer-003"
     }
   ],
   "portfolio_health": "critical",
@@ -31,15 +23,19 @@
     "btc_15m": "LONG_BIAS",
     "btc_4h": "LONG_BIAS",
     "continuum": "ABOVE",
-    "volatility": "NORMAL",
-    "zscore_tier": "STRONG_POS",
+    "volatility": "LOW",
+    "zscore_tier": "POS",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
-    "volume_regime": "NORMAL",
-    "linreg_alignment": 0.75,
-    "wyckoff_phase": "MARKUP",
-    "market_phase": "DECLINING",
+    "acceleration_state": "POSITIVE",
+    "volume_regime": "LOW",
+    "linreg_alignment": 0.5,
+    "wyckoff_phase": "DISTRIBUTION",
+    "market_phase": "CALM",
     "trend_quality": "STRONG_UP"
   },
-  "open_count": 1
+  "open_count": 0,
+  "deep_analysis": "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 1 (0 long, 1 short)\nUnrealized PnL: -0.11 USDT\nRegime: CHOP-leaning (sources disagree) | Volatility: LOW\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83d\udd34 **[regime] BTC SHORT #17052 is on the wrong side** \u2014 entered at meta_rsi 17.3 (deep oversold short = BANANA anti-pattern repeat). BTC 1m AT/ABOVE EMA300 for 41+ min (price ~60907 vs 60831), linreg LEAN_BULL, trend STRONG_UP. Action: **do NOT add to this short while 1m closes hold above EMA300 (~60831); let the R1-tightened SL 61018.46 exit if price lifts through it** (currently ~0.1% below). Condition re-tested next cycle; retract if 1m closes back below EMA300 15-30m. age=initial.\n\n\ud83d\udfe1 **[health] Chop-bleed 7d 89.0%** (dollar share, 41/50 losers never armed, 0 NULL mfe_pct; 14d 86.6%, 30d 91.7%; 24h arm rate 53.3%) \u2014 0.8pt from the 92% entry-quality tripwire. All 7 losses in 24h never armed (max MFE 0.39). Owner: entry gates, not exits.\n\n\ud83d\udfe1 **[health] atr-trend- live bleed** \u2014 7d 22T 12W -$0.29, flags True, traffic present \u2192 legitimate brain-auditor candidate (NOT a dead-signal stale window). pump-chain+ 7T 0W -$0.23 is prearm_lock-capped (guard working) \u2192 NO disable action.\n\n\ud83d\udfe2 **[opportunity] MNT SHORT pick written** \u2014 `PICK (watchlist only \u2014 AI_TRADER_ENABLED=False, will NOT execute)`. Precheck PASS all gates: RSI 59.3, conf 86 SHORT gate, ATR 1.11%, fresh. Prior pick PUMP LONG (12:15) not rejected.\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nThe lone open short entered against every regime source except regime_5m (SHORT_BIAS conf 58.9); watchdog says LONG_BIAS and continuum is above EMA300 \u2014 but flip-rate is **27/24h (at p95 instability)**, so this is a ~1-hour-state tape, not a trend to lean on. The real, stable signal is portfolio-level: **89% of 7d loss dollars come from trades that never armed** \u2014 we're entering in stall/chop, then the trail family (jup_yolo_mirrored 19T 17W +$1.06) shows what the winning side looks like: momentum that already exists, handed to the trail. The current short's winning side is the LONG from 60624 \u2014 the same move bleeding us.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Hold the R1 SL at 61018.46 on BTC SHORT #17052; no adds while 1m holds above EMA300; exit manually if 1m closes back below EMA300 ~60831 and holds 15-30m (premise restored only then).\n2. Route atr-trend- (22T/7d -$0.29, live) to brain-auditor for kill/tune review; leave pump-chain+ alone (prearm_lock cap working).\n3. Push entry-quality gates \u2014 chop-bleed 89.0% is 0.8pt from the 92% tripwire; next breach = entry-gate ownership, not exit work.\n4. Watchlist MNT SHORT (watchlist only, will not execute while AI_TRADER_ENABLED=False).\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n",
+  "agent_timestamp": "2026-11-22T21:16:02.839988+00:00",
+  "regime_context": "Sources disagree \u2014 quote both. watchdog btc_15m LONG_BIAS + btc_4h LONG_BIAS + continuum AT/ABOVE EMA300 (41+ min, last cross ~20:32) + trend_quality STRONG_UP + zscore STRONG_POS vs regime_5m BTC SHORT_BIAS conf 58.9. 15m aggregate: LONG_BIAS 27 / SHORT_BIAS 19 / NEUTRAL 76. Flip-rate 27/24h aggregate and 27/24h BTC = AT the p95 'unusually unstable' line (>=26); average direction state survives ~1h. Auto-trader reads CHOP (score long -5 / short -35, MANAGE_ONLY). Volatility LOW, volume LOW, acceleration NEGATIVE \u2014 drifting up on thin tape, not a clean trend either. Implication: direction-flavored steers must be condition-keyed and re-tested each cycle; our lone short is aligned with the regime_5m dissent but against every other source.",
+  "pattern_alerts": "VERIFIED (PostgreSQL, run this cycle):\n1. Chop-bleed dollar share 7d 89.0% (41/50 loser trades never armed MFE<0.40, 0 NULL mfe_pct), 14d 86.6%, 30d 91.7% \u2014 near the 92% entry-quality tripwire; 24h arm rate 53.3% (15 closes). WINNING side: trades that reach +0.40% and hand off to the trail family (86.5% WR historically). We weren't on it because we enter during chop before momentum exists. Owner: entry-quality gates (brain-auditor), NOT exit tweaks.\n2. 24h losses n=7, ALL never-armed (max MFE 0.39): RESOLV/KAS/ANIME/ZRO/BTC-continuum/ZORA/BTC-continuum-osc. Same failure: entries in stall conditions. KAS SHORT lost at meta_rsi 68.2 exiting cut-loser \u2014 fine RSI, coin just didn't follow.\n3. atr-trend- live bleed: 7d 22T 12W -$0.29 (flags True, traffic present \u2014 NOT a dead signal). pump-chain+ 7d 7T 0W -$0.23 (prearm_lock caps; guard working). Both brain-auditor candidates; atr-trend- first.\n4. Winning pattern: jup_yolo_mirrored 19T 17W +$1.06 in 7d \u2014 trail-armed momentum longs/shorts. Every losing trade's winning side = the move we faded or entered before it started.\n5. Open-trade pattern: SHORT entered at meta_rsi 17.3 (oversold short, BANANA lesson repeat). Entry condition was wrong, not the exit."
 }

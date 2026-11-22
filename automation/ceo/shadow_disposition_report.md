@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-22T16:45:59.210652+00:00
-registry: 139 entries (open=34)
+# Shadow disposition report — 2026-11-22T21:06:39.511707+00:00
+registry: 142 entries (open=35)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -124,7 +124,7 @@ registry: 139 entries (open=34)
 - OPEN hl-copy-plus-shadow: deadline=2026-11-30T00:00:00Z | (no parseable source)
 - OPEN hotset-pin-approved-shadow: deadline=2026-11-25T00:00:00Z | (no parseable source)
 - OPEN amplify-pumpchain-normal-short-early: deadline=2026-12-02T00:00:00Z | (no parseable source)
-- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 3476 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 3.1d
+- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 3696 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 3.3d
 - DONE amplify-rider-fade-threshold-walk: ? (?)
 - OPEN amplify-jup-long-blocked-clonehunt: deadline=2026-11-23T00:00:00Z | (no parseable source)
 - OPEN stop-family-entry-filter-shadow: deadline=2026-11-27T00:00:00Z | (no parseable source)
@@ -140,3 +140,6 @@ registry: 139 entries (open=34)
 - OPEN prearm-enforce-day7-read: deadline=2026-11-28T00:00:00Z | (no parseable source)
 - DONE tp-vs-trail-shadow: NO SHIP (early close 2026-11-22 — bar evaluated on full 14d population, n=142 deduped >=30; mechanism structural, more data will not change it) (2026-11-22)
 - OPEN prearm-band-lower-candle-oos: deadline=2026-12-01T00:00:00Z | (no parseable source)
+- DONE goal-metric-restructure: EXECUTED 2026-11-22 — T APPROVED both items (goal rewrite + philosophy): verifier goal_metrics_check.py restructured to the expectancy set (net $/trade 7d >0, fleet payoff 7d >=1.2, cost % RT <=0.15%; WR = info-only diagnostic, no target); AGENTS.md philosophy line reframed verbatim per CEO 20261122T194418Z (2026-11-22)
+- DONE post822-payoff-regrouping: MASKED EDGE DOES NOT SURVIVE CLEAN DATA (agent-7 run 2026-11-22, fixed anchors + fingerprints): payoff>1.2 group post-8/22 = gross +$3.97 t=+1.00 (ns) fee-net -$0.70 t=-0.18 (vs all-time +2.40); <1.0 loser group t=-4.10 (STRONGER than all-time -1.76) — cut case strengthened, keep case evaporated (2026-11-22)
+- OPEN winner-side-protection-review: deadline=2026-12-06T00:00:00Z | (no parseable source)

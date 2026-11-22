@@ -1831,3 +1831,9 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 20T -0.12 30.0% | 7d 122T +0.06 48.4%
 ### Findings: 24h WR soft (30%) but net flat — not actionable at n=20; disk 88% WARN recurring in error_alerts (threshold 85%); regime-specialist read (rotating Q): 14d NORMAL 74T 50.0% +1.10 | EXTREME 73T 47.9% +0.10 | HIGH 84T 46.4% -1.61 | FLAT n=2 — edge concentrated NORMAL/EXTREME, HIGH is the bleed cell (owned by existing vol-gate work, no new action).
 ### Recommendation: none — disk at 88% is the only drift; note for weekly deep run to check cleanup before 90%.
+
+## CEO Status — 20261122T193828Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 14T +0.14 42.9% | 7d 115T +0.41 50.4%
+### Findings: disk 88% used (warn threshold 85%) repeating hourly in error_alerts; pipeline+guardian both active, no tracebacks
+### Recommendation: prune logs/data before disk hits 95% — weekly deep run to own cleanup
