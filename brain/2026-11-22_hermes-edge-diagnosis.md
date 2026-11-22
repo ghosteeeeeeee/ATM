@@ -404,6 +404,17 @@ in `scripts/*.py` during this session. **Verify the definition before treating s
 hard cost.** If it is measured against a stale reference rather than a live book, the 1.14%
 friction figure is overstated.
 
+> **⚠️ CORRECTION (2026-11-22, idea-4 re-doc — `scripts/accounting_reconciliation.py` §4):**
+> the computation **was** located: it is a PostgreSQL `GENERATED ALWAYS ... STORED` column on
+> `trades` — `abs(exit_price - stop_loss)/stop_loss * 100` — so no script writes it. It is
+> **distance-from-stop-at-exit (% of stop), not fill slippage.** Stop-family losers exit AT the
+> stop (→ ~0), trailed winners exit far from it (→ large), which by itself produces the 2.7x
+> "anomaly" above. **The 0.69% mean is not friction and the 1.14% round-trip total is
+> overstated**; the doc's own warning was correct. Also measured: `hl_exit_price` is populated
+> on **1 of 6,641** closed rows (real fill-vs-mark exit slippage is not measurable today),
+> while `hl_entry_price` is populated on 6,171 (92.9%) — entry-side fill-vs-recorded gap is.
+> Already documented at `automation/ceo/shadow_disposition_report.md:98` (2026-11-16).
+
 ---
 
 # REVISED CONCLUSION

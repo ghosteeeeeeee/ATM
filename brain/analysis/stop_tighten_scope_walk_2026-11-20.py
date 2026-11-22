@@ -21,6 +21,15 @@ Slippage model: AVG(exit_slippage_pct) of stop-family exits in window (realized,
 PG column, forward rule from stop-tighten-slippage-column: use realized exit,
 never the bare stop level). Net is reported both WITH and WITHOUT slippage.
 
+DEFINITION (idea-4 re-doc, 2026-11-22): `exit_slippage_pct` is a PG GENERATED
+column — `abs(exit_price - stop_loss)/stop_loss*100` (trades DDL, computed by
+PostgreSQL, no script writes it). It is DISTANCE-FROM-STOP-AT-EXIT as a % of the
+stop, NOT fill slippage. For a stop-family exit the exit IS the stop, so it reads
+~0 by construction; large values are trailed winners — that alone produces the
+2026-11-22 edge-diagnosis doc's "winners slip 2.7x more than losers" artifact.
+Never sum it into a friction/cost budget. Full reconciliation + `hl_entry_price` /
+`hl_exit_price` coverage: `scripts/accounting_reconciliation.py` §4.
+
 Walk detail vs ceiling math (why this script exists): ceiling used final move%
 (ABS(entry-exit)/entry). The walk uses the PATH — a loser that touched 0.76%
 but exited at only -0.30% (tighter ATR SL fired first) is HURT by the clamp
