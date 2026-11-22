@@ -32046,3 +32046,35 @@ BY: auto_1hr
 - unarmed WR 0% cohort 43.8% of closes — stall stack owns fix
 - storm packet bar 3/3 awaits CEO sign-off by 2026-11-26
 BY: auto_1hr
+
+## [2026-11-22 22:55] Hourly Analysis
+
+**Storm:** no storm (window-min -0.41% / at-run +0.12%)
+
+**Trades:** 0 closed last hour | 24h 15 closed (6W 9L)
+**PnL NET:** hour $0.00 | 24h NET $-0.26 (gross -0.01, fees 0.25, payoff 1.31, WR 40.0%) | 7d NET $-1.18 (113T) | 14d NET $-3.94 (227T) | **size-reduce: file absent -> 1.0x**
+
+**Last hour:**
+- none (0 closes)
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Kill policy: no signal at 0% with 3+ closes last hour (0 closes)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/15 = 13.3% (<40%); tpsl_utils deployed
+- Boost: none eligible — max n=5 (ai-trader-pending 60% net +0.11 all-BTC CEO trades, not a compactor signal; atr-trend- 4T 25% net -0.21 loser)
+- Arm rate: unarmed 7/15 = 46.7% below 70%, WR 0% net -$0.66 vs armed 8/8 75.0% net +$0.40 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly net last 12h only 12:00 +0.15, 13:00 -0.01, 17:00 +0.03, 21:00 -0.12 — not 3 consecutive; no size cut
+- Frequency: 0 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.067% < 0.5% (max 0.120)
+- 1 open: SPX warrior-sr-confirm+ LONG (22:17 SL 0.2775 TP 0.2873)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.26 (fees 0.25 vs gross -0.01); 7d -1.18, 14d -3.94 fee-drag persistent
+- pump-chain+ 14d n=11 of 20 kill threshold, net -0.55 — revisit if n reaches 20
+- unarmed WR 0% cohort 46.7% of closes — stall stack owns fix
+- storm packet bar 3/3 awaits CEO sign-off by 2026-11-26
+BY: auto_1hr
