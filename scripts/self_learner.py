@@ -689,8 +689,36 @@ def _check_daily_limit():
     return log_data.get('daily_count', 0) >= MAX_ADJUSTMENTS_PER_DAY
 
 
+def _formal_kpi_snapshot():
+    """Formal KPI values (NS1/NS2/R1 + Tier-H health pass-count) for
+    goal_progress.json — computed from PG through the canonical verifier
+    brain/analysis/goal_metrics_check.py (verdict 20261122T221140Z: ONE canonical
+    compute, so the dashboard can never drift from the verifier).
+
+    Returns None on any failure — the daily write must survive a PG/API hiccup;
+    the dashboard then shows N/A instead of a stale number.
+    """
+    try:
+        sys.path.insert(0, '/root/.hermes/brain/analysis')
+        from goal_metrics_check import collect
+        r = collect()
+        return {
+            'ns1_net_per_trade_7d': round(r['ns1'], 4),
+            'ns2_net_30d': round(r['ns2'], 2),
+            'r1_dd30d_usd': round(r['r1_dd_usd'], 2),
+            'r1_dd30d_pct_of_equity': (round(r['r1_dd_pct'], 1)
+                                       if r['r1_dd_pct'] is not None else None),
+            'equity': round(r['equity'], 2) if r['equity'] else None,
+            'health_pass': r['health_pass'],
+            'health_total': r['health_total'],
+        }
+    except Exception as e:
+        _log(f"formal KPI snapshot failed (diagnostics only this run): {e}")
+        return None
+
+
 def _write_goal_progress():
-    """Write current performance metrics + targets to goal_progress.json.
+    """Write the formal KPI snapshot + diagnostic metrics to goal_progress.json.
     
     CEO and self_learner read this file to understand current state.
     """
@@ -749,14 +777,30 @@ def _write_goal_progress():
         wr_2d = _calculate_wr(trades_2d) if trades_2d else 0
         wr_7d = _calculate_wr(trades_7d) if trades_7d else 0
         
+        # Formal KPI snapshot from PG via the canonical verifier (CEO verdict
+        # 20261122T221140Z, registry kpi-framework-formal). The old
+        # targets{win_rate:0.40, daily_pnl:0.05, min_sharpe_30d:1.0} block is the
+        # PRE-restructure WR framing T retired on 2026-11-22 and it rendered as a
+        # live "WR 30d (target 40%)" card on the CEO dashboard — gone. WR survives
+        # only as a diagnostic in `current` (no target, never gated).
+        # SELF_LEARNER_WR_TARGET itself is untouched — it still drives the
+        # kill-underperformer heuristic (analyze_and_adjust, constants rule).
+        kpi = _formal_kpi_snapshot()
+
         data = {
             'updated_at': datetime.now(timezone.utc).isoformat(),
+            'framework': 'formal KPI set — verdict 20261122T221140Z '
+                         '(registry kpi-framework-formal); WR = diagnostic, no target',
             'targets': {
-                'win_rate': GOAL_WR,
-                'daily_pnl': 0.05,
-                'min_sharpe_30d': 1.0,
+                'ns1_net_per_trade_7d': 0.0,        # NS1  >0 sustained
+                'ns2_net_30d': -2.00,               # NS2  >= -2.00 (bounded bleed)
+                'r1_dd30d_pct_of_equity': -50.0,    # R1   >= -50% of current equity
+                # no health target here: the health pass-count is a snapshot
+                # (x/10), not a gate — its bar is "all gates pass", rendered
+                # from current.health_total in ceo_dashboard.html
             },
             'current': {
+                **(kpi or {}),
                 'win_rate_30d': round(wr_30d, 4),
                 'win_rate_7d': round(wr_7d, 4),
                 'daily_pnl_7d': round(pnl_7d / 7, 4) if pnl_7d else 0,
@@ -775,7 +819,13 @@ def _write_goal_progress():
             with os.fdopen(fd, 'w') as f:
                 json.dump(data, f, indent=2)
             os.replace(tmp, GOAL_PROGRESS_FILE)
-            _log(f"Wrote {GOAL_PROGRESS_FILE} — WR30d={wr_30d:.1%} PnL30d=${pnl_30d:+.2f}")
+            _log(f"Wrote {GOAL_PROGRESS_FILE} — "
+                 f"NS1={data['current'].get('ns1_net_per_trade_7d')} "
+                 f"NS2={data['current'].get('ns2_net_30d')} "
+                 f"R1={data['current'].get('r1_dd30d_pct_of_equity')}% "
+                 f"health={data['current'].get('health_pass')}/"
+                 f"{data['current'].get('health_total')} "
+                 f"| diagnostic WR30d={wr_30d:.1%} PnL30d=${pnl_30d:+.2f}")
         except Exception:
             os.unlink(tmp)
             raise
