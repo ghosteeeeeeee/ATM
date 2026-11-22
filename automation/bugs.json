@@ -2006,6 +2006,32 @@
       "root_cause": "jitoBundle built as a straightforward probe port: fetch list each call, plain fetch with no AbortSignal.",
       "found_by": "bug-hunter-sct full verification run (post-Jito-deploy audit)",
       "fix": "Tip accounts cached in closure (list is stable; fetched once with AbortSignal.timeout(2500)), both block-engine calls capped at 2500ms; failures still return null \u2192 plain-send fallback. Verified: npm test + selftest pass, bot restarted active/LIVE, counters clean (mentions 12462\u219212887/15s, errors 0, dropped 0)."
+    },
+    {
+      "id": "BUG-113",
+      "title": "SCT Jito comment claimed any-failure fallback to plain send; accepted-but-unlanded bundles get no fallback (code safe, comment wrong)",
+      "severity": "LOW",
+      "status": "FIXED",
+      "files": [
+        "bot.js"
+      ],
+      "symptom": "sendSwap comment said ANY Jito failure falls back to plain send; code only falls back when sendBundle returns no bundleId. An accepted bundle that never lands waits through the90s reconcile then errors with no retry.",
+      "root_cause": "Comment written from intent, not behavior; a plain-send retry after bundle acceptance risks a double-buy if the bundle lands a slot later \u2014 the code is the safe choice, the comment was the bug.",
+      "found_by": "bug-hunter-sct (audit of Jito/entry-premium/read-pool commits dabc68e..1a38985)",
+      "fix": "Rewrote comment to state exact semantics: transport failures fall back; accepted-but-unlanded bundles are deliberately not re-sent (reconcile declares failure at blockhash expiry) to avoid double-buy."
+    },
+    {
+      "id": "BUG-114",
+      "title": "launch-watcher: phantom second-gate comment, WOULD-BUY mislabel, major-token noise (USDC/WSOL CreateV2) counted as launches",
+      "severity": "LOW",
+      "status": "FIXED",
+      "files": [
+        "launch-watcher.mjs"
+      ],
+      "symptom": "Comment claimed a pump-suffix gate that was never implemented; every CreateV2 printed WOULD-BUY(dry-run) including USDC-pool and WSOL-wrap noise (EPjFWdd5/So1111 mints); heartbeat had no noise counter.",
+      "root_cause": "Comment written ahead of the code during live calibration; marker tightening shipped without the promised second gate.",
+      "found_by": "bug-hunter-sct (skill test of new launch-watcher.mjs)",
+      "fix": "Implemented the gate as NOISE_MINTS skip (USDC/WSOL counted as noise with early return before the authority RPC), renamed label to CANDIDATE, pointed the comment at the real gate, added noise= to heartbeat. Verified: watcher restarted pid3683466, npm test green."
     }
   ],
   "schema": {
