@@ -4697,5 +4697,16 @@
     "after": "open registry entry, atomic write, shadow_disposition --selfcheck PASS",
     "rationale": "registry is the only thing that surfaces due work every run; a deadline inside a done entry gets dropped",
     "impact": "Guarantees the 11-28 prearm fk read + divergence census (2/10 enforce exits show stored MFE >= 0.40) are surfaced"
+  },
+  {
+    "timestamp": "2026-11-22T16:50:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #289: watchdog steer-001 (losing streak) now self-diagnoses window composition — added mfe_pct to collect_recent_closed, never-armed/gave-back branches + exit-reason mix in detail, constants STEER_ARMED_MFE_PCT=0.40 / STEER_NEVER_ARMED_SHARE=0.60, --selfcheck extended to 9 fixtures",
+    "type": "tweak",
+    "file": "scripts/trade_watchdog.py",
+    "before": "\"Win rate 30% over last 20 trades. Total PnL: -0.12 USDT. Something is wrong.\"",
+    "after": "\"Win rate 30% over last 20 trades. Total PnL: -0.12 USDT. 12/13 losses never armed (MFE<0.40%) = chop cohort, not wrong-side; arm-rate/stall stack owns the fix. Exits: prearm_lock x6, atr_sl_hit x2, hard_max_loss x2.\"",
+    "rationale": "steer text only — every run was re-deriving the known chop diagnosis by hand; no trading behavior touched (hermes_constants EMPTY diff)",
+    "impact": "triage speed; live-verified, py_compile + --selfcheck 9 fixtures PASS"
   }
 ]

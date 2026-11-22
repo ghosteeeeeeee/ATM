@@ -61,6 +61,10 @@ MAX_SAME_COIN_TRADES = 2           # Max trades on same coin
 MAX_SAME_DIRECTION = 3             # Max trades in same direction
 MFE_GIVEBACK_URGENT_PCT = 5.0      # Gave back 5%+ of MFE = urgent
 MFE_GIVEBACK_WARNING_PCT = 3.0     # Gave back 3%+ of MFE = warning
+# brain_auditor #289: losing-streak self-diagnosis (steer-001). mfe_pct is in
+# PERCENT units in PG (0.40 = 0.40%), matching the pm trail-activation band.
+STEER_ARMED_MFE_PCT = 0.40         # >= this at exit = trade armed (trail band)
+STEER_NEVER_ARMED_SHARE = 0.60     # majority of losses below arm = chop cohort
 
 # Mode: "recommend" or "autopilot"
 # Auto-switches after DEPLOY_TIME + AUTOPILOT_DELAY_HOURS
@@ -275,7 +279,7 @@ def collect_recent_closed(limit=20):
             SELECT id, token, direction, entry_price, exit_price,
                    open_time, close_time, pnl_usdt, pnl_pct, signal,
                    _signal_metadata, regime,
-                   amount_usdt, leverage, exit_reason
+                   amount_usdt, leverage, exit_reason, mfe_pct
             FROM trades
             WHERE close_time IS NOT NULL
               AND exit_price IS NOT NULL AND exit_price != 0
@@ -901,12 +905,36 @@ def analyze_recent_losses(recent_trades):
     wr = (wins.__len__() / total * 100) if total > 0 else 0
 
     if loss_count >= 5 and len(losses) >= total * 0.6:
+        detail = (f"Win rate {wr:.0f}% over last {total} trades. "
+                  f"Total PnL: {total_pnl:+.2f} USDT.")
+        # brain_auditor #289: "Something is wrong" forced every run to re-derive
+        # the same chop diagnosis by hand. Say what the window IS: never-armed
+        # losses = chop cohort (arm/stall owns the fix), armed-then-gave-back =
+        # exit/lock review. Composition only — no advice, no disable/tune.
+        mfes = [float(t["mfe_pct"]) for t in losses if t.get("mfe_pct") is not None]
+        if mfes:
+            armed = sum(1 for m in mfes if m >= STEER_ARMED_MFE_PCT)
+            never = len(mfes) - armed
+            reasons = [t.get("exit_reason") or "?" for t in losses]
+            mix = ", ".join(f"{r} x{reasons.count(r)}"
+                            for r in sorted(set(reasons), key=reasons.count, reverse=True)[:3])
+            if never >= len(mfes) * STEER_NEVER_ARMED_SHARE:
+                detail += (f" {never}/{len(mfes)} losses never armed "
+                           f"(MFE<{STEER_ARMED_MFE_PCT:.2f}%) = chop cohort, not wrong-side; "
+                           f"arm-rate/stall stack owns the fix. Exits: {mix}.")
+            elif armed >= len(mfes) * STEER_NEVER_ARMED_SHARE:
+                detail += (f" {armed}/{len(mfes)} losses armed then gave back "
+                           f"= exit/lock review, not entry. Exits: {mix}.")
+            else:
+                detail += (f" Exit mix: {mix} — neither armed-giveback nor "
+                           f"never-armed dominant. Something is wrong.")
+        else:
+            detail += " Something is wrong."
         steers.append({
             "severity": "urgent",
             "category": "health",
             "title": f"Losing streak: {loss_count}/{total} recent trades lost",
-            "detail": f"Win rate {wr:.0f}% over last {total} trades. "
-                      f"Total PnL: {total_pnl:+.2f} USDT. Something is wrong.",
+            "detail": detail,
             "auto_executable": False
         })
 
@@ -2560,10 +2588,13 @@ def _selfcheck_streak_advice():
 
     # LOW-1 guard: the SELECT must carry exit_reason or live degrades to "?"
     assert "exit_reason" in inspect.getsource(collect_recent_closed)
+    # #289: steer-001 composition needs mfe_pct or the chop/giveback branches
+    # silently degrade to "Something is wrong"
+    assert "mfe_pct" in inspect.getsource(collect_recent_closed)
 
-    def _t(sig, pnl, reason):
+    def _t(sig, pnl, reason, mfe=None):
         return {"signal_name": sig, "pnl_usdt": pnl, "pnl_pct": pnl, "exit_reason": reason,
-                "amount_usdt": 10.0, "leverage": 5}
+                "amount_usdt": 10.0, "leverage": 5, "mfe_pct": mfe}
 
     # (a) all-prearm streak -> guard note, no disable advice
     prearm = [_t("pump-chain+", -0.01, "prearm_lock") for _ in range(4)]
@@ -2619,7 +2650,46 @@ def _selfcheck_streak_advice():
     assert "prearm_lock breakeven caps" in sig[0]["detail"], sig[0]["detail"]
     assert "Consider disabling" not in sig[0]["detail"], sig[0]["detail"]
 
-    print("SELFCHECK PASS: interval-merge 5 + streak-advice 5 fixtures (a-e)")
+    # (f) #289: never-armed majority -> chop-cohort diagnosis replaces
+    #     "Something is wrong" (a deletion of the composition block must fail here)
+    chop = [_t("atr-trend-", -0.05, "atr_sl_hit", mfe=0.10) for _ in range(5)] + \
+           [_t("atr-trend-", -0.02, "hard_max_loss", mfe=0.15) for _ in range(2)] + \
+           [_t("other-sig", +0.05, "profit-monster-trail", mfe=1.2)]
+    steers = analyze_recent_losses(chop)
+    st = [s for s in steers if s["title"].startswith("Losing streak")]
+    assert len(st) == 1, st
+    assert "chop cohort, not wrong-side" in st[0]["detail"], st[0]["detail"]
+    assert "never armed" in st[0]["detail"], st[0]["detail"]
+    assert "Something is wrong" not in st[0]["detail"], st[0]["detail"]
+
+    # (g) armed-giveback majority -> exit/lock review branch
+    give = [_t("jup_yolo_mirrored", -0.09, "atr_sl_hit", mfe=0.62) for _ in range(5)] + \
+           [_t("jup_yolo_mirrored", -0.07, "hard_max_loss", mfe=0.45) for _ in range(2)] + \
+           [_t("other-sig", +0.05, "profit-monster-trail", mfe=1.0)]
+    steers = analyze_recent_losses(give)
+    st = [s for s in steers if s["title"].startswith("Losing streak")]
+    assert len(st) == 1, st
+    assert "armed then gave back" in st[0]["detail"], st[0]["detail"]
+    assert "exit/lock review" in st[0]["detail"], st[0]["detail"]
+
+    # (h) neither majority (4 never / 4 armed of 8) -> mixed keeps the alarm
+    mixm = [_t("x", -0.05, "atr_sl_hit", mfe=0.10) for _ in range(4)] + \
+           [_t("x", -0.05, "atr_sl_hit", mfe=0.90) for _ in range(4)] + \
+           [_t("y", +0.05, "profit-monster-trail", mfe=1.0) for _ in range(2)]
+    steers = analyze_recent_losses(mixm)
+    st = [s for s in steers if s["title"].startswith("Losing streak")]
+    assert len(st) == 1, st
+    assert "Something is wrong" in st[0]["detail"], st[0]["detail"]
+
+    # (i) no mfe data at all -> old behavior preserved verbatim
+    nomfe = [_t("z", -0.05, "hard_max_loss") for _ in range(6)] + \
+            [_t("z", +0.05, "profit-monster-trail") for _ in range(3)]
+    steers = analyze_recent_losses(nomfe)
+    st = [s for s in steers if s["title"].startswith("Losing streak")]
+    assert len(st) == 1, st
+    assert "Something is wrong" in st[0]["detail"], st[0]["detail"]
+
+    print("SELFCHECK PASS: interval-merge 5 + streak-advice 9 fixtures (a-i)")
 
 
 if __name__ == "__main__":

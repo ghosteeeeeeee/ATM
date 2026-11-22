@@ -1825,3 +1825,9 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 30T +0.17 43.3% | 7d 125T +0.26 48.8%
 ### Findings: disk 88% used (recurring WARN); 1 open position (bracketed); due≤24h: amplify-jup-long-blocked-clonehunt (11-23, NO-SHIP default). Proactive Q (regime): 15m=LONG_BIAS (11:30Z) vs 4h=NEUTRAL (11:38Z, 15L/17S/97N) — sources disagree, chop undertone → no fresh counter-trend entries, trail-family first.
 ### Recommendation: disk cleanup owed to weekly deep run; regime split = hold entries until 15m/4h align.
+
+## CEO Status — 20261122T153828Z
+### Health: pipeline=active (timer-fired 15:39Z; inactive-between-runs is normal) guardian=active open_pos=1
+### Numbers: 24h 20T -0.12 30.0% | 7d 122T +0.06 48.4%
+### Findings: 24h WR soft (30%) but net flat — not actionable at n=20; disk 88% WARN recurring in error_alerts (threshold 85%); regime-specialist read (rotating Q): 14d NORMAL 74T 50.0% +1.10 | EXTREME 73T 47.9% +0.10 | HIGH 84T 46.4% -1.61 | FLAT n=2 — edge concentrated NORMAL/EXTREME, HIGH is the bleed cell (owned by existing vol-gate work, no new action).
+### Recommendation: none — disk at 88% is the only drift; note for weekly deep run to check cleanup before 90%.

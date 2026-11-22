@@ -12090,5 +12090,35 @@
     "category": "KPI watch",
     "status": "monitor",
     "risk": "none"
+  },
+  {
+    "date": "2026-11-22T16:50:00Z",
+    "id": "C1-audit289",
+    "idea": "WATCHDOG steer-001 SELF-DIAGNOSIS — losing-streak steer reports never-armed/gave-back composition + exit-reason mix instead of 'Something is wrong'",
+    "rationale": "Live window: 12/13 losses never armed (MFE<0.40) = chop cohort with 6 prearm caps; diagnosis existed in audit prose but never at the alarm site",
+    "expected_impact": "triage steer-001 in one read on every future run; no trading behavior change",
+    "category": "steer quality",
+    "status": "SHIPPED",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-22T16:50:00Z",
+    "id": "C2-audit289",
+    "idea": "PREARM-BAND-LOWER candle-OOS pre-registration — extend prearm_lock giveback band [0.25,0.40) -> [0.10,0.40); ceiling +2.42/14d (+8.42/30d) from never-armed loser MFE buckets 0.10-0.25",
+    "rationale": "14d never-armed losers: <0.10 -4.10 (band-unreachable), 0.10-0.15 -0.94, 0.15-0.20 -0.71, 0.20-0.25 -0.77, covered 0.25-0.40 -2.07; fk surface = 66 armed winners mfe<1.0 (+3.05). Prior art [yolo dash 2026-11-02] raised MFE_EXIT_ARM 0->0.004 warning too-low thresholds churn breakeven exits — band-lower must clear fk to avoid exactly that",
+    "expected_impact": "up to ~2.4/14d captured IF candle-OOS clears; zero cost if it fails",
+    "category": "exit quality",
+    "status": "pre-registered (shadow_disposition eval, due 2026-12-01, NO CODE)",
+    "risk": "medium",
+    "bar": "candle-OOS net >= +1.00/14d pnl_usdt units (guard #193) + fk<20% + 30d same-sign"
+  },
+  {
+    "date": "2026-11-22T16:50:00Z",
+    "id": "C3-audit289",
+    "idea": "atr_sl_hit as signal-not-exit: 30d 90T 0%W -9.83, avg MFE 0.176, 94% never armed = momentum never arrived",
+    "rationale": "largest single bleed bucket; jup owns 30/90 (-4.03)",
+    "category": "entry quality",
+    "status": "MONITOR — owned by stop-family-entry-filter-shadow (11-27) + jup-atrsl parity (12-01)",
+    "risk": "none"
   }
 ]

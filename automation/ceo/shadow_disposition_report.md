@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-22T08:15:00.163282+00:00
-registry: 138 entries (open=33)
+# Shadow disposition report — 2026-11-22T16:45:59.210652+00:00
+registry: 139 entries (open=34)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -124,7 +124,7 @@ registry: 138 entries (open=33)
 - OPEN hl-copy-plus-shadow: deadline=2026-11-30T00:00:00Z | (no parseable source)
 - OPEN hotset-pin-approved-shadow: deadline=2026-11-25T00:00:00Z | (no parseable source)
 - OPEN amplify-pumpchain-normal-short-early: deadline=2026-12-02T00:00:00Z | (no parseable source)
-- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 3124 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 2.7d
+- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 3476 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 3.1d
 - DONE amplify-rider-fade-threshold-walk: ? (?)
 - OPEN amplify-jup-long-blocked-clonehunt: deadline=2026-11-23T00:00:00Z | (no parseable source)
 - OPEN stop-family-entry-filter-shadow: deadline=2026-11-27T00:00:00Z | (no parseable source)
@@ -139,3 +139,4 @@ registry: 138 entries (open=33)
 - OPEN amplify-capture-leaderboard-giveback: deadline=2026-11-26T00:00:00Z | (no parseable source)
 - OPEN prearm-enforce-day7-read: deadline=2026-11-28T00:00:00Z | (no parseable source)
 - DONE tp-vs-trail-shadow: NO SHIP (early close 2026-11-22 — bar evaluated on full 14d population, n=142 deduped >=30; mechanism structural, more data will not change it) (2026-11-22)
+- OPEN prearm-band-lower-candle-oos: deadline=2026-12-01T00:00:00Z | (no parseable source)
