@@ -1951,6 +1951,20 @@
       "root_cause": "held is an in-memory Map acting as the gate for BOTH buy-skip and sell-eligibility, but it is populated only by a successful in-process sendSwap \u2014 it is not ground truth.",
       "found_by": "bug-hunter-sct workflow (balance-vs-detection watcher + log/tx decode of double-buy)",
       "fix": "Chain-truth gates: sell path dropped the held.has gate (the existing on-chain ourTokenBalance==0 check decides \u2014 target exit now flushes untracked bags); buy path added an on-chain already-holding guard (prevents buying on top of bags after restart/confirm bugs). sendSwap reconcile upgraded to dual-source (raw getTransaction + address index) over 90s since getTransaction was observed lagging 70-180s while the index already had the tx. Verified: npm test + selftest pass; post-fix bot ran a clean cycle (buy 0.0995, skip re-buy, sell, 0 errors)."
+    },
+    {
+      "id": "BUG-109",
+      "title": "SCT bot had no crash/restart protection \u2014 silent death halts all exits until noticed",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "sct-bot.service",
+        "bot.js"
+      ],
+      "symptom": "Bot ran as a setsid nohup process: a crash or box reboot meant no watcher, no copies, and no exits for positions until someone looked \u2014 the same silent-failure class as BUG-103/106.",
+      "root_cause": "No supervisor: manual launch only, no systemd unit, no boot persistence.",
+      "found_by": "bug-hunter-sct workflow (user: we obviously need to avoid these situations in the future)",
+      "fix": "Added sct-bot.service (WorkingDirectory, Restart=always, RestartSec=5, WantedBy=multi-user.target, logs continue to /tmp/bot2.log), installed and enabled. Verified: systemctl kill -s SIGKILL \u2192 active again within 8s, NRestarts=1, dashboard LIVE. Skill process check now reads systemctl + NRestarts."
     }
   ],
   "schema": {
