@@ -708,7 +708,7 @@ def _formal_kpi_snapshot():
             'r1_dd30d_usd': round(r['r1_dd_usd'], 2),
             'r1_dd30d_pct_of_equity': (round(r['r1_dd_pct'], 1)
                                        if r['r1_dd_pct'] is not None else None),
-            'equity': round(r['equity'], 2) if r['equity'] else None,
+            'equity': round(r['equity'], 2) if r['equity'] is not None else None,
             'health_pass': r['health_pass'],
             'health_total': r['health_total'],
         }
