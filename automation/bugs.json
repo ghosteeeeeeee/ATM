@@ -1980,6 +1980,19 @@
       "root_cause": "act() bought whatever Jupiter quoted with no comparison to the target entry price decoded from their own trade \u2014 README listed No entry filters as a known gap and this is the one that bleeds money.",
       "found_by": "user loss report (bug-hunter-sct workflow) with tracker rows for target vs mirror",
       "fix": "entryPremiumOk() guard after the quote, before sendSwap: copy only when our expected fill price <= maxEntryPremium (config, default 1.25) x target entry price (their sol/amount from the decoded trade); skip logs the measured premium. Sells unaffected (exits always fire \u2014 bag avoidance priority). Unit tests incl. the exact decumas numbers (1.65x rejected), inclusive cap, unpriceable-quote and zero-target edge \u2014 the zero-target case caught an Infinity-compare bug in the first implementation. Latency work in same commit: 3 parallel fetch/confirm workers (rapid flips no longer queue behind one confirm), priority fee 2000000\u21923000000 for landing speed; processed-commitment feed attempted and reverted (publicnode refuses getTransaction below confirmed, making a processed feed pointless)."
+    },
+    {
+      "id": "BUG-111",
+      "title": "SCT getTx treats allnodes -32005 rate-limit as a hard error \u2014 error bleed and lost mentions under throttle",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "bot.js"
+      ],
+      "symptom": "errors climbed to 17 in ~10 min: publicnode (allnodes free tier) started answering getTransaction with {code:-32005, Rate limit exceeded}; getTx only retried code 429, so -32005 threw immediately \u2014 every throttled mention became an error event and a lost fetch (a target trade in that window would have been missed).",
+      "root_cause": "Rate-limit detection keyed on the literal 429 only; the same provider switched to its own -32005 code for the same condition.",
+      "found_by": "user (bot is collecting errors now, check) during bug-hunter-sct latency pass",
+      "fix": "getTx now treats 429 and -32005 as THROTTLE (retry, patient budget 2s*(n+1), 8 attempts \u2248 up to ~72s total) while any other error still surfaces; non-limit backoff capped at 8s. Latency work in same commit: sendSwap builds the swap and fetches the deadline blockhash in parallel (one round trip off the hot path) and sends with skipPreflight (\u2212~300ms landing; quote is <1s old so revert risk is low). Verified: npm test + selftest pass; after restart errors stayed 0 through 11k mentions/45s."
     }
   ],
   "schema": {
