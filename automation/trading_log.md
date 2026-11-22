@@ -31651,3 +31651,35 @@ BY: auto_1hr
 - atr-trend- EXTREME 8T 37.5% -0.63 — revisit if n reaches ~20
 - unarmed WR 0% cohort 50% of closes — stall stack owns fix
 BY: auto_1hr
+
+## [2026-11-22 09:54] Hourly Analysis
+
+**Storm:** FIRED (pump gate: |at-run| >= 1.5) — window-min +0.42% / at-run +1.68%
+
+**Storm Packet:** 🌩️ [STORM-READINESS] window-min +0.42% / at-run +1.68% (pump gate: |at-run|>=1.5) | blocked 221 (combo-key-stale 59, compaction_stale_10min 57, hotset-expired 53, pump-chain-* 18, vol-gate-override-0.0 7, spike-filter-long 6, confluence single-type 3, short-rsi-hard-floor/knife 2, rr-engine-hard-block 2, other 14) | true-starvation 61 RSI>=35 (200 raw, deduped first-fire-per-token 61; 61 walked, 0 skipped) | counterfactual $+0.37 (touch 22/61) | waiver: SHADOW=True ENFORCE=False — counterfactual POSITIVE -> **streak 7th positive, BAR MET 3/3 stands** (deadline 2026-11-26 per shadow_disposition.json file truth) — bar met does NOT auto-flip: default KEEP shadow + CEO NO-CONVERT 2026-11-08 stands; split: blocked LONGs $+1.90 (33, touch 17/33) = gates suppressed pump LONG winners, blocked SHORTs $-1.53 (28, touch 5/28) — PUMP packet, waiver SHORT-side scope, cf LONG-driven + weak touch rate: flag for CEO at sign-off, no auto action
+
+**Trades:** 1 closed last hour (0 wins, 1 losses) | 24h 30 closed
+**PnL NET:** hour $-0.02 (gross -0.01) | 24h NET $-0.25 (gross +0.17, fees 0.42, payoff 1.55, WR 43.3%) | 7d NET $-1.73 (126T, fees 1.90) | 14d NET $-4.28 (232T, fees 3.45) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Last hour: 1 close — RESOLV atr-trend+ LONG prearm_lock net -0.02
+- Kill policy: no 0% signal with n>=3 last hour (atr-trend+ 1T 0% n<3); pump-chain+ 0 closes last hour, 14d 11T net -0.55 EXTREME 10T 10% -0.50 / NORMAL 1T, n=11 < 20 -> monitor
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/30 = 6.7% (<40%); tpsl_utils deployed. Buckets: profit-monster-trail 12T net +0.77 (earner), prearm_lock 8T net -0.21, manual_sl_hit 3T net -0.33
+- Boost: none eligible — btc-pump-rider+ 5T 100% net +0.34 across 5 tokens but already at 1.3 (verified signal_compactor.py:469); jup_yolo_mirrored 3T n<5
+- Arm rate: unarmed 16/30 = 53.3% below 70%, WR 0% net -$1.07 vs armed 14/14 92.9% net +$0.82 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 2 consecutive hrs with closes (08 -0.03, 09 -0.02) not 3 -> no size cut
+- Frequency: 1 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.180% < 0.5% (max 0.678)
+- 1 open: BTC ai-trader-pending LONG (09:03, SL 59682.26 TP 60808)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.25 (fees 0.42 vs gross 0.17); 7d NET -1.73, 14d -4.28 fee-drag persistent
+- pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
+- unarmed WR 0% cohort 53.3% of closes — stall stack owns fix
+- storm packet PUMP-side (cf LONG-driven, touch 22/61 weak) — bar met 3/3 awaits CEO sign-off by 2026-11-26
+BY: auto_1hr
