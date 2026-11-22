@@ -1938,6 +1938,19 @@
       "root_cause": "publicnode status endpoint lagged its own index: getSignatureStatuses and getTransaction both returned null minutes after landing while getSignaturesForAddress already returned the tx. confirmTransaction threw TransactionExpiredBlockheightExceededError ~1s after send (stale getLatestBlockhash from a lagging LB backend), so sendSwap declared failure without ever consulting the address index.",
       "found_by": "bug-hunter-sct workflow (balance-vs-detection watcher fired: detected=2 but errors=1, buys=0 while wallet balance dropped)",
       "fix": "sendSwap now reconciles after any confirm error: raw getTransaction (the schema-safe helper) polled 10x4s; found+success \u2192 treated as success (held set, exit path armed), found+err \u2192 lands-but-failed error, not found \u2192 original error rethrown. Skill gained a Confirm != fact pattern row."
+    },
+    {
+      "id": "BUG-108",
+      "title": "SCT ephemeral held map: false-confirm failures and restarts untrack positions \u2014 skipped exits, double buys",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "bot.js"
+      ],
+      "symptom": "Old bot bought 7Aso twice (0.125 + 0.111 SOL) because both confirms falsely reported expired (BUG-107) so held never set; target then sold and the exit was skipped (not holding). After restarts, held forgets the existing bags entirely \u2014 next target entry into those mints would buy on top, and their exits would never fire.",
+      "root_cause": "held is an in-memory Map acting as the gate for BOTH buy-skip and sell-eligibility, but it is populated only by a successful in-process sendSwap \u2014 it is not ground truth.",
+      "found_by": "bug-hunter-sct workflow (balance-vs-detection watcher + log/tx decode of double-buy)",
+      "fix": "Chain-truth gates: sell path dropped the held.has gate (the existing on-chain ourTokenBalance==0 check decides \u2014 target exit now flushes untracked bags); buy path added an on-chain already-holding guard (prevents buying on top of bags after restart/confirm bugs). sendSwap reconcile upgraded to dual-source (raw getTransaction + address index) over 90s since getTransaction was observed lagging 70-180s while the index already had the tx. Verified: npm test + selftest pass; post-fix bot ran a clean cycle (buy 0.0995, skip re-buy, sell, 0 errors)."
     }
   ],
   "schema": {
