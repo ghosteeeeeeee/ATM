@@ -5347,3 +5347,14 @@
 ## Error Alerts — 2026-11-22 21:39 UTC
 - **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] CC TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
 - **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-11-22 21:54 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+- **[WARN]** (health_monitor): `logs`: compressed 1 old logs, freed 5.9MB (disk 88%)
+
+## Error Alerts — 2026-11-22 22:54 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-22 23:39 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] CC TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
