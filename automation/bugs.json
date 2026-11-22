@@ -1925,6 +1925,19 @@
       "root_cause": "state.counts.mentions++ sat below if (err) return in the onLogs callback; ~49/50 target mentions are on-chain failures (InstructionError Custom(7), pump.fun slippage reverts), so the counter only counted the ~1/s clean remainder and read as a dead feed.",
       "found_by": "bug-hunter-sct skill test run (simultaneous bot-vs-standalone measurement)",
       "fix": "Moved the increment above the err guard \u2014 mentions now counts raw arrivals (verified 2031\u21926489 in 15s after restart); failed txs still never enter the queue. Skill updated: layer-2 expectation (tens per 15s) and a bug-pattern row documenting the 99%-failed phenomenon."
+    },
+    {
+      "id": "BUG-107",
+      "title": "SCT sendSwap false-negative: confirmTransaction reported expired while the buy had actually landed \u2014 untracked position",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "bot.js"
+      ],
+      "symptom": "First live buy (0.1377 SOL of JCkX pump mint) logged order failed: Signature has expired: block height exceeded, yet on-chain the tx succeeded at the same second: SOL 1.377122931\u21921.234545598, 1628674.372078 tokens received. The target sold 22s later; the bot skipped our exit (not holding) because held.set never ran \u2014 we now hold a bag the bot does not track.",
+      "root_cause": "publicnode status endpoint lagged its own index: getSignatureStatuses and getTransaction both returned null minutes after landing while getSignaturesForAddress already returned the tx. confirmTransaction threw TransactionExpiredBlockheightExceededError ~1s after send (stale getLatestBlockhash from a lagging LB backend), so sendSwap declared failure without ever consulting the address index.",
+      "found_by": "bug-hunter-sct workflow (balance-vs-detection watcher fired: detected=2 but errors=1, buys=0 while wallet balance dropped)",
+      "fix": "sendSwap now reconciles after any confirm error: raw getTransaction (the schema-safe helper) polled 10x4s; found+success \u2192 treated as success (held set, exit path armed), found+err \u2192 lands-but-failed error, not found \u2192 original error rethrown. Skill gained a Confirm != fact pattern row."
     }
   ],
   "schema": {
