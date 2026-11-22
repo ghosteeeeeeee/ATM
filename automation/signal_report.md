@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-22 01:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-22 07:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,932 | **WR:** 51.3% | **PnL:** -116.37%
+- **Total trades (all time):** 3,933 | **WR:** 51.3% | **PnL:** -117.17%
 - **Date range:** 2026-07-29 → 2026-11-22
 
 ---
@@ -11,7 +11,7 @@
 
 | Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
 |--------|-----|------|-------|--------|-------|--------|---------|--------|
-| btc-pump-rider+ | LONG | — | —% | — | 6 | 100.0% | +4.81 | ❓ |
+| btc-pump-rider+ | LONG | — | —% | — | 5 | 100.0% | +4.04 | ❓ |
 
 ---
 
@@ -60,6 +60,7 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-11-22 | 272ba31 | Daily trading system update (2026-11-22) |
 | 2026-11-21 | 02357b3 | logs: hourly analysis 2026-11-21 03:56 — storm packet cf +2.... |
 | 2026-11-20 | 03d6800 | F6: register MFE_EXIT_* in CEO_PROTECTED_FLAGS (bug-hunter m... |
 | 2026-11-20 | 5c814dc | straight-line escape: no level-starvation on one-way moves +... |
@@ -69,6 +70,5 @@ None found. Top performers are already enabled.
 | 2026-11-19 | 1c9ef17 | scripts: brain_auditor audit #279 — steer root-cause + fade-... |
 | 2026-11-18 | 8e83dfc | scripts: win-side-capture shadow collector (LOG-ONLY givebac... |
 | 2026-11-17 | afa915d | auto_1hr: hourly analysis 2026-11-17 19:52 — no changes (0 c... |
-| 2026-11-16 | 08412fc | scripts: pump-long-push 20261116T153048Z — 3 log-only shadow... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

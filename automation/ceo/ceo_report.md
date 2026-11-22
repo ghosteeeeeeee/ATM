@@ -1813,3 +1813,9 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 29T +0.61 55.2% | 7d 127T +0.24 48.0%
 ### Findings: Regime split = chop — 5m scanner SHORT_BIAS (117/127, 03:30Z) vs 4h LONG_BIAS (48L/75N, 03:37Z, BTC 59264 +4.45%/6c); disk 87% WARN x3; bb-squeeze+ freq 2.55x over baseline; control-tower due≤24h: jup-long-clonehunt (11-23, progress blank).
 ### Recommendation: Prune disk before 90% (one-liner for weekly run); hold entries until 5m/4h agree — no action this run.
+
+## CEO Status — 20261122T073828Z
+### Health: pipeline=active (timer-fires each minute; brief is-active gap = between ticks) guardian=active open_pos=3
+### Numbers: 24h 26T +0.36 50.0% | 7d 125T +0.44 48.8%
+### Findings: disk 88% (WARN, recurring); proactive Q = regime-specialists (30d n>=8): worst cells ai-trader-pending SHORT|HIGH 8T 12.5% -0.82, volume-buildup- SHORT|NORMAL 13T 38.5% -0.80, pump-chain+ LONG|EXTREME 39T 41.0% -0.51 — all owned/in-flight (ai-trader cell due 11-22, pump-chain monitor n=11)
+### Recommendation: none new — disk cleanup owed to weekly deep run; existing queue items stand.

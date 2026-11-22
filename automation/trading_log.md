@@ -31591,3 +31591,33 @@ Final set: ['BLUR']
 - pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
 - unarmed WR 0% cohort 44.4% of closes — stall stack owns fix
 BY: auto_1hr
+
+## [2026-11-22 07:52] Hourly Analysis
+
+**Storm:** no storm — window-min -1.26% / at-run +0.05%
+
+**Trades:** 0 closed last hour | 24h 25 closed
+**PnL NET:** hour $0.00 | 24h NET $-0.19 (gross +0.16, fees 0.35, payoff 1.33, WR 48.0%) | 7d NET $-1.51 (125T, gross +0.44, fees 1.95) | 14d NET $-4.34 (227T, gross -0.96, fees 3.38) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes -> no 0% n>=3 kill trigger, no boost candidates
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/25 = 8.0% (<40%); tpsl_utils deployed. Buckets: profit-monster-trail 12T net +0.70 (earner), prearm_lock 6T net -0.16, manual_sl_hit 3T net -0.33
+- Kill: pump-chain+ 14d 11T net -0.55 (EXTREME 10T 10% -0.50, NORMAL 1T -0.05), n=11 < 20 -> no kill, monitor
+- Boost: none eligible — btc-pump-rider+ 5T 100% net +0.34 across 5 tokens but already at 1.3 (verified signal_compactor.py:469); jup_yolo_mirrored 3T n<5
+- Arm rate: unarmed 12/25 = 48.0% below 70%, WR 0% net -0.81 vs armed 13/13 92.3% net +0.62 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: only 1 hr with closes in last 6h (02 -0.14) -> not 3 consecutive; regime not NEUTRAL
+- Frequency: 0 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.207% < 0.5% (max 0.678)
+- 3 open: SOL jup_yolo_mirrored LONG (06:29), RESOLV atr-trend+ LONG (07:07), BTC ai-trader-pending SHORT (02:43)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.19 turned negative (fees 0.35 vs gross 0.16); 7d NET -1.51, 14d -4.34 fee-drag persistent
+- ai-trader-pending 14d 48T 33.3% net -0.71 — losing cohort, but no hourly trigger; watch for regime-kill review
+- pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
+- unarmed WR 0% cohort 48.0% of closes — stall stack owns fix
+BY: auto_1hr
