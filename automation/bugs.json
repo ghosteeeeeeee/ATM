@@ -1965,6 +1965,21 @@
       "root_cause": "No supervisor: manual launch only, no systemd unit, no boot persistence.",
       "found_by": "bug-hunter-sct workflow (user: we obviously need to avoid these situations in the future)",
       "fix": "Added sct-bot.service (WorkingDirectory, Restart=always, RestartSec=5, WantedBy=multi-user.target, logs continue to /tmp/bot2.log), installed and enabled. Verified: systemctl kill -s SIGKILL \u2192 active again within 8s, NRestarts=1, dashboard LIVE. Skill process check now reads systemctl + NRestarts."
+    },
+    {
+      "id": "BUG-110",
+      "title": "SCT no entry filter: mirror bought a completed pump at 1.65x the target entry and lost 19.6% while target gained +1.11 SOL",
+      "severity": "HIGH",
+      "status": "FIXED",
+      "files": [
+        "bot.js",
+        "config.json",
+        "test.js"
+      ],
+      "symptom": "decumas flip: target bought 1.9556 SOL at $2.62e-6 and exited at $4.11e-6 (+1.11 SOL). Our copy detected late, got quoted $4.32e-6 entry (+65% over target) and exited $3.48e-6 \u2014 0.0995 SOL in, 0.08 out, -19.6%. Detection-to-send latency means the bonding curve runs before we fill; exit-after-them means their dump hits us.",
+      "root_cause": "act() bought whatever Jupiter quoted with no comparison to the target entry price decoded from their own trade \u2014 README listed No entry filters as a known gap and this is the one that bleeds money.",
+      "found_by": "user loss report (bug-hunter-sct workflow) with tracker rows for target vs mirror",
+      "fix": "entryPremiumOk() guard after the quote, before sendSwap: copy only when our expected fill price <= maxEntryPremium (config, default 1.25) x target entry price (their sol/amount from the decoded trade); skip logs the measured premium. Sells unaffected (exits always fire \u2014 bag avoidance priority). Unit tests incl. the exact decumas numbers (1.65x rejected), inclusive cap, unpriceable-quote and zero-target edge \u2014 the zero-target case caught an Infinity-compare bug in the first implementation. Latency work in same commit: 3 parallel fetch/confirm workers (rapid flips no longer queue behind one confirm), priority fee 2000000\u21923000000 for landing speed; processed-commitment feed attempted and reverted (publicnode refuses getTransaction below confirmed, making a processed feed pointless)."
     }
   ],
   "schema": {
