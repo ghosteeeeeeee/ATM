@@ -12060,5 +12060,35 @@
     "category": "kill-screen calibration",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-22T04:45:00Z",
+    "id": "C1-audit288",
+    "idea": "PEAK-SOURCE DIVERGENCE GUARD — prearm fires read pos highest_price only; #17023 fired with pos-peak +0.40 while trades.highest_price=0.580 and 1m candle peak=0.834 (trail=FALSE). Pre-register: on every prearm fire log pos-peak vs DB-peak vs candle-peak; >=2 fires with DB/candle >=0.40 -> CEO guard proposal (skip lock when trades.highest_price >= PM_TRAIL_ACTIVATE)",
+    "rationale": "Same class as #275 MED (IOTA candle 0.60 vs hp 0.27). Three independent MFE measurements disagree on one trade; the lock's armed-guard and the PM trail's arm check both use sources that can under-read, so a trade can round-trip to entry having truly moved past the arm, get 'capped' by the lock, and never have been trail-eligible. 2 of 10 enforce exits show stored MFE >= 0.40.",
+    "expected_impact": "Prevents lock fires on arm-band trades and feeds the 11-28 fk read correct denominators; potential capture restoration on missed-arm trades (ARM-GAP #17023 peakTrail@0.45 = +0.13%)",
+    "category": "telemetry/guard",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-22T04:45:00Z",
+    "id": "C2-audit288",
+    "idea": "WATCHDOG STEER GUARD — losing-streak steer now labels prearm_lock-dominated streaks as 'breakeven caps, NOT a disable/tune candidate' instead of 'Consider disabling'",
+    "rationale": "steer-002 this run: 4-loss pc+ streak was 4x prearm_lock -0.01 each (the new guard working) yet the steer advised disabling the signal. collect_recent_closed never selected exit_reason, so the steer was structurally blind to guard exits.",
+    "expected_impact": "Removes a recurring mis-disposition path; zero trading behavior change (steer text only)",
+    "category": "steer quality",
+    "status": "SHIPPED 2026-11-22",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-22T04:45:00Z",
+    "id": "C3-audit288",
+    "idea": "ARM-RATE TRIPWIRE single-leg observation — LONG limb 48.6% (<50) for a 7th consecutive window while SHORT limb fell to 54.5 (was >55 through the 6-cycle run): tripwire NOT tripped (both legs required) but the SHORT leg just left the trip condition",
+    "rationale": "Pre-reg #180/#185: flag CEO when 7d LONG arm <50 AND SHORT >55 for 2 consecutive runs, advisory NO auto-config. This run's measure: LONG 34/70=48.6%, SHORT 30/55=54.5% (mfe>=0.40 basis, 0 nulls).",
+    "expected_impact": "Keeps the advisory cycle honest; if both legs re-trip -> CEO flag with leaderboard per pre-reg",
+    "category": "KPI watch",
+    "status": "monitor",
+    "risk": "none"
   }
 ]

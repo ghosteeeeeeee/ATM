@@ -275,7 +275,7 @@ def collect_recent_closed(limit=20):
             SELECT id, token, direction, entry_price, exit_price,
                    open_time, close_time, pnl_usdt, pnl_pct, signal,
                    _signal_metadata, regime,
-                   amount_usdt, leverage
+                   amount_usdt, leverage, exit_reason
             FROM trades
             WHERE close_time IS NOT NULL
               AND exit_price IS NOT NULL AND exit_price != 0
@@ -958,15 +958,20 @@ def analyze_recent_losses(recent_trades):
     # each signal's trades newest-first and stop at its first non-loss.
     sig_pnl = {}
     sig_tail_streak = {}
+    sig_streak_reasons = {}
     _streak_broken = set()
     sig_losses = {}
     for t in recent_trades:
         sig = t.get("signal_name", "unknown")
         pnl = t.get("pnl_usdt", 0) or 0
         sig_pnl[sig] = sig_pnl.get(sig, 0) + pnl
+        # NOTE: any pnl >= 0 breaks the streak — a breakeven prearm_lock exit
+        # (+0.00/+0.01, 3 of the 10 live exits) ends it. Pre-existing streak
+        # semantics, kept: the guard note is about the streak as measured.
         if sig not in _streak_broken:
             if pnl < 0:
                 sig_tail_streak[sig] = sig_tail_streak.get(sig, 0) + 1
+                sig_streak_reasons.setdefault(sig, []).append(t.get("exit_reason") or "?")
             else:
                 _streak_broken.add(sig)
     for t in losses:
@@ -981,13 +986,25 @@ def analyze_recent_losses(recent_trades):
             continue  # DRIFT-W1: historical losses from killed signals — not actionable
         streak = sig_tail_streak.get(sig, 0)
         if streak >= 3 and sig_pnl.get(sig, 0) < 0:
+            # brain_auditor #288: prearm_lock streaks are the breakeven cap
+            # (PREARM_LOCK_ENFORCE live 2026-11-20) doing its job — avg loss is
+            # ~$0.01 vs $0.11 for a real stop. "Consider disabling" on that
+            # streak is the wrong advice (steer-002 misread, run #288).
+            reasons = sig_streak_reasons.get(sig, [])
+            pl = sum(1 for r in reasons if r == "prearm_lock")
+            if reasons and pl >= (len(reasons) + 1) // 2:
+                advice = (f"{pl}/{len(reasons)} streak exits are prearm_lock "
+                          f"breakeven caps (guard live 2026-11-20) — cap working, "
+                          f"NOT a disable/tune candidate.")
+            else:
+                advice = "Consider disabling or tuning this signal."
             steers.append({
                 "severity": "warning",
                 "category": "health",
                 "title": f"Signal '{sig}' losing streak: {streak} consecutive losses",
                 "detail": f"Net {sig_pnl[sig]:+.2f} USDT over last {len(recent_trades)} trades "
                           f"(window losses: {data['total_loss']:+.2f}). "
-                          f"Consider disabling or tuning this signal.",
+                          f"{advice}",
                 "auto_executable": False
             })
 
@@ -2431,7 +2448,7 @@ def main():
     parser.add_argument("--analyze", action="store_true", help="Analyze only (requires collected data)")
     parser.add_argument("--dry-run", action="store_true", help="Analyze but don't write outputs")
     parser.add_argument("--selfcheck", action="store_true",
-                        help="Run interval-merge self-check and exit (no DB, no writes)")
+                        help="Run interval-merge + streak-advice self-checks and exit (no DB, no writes)")
     args = parser.parse_args()
 
     if args.selfcheck:
@@ -2450,6 +2467,7 @@ def main():
         # abutting intervals (s == prev end) merge — one continuous block
         assert _merge_intervals([(h(0), h(1)), (h(1), h(2))]) == [(h(0), h(2))]
         print("selfcheck PASS: 5 interval-merge cases")
+        _selfcheck_streak_advice()
         return
 
     # Determine mode (recommend → autopilot after 48h)
@@ -2529,6 +2547,79 @@ def main():
         print(f"  {icon} [{steer['category']}] {steer['title']}")
 
     print("=" * 60)
+
+
+def _selfcheck_streak_advice():
+    """Fixtures for the prearm_lock streak-advice branch (brain_auditor #288).
+
+    Run: python3 scripts/trade_watchdog.py --selfcheck
+    Mutation guards: (d) kills a 'pl >= len (100% prearm)' regression,
+    (e) kills counting reasons OUTSIDE the trailing-streak walk.
+    """
+    import inspect
+
+    # LOW-1 guard: the SELECT must carry exit_reason or live degrades to "?"
+    assert "exit_reason" in inspect.getsource(collect_recent_closed)
+
+    def _t(sig, pnl, reason):
+        return {"signal_name": sig, "pnl_usdt": pnl, "pnl_pct": pnl, "exit_reason": reason,
+                "amount_usdt": 10.0, "leverage": 5}
+
+    # (a) all-prearm streak -> guard note, no disable advice
+    prearm = [_t("pump-chain+", -0.01, "prearm_lock") for _ in range(4)]
+    prearm.append(_t("other-sig", +0.05, "profit-monster-trail"))
+    steers = analyze_recent_losses(prearm)
+    sig = [s for s in steers if s["title"].startswith("Signal 'pump-chain+'")]
+    assert len(sig) == 1, sig
+    assert "prearm_lock breakeven caps" in sig[0]["detail"], sig[0]["detail"]
+    assert "Consider disabling" not in sig[0]["detail"], sig[0]["detail"]
+
+    # (b) real stop-loss streak -> original disable advice kept
+    stops = [_t("r2v2-long3", -0.10, "hard_max_loss") for _ in range(4)]
+    stops.append(_t("other-sig", +0.05, "profit-monster-trail"))
+    steers = analyze_recent_losses(stops)
+    sig = [s for s in steers if s["title"].startswith("Signal 'r2v2-long3'")]
+    assert len(sig) == 1, sig
+    assert "Consider disabling or tuning this signal." in sig[0]["detail"], sig[0]["detail"]
+    assert "prearm_lock" not in sig[0]["detail"], sig[0]["detail"]
+
+    # (c) mixed streak, minority prearm -> disable advice kept
+    mixed = [_t("atr-trend+", -0.08, "atr_sl_hit"),
+             _t("atr-trend+", -0.09, "atr_sl_hit"),
+             _t("atr-trend+", -0.01, "prearm_lock"),
+             _t("other-sig", +0.05, "profit-monster-trail")]
+    steers = analyze_recent_losses(mixed)
+    sig = [s for s in steers if s["title"].startswith("Signal 'atr-trend+'")]
+    assert len(sig) == 1, sig
+    assert "Consider disabling" in sig[0]["detail"], sig[0]["detail"]
+
+    # (d) MAJORITY not all: 3 prearm + 1 stop -> guard note (a 100%-prearm
+    #     threshold mutation must fail here)
+    maj = [_t("bb-squeeze+", -0.01, "prearm_lock"),
+           _t("bb-squeeze+", -0.01, "prearm_lock"),
+           _t("bb-squeeze+", -0.02, "prearm_lock"),
+           _t("bb-squeeze+", -0.11, "hard_max_loss"),
+           _t("other-sig", +0.05, "profit-monster-trail")]
+    steers = analyze_recent_losses(maj)
+    sig = [s for s in steers if s["title"].startswith("Signal 'bb-squeeze+'")]
+    assert len(sig) == 1, sig
+    assert "prearm_lock breakeven caps" in sig[0]["detail"], sig[0]["detail"]
+
+    # (e) TRAILING-only reasons: 3 newest prearm, then a win, then 5 OLDER
+    #     stops — reasons must ignore the pre-win stops (a move of the append
+    #     outside the _streak_broken guard must fail here: 3/8 -> disable)
+    trail = [_t("jup_yolo_mirrored", -0.01, "prearm_lock"),
+             _t("jup_yolo_mirrored", -0.01, "prearm_lock"),
+             _t("jup_yolo_mirrored", -0.01, "prearm_lock"),
+             _t("jup_yolo_mirrored", +0.05, "profit-monster-trail"),
+             ] + [_t("jup_yolo_mirrored", -0.10, "hard_max_loss") for _ in range(5)]
+    steers = analyze_recent_losses(trail)
+    sig = [s for s in steers if s["title"].startswith("Signal 'jup_yolo_mirrored'")]
+    assert len(sig) == 1, sig
+    assert "prearm_lock breakeven caps" in sig[0]["detail"], sig[0]["detail"]
+    assert "Consider disabling" not in sig[0]["detail"], sig[0]["detail"]
+
+    print("SELFCHECK PASS: interval-merge 5 + streak-advice 5 fixtures (a-e)")
 
 
 if __name__ == "__main__":

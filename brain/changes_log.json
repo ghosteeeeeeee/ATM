@@ -4675,5 +4675,27 @@
     "after": "rider-fade -> done / NO FLIP (lines 204, blocked_net -0.25 MET, fk_live FAIL 4 winners 16921/16895/17017/17021, review-queue absent); win-capture -> deadline extended 11-25 with measured +0.0870/day (bar +0.10) n=8 fk=0; NEW amplify-capture-leaderboard-giveback due 11-26; 136 entries, 0 stranded in _doc",
     "rationale": "Both entries hit their 2026-11-22 00:00Z deadline at this run; the reads were owed and are now measured in-file so the 08:15Z daily runner does not re-derive them. AMPLIFY weekly emit needs >=1 proposal.",
     "impact": "Report/disposition only — zero trading behavior. shadow_disposition --selfcheck PASS after write."
+  },
+  {
+    "timestamp": "2026-11-22T04:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #288: watchdog losing-streak steer now labels prearm_lock-dominated streaks as breakeven caps instead of advising disable (collect_recent_closed selects exit_reason; majority-prearm tail-streak branch); --selfcheck 3 fixtures",
+    "type": "tweak",
+    "file": "scripts/trade_watchdog.py",
+    "before": "steer detail always ended 'Consider disabling or tuning this signal.' with no exit_reason visibility",
+    "after": ">=half tail-streak exits = prearm_lock -> 'cap working, NOT a disable/tune candidate'; else original text; exit_reason added to SELECT",
+    "rationale": "steer-002 this run recommended disabling pump-chain+ for a 4-loss streak that was 100% the new PREARM_LOCK_ENFORCE caps (-0.01 each); steer text only, zero trading behavior",
+    "impact": "Prevents recurring mis-disposition of guard-working streaks; py_compile PASS, selfcheck PASS, live-verified on current 20 trades (steer-002 now reads guard note, steer-003 unchanged)"
+  },
+  {
+    "timestamp": "2026-11-22T04:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #288: registered prearm-enforce-day7-read (kind eval, due 2026-11-28) in data/shadow_disposition.json with fk bar + peak-source divergence check",
+    "type": "data",
+    "file": "data/shadow_disposition.json",
+    "before": "day-7 re-measure deadline existed only inside the done disposition amplify-prearm-breakeven-lock",
+    "after": "open registry entry, atomic write, shadow_disposition --selfcheck PASS",
+    "rationale": "registry is the only thing that surfaces due work every run; a deadline inside a done entry gets dropped",
+    "impact": "Guarantees the 11-28 prearm fk read + divergence census (2/10 enforce exits show stored MFE >= 0.40) are surfaced"
   }
 ]

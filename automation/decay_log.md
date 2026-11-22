@@ -2404,3 +2404,10 @@
 [2026-11-21 19:43 UTC]   🟢 OK: btc-pump-rider+: 6 trades, 100.0% WR, PnL=4.81
 [2026-11-21 19:43 UTC] Done. Rapid-disabled 0 signals.
 [2026-11-21 19:43 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
+[2026-11-22 01:43 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-11-22 01:43 UTC]   🟡 RAPID DISABLE BLOCKED: pump-chain+: 0.0% WR but has winning regimes: ['EXTREME']
+[2026-11-22 01:43 UTC]     → Keeping alive in habitat: EXTREME
+[2026-11-22 01:43 UTC]   🟢 OK: ai-trader-pending: 7 trades, 57.1% WR, PnL=1.53
+[2026-11-22 01:43 UTC]   🟢 OK: btc-pump-rider+: 6 trades, 100.0% WR, PnL=4.81
+[2026-11-22 01:43 UTC] Done. Rapid-disabled 0 signals.
+[2026-11-22 01:43 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

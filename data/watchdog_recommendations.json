@@ -1,19 +1,19 @@
 {
-  "timestamp": "2026-11-22T00:39:33.629500+00:00",
+  "timestamp": "2026-11-22T07:09:36.645860+00:00",
   "steers": [
     {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: BTC + ZORA",
-      "detail": "Both opened within 14 minutes. Correlation risk.",
+      "severity": "urgent",
+      "category": "health",
+      "title": "Losing streak: 12/20 recent trades lost",
+      "detail": "Win rate 40% over last 20 trades. Total PnL: -0.02 USDT. Something is wrong.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
       "severity": "warning",
       "category": "health",
-      "title": "Signal 'pump-chain+' losing streak: 5 consecutive losses",
-      "detail": "Net -0.07 USDT over last 20 trades (window losses: -0.07). Consider disabling or tuning this signal.",
+      "title": "Signal 'pump-chain+' losing streak: 4 consecutive losses",
+      "detail": "Net -0.05 USDT over last 20 trades (window losses: -0.05). 4/4 streak exits are prearm_lock breakeven caps (guard live 2026-11-20) \u2014 cap working, NOT a disable/tune candidate.",
       "auto_executable": false,
       "id": "steer-002"
     },
@@ -26,20 +26,20 @@
       "id": "steer-003"
     }
   ],
-  "portfolio_health": "warning",
+  "portfolio_health": "critical",
   "regime": {
     "btc_15m": "LONG_BIAS",
     "btc_4h": "LONG_BIAS",
-    "continuum": "AT",
+    "continuum": "BELOW",
     "volatility": "LOW",
     "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
     "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.0,
+    "linreg_alignment": 0.5,
     "wyckoff_phase": "UNKNOWN",
-    "market_phase": "CALM",
-    "trend_quality": "UP"
+    "market_phase": "DECLINING",
+    "trend_quality": "STRONG_UP"
   },
-  "open_count": 2
+  "open_count": 3
 }
