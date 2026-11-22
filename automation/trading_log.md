@@ -31621,3 +31621,33 @@ BY: auto_1hr
 - pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
 - unarmed WR 0% cohort 48.0% of closes — stall stack owns fix
 BY: auto_1hr
+
+## [2026-11-22 08:52] Hourly Analysis
+
+**Storm:** no storm — window-min -0.05% / at-run +0.99%
+
+**Trades:** 5 closed last hour (2 wins, 3 losses) | 24h 30 closed
+**PnL NET:** hour $-0.03 (gross +0.04) | 24h NET $-0.22 (gross +0.20, fees 0.42, payoff 1.40, WR 46.7%) | 7d NET $-1.37 (128T, gross +0.61, fees 1.98) | 14d NET $-4.37 (232T, gross -0.92, fees 3.45) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Last hour: 5 closes — KAS/ANIME/ZRO atr-trend- SHORT losses (net -0.12/-0.03/-0.09), SOL jup_yolo_mirrored +0.08, BTC ai-trader-pending manual_trail +0.13
+- Kill policy (trigger: atr-trend- 0% WR 3T last hour): 14d regime split EXTREME 8T 37.5% net -0.63 / HIGH 25T 60.0% net -0.40 / NORMAL 17T 64.7% net -0.09 — wins in HIGH+NORMAL -> keep alive; EXTREME n=8 binomial p~0.33 not significant AND volatility_gate_v2.py:47-51 documents "regime-split untested, must not exec-gate" -> NO block, monitor
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/30 = 6.7% (<40%); tpsl_utils deployed. Buckets: profit-monster-trail 13T net +0.78 (earner), prearm_lock 7T net -0.19, manual_sl_hit 3T net -0.33
+- Boost: none eligible — btc-pump-rider+ 5T 100% net +0.34 already at 1.3 (verified signal_compactor.py:469); jup_yolo_mirrored 4T n<5
+- Arm rate: unarmed 15/30 = 50.0% below 70%, WR 0% net -$1.05 vs armed 15/15 93.3% net +$0.83 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: closes at 01 (-0.05), 02 (-0.14), 08 (-0.03) — not consecutive (03-07 empty); regime not NEUTRAL -> no size cut
+- Frequency: 5 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.187% < 0.5% (max 0.678)
+- 1 open: RESOLV atr-trend+ LONG (07:07, SL 0.013305 TP 0.013616)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.22 (fees 0.42 vs gross 0.20); 7d NET -1.37, 14d -4.37 fee-drag persistent
+- pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
+- atr-trend- EXTREME 8T 37.5% -0.63 — revisit if n reaches ~20
+- unarmed WR 0% cohort 50% of closes — stall stack owns fix
+BY: auto_1hr
