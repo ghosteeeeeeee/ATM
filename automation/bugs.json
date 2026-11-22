@@ -1828,7 +1828,7 @@
         "scripts/decider_run.py",
         "scripts/vacation_guardrail.py"
       ],
-      "symptom": "Recorded fee = amount*10*0.0009 for closes before the 2026-08-22 leverage-SELECT fix regardless of actual leverage (3/5), while hl_notional_usdt ~ amount and the correct model is amount*0.0009. Any lifetime net summed from fees::json->>'fee_total' (decider_run.py:881, vacation_guardrail.py:116) overstates pre-8/24 cost ~10x. Side note: under the correct house fee model NO week in the 26-week history is net-positive (closest 6/22 -$0.06). | RESIDUE 2026-11-22 (agent-7): NOT FIXED \u2014 fee_total/notional/0.0009 == leverage (3x/5x/10x) on 76 rows post-8/22 (latest today); missed close paths: atr_sl_hit(40), atr_trail_hit(7), profit-monster-trail(7), hard_max_loss(4), mfe_exit(2), trail_arm_timeout(2), ugb_pt(2), UNIVERSAL_MAX_HOLD(2) \u2014 the 8/22 leverage-SELECT fix missed these exit-reason writers; any fee-JSON summing KPI still wrong TODAY; synthetic notional*0.0009 mandatory until write-path fixed.",
+      "symptom": "Recorded fee = amount*10*0.0009 for closes before the 2026-08-22 leverage-SELECT fix regardless of actual leverage (3/5), while hl_notional_usdt ~ amount and the correct model is amount*0.0009. Any lifetime net summed from fees::json->>'fee_total' (decider_run.py:881, vacation_guardrail.py:116) overstates pre-8/24 cost ~10x. Side note: under the correct house fee model NO week in the 26-week history is net-positive (closest 6/22 -$0.06). | RESIDUE 2026-11-22 (agent-7): NOT FIXED \u2014 fee_total/notional/0.0009 == leverage (3x/5x/10x) on 76 rows post-8/22 (latest today); missed close paths: atr_sl_hit(40), atr_trail_hit(7), profit-monster-trail(7), hard_max_loss(4), mfe_exit(2), trail_arm_timeout(2), ugb_pt(2), UNIVERSAL_MAX_HOLD(2) \u2014 the 8/22 leverage-SELECT fix missed these exit-reason writers; any fee-JSON summing KPI still wrong TODAY; synthetic notional*0.0009 mandatory until write-path fixed. | FIXED-WRITEPATH 2026-11-22 (agent-8, commit 1ff1cf37): root cause = all9 fee-JSON writers used calc_notional (PnL basis, fallback amount_usdt x leverage) as the FEE base \u2014 every close with hl_notional_usdt IS NULL wrote fee = notional x 0.0009 x LEVERAGE. Fixed once at pnl_utils.fee_notional() = COALESCE(hl_notional_usdt, amount_usdt), never x leverage; 9 sites unified; probes: pre-fix 3/5/10x ratio==lev, post-fix ratio==1.000, reader audit = NO compensating errors (all fee-net consumers improve), loss cooldowns use gross = trading behavior untouched. HISTORY still wrong by design (reconciliation owns correction): epoch A pre-8/22 = 2098 rows (fixed x10), epoch B 8/22-11-22 = 76 rows (enumerated, $3.09 overcharge), epoch C >=11-22 clean. Status stays OPEN until history corrected.",
       "root_cause": "pre-8/22 fee formula multiplied by a fixed 10x (leverage placeholder) before the SELECT was fixed at position_manager.py:1184-1189.",
       "found_by": "CEO consult 20261109T2330Z (sideways, severity high, accounting)",
       "fix": "one HL balance reconciliation to confirm; if confirmed null/correct pre-8/24 fee rows; audit every consumer of fee_total before quoting lifetime nets."
@@ -2058,6 +2058,20 @@
       "root_cause": "VersionedTransaction.signatures is Array<Uint8Array> (index.d.ts line1817), not Array<{signature}>; bs58.encode(undefined) throws Expected Buffer from base-x. The probe tested endpoint+payload but never the post-submit encode path.",
       "found_by": "user (check on the bot) + bug-hunter-sct triage (counts errors14/buys0 with SOL drop = landed-but-untracked)",
       "fix": "bs58.encode(tx.signatures[0]) with a comment naming the type trap. Verified: npm test + selftest pass, bot active/LIVE (commit bf2f248). Mitigation already in place during the outage: chain-truth gates flushed every untracked buy on the target sell \u2014 ended flat, no bags; cost of the window: -0.1308 SOL (-0.0667 trading, -0.0642 fees/tips across 16 landed txs). Lesson for skill: probe must exercise the exact post-submit path, not just endpoint acceptance."
+    },
+    {
+      "id": "BUG-117",
+      "title": "calc_notional PnL-path fallback amount_usdt x leverage can inflate pnl_usdt on hl-NULL closes",
+      "severity": "MEDIUM",
+      "status": "OPEN",
+      "files": [
+        "scripts/pnl_utils.py",
+        "scripts/position_manager.py"
+      ],
+      "symptom": "calc_notional = amount_usdt x leverage fallback lives in the PnL path (not fees): would inflate pnl_usdt/hype_pct whenever hl_notional_usdt IS NULL. Currently MASKED \u2014 hype_realized_pnl_usdt ground truth overwrites it on 110/111 of those rows, and the 111th landed unleveraged-basis anyway.",
+      "root_cause": "2026-08-21 'amount is MARGIN' fix made amount x leverage the fallback, but amount_usdt IS the notional on this book (measured: hl_notional/amount = 1.0 or 0.9, ZERO rows at 3/5/10).",
+      "found_by": "agent-8 BUG-099 residue fix 2026-11-22 (skipped as pnl-math, out of fee-task gates)",
+      "fix": "replace fallback with COALESCE(hl_notional_usdt, amount_usdt) in the PnL path too \u2014 pnl math change, needs own gates + verification against hype_realized_pnl_usdt before/after."
     }
   ],
   "schema": {
