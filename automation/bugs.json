@@ -1993,6 +1993,19 @@
       "root_cause": "Rate-limit detection keyed on the literal 429 only; the same provider switched to its own -32005 code for the same condition.",
       "found_by": "user (bot is collecting errors now, check) during bug-hunter-sct latency pass",
       "fix": "getTx now treats 429 and -32005 as THROTTLE (retry, patient budget 2s*(n+1), 8 attempts \u2248 up to ~72s total) while any other error still surfaces; non-limit backoff capped at 8s. Latency work in same commit: sendSwap builds the swap and fetches the deadline blockhash in parallel (one round trip off the hot path) and sends with skipPreflight (\u2212~300ms landing; quote is <1s old so revert risk is low). Verified: npm test + selftest pass; after restart errors stayed 0 through 11k mentions/45s."
+    },
+    {
+      "id": "BUG-112",
+      "title": "SCT Jito path: getTipAccounts fetched per trade on the hot path, no timeouts \u2014 serial latency + up to 300s hang risk",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "bot.js"
+      ],
+      "symptom": "Every sendSwap paid a serial getTipAccounts round trip (100-400ms) before the bundle could go out \u2014 undoing the parallel-blockhash latency work \u2014 and neither Jito fetch had a timeout, so a hanging block engine would stall the single-purpose worker until undici default (300s) fired: missed exits while waiting on Jito.",
+      "root_cause": "jitoBundle built as a straightforward probe port: fetch list each call, plain fetch with no AbortSignal.",
+      "found_by": "bug-hunter-sct full verification run (post-Jito-deploy audit)",
+      "fix": "Tip accounts cached in closure (list is stable; fetched once with AbortSignal.timeout(2500)), both block-engine calls capped at 2500ms; failures still return null \u2192 plain-send fallback. Verified: npm test + selftest pass, bot restarted active/LIVE, counters clean (mentions 12462\u219212887/15s, errors 0, dropped 0)."
     }
   ],
   "schema": {
