@@ -31557,3 +31557,37 @@ BY: auto_1hr
 - pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
 - unarmed WR 7.7% cohort 44.8% of closes — stall stack owns fix
 BY: auto_1hr
+
+## LOSERS Update — 2026-11-22 06:05 UTC
+- ADD BLUR (WR=0.0%, PnL=$-0.25, consecutive_losses (5))
+
+Final set: ['BLUR']
+
+## [2026-11-22 06:52] Hourly Analysis
+
+**Storm:** no storm — window-min -0.57% / at-run +0.24%
+
+**Trades:** 0 closed last hour | 24h 27 closed
+**PnL NET:** hour $0.00 | 24h NET $+0.06 (gross +0.43, fees 0.37, payoff 1.51, WR 51.9%) | 7d NET $-1.51 (125T, gross +0.44, fees 1.95) | 14d NET $-4.34 (227T, gross -0.96, fees 3.38) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes -> no 0% n>=3 kill trigger, no boost candidates
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/27 = 7.4% (<40%); tpsl_utils deployed. Buckets: profit-monster-trail 13T net +0.76 (earner), prearm_lock 6T net -0.16, manual_sl_hit 3T net -0.33
+- Kill: pump-chain+ 14d 11T net -0.55 (EXTREME 10T 10% -0.50, NORMAL 1T -0.05), n=11 < 20 -> no kill, monitor
+- Boost: none eligible — btc-pump-rider+ 6T 100% net +0.40 already at 1.3 (verified signal_compactor.py:469); jup_yolo_mirrored 3T n<5
+- Arm rate: unarmed 12/27 = 44.4% below 70%, WR 0% net -$0.81 vs armed 15/15 93.3% net +$0.87 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 3 neg hrs with closes (23 -0.07, 01 -0.05, 02 -0.14; 00/03+ empty) but regime EXTREME/HIGH not NEUTRAL -> no size cut
+- Frequency: 0 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.203% < 0.5% (max 0.678)
+- 2 open: SOL jup_yolo_mirrored LONG (06:29, SL 68.57 TP 70.24), BTC ai-trader-pending SHORT (02:43)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET +0.06 nearly zero (fees 0.37 vs gross 0.43); 7d NET -1.51, 14d -4.34 fee-drag
+- pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
+- unarmed WR 0% cohort 44.4% of closes — stall stack owns fix
+BY: auto_1hr
