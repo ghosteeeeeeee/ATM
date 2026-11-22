@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """goal_metrics_check.py — the goal-704ed65e verifier. Run every goal round.
 
-Prints the 5 pinned CEO metrics vs targets + net-of-fees book windows.
-Target source: registry entry harvest-ship-2026-11-04 + CEO verdict 20261104.
-All numbers from PG (source of truth); fees = 0.09% RT of amount_usdt (BUG-073).
+RESTRUCTURED metrics 2026-11-22 (CEO verdict 20261122T194418Z + T approval 2026-11-22):
+expectancy set replaces the WR target — "we want net positive". WR is diagnostic only.
+Target source: CEO edge-diagnosis verdict 20261122T194418Z + registry goal-metric-restructure.
+All numbers from PG (source of truth); fees = synthetic 0.09% RT of amount_usdt (BUG-073/099).
 """
 import sys
 import psycopg2
@@ -53,13 +54,38 @@ def main():
     ratio = (nl / ns) if ns else float('inf')
     chk(ratio < 2.0, f"fill ratio 48h LONG:SHORT = {nl}:{ns} = {ratio:.1f}:1 (target <2:1)")
 
-    # 5. non-jup fleet WR 14d (target >=55% at n>=10)
+    # 5. EXPECTANCY SET (RESTRUCTURED — CEO verdict 20261122T194418Z, T approval 2026-11-22:
+    #    the old "fleet WR >=55%" target optimized the losing population (payoff<1.0 group =
+    #    23 signals -$9.21 at WR 54.7%); WR is now DIAGNOSTIC ONLY, never a target.)
+    # 5a. net $/trade fee-adj 7d (baseline -$0.0124; target >0 sustained 7d)
+    cur.execute("""SELECT COUNT(*), COALESCE(SUM(pnl_usdt - amount_usdt*%s),0)
+        FROM trades WHERE status='closed' AND close_time > NOW()-INTERVAL '7 days'""", (FEE,))
+    n7, s7 = cur.fetchone()
+    chk(n7 > 0 and float(s7) / n7 > 0,
+        f"net $/trade 7d: {float(s7)/n7 if n7 else 0:+.4f} over {n7}T (target >0 sustained; baseline -0.0124)")
+    # 5b. fleet payoff ratio 14d (baseline ~1.05; target >=1.2)
+    cur.execute("""SELECT COALESCE(AVG(pnl_usdt - amount_usdt*%s) FILTER (WHERE pnl_usdt > 0),0),
+        COALESCE(AVG(pnl_usdt - amount_usdt*%s) FILTER (WHERE pnl_usdt < 0),0), COUNT(*)
+        FROM trades WHERE status='closed' AND close_time > NOW()-INTERVAL '14 days'""", (FEE, FEE))
+    aw, al, np_ = cur.fetchone()
+    payoff = (float(aw) / abs(float(al))) if float(al) else 0.0
+    chk(np_ >= 30 and payoff >= 1.2,
+        f"fleet payoff 14d: {payoff:.2f} (aw {float(aw):+.3f} / al {float(al):+.3f}) over {np_}T (target >=1.2; baseline ~1.05)")
+    # 5c. cost % notional RT 14d = synthetic fee + atr_sl stop-overshoot (exit_slippage_pct)
+    #     (baseline ~0.22% = 0.10 fee + 0.12 overshoot; target <=0.15%)
+    cur.execute("""SELECT COALESCE(SUM(amount_usdt),0),
+        COALESCE(SUM(amount_usdt*0.0009),0),
+        COALESCE(SUM(CASE WHEN exit_reason='atr_sl_hit' THEN amount_usdt*COALESCE(exit_slippage_pct,0) ELSE 0 END),0)
+        FROM trades WHERE status='closed' AND close_time > NOW()-INTERVAL '14 days'""", ())
+    tot_not, fee_sum, over_sum = cur.fetchone()
+    cost_pct = (float(fee_sum) + float(over_sum)) / float(tot_not) * 100 if float(tot_not) else 99.0
+    chk(cost_pct <= 0.15,
+        f"cost % notional RT 14d: {cost_pct:.3f}% (fee {float(fee_sum)/float(tot_not)*100 if float(tot_not) else 0:.3f}% + overshoot {float(over_sum)/float(tot_not)*100 if float(tot_not) else 0:.3f}%) (target <=0.15%; baseline ~0.22%)")
+    # WR = DIAGNOSTIC ONLY (no target) — reported, never gated
     cur.execute("""SELECT COUNT(*), 100.0*SUM(CASE WHEN pnl_usdt>0 THEN 1 ELSE 0 END)/COUNT(*)
-        FROM trades WHERE status='closed' AND close_time > NOW()-INTERVAL '14 days'
-        AND signal NOT LIKE '%jup_yolo%'""")
-    fn, fwr = cur.fetchone()
-    chk(fn >= 10 and float(fwr) >= 55.0,
-        f"non-jup fleet WR 14d: {float(fwr):.1f}% over {fn}T (target >=55% at n>=10)")
+        FROM trades WHERE status='closed' AND close_time > NOW()-INTERVAL '14 days'""")
+    wn, w = cur.fetchone()
+    out.append(f"info  WR 14d (diagnostic, NO target): {float(w):.1f}% over {wn}T")
 
     # book context (informational, not gated)
     for w in ('24 hours', '7 days', '30 days'):

@@ -7,7 +7,7 @@
   "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
   "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
  ],
- "updated": "2026-11-22T21:30:00Z",
+ "updated": "2026-11-22T22:00:00Z",
  "entries": [
   {
    "id": "flip-contrarian-pc",
@@ -2349,14 +2349,16 @@
    "id": "goal-metric-restructure",
    "stream": "goal metrics: replace fleet-WR>=55% target with expectancy set (CEO edge-diagnosis verdict 20261122T194418Z)",
    "kind": "eval",
-   "disposition": "EVAL",
-   "status": "open",
+   "disposition": "EXECUTED 2026-11-22 \u2014 T APPROVED both items (goal rewrite + philosophy): verifier goal_metrics_check.py restructured to the expectancy set (net $/trade 7d >0, fleet payoff 7d >=1.2, cost % RT <=0.15%; WR = info-only diagnostic, no target); AGENTS.md philosophy line reframed verbatim per CEO 20261122T194418Z",
+   "status": "done",
    "started": "2026-11-22",
    "deadline": "2026-11-24T00:00:00Z",
    "threshold": "PROPOSED new set (needs T sign-off before touching goal_metrics_check): net $/trade fee-adj (baseline 7d -$0.0124, target >0 sustained 7d) \u00b7 fleet payoff ratio (baseline ~1.05, target >=1.2) \u00b7 cost % notional RT (baseline 0.10% fees + ~0.12% overshoot, target <=0.15%) \u00b7 WR becomes DIAGNOSTIC ONLY (no target). Rationale: payoff<1.0 group = 23 signals -$9.21 at WR 54.7% \u2014 the >=55% target optimizes the losing population",
    "default_action": "keep current metrics until T approves (WR target is T's goal framework \u2014 CEO cannot unilaterally restructure)",
    "owner": "CEO+T",
-   "evidence": "CEO 20261122T194418Z item2; diagnosis Section7.2/7.3 verified exact"
+   "evidence": "CEO 20261122T194418Z item2; diagnosis Section7.2/7.3 verified exact",
+   "done_at": "2026-11-22",
+   "action_taken": "metric5 (fleet WR>=55%) replaced by 5a/5b/5c with baselines in-code; WR line = info, never gated; docstring cites verdict + T approval. AGENTS.md:15 third sentence = 'in expectancy: net-of-cost positive per trade is the only win that counts; hit rate is a diagnostic, not a goal' (momentum doctrine untouched; note cites edge-diagnosis doc + this entry)."
   },
   {
    "id": "post822-payoff-regrouping",

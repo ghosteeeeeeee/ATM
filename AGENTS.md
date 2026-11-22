@@ -12,7 +12,7 @@
 
 ## 🎯 Trading Philosophy
 
-**Every pump is a LONG opportunity. Every dump is a SHORT opportunity. Every trade should be a winner.**
+**Every pump is a LONG opportunity. Every dump is a SHORT opportunity. Every trade should be a winner — in expectancy: net-of-cost positive per trade is the only win that counts; hit rate is a diagnostic, not a goal.** (Reframed 2026-11-22 with T's approval — the hit-rate reading of the old line selected the losing population: payoff<1.0 signals = 23 at −$9.21 with the system's HIGHEST win rates. Momentum doctrine above untouched. See `brain/2026-11-22_hermes-edge-diagnosis.md` + goal-metric-restructure registry entry.)
 
 This is non-negotiable. If we're losing, we're on the wrong side of the trade — not at the wrong time. The system must catch moves in BOTH directions and never fade momentum. No time-of-day blocks, no blanket regime kills. The oscillator, the volume, the structure — they tell us which side to be on. We follow them.
 
