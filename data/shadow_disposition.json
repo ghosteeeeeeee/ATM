@@ -7,7 +7,7 @@
   "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
   "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
  ],
- "updated": "2026-11-22T20:10:00Z",
+ "updated": "2026-11-22T21:30:00Z",
  "entries": [
   {
    "id": "flip-contrarian-pc",
@@ -2362,14 +2362,16 @@
    "id": "post822-payoff-regrouping",
    "stream": "Section 7 payoff groups re-run on post-BUG-099 data (trailing 60d only)",
    "kind": "eval",
-   "disposition": "EVAL",
-   "status": "open",
+   "disposition": "MASKED EDGE DOES NOT SURVIVE CLEAN DATA (agent-7 run 2026-11-22, fixed anchors + fingerprints): payoff>1.2 group post-8/22 = gross +$3.97 t=+1.00 (ns) fee-net -$0.70 t=-0.18 (vs all-time +2.40); <1.0 loser group t=-4.10 (STRONGER than all-time -1.76) \u2014 cut case strengthened, keep case evaporated",
+   "status": "done",
    "started": "2026-11-22",
    "deadline": "2026-11-28T00:00:00Z",
    "threshold": "Re-run the payoff>1.2 / <1.0 grouping on trailing 60d fee-JSON-clean data only (all-time groups are BUG-099-contaminated and stale: only 3 of 14 keepers fired in 30d; post-8/22 keepers gross +$3.86 -> fee-net -$1.22). Deliver the LIVE keeper set with OOS split-halves same-sign; feed the 12-06/11-28 adjudications (atr-trend- KILL bar, r2v2/jup walks)",
    "default_action": "no signal changes from this analysis alone (cuts go through per-signal bars)",
    "owner": "signal_analyst",
-   "evidence": "CEO 20261122T194418Z idea7 + item1 deeper-problem finding"
+   "evidence": "SIDE FINDING HIGH (agent-7): BUG-099 NOT FIXED \u2014 fee_total/notional/0.0009 == leverage exactly on 76 rows post-8/22 (37 in W60, latest 2026-11-22 TODAY); missed close paths: atr_sl_hit(40), atr_trail_hit(7), profit-monster-trail(7), hard_max_loss(4), mfe_exit(2), trail_arm_timeout(2), ugb_pt(2), UNIVERSAL_MAX_HOLD(2) \u2014 any KPI summing fees::json->>'fee_total' is still wrong today; synthetic notional*0.0009 mandatory until write-path fixed. Extended into BUG-099 residue.",
+   "done_at": "2026-11-22",
+   "action_taken": "W60 (>=09-23, n=1366, md5 292c324e): >1.2 group n=353 gross +0.69 net -3.57 t(net) -1.15; <1.0 n=572 net -8.95 t -3.72. W822 (n=2821): >1.2 n=382 gross +3.97 net -0.70; <1.0 n=1108 net -18.84 t -4.10. LIVE KEEPERS = 0 of original 14: 9/14 have ZERO trades since 8/22 (accel_300_,rs_s_broken last 7/21 etc); the 4 that fired all fail (volume-breakout-long+ n=24<30 + OOS flip; pump-chain+ cent-noise +$0.01 with OOS sign flips both windows; ai-trader-pending fee-net -0.59; hl_copy -0.95). 7 confirmed losers feed per-signal cut bars (all in original 23): jup_yolo_mirrored 177T -2.83 pay0.50 (T-directive \u2014 cut needs T), bb-bounce-v2-long+ -1.56, bb-squeeze+ -1.20 (W60; NOTE conflicts with 30d +0.17 read \u2014 window-dependent, reband in-flight11-25 adjudicates), volume-buildup- -1.19, atr-trend- -1.05 (KILL bar already fires 12-06), doji-bottom-long -0.70, r2v2-long3 -0.41 (walk11-28). Caveats: synthetic fee model (no funding/slippage), 453/1366 no-JSON, OOS=median split not forward holdout, small groups (t fragile). Reproduce: /tmp/post822_payoff_regrouping.py (asserts premise + 14/5/23 reproduction)."
   },
   {
    "id": "winner-side-protection-review",
