@@ -1,256 +1,146 @@
 {
-  "timestamp": "2026-11-22T16:50:00Z",
-  "run": 289,
+  "timestamp": "2026-11-22T20:49:14Z",
+  "run": 290,
   "session_brain_stats": {
-    "queries": 12,
-    "hits_each": "2-5",
-    "all_cited": true,
-    "quality_note": "session_brain dup-heavy as flagged in prior runs; 4 queries returned weak/irrelevant hits (scores >1.0) and are cited only as weak/no-prior-art evidence"
+    "queries": 9,
+    "all_cited": true
   },
   "questions_asked": [
     {
-      "question": "what did we say about atr-trend- EXTREME regime short losses",
+      "question": "what did we say about atr-trend- losses EXTREME regime",
       "results_found": 5,
-      "cited": true,
-      "citation": [
-        "risk-budget decision",
-        "2026-10-21",
-        "'It is not signal quality — it is regime routing + chop mechanics' — same frame as this run's finding; no atr-trend- EXTREME gate was ever shipped"
-      ]
+      "cited": true
     },
     {
-      "question": "have we tried gating atr-trend shorts by volatility regime before",
+      "question": "have we tried disabling or filtering atr-trend SHORT",
+      "results_found": 4,
+      "cited": true
+    },
+    {
+      "question": "what did we say about prearm_lock guard working",
       "results_found": 2,
-      "cited": true,
-      "citation": [
-        "hall of shame",
-        "2026-10-11",
-        "check winrate stats to make sure they are enabled in the valid regimes"
-      ]
+      "cited": true
     },
     {
-      "question": "prearm_lock breakeven cap enforce outcome",
+      "question": "have we tried RSI filter for short entries before",
       "results_found": 5,
-      "cited": true,
-      "citation": [
-        "youtube watch",
-        "2026-11-08",
-        "weak hit (score 1.04) — NO prior art on enforce-day outcomes; live data used instead: 12 exits since 11-20 01:26Z avg -0.011"
-      ]
+      "cited": true
     },
     {
-      "question": "24 hour losing streak win rate fee drag chop",
-      "results_found": 5,
-      "cited": false,
-      "note": "all hits were transcript-miner noise — no prior session text on this exact window; dispositioned from live data"
-    },
-    {
-      "question": "jup atr_sl_hit chop entries shadow parity filter",
-      "results_found": 5,
-      "cited": true,
-      "citation": [
-        "mfe exit",
-        "2026-10-31",
-        "verdicts: {hml65: REJECT, hml50: REJECT} — jup HML variants already REJECTED; no enforcement"
-      ]
-    },
-    {
-      "question": "HIGH volatility regime losing trades gate",
+      "question": "arm rate stall stack progress unarmed losers",
       "results_found": 2,
-      "cited": true,
-      "citation": [
-        "risk-budget decision",
-        "2026-10-21",
-        "regime routing + chop mechanics — prior HIGH/regime-gate discussion"
-      ]
+      "cited": true
     },
     {
-      "question": "atr_sl_hit 0 win rate stop too tight",
-      "results_found": 5,
-      "cited": true,
-      "citation": [
-        "ugb_pt exit",
-        "2026-10-31",
-        "T: 1.0% was binding constraint on nearly every ATR_SL loss — normal 1% pullbacks = instant SL hit; 1.2% gives breathing room"
-      ]
+      "question": "what did we say about win capture giveback shadow",
+      "results_found": 4,
+      "cited": true
     },
     {
-      "question": "btc-pump-rider LONG EXTREME winner cell notional size",
-      "results_found": 5,
-      "cited": false,
-      "note": "weak hits only (s>0.92) — no prior art found for this exact cell"
+      "question": "have we tried cutting low payoff signals expectancy",
+      "results_found": 4,
+      "cited": true
     },
     {
-      "question": "winner cell notional multiplier validation bar",
-      "results_found": 5,
-      "cited": true,
-      "citation": [
-        "calwndar",
-        "2026-10-31",
-        "sizing chain _trade_size = base * favorite_mult * amplitude_mult"
-      ]
+      "question": "masked edge high win rate losers payoff",
+      "results_found": 4,
+      "cited": true
     },
     {
-      "question": "ai-trader-pending NORMAL SHORT winner cell",
-      "results_found": 5,
-      "cited": true,
-      "citation": [
-        "signal analyst",
-        "2026-10-24",
-        "ai-trader winrate stuck at 35% discussion — ai-trader performance is long-standing CEO topic, tag-split due 11-24"
-      ]
-    },
-    {
-      "question": "have we tried lowering prearm lock band below 0.25 giveback cap",
-      "results_found": 5,
-      "cited": true,
-      "citation": [
-        "yolo dash",
-        "2026-11-02",
-        "MFE_EXIT_ARM_PCT 0.0 -> 0.004: 'a minimum arm threshold is essential' else trades close at essentially breakeven constantly — closest prior art, OPPOSITE direction (floor raised, not band lowered)"
-      ]
-    },
-    {
-      "question": "prearm lock band 0.25 0.40 breakeven cap design",
-      "results_found": 5,
-      "cited": false,
-      "note": "weak hits — band-lowering itself has no prior attempt (no prior art found)"
+      "question": "have we tried floor admit verdict ship",
+      "results_found": 3,
+      "cited": true
     }
   ],
   "trade_summary_24h": {
-    "pg_window_16_20z": "18T 27.8% gross -0.06",
-    "watchdog_window": "13/20 lost, WR 30%, -0.12 (steer-001)",
-    "auto_1hr_15_55z": "20T 30.0% net -0.41 (gross -0.12, fees 0.29)",
-    "7d": "122T 48.4% gross +0.06 / net -1.79 (fees 1.85)",
-    "14d": "231T 47.6% gross -0.58",
-    "30d": "648T 52.9% gross -2.47",
-    "armed_vs_never_7d": "armed 61T 83.6% +3.47 | never 61T 13.1% -3.41",
-    "armed_vs_never_14d": "armed 118T 83.1% +7.60 | never 113T 10.6% -8.18",
-    "regime_7d": "NORMAL 24T 58.3% +0.39 | EXTREME 47T 48.9% +0.14 | HIGH 51T 43.1% -0.47",
-    "kill_screen_14d_sub50_n15": "ZERO ROWS",
-    "chop_mandate": "14d exits: pm_trail 72T 97.2% +4.55 vs atr_sl_hit 32T 0% -3.47 / hard_max 25T 0% -2.62 / manual_sl 22T 0% -2.13 / prearm_lock 12T -0.13 (guard). 30d: atr_sl_hit 90T 0W -9.83 (94% never-armed, avg MFE 0.176) = largest bleed bucket, covered by stop-family-entry-filter-shadow (11-27) + jup-atrsl parity (12-01)"
+    "24h": "14T 42.9% net +0.14",
+    "7d": "114T 50.0% net +0.38 (GREEN — first positive 7d in weeks)",
+    "14d": "227T 47.6% net -0.39",
+    "30d": "647T 52.9% net -2.48",
+    "armed_7d": "59T 83.1% +3.43",
+    "never_7d": "55T 14.5% -3.05",
+    "rr_asymmetry_7d": "avg win +0.0718 vs avg loss -0.0713 = 1.00x (breakeven WR 49.7% vs actual 50.0%)",
+    "chop_bleed": "7d 82.7% (43/52) / 14d 84.3% (91/108) — BELOW 92% push bar",
+    "exits_14d": "pm_trail 69T 97.1% +4.46 || atr_sl 31T 0% -3.33 || hard_max 24T 0% -2.53 || manual_sl 22T 0% -2.13 || prearm_lock 12T avg -0.011 (guard working)",
+    "regime_7d": "NORMAL +0.38 / EXTREME +0.14 / HIGH -0.14"
+  },
+  "watchdog_triage": {
+    "steer-001": "URGENT 13/20 lost — self-diagnosis (shipped #289) LIVE: 12/13 never armed = chop cohort, arm-rate/stall stack owns fix. Window artifact (last-20 all-signal book). NO ACTION.",
+    "steer-002": "atr-trend- 3 consecutive — 14d 49T 57.1% net -0.61; EXTREME cell n=8<20 INSUFFICIENT; wins HIGH 60%+NORMAL 62.5% -> MONITOR, auto_1hr NO-block stands. Losses 0/20 armed = same chop class.",
+    "steer-003": "pump-chain+ prearm_lock streak = guard working (caps at -0.01), NOT a disable candidate."
   },
   "shadow_analysis": {
-    "contrarian": "JOIN RE-RAN 16:30Z (mandate): overall flip 47.3% n=2457 decided — flipping LOSES. per-signal only: pc- BELOW-branch ~63-70% holds (LIVE prefix stands), rider chi2 p~1e-42 do-NOT-flip",
-    "floor_admit": "join fresh 12:31Z: floor_only 50.0% vs always_admit 47.2%, fisher p=0.2862 — NOT significant, not converging (was 0.2532 at 04:44Z) -> route stays CLOSED, no 11-15 early promote",
-    "oscillator": "ARCHIVED fossil — not answerable (pre-live evidence only)",
-    "wyckoff": "retired, no outcome join",
-    "rr_shadow": "orphaned (no producer, 24d stale) — not answerable",
-    "shadow_trader": "133,439 signals — ALL gates block would-win 44-56% cohorts at avg-negative EV (gates earning keep: CONFLUENCE-EXPIRY 18,724 @47% -0.13, COMBO-STALE 8,053 -0.16, BTC-CRASH 2,403 -0.17). Exit A/B: pm_trail +20,528 vs hard_max -26,645 / rr_engine -9,670 / cut_loser -2,359 = TRAIL-OR-NOTHING confirmed. HML report: peak-buyers grind-breakout+ / return_exhaustion / ai-trader- / pump-chain-v6-",
-    "overall": "3/6 raw sources answerable + shadow_trader + 2 live outcome joins; contrarian and floor both RE-RAN this run"
+    "contrarian": "JOIN RE-RAN 20:31Z — overall flip 48.4% n=2526 (flipping loses); pump-chain- 61W/44L ~58% directionally holds below tape; rider chi2 p=2e-46 = per-signal only, do-NOT blanket",
+    "floor_admit": "JOIN RE-RAN 20:42Z — floor_only 49.7% n=2093 vs always 46.9% n=491, fisher p=0.2897 (decaying trajectory continues) -> NO-SHIP stands, route CLOSED",
+    "win_capture": "INTERIM READ due 11-22: n=8/40 FAIL, capture 0.608 vs bar 0.70 FAIL, whatif delta +$0.10 over sample -> CONTINUE to 11-25",
+    "shadow_trader": "exit A/B pm_trail +20,608 vs hard_max -26,750 / rr -9,747 / cut_loser -2,359 = TRAIL-OR-NOTHING; all gates block would-win avg-negative-EV",
+    "oscillator_wyckoff_rr": "archived / retired / orphaned = 3/6 answerable + shadow_trader + 2 live joins"
   },
   "drift_findings": [
     {
-      "item": "steer-001 said 'Something is wrong' with zero composition — every run re-derived the chop diagnosis by hand",
-      "impact": "wasted audit cycles; 'critical' health badge carried no triage info",
-      "fixed": "SHIPPED this run: never-armed/gave-back composition + exit mix in the steer detail (see config_changes_applied)"
+      "finding": "steer-001 self-diagnosis (#289) is LIVE and firing correctly in watchdog.json",
+      "status": "working",
+      "impact": "triage only"
     },
     {
-      "item": "session_brain dup-heavy",
-      "severity": "LOW",
-      "status": "14th+ run flagged — ideation-only quality, 4/12 queries returned transcript noise"
+      "finding": "prearm_lock guard (CEO GO 11-20): 12 exits avg -0.011 (min -0.03 max +0.01)",
+      "status": "working",
+      "impact": "caps never-armed bleed; day-7 fk walk due 11-28"
     },
     {
-      "item": "portfolio_health='critical' from a 20-trade WR window",
-      "severity": "INFO",
-      "status": "ASSESSED, NOT CHANGED — at $11 notional dollar-magnitude health would be permanently green (useless badge); WR window is the right signal at fixed size. Consumers are display-only (web/watchdog.html, brain_api passthrough) — no auto-trading reaction"
+      "finding": "RR asymmetry collapsed 1.65x -> 1.00x over the stop-tighten/prearm stack",
+      "status": "structural improvement",
+      "impact": "7d net flipped GREEN +0.38"
     }
   ],
   "recurring_problems": [
-    {
-      "problem": "never-armed chop cohort owns the entire bleed",
-      "evidence": "7d never 61T 13.1% -3.41 vs armed 61T 83.6% +3.47; 14d never 113T -8.18; 14d atr_sl+hard_max = 57T -6.09 with 0 armed exits",
-      "owner": "stop-family-entry-filter-shadow (11-27), brake-counterfactual (11-24), stall stack — NOT re-proposed"
-    },
-    {
-      "problem": "fee drag flips 7d green to red",
-      "evidence": "7d gross +0.06 / fees 1.85 / net -1.79; 24h gross -0.12 / fees 0.29",
-      "owner": "maker-entry fee walk (11-28, in queue)"
-    }
+    "chop-bleed (never-armed losers) — chronic but now BELOW the 92% push bar (82.7%/84.3%); remedy stack (prearm/TAT/stop-family) still owning it",
+    "arm-rate: 7d never-armed 55T WR 14.5% net -3.05 — the remaining single largest bleed bucket"
   ],
   "missing_implementations": [],
   "creative_improvements": [
     {
-      "id": "C1-audit289",
-      "idea": "WATCHDOG steer-001 SELF-DIAGNOSIS — losing-streak steer now reports never-armed/gave-back composition + top exit reasons instead of 'Something is wrong'",
-      "rationale": "window was 12/13 never-armed = classic chop cohort; diagnosis was already known (mandate + #248 stall decomposition) but never surfaced where the alarm fires",
-      "expected_impact": "every future run triages steer-001 in one read; kills the 'critical but what do we do' round-trip",
-      "category": "steer quality",
-      "status": "SHIPPED this run (py_compile PASS, --selfcheck 9 fixtures PASS, live-verified: '12/13 losses never armed (MFE<0.40%) = chop cohort, not wrong-side; arm-rate/stall stack owns the fix. Exits: prearm_lock x6, atr_sl_hit x2, hard_max_loss x2')",
-      "risk": "low"
+      "idea": "RR-collapse KPI — treat 1.00x ratio + GREEN 7d as the stack's first structural win; shift focus from loss-SIZE to arm-rate",
+      "status": "observed"
     },
     {
-      "id": "C2-audit289",
-      "idea": "PREARM-BAND-LOWER candle-OOS pre-registration — extend prearm_lock giveback band from [0.25,0.40) down to [0.10,0.40)",
-      "rationale": "never-armed losers by MFE bucket 14d: <0.10 -4.10 (unreachable by any band-keyed cap), 0.10-0.15 -0.94, 0.15-0.20 -0.71, 0.20-0.25 -0.77, [0.25,0.40) -2.07 (already covered) — lowering the band to 0.10 has a +2.42/14d ceiling (+8.42/30d); fk surface = 66 armed winners with mfe<1.0 (+3.05/14d) that dipped through a lower band before arming",
-      "expected_impact": "if candle-OOS clears, captures up to ~2.4/14d of the stall bleed; if fk fails, dies in shadow at zero cost",
-      "category": "exit quality",
-      "status": "PRE-REGISTERED (kind eval in shadow_disposition, due 2026-12-01, NO CODE)",
-      "risk": "medium — prior art [yolo dash 2026-11-02] rejected too-low arm thresholds for breakeven churn; bar must kill exactly that",
-      "bar": "candle-OOS net >= +1.00/14d in pnl_usdt UNITS (units guard #193) AND fk<20% AND 30d same-sign",
-      "prior_art": "NOT a duplicate of ARM-BE (post-0.40) / TAT / mfe-cut / prearm-enforce-day7-read; closest = MFE_EXIT_ARM floor 0->0.004 (opposite direction)"
-    },
-    {
-      "id": "C3-audit289",
-      "idea": "atr_sl_hit as a SIGNAL, not just an exit — 30d 90T 0%W -9.83 with avg MFE 0.176 = momentum never arrived",
-      "rationale": "every atr_sl_hit trade in 30d lost (94% never armed); the exit signature itself identifies the chop-entry class the mandate says to keep out of",
-      "status": "MONITOR — already owned by stop-family-entry-filter-shadow (11-27) + jup-atrsl parity (12-01); jup owns 30/90 (-4.03)",
-      "risk": "none (no code)"
+      "idea": "BTC SHORT #17052 meta_rsi 17.25 = BANANA oversold-short pattern live (ai-trader CEO domain, report-only)",
+      "status": "reported"
     }
   ],
-  "config_changes_applied": [
-    {
-      "file": "scripts/trade_watchdog.py",
-      "type": "steer-quality (non-constant, non-trading)",
-      "change": "steer-001 losing-streak detail now self-diagnoses: added mfe_pct to collect_recent_closed SELECT; analyze_recent_losses emits never-armed majority -> 'chop cohort, not wrong-side; arm-rate/stall stack owns the fix', armed majority -> 'exit/lock review', else mixed; exit-reason top-3 mix always appended when mfe present; added constants STEER_ARMED_MFE_PCT=0.40 / STEER_NEVER_ARMED_SHARE=0.60; --selfcheck extended to 9 fixtures (a-i) with mfe_pct SELECT mutation guard",
-      "behavior_change": "STEER TEXT ONLY — no trading, sizing, gate, or kill behavior touched; hermes_constants.py git diff EMPTY; CEO_PROTECTED_FLAGS untouched",
-      "verified": "py_compile PASS; --selfcheck PASS (5 interval-merge + 9 streak fixtures); live run on current last-20: detail = 'Win rate 30% ... 12/13 losses never armed (MFE<0.40%) = chop cohort, not wrong-side; arm-rate/stall stack owns the fix. Exits: prearm_lock x6, atr_sl_hit x2, hard_max_loss x2.'"
-    }
-  ],
+  "config_changes_applied": [],
   "changes_from_last_run": [
     {
-      "change": "#288 watchdog exit_reason in collect_recent_closed + prearm streak guard note",
-      "worked": "YES — live steer-003 (pump-chain+) carries '3/3 streak exits are prearm_lock breakeven caps (guard live 2026-11-20) — cap working, NOT a disable/tune candidate'; steer-002 (atr-trend-) correctly has NO note since its streak is stops/cut-loser not prearm"
+      "change": "#289 steer-001 self-diagnosis",
+      "verified": "LIVE — watchdog detail shows 'chop cohort, not wrong-side; arm-rate/stall stack owns the fix'",
+      "outcome": "WORKING"
     },
     {
-      "change": "#288 registered prearm-enforce-day7-read (due 11-28)",
-      "worked": "YES — present in shadow_disposition open entries; prearm_lock guard health: 12 exits since 11-20 01:26Z, avg -0.011, min -0.03, max +0.01 = working as designed; 6 of this window's 13 losses are prearm caps"
-    },
-    {
-      "change": "#287 dispositioned rider-fade NO FLIP / win-capture / capture-leaderboard",
-      "worked": "YES — no past-due entries found this run; next deadline 11-23 (jup-long clonehunt + formal weekly)"
+      "change": "#289 prearm-band-lower-candle-oos registration",
+      "verified": "present in shadow_disposition, due 12-01, no code (correct)",
+      "outcome": "ON-TRACK"
     }
   ],
-  "amplify_weekly": {
-    "proposal_emitted": false,
-    "why_not": "30d winner cells n>=10 net>0 (7 cells): ai-trader-pending NORMAL SHORT 25T +1.37 (IN-FLIGHT: tag-split due 11-24 + CEO-domain pending orders; all 25 fills in last 15d = no OOS), bb-squeeze+ NORMAL LONG 36T +0.56 (ALREADY in WINNER_CELLS_VALIDATED), volume-buildup- HIGH SHORT 19T +0.41 (ALREADY validated), btc-pump-rider+ EXTREME LONG 13T +0.35 (FAILS 2-consecutive-positive-weeks: 11-09 wk -0.04, 11-16 wk +0.39), jup_yolo_mirrored HIGH SHORT 28T +0.29 (IN-FLIGHT amplify-jup-short-walk due 11-28), pump-chain- NORMAL LONG 31T +0.15 (below +0.50-type bar, WR 38.7% R:R-class), atr-trend- NORMAL SHORT 19T +0.13 (below bar, n=19<20; atr-trend-accel shadow due 12-06 covers family). Formal weekly AMPLIFY due 11-23 services amplify-jup-long-blocked-clonehunt.",
-    "flip_kpi": "MET (prearm enforce shadow->live 11-20) — no new conversion this run"
+  "amplify_step": {
+    "formal_weekly_due": "2026-11-23 (tomorrow — jup-long clonehunt + weekly)",
+    "new_proposals": 0,
+    "why_not": "Top 30d n>=10 cells all in-flight or CEO-domain: ai-trader-pending NORMAL SHORT 25T +1.37 (CEO domain, covered by winner-side-protection-review) · bb-squeeze+ NORMAL LONG 36T +0.56 (4 in-flight) · vb- HIGH SHORT 19T +0.41 (clone-hunt) · rider EXTREME LONG 13T +0.35 (+1.25x adds ~+0.09/30d < +1.00 materiality) · jup HIGH SHORT 28T +0.29 (HIGH OOS) · pc- NORMAL LONG 31T +0.15 (contrarian). Flip-KPI MET this week (prearm enforce 11-20).",
+    "early_cells": "0 n5-9 net>0.50"
   },
-  "losing_autopsy": {
-    "method": "recovery_replay adverse-first (selfcheck ASSERT PASS) — open-anchored replay NOT used (vacuous, run #85)",
-    "48h": "n=20 = 5 never-adverse / 12 recovered-after-adverse / 3 NEVER -> WRONG-SIDE REFUTED 140th consecutive run (#61 opposite-side p=0.116, #84 fwd-return t=-0.04)",
-    "never_cohort": "KAS atr-trend- SHORT -0.11 cut-loser-CL-T1 (MFE 0.0, 23min, chop) · BLUR pump-chain+ -0.02 prearm · RESOLV atr-trend+ -0.01 prearm — all never-armed chop class, guards/prescribed exits",
-    "window_13_losers_pattern": "12/13 never armed (max MFE among them 0.39; only BLUR 0.406 armed-then-capped); 6/13 are prearm_lock -0.01 caps = guard working; 0 losers entered with momentum and got run over"
-  },
-  "signal_quality_deep_dive": {
-    "new_targets": "ZERO (kill screen 14d sub-50% n>=15 net<0 = 0 rows)",
-    "atr_trend_minus_steer": "steer-002 dispositioned: 14d 50T 58.0% -0.59 overall; by regime EXTREME 8T 37.5% -0.51 (n=8<20 INSUFFICIENT) / HIGH 25T 60% -0.15 / NORMAL 17T 64.7% +0.07 — wins HIGH+NORMAL, auto_1hr 08:52Z already ruled NO-block (n=8 ns); 24h's 4 SHORTs -0.17 = 1 hard_max + 1 cut-loser + 1 prearm + 1 (ZRO EXTREME MFE -0.07 = never-armed chop). MONITOR, no kill",
-    "high_regime_gate": "REJECTED-WITH-DATA: 30d HIGH 187T 51.3% -3.17 (both split-halves negative: 102T -1.46 / 85T -1.71) BUT a blanket HIGH gate would have blocked 22 of ~59 7d winners (+1.64, 37% winner-kill > 20% bar) including vb- 78.9% cell and jup SHORT +0.29 cell. Bleed is exit-side (atr_sl -3.42 + hard_max -3.25 of the -8.52 losers), owned by stop-family shadow (11-27)"
-  },
-  "next_actions": [
-    "11-23: jup-long blocked clone-hunt (amplify-jup-long-blocked-clonehunt) + FORMAL WEEKLY AMPLIFY",
-    "11-24: ai-trader-pending tag-split (decides whether the +1.37 NORMAL-SHORT cell is sizeable) / gate-cross-tab / brake-cf / regime-gate-tension",
-    "11-25: WIN-CAPTURE READ (n>=40, pace >= +$0.10/day, fk<20%) + bbsqueeze reband + watch-contrarian + structure-flip + hotset-pin + pcfade",
-    "11-26: storm waiver bar + capture-leaderboard (CEO storm sign-off deadline)",
-    "11-27: stop-family-entry-filter (the 90T/0W/-9.83 atr_sl chop bucket) + linregfade + pc-weight",
-    "11-28: maker-entry fee walk + PREARM-ENFORCE-DAY7-READ (full fk walk; 6/10 reach-proxy) + jup-walk + dual-basis + conf-tilt + r2v2 clonehunt + reentry",
-    "12-01: prearm-band-lower candle-OOS (NEW, registered this run)",
-    "12-03 kill-line (only pending checkpoint) · 12-06 atr-trend-accel · 12-15 ugb-bypass",
-    "CEO owed: V6 kill RATIFY/VETO · rider-fade fk-limb · maker-entry lever (NO-SHIP default) · mult-150 label (pending since 11-04, CHASE) · storm bar by 11-26"
+  "last_run_verify_289": "ALL PASS — steer-001 selfdiag live ✓ · prearm-band-lower registered ✓ · constants EMPTY ✓ · session lock ABSENT ✓ · size-reduce absent=1.0x ✓ · CEO_PROTECTED intact (16 flags incl F6 MFE trio) ✓ · 0 Tracebacks ✓ · recovery selfcheck PASS ✓ · checkpoint_registry only kill-line 12-03 ✓ · prearm guard 12 exits avg -0.011 ✓",
+  "open_trades": [
+    "BTC SHORT ai-trader-pending #17052 @60624, 2.4h, 0.00, SL 61330 / TP 58953, meta_rsi 17.25 (BANANA watch), NORMAL — HOLD bracketed",
+    "SOL LONG jup_yolo_mirrored #17053 @69.92 opened 20:32Z, SL 69.39 / TP 71.01 — HOLD bracketed"
   ],
-  "readiness_16_50z": {
-    "open": "1 — BTC LONG #17051 ai-trader-pending @60570, +0.70% (+$0.08), 2.4h, SL trailed 60553 (below entry = breakeven-protected), TP 62300, meta_rsi 34 — HOLD bracketed",
-    "regime": "btc_15m SHORT_BIAS vs btc_4h LONG_BIAS DISAGREE · continuum ABOVE · vol LOW · velocity SLOW · market_phase DECLINING vs trend_quality STRONG_UP · auto_trader CHOP/MANAGE_ONLY",
-    "call": "sources disagree = chop. NO fresh counter-trend entries; trail-family first; LONGs only on reclaim-that-holds with volume; SHORTs only with 4h aligned; size 1.0x (size-reduce file absent = truth). Watchdog 'critical' = steer-001 window (now self-diagnosed as chop cohort), 0 auto-executable steers"
-  }
+  "readiness": "2 open both bracketed — HOLD. btc_15m SHORT_BIAS vs btc_4h LONG_BIAS DISAGREE = chop; continuum BELOW; vol LOW; velocity SLOW; trend_quality STRONG_DOWN. Rule: NO fresh counter-trend entries; dump-side preferred while 15m agrees with trend_quality; trail-family first; size 1.0x.",
+  "next_actions": [
+    "11-23 FORMAL WEEKLY AMPLIFY + amplify-jup-long-blocked-clonehunt (candle-walk provenance)",
+    "11-24 ai-trader-pending-tag-split + brake-cf + gate-cross-tab + regime-tension",
+    "11-25 WIN-CAPTURE verdict (n>=40, capture>=0.70, net30>=$0.10/day) + watch-contrarian + hotset-pin",
+    "11-26 storm waiver (CEO deadline) + capture-leaderboard",
+    "11-27 stop-family-entry-filter + linregfade + pc-weight",
+    "11-28 prearm-enforce-day7 fk walk + jup-walk + dual-basis + conf-tilt + r2v2 + reentry",
+    "12-01 prearm-band-lower candle OOS",
+    "CEO owed: V6 kill RATIFY/VETO · rider-fade fk-limb · maker-entry lever · mult-150 label CHASE · storm bar by 11-26 · edge-diagnosis brief (accounting/friction/goal-metric reconciliations)"
+  ]
 }

@@ -4708,5 +4708,16 @@
     "after": "\"Win rate 30% over last 20 trades. Total PnL: -0.12 USDT. 12/13 losses never armed (MFE<0.40%) = chop cohort, not wrong-side; arm-rate/stall stack owns the fix. Exits: prearm_lock x6, atr_sl_hit x2, hard_max_loss x2.\"",
     "rationale": "steer text only — every run was re-deriving the known chop diagnosis by hand; no trading behavior touched (hermes_constants EMPTY diff)",
     "impact": "triage speed; live-verified, py_compile + --selfcheck 9 fixtures PASS"
+  },
+  {
+    "timestamp": "2026-11-22T20:48:12Z",
+    "agent": "brain_auditor",
+    "change": "Audit #290: appended interim WIN-CAPTURE read (n=8 FAIL, continue to 11-25) + floor-join fresh p=0.2897 confirm + ai-trader NORMAL-SHORT cell check to data/shadow_disposition.json",
+    "type": "data",
+    "file": "data/shadow_disposition.json",
+    "before": "evidence without 11-22 reads",
+    "after": "evidence includes 11-22 interim reads",
+    "rationale": "mandated interim reads due 11-22; zero trading behavior",
+    "impact": "verdicts unchanged (WIN-CAPTURE continue, floor NO-SHIP stands)"
   }
 ]

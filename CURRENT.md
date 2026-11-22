@@ -1,54 +1,54 @@
-# Current State — brain_auditor #289 2026-11-22 16:55 UTC
-**Last Updated: 2026-11-22 16:55 UTC**
-**Updated by: brain_auditor #289. Prior: #288 2026-11-22 04:45 UTC (preserved in git history).**
+# Current State — brain_auditor #290 2026-11-22 20:50 UTC
+**Last Updated: 2026-11-22 20:50 UTC**
+**Updated by: brain_auditor #290. Prior: #289 2026-11-22 16:55 UTC (preserved in git history).**
 
-## HEADLINE — THE 'CRITICAL' LOSING-STREAK ALARM SAID 'Something is wrong' WHILE THE ANSWER WAS ALREADY KNOWN: 12/13 LOSSES NEVER ARMED. steer-001 now self-diagnoses chop-cohort vs giveback at the alarm site (shipped, live-verified). 0 trading-constant changes.
+## HEADLINE — 7d NET FLIPPED GREEN (+0.38) AND RR ASYMMETRY COLLAPSED TO 1.00x: the stop-tighten + prearm stack has fully normalized loss-size; chop-bleed dropped BELOW the 92% push bar (82.7%/84.3%) for the first time in ~20 runs. 0 trading-constant changes. Focus shifts from loss-SIZE to ARM-RATE.
 
-1. **steer-001 SELF-DIAGNOSIS SHIPPED (`scripts/trade_watchdog.py`).** `mfe_pct` added to `collect_recent_closed`; never-armed majority → "chop cohort, not wrong-side; arm-rate/stall stack owns the fix", armed majority → "exit/lock review", mixed keeps the alarm; exit-reason top-3 mix appended. Constants `STEER_ARMED_MFE_PCT=0.40`, `STEER_NEVER_ARMED_SHARE=0.60`. py_compile PASS · `--selfcheck` 9 fixtures PASS (incl. mfe_pct SELECT mutation guard) · live: *"12/13 losses never armed (MFE<0.40%) = chop cohort… Exits: prearm_lock x6, atr_sl_hit x2, hard_max_loss x2."* Complements #288's per-signal prearm-streak note (steer-003 guard note still live).
-2. **HIGH-REGIME BLANKET GATE REJECTED-WITH-DATA.** 30d HIGH 187T 51.3% '-3.17', both split-halves negative — but would block 22 of ~59 7d winners (+1.64, **37% winner-kill > 20% bar**). Bleed is exit-side (atr_sl -3.42 + hard_max -3.25 of -8.52) → owned by stop-family-entry-filter-shadow (11-27). Same verdict class as #287's four rejected candidates.
-3. **Steers 3/3 dispositioned:** steer-001 = chop cohort, window artifact (24h gross -0.06 vs watchdog window -0.12; 7d GROSS +0.06 → net -1.79 fee-drag) · steer-002 atr-trend- = EXTREME cell n=8<20 INSUFFICIENT, wins HIGH+NORMAL → MONITOR, auto_1hr NO-block stands · steer-003 = prearm guard working (6/13 window losses are -0.01 caps).
-4. **PREARM guard health day-2+: 12 exits since 11-20 01:26Z, avg -0.011 (min -0.03, max +0.01)** = working; full fk walk due 11-28 (`prearm-enforce-day7-read`).
-5. **Kill screen 0 rows · AMPLIFY 0 new (why-not with all 7 cells) · Flip-KPI MET** (prearm enforce 11-20). Formal weekly due 11-23 (tomorrow: jup-long clonehunt + weekly).
+1. **STRUCTURAL WIN (observe, don't touch):** 7d avg win +0.0718 vs avg loss -0.0713 = ratio **1.00x** (was 1.65x two weeks ago) → breakeven WR 49.7% vs actual 50.0% = book at breakeven; 7d net **+0.38 GREEN**. Drivers: stop-tighten (11-04) + prearm ENFORCE (11-20, 12 exits avg -0.011) + RSI ceiling. **Remaining bleed = ARM-RATE: 7d never-armed 55T WR 14.5% net -3.05** — owned by queued arm/stall stack (prearm-band-lower 12-01, stop-family 11-27).
+2. **CHOP-BLEED BELOW BAR:** 7d 82.7% (43/52) / 14d 84.3% (91/108) vs 92% push bar — first break below since the streak began. No escalation; remedy stack continues.
+3. **Watchdog 3/3 dispositioned:** steer-001 = chop cohort (self-diagnosis from #289 LIVE-FIRING, no action) · steer-002 atr-trend- EXTREME cell n=8<20 INSUFFICIENT, wins HIGH+NORMAL → MONITOR · steer-003 prearm guard working (caps at -0.01).
+4. **Win-capture INTERIM READ (due 11-22): n=8/40 FAIL, capture 0.608/0.70 FAIL** → CONTINUE to 11-25 verdict. Floor join re-ran p=0.2897 (decaying) → NO-SHIP stands.
+5. **AMPLIFY: 0 new (formal weekly TOMORROW 11-23).** All top cells in-flight/CEO-domain/below materiality. Flip-KPI MET (prearm enforce 11-20).
 
 ### 1. FINDINGS THIS RUN
 | Item | Result |
 |---|---|
-| 24h / 7d | **18T 27.8% gross -0.06** (auto_1hr net -0.41, fees 0.29) / 122T 48.4% **gross +0.06, NET -1.79 (fees 1.85)** |
-| 14d / 30d | 231T 47.6% -0.58 · 648T 52.9% -2.47 |
-| armed vs never | 7d armed 61T **83.6% +3.47** vs never 61T 13.1% -3.41 · 14d armed 118T 83.1% +7.60 vs never 113T 10.6% -8.18 |
-| exits 14d | pm_trail 72T 97.2% **+4.55** ‖ atr_sl 32T 0% -3.47 · HML 25T 0% -2.62 · manual_sl 22T 0% -2.13 (CEO) · prearm_lock 12T -0.13 (guard) |
-| 30d bleed bucket | **atr_sl_hit 90T 0%W -9.83, 94% never-armed (avg MFE 0.176)** — jup owns 30/90 (-4.03); COVERED by stop-family (11-27) + jup-atrsl parity (12-01) |
-| regime 7d | NORMAL 24T 58.3% +0.39 · EXTREME 47T 48.9% +0.14 · HIGH 51T 43.1% -0.47 (blanket gate rejected, above) |
-| kill screen 14d sub-50 n>=15 | **ZERO rows** |
+| 24h / 7d | 14T 42.9% **+0.14** / 114T 50.0% **+0.38 GREEN** |
+| 14d / 30d | 227T 47.6% -0.39 · 647T 52.9% -2.48 |
+| armed vs never 7d | armed 59T 83.1% **+3.43** vs never 55T 14.5% **-3.05** |
+| RR 7d | win +0.0718 / loss -0.0713 = **1.00x** (breakeven WR 49.7%) |
+| chop-bleed | **7d 82.7% / 14d 84.3% — BELOW 92% bar** |
+| exits 14d | pm_trail 69T 97.1% +4.46 ‖ atr_sl 31T 0% -3.33 · HML 24T 0% -2.53 · manual_sl 22T 0% -2.13 · prearm_lock 12T avg -0.011 |
+| kill screen | 0 sub-50 n>=15 rows (ai-trader-pending 52T 36.5% is CEO-domain + net +0.52) |
 
-### 2. AUTOPSY (48h, recovery_replay adverse-first, ASSERT PASS)
-n=20 = 5 never-adverse / 12 recovered / **3 NEVER** (KAS atr-trend- cut-loser -0.11 MFE 0.0 · BLUR pc+ prearm -0.02 · RESOLV atr-trend+ prearm -0.01) = never-armed chop class → **WRONG-SIDE REFUTED 140th consecutive run** (#61 p=0.116, #84 t=-0.04). Window: max MFE among 13 losers = 0.406 (armed-then-capped); 0 losers entered with momentum and got run over.
+### 2. AUTOPSY (48h, recovery_replay adverse-first, SELF-CHECK PASS)
+n=18 = 5 never-adverse / 10 recovered / **3 NEVER** (KAS atr-trend- cut-loser · BLUR pc+ prearm · RESOLV atr-trend+ prearm — all tiny -0.01..-0.11 never-armed class) → **WRONG-SIDE REFUTED 141st consecutive run** (#61 p=0.116, #84 t=-0.04).
 
-### 3. SHADOW (both mandate joins re-run)
+### 3. SHADOW (both mandate joins re-ran)
 | Source | Status |
 |---|---|
-| contrarian join | **RE-RAN 16:30Z** — overall flip **47.3% n=2457** (flipping loses) · pc-\|BELOW ~63-70% holds · pc-\|AT 28.6% never blanket · rider chi2 ~1e-42 per-signal only |
-| floor join | **RE-RAN 12:31Z** — floor_only 50.0% vs always 47.2%, **fisher p=0.2862** (worse than 04:44's 0.2532, not converging) → route stays CLOSED |
-| shadow_trader | **133,439** signals — all gates block 44-56% would-win avg-negative-EV (earning keep); exit A/B **pm_trail +20,528** vs hard_max -26,645 / rr -9,670 / cut_loser -2,353 = **TRAIL-OR-NOTHING** |
+| contrarian join | **RE-RAN 20:31Z** — overall flip **48.4% n=2526** (flipping loses) · pc- ~58% below-tape direction holds · rider chi2 p=2e-46 = per-signal only |
+| floor join | **RE-RAN 20:42Z** — floor_only 49.7% n=2093 vs always 46.9% n=491, **fisher p=0.2897** (decaying) → NO-SHIP, route CLOSED |
+| win-capture | **INTERIM READ: n=8/40 FAIL, capture 0.608 FAIL** → CONTINUE to 11-25 |
+| shadow_trader | exit A/B **pm_trail +20,608** vs hard_max -26,750 / rr -9,747 = **TRAIL-OR-NOTHING** |
 | oscillator / wyckoff / rr | archived / retired / orphaned = **3/6 answerable + shadow_trader + 2 live joins** |
 
 ### 4. CREATIVE (this run)
-- **C1 SHIPPED:** steer-001 self-diagnosis (above).
-- **C2 PRE-REGISTERED (NO CODE):** `prearm-band-lower-candle-oos` (due 12-01) — extend prearm band [0.25,0.40) → [0.10,0.40). Ceiling: never-armed loser MFE buckets 0.10-0.25 = +2.42/14d (+8.42/30d); fk surface 66 armed winners mfe<1.0 (+3.05). **Bar: candle-OOS >= +1.00/14d pnl_usdt UNITS (guard #193) + fk<20% + 30d same-sign; default NO SHIP.** Prior art: MFE_EXIT_ARM floor 0→0.004 [yolo dash 11-02] rejected too-low thresholds — that churn risk is what the fk bar tests.
-- **C3 MONITOR:** atr_sl_hit as signal-not-exit (owned by in-flight 11-27/12-01).
+- **C1 OBSERVED:** RR-collapse KPI — 1.00x ratio + GREEN 7d = stack's first structural win; pivot measurement focus to arm-rate.
+- **C2 REPORTED:** BTC SHORT #17052 meta_rsi 17.25 = BANANA oversold-short pattern (ai-trader CEO domain; direction aligns 15m SHORT_BIAS, bracketed R:R ~2.3 — monitor, no lever).
 
 ### 5. DUE
-**11-23** jup-long clonehunt + **FORMAL WEEKLY AMPLIFY** → **11-24** tag-split / brake-cf / gate-cross-tab / regime-tension → **11-25** WIN-CAPTURE READ (n>=40, pace >= +$0.10/day, fk<20%) + bbsqueeze reband + structure-flip + watch-contrarian + pcfade + hotset-pin → **11-26** storm waiver (CEO deadline) + capture-leaderboard → **11-27** stop-family (90T/0W bucket) + linregfade + pc-weight → **11-28** maker-entry + **prearm-enforce-day7 fk walk** + jup-walk + dual-basis + conf-tilt + r2v2 + reentry → **11-29** tape-at-long → **12-01** prearm-band-lower walk (NEW) → 12-03 kill-line (only pending checkpoint) → 12-06 atr-trend-accel → 12-15 ugb-bypass.
+**11-23** jup-long clonehunt + **FORMAL WEEKLY AMPLIFY** → **11-24** tag-split / brake-cf / gate-cross-tab / regime-tension → **11-25 WIN-CAPTURE VERDICT** + bbsqueeze reband + structure-flip + watch-contrarian + pcfade + hotset-pin → **11-26** storm waiver (CEO) + capture-leaderboard → **11-27** stop-family (90T/0W bucket) + linregfade + pc-weight → **11-28** maker-entry + **prearm-enforce-day7 fk walk** + jup-walk + dual-basis + conf-tilt + r2v2 + reentry → **11-29** tape-at-long → **12-01** prearm-band-lower OOS → 12-03 kill-line → 12-06 atr-trend-accel → 12-15 ugb-bypass.
 
-### 6. CHANGES THIS RUN (both non-trading-behavior)
-1. `scripts/trade_watchdog.py` — steer-001 composition diagnosis + `mfe_pct` SELECT + 2 constants + `--selfcheck` 9 fixtures. STEER TEXT ONLY; hermes_constants.py git diff EMPTY; CEO_PROTECTED untouched.
-2. `data/shadow_disposition.json` — registered `prearm-band-lower-candle-oos` (kind eval, due 2026-12-01), atomic write.
+### 6. CHANGES THIS RUN (data-only, zero trading behavior)
+1. `data/shadow_disposition.json` — appended win-capture interim read (FAIL/continue), floor-join fresh p=0.2897 confirm, ai-trader cell check. Atomic write.
+2. `brain/audit_recommendations.json`, `brain/creative_improvements.json`, `brain/changes_log.json` — run artifacts.
 
-### 7. LAST-RUN VERIFY (#288) — ALL PASS
-steer-003 prearm guard note live ✓ · prearm-enforce-day7-read present (11-28) ✓ · prearm guard working (12 exits avg -0.011) ✓ · no past-due dispositions ✓ · constants EMPTY ✓ · protected untouched ✓ · size-reduce absent = 1.0x ✓ · **0 Tracebacks** ✓ · checkpoint_registry only kill-line 12-03 ✓ · recovery_replay selfcheck PASS ✓.
+### 7. LAST-RUN VERIFY (#289) — ALL PASS
+steer-001 selfdiag LIVE ✓ · prearm-band-lower registered ✓ · constants EMPTY ✓ · session lock ABSENT ✓ · size-reduce absent=1.0x ✓ · CEO_PROTECTED intact ✓ · 0 Tracebacks ✓ · recovery selfcheck PASS ✓ · registry only kill-line 12-03 ✓ · prearm guard 12 exits avg -0.011 ✓.
 
-### 8. READINESS (2026-11-22 16:55 UTC)
-**1 open — BTC LONG #17051 ai-trader-pending @60570, +0.70% (+$0.08), 2.4h, SL trailed 60553 BELOW entry = breakeven-protected, TP 62300, meta_rsi 34 — HOLD bracketed.** btc_15m SHORT_BIAS vs btc_4h LONG_BIAS **DISAGREE**, continuum ABOVE, vol LOW, velocity SLOW, market_phase DECLINING vs trend_quality STRONG_UP, auto_trader CHOP/MANAGE_ONLY → **chop: NO fresh counter-trend entries; trail-family first; LONGs only on reclaim-that-holds WITH volume; SHORTs only with 4h aligned; size 1.0x.** Watchdog 'critical' = steer-001 (now self-diagnosed chop cohort), 0 auto-executable steers.
+### 8. READINESS (2026-11-22 20:50 UTC)
+**2 open, both bracketed — HOLD:** BTC SHORT ai-trader #17052 @60624 (2.4h, 0.00, SL 61330/TP 58953, **meta_rsi 17.25 = BANANA watch**) · SOL LONG jup #17053 @69.92 (opened 20:32Z, SL 69.39/TP 71.01). btc_15m SHORT_BIAS vs btc_4h LONG_BIAS **DISAGREE = chop**, continuum BELOW, vol LOW, velocity SLOW, trend_quality STRONG_DOWN → **NO fresh counter-trend entries; dump-side preferred while 15m agrees with trend_quality; trail-family first; size 1.0x.**
 
-**CEO owed:** **V6 kill RATIFY/VETO** · **rider-fade fk-limb (rec: keep shadow one more 14d read)** · **maker-entry lever ruling (NO-SHIP default)** · **mult-150 label (pending since 11-04, CHASE)** · **storm bar sign-off by 11-26.**
+**CEO owed:** V6 kill RATIFY/VETO · rider-fade fk-limb · maker-entry lever · mult-150 label (CHASE) · storm bar by 11-26 · **edge-diagnosis brief reconciliations (accounting/friction/goal-metrics)**.
 **Flip-KPI:** MET (prearm enforce shadow→live 11-20).

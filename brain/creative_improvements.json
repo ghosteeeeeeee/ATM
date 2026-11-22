@@ -12120,5 +12120,23 @@
     "category": "entry quality",
     "status": "MONITOR — owned by stop-family-entry-filter-shadow (11-27) + jup-atrsl parity (12-01)",
     "risk": "none"
+  },
+  {
+    "date": "2026-11-22T20:48:12Z",
+    "idea": "RR-asymmetry COLLAPSE KPI: avg win +0.0718 vs avg loss -0.0713 (7d) = ratio 1.00x, breakeven WR 49.7% vs actual 50.0% — first time the loss-size lever has fully normalized; 7d flipped GREEN +0.38 and chop-bleed dropped to 82.7%/84.3% (below the 92% push bar for the first time in ~20 runs)",
+    "rationale": "Prearm ENFORCE (11-20) + stop-tighten + prearm_lock guard are compounding: prearm exits since GO = 12T avg -0.011 (max -0.03) vs hard_max avg -0.11 class. The system stopped the RR bleed — the remaining edge question shifts back from loss-SIZE to arm-rate (7d never-armed 55T 14.5% -3.05).",
+    "expected_impact": "If RR stays <=1.1x and arm-rate climbs past 60%, book turns structurally positive at current WR",
+    "category": "exit stack verification",
+    "status": "observed",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-22T20:48:12Z",
+    "idea": "BTC SHORT #17052 opened at meta_rsi 17.25 (watchdog) — BANANA oversold-short pattern live on an ai-trader-pending fill; bracketed R:R ~2.3 (SL 61330 / TP 58953), direction aligned with btc_15m SHORT_BIAS + trend_quality STRONG_DOWN",
+    "rationale": "BANANA lesson: shorting extreme oversold = catching the bounce. Direction aligns with 15m bias so it is not counter-trend, but RSI 17 leaves no edge for the short side if a snap-back fires. ai-trader-pending = CEO domain (precheck advisory only).",
+    "expected_impact": "report-only — CEO visibility; no config lever (manual/ai-trader path)",
+    "category": "wrong-side early warning",
+    "status": "reported",
+    "risk": "low"
   }
 ]
