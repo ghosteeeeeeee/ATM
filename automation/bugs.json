@@ -2045,6 +2045,19 @@
       "root_cause": "Patient-retry budget was sized for delivery under throttle without a total-time ceiling; the round-robin makes single-provider recovery fast (~2-4s) so the long budget only binds on dual-provider outages where delivery is stale regardless.",
       "found_by": "user review (latency-critical verification request)",
       "fix": "Total deadline of 18s (Date.now() budget checked before each sleep, break \u2192 null \u2192 dropped++ visible). Covers ~2 full provider rotations under single-provider throttle (the common case, unchanged); sheds a hopelessly-stalled worker at 18s instead of 72s. Latency over delivery per user directive. Verified: npm test + selftest pass, bot active/LIVE after restart, commit 4c1f157."
+    },
+    {
+      "id": "BUG-116",
+      "title": "SCT CRITICAL: Jito sig extraction used .signature on Array<Uint8Array> \u2014 every order errored post-submit while bundles landed untracked",
+      "severity": "CRITICAL",
+      "status": "FIXED",
+      "files": [
+        "bot.js"
+      ],
+      "symptom": "All orders since the Jito deploy failed with order failed: Expected Buffer (14+ attempts) while SOL dropped 0.8702\u21920.7394 with counts buys:0/sells:0. On-chain: 6 full round trips HAD landed (buys+sellls+16 tips) \u2014 the bot submitted the bundle, then crashed on sig extraction before confirm, so held was never set and every cycle was invisible. User noticed: are we still losing while the target is winning.",
+      "root_cause": "VersionedTransaction.signatures is Array<Uint8Array> (index.d.ts line1817), not Array<{signature}>; bs58.encode(undefined) throws Expected Buffer from base-x. The probe tested endpoint+payload but never the post-submit encode path.",
+      "found_by": "user (check on the bot) + bug-hunter-sct triage (counts errors14/buys0 with SOL drop = landed-but-untracked)",
+      "fix": "bs58.encode(tx.signatures[0]) with a comment naming the type trap. Verified: npm test + selftest pass, bot active/LIVE (commit bf2f248). Mitigation already in place during the outage: chain-truth gates flushed every untracked buy on the target sell \u2014 ended flat, no bags; cost of the window: -0.1308 SOL (-0.0667 trading, -0.0642 fees/tips across 16 landed txs). Lesson for skill: probe must exercise the exact post-submit path, not just endpoint acceptance."
     }
   ],
   "schema": {
