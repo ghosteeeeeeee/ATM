@@ -31773,3 +31773,63 @@ BY: auto_1hr
 - unarmed WR 0% cohort 55.2% of closes — stall stack owns fix
 - storm packet bar 3/3 awaits CEO sign-off by 2026-11-26
 BY: auto_1hr
+
+## [2026-11-22 13:55] Hourly Analysis
+
+**Storm:** no storm (window-min -0.32% / at-run -0.07%)
+
+**Trades:** 1 closed last hour (1W 0L: BTC ai-trader-pending LONG manual_trail_hit net -0.01, pnl_pct -0.15) | 24h 26 closed
+**PnL NET:** hour $-0.01 | 24h NET $-0.35 (gross +0.01, fees 0.36, payoff 1.80, WR 34.6%) | 7d NET $-1.83 (124T, fees 1.87) | 14d NET $-4.03 (233T, fees 3.46) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Last hour: 1 close near-breakeven — kill policy no trigger (needs 0% n>=3 last hour)
+- 24h losers: atr-trend- 4T 25% net -0.21, pump-chain+ 4T 0% net -0.09 (14d n=11<20: EXTREME 10T 10% -0.50 / NORMAL 1T), ai-trader-pending 6T 33% -0.06
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/26 = 7.7% (<40%); tpsl_utils deployed. profit-monster-trail 7T net +0.50, manual_trail_hit 3T +0.27 earners
+- Boost: none eligible — jup_yolo_mirrored 3T 100% net +0.18 (n<5), btc-pump-rider+ 2T n<5
+- Arm rate: unarmed 15/26 = 57.7% below 70%, WR 0% net -$1.04 vs armed 11/11 81.8% net +$0.69 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: not 3 consecutive (02 -0.14, 08 -0.03, 09 -0.02, 12 +0.15, 13 -0.01) and regime NORMAL (not NEUTRAL) -> no size cut
+- Frequency: 1 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.136% < 0.5% (max 0.678)
+- 1 open: BTC ai-trader-pending LONG (13:48, SL 60398 TP 62300)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.35 (fees 0.36 vs gross 0.01); 7d NET -1.83, 14d -4.03 fee-drag persistent
+- pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
+- unarmed WR 0% cohort 57.7% of closes — stall stack owns fix
+- storm packet bar 3/3 awaits CEO sign-off by 2026-11-26
+BY: auto_1hr
+
+## [2026-11-22 14:54] Hourly Analysis
+
+**Storm:** no storm (window-min -0.32% / at-run +0.19%)
+
+**Trades:** 0 closed last hour | 24h 23 closed
+**PnL NET:** hour $0.00 | 24h NET $-0.57 (gross -0.24, fees 0.33, payoff 1.55, WR 30.4%) | 7d NET $-1.79 (122T, fees 1.85) | 14d NET $-4.03 (233T, fees 3.46) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes — kill policy no trigger (needs 0% n>=3 last hour)
+- 24h losers: atr-trend- 4T 25% net -0.21, pump-chain+ 3T 0% net -0.06 (14d n=11<20: -0.55 monitor), continuum+/-osc/r2v2/bb-squeeze singles -0.07..-0.14
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/23 = 8.7% (<40%); tpsl_utils deployed. profit-monster-trail 5T net +0.25, manual_trail_hit 3T +0.27 earners
+- Boost: none eligible — only ai-trader-pending n=6 (33.3% WR net -0.06); jup_yolo_mirrored 3T 100% +0.18 n<5
+- Arm rate: unarmed 14/23 = 60.9% below 70%, WR 0% net -$1.01 vs armed 9/9 77.8% net +$0.44 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: not 3 consecutive (08 -0.03, 09 -0.02, 12 +0.15, 13 -0.01) and regime NORMAL/EXTREME not NEUTRAL -> no size cut
+- Frequency: 0 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.156% < 0.5% (max 0.678)
+- 1 open: BTC ai-trader-pending LONG (13:48, SL 60398 TP 62300)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.57 (fees 0.33 vs gross -0.24); 7d -1.79, 14d -4.03 fee-drag persistent
+- pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
+- unarmed WR 0% cohort 60.9% of closes — stall stack owns fix
+- storm packet bar 3/3 awaits CEO sign-off by 2026-11-26
+BY: auto_1hr
