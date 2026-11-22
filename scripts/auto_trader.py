@@ -57,7 +57,7 @@ def get_open_btc():
         return None  # DB failure — caller decides (fail-safe: no decision)
 
 
-from hermes_constants import PM_TRAIL_ACTIVATE_PCT
+from hermes_constants import PM_TRAIL_ACTIVATE_PCT, BE_ARM_PEAK_PCT
 
 # ROUND-ANCHOR shadow dedup — one WOULD-RATCHET line per (pid, round level)
 # per process (same pattern as position_manager's *_shadow_logged sets).
@@ -65,11 +65,14 @@ _round_shadow_logged = set()
 
 
 def _be_armed(entry, price, side, hi=None, lo=None):
-    """BE-cap arm check — CEO D2.2 ruling 2026-11-21: arm ONLY when in
-    profit AND peak favorable since entry >= PM_TRAIL_ACTIVATE_PCT (0.40%).
+    """BE-cap arm check — CEO D2.2 ruling 2026-11-21, peak-gate updated by
+    CEO fold-in A 2026-11-22 (major-break redesign): arm ONLY when in
+    profit AND peak favorable since entry >= BE_ARM_PEAK_PCT (2.5%).
+    Peak-gate 2.5% separates the retest-kill class (peaks <=1.28%) from the
+    V-reversal class that must still arm; in-profit requirement unchanged.
     Wick-level in-profit no longer arms (#17026 class). Peak unknown/zero/
-    uncoercible -> False (fail-safe: structure-only). REVERT = drop the
-    peak gate (restore in-profit-at-birth arming)."""
+    uncoercible -> False (fail-safe: structure-only). REVERT = set
+    BE_ARM_PEAK_PCT back to 0.004."""
     if not entry or not price:
         return False
     if side == 'SHORT':
@@ -86,8 +89,8 @@ def _be_armed(entry, price, side, hi=None, lo=None):
         return False
     if peak <= 0:
         return False
-    return (entry - peak) / entry >= PM_TRAIL_ACTIVATE_PCT if side == 'SHORT' \
-        else (peak - entry) / entry >= PM_TRAIL_ACTIVATE_PCT
+    return (entry - peak) / entry >= BE_ARM_PEAK_PCT if side == 'SHORT' \
+        else (peak - entry) / entry >= BE_ARM_PEAK_PCT
 
 
 def track_hypotheticals(cfg, size):
@@ -503,14 +506,16 @@ def tweak_structure_fixed(decision, open_positions):
             cur_sh, cur_sl, cur_atr = s15
             fld = 'sh' if side == 'SHORT' else 'sl'
             # BREAKEVEN-CAP when armed — CEO D2.2 ruling 2026-11-21
-            # (option i): _be arms ONLY when peak favorable since entry
-            # >= PM_TRAIL_ACTIVATE_PCT (0.40%) — NOT at birth/instant
+            # (option i), peak-gate moved by CEO fold-in A 2026-11-22:
+            # _be arms ONLY when peak favorable since entry
+            # >= BE_ARM_PEAK_PCT (2.5% — NOT PM_TRAIL_ACTIVATE_PCT's 0.40%,
+            # which stays protected for the mxm trail) — NOT at birth/instant
             # profit (wick-level no longer arms). #17026/#17013/#17005
             # class fix: entry×0.999 cannot survive the expected level
             # retest; the armed structure stop does. Peak unknown
             # (hi/lo None/0/uncoercible) -> _be = 0 (unarmed, fail-safe
-            # toward structure-only). REVERT = remove the peak gate
-            # (restore in-profit-at-birth arming). Once armed, clamps
+            # toward structure-only). REVERT = set BE_ARM_PEAK_PCT to 0.004
+            # (restore 0.40% arm). Once armed, clamps
             # behave as before (CEO 2026-11-15: #16915 'got pummeled
             # waiting for structure to break' — while IN PROFIT the trail
             # never targets past breakeven (+0.1% hair); UNDERWATER

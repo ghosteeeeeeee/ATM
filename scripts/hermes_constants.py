@@ -2205,6 +2205,17 @@ WIN_CAPTURE_SHADOW_GIVEBACK = 0.20  # ANALYSIS-ONLY what-if giveback — never a
 # (expensive FKs: COMP +8.42% end, SUPER +2.83%). Zero behavior — logs
 # would-fires only. Flip live only with CEO GO + v6 exit-stack integration.
 ARM_BE_SHADOW_ENABLED = True  # Revert: set False.
+# ── major-break redesign constants (CEO 2026-11-22) ──────────────────────────
+MOMENTUM_ATR_K = 0.5           # E1 displacement: fill requires closed-1m close beyond level >= K x ATR(15m). REVERT via MOMENTUM_CONFIRM_ENABLED.
+MOMENTUM_CONFIRM_ENABLED = True  # E1 master switch (trade_watchdog fill gate). False = legacy fill-on-cross, byte-identical. REVERT = False.
+BOUNCE_SHADOW_ENABLED = True   # E3 bounce-trigger SHADOW (log-only would-fires at level rejection). False = silent. Flip to live only with CEO approval after 7d data.
+# BE-ARM PEAK (CEO fold-in A, 2026-11-22 major-break redesign): _be_armed in
+# auto_trader keys on THIS, not PM_TRAIL_ACTIVATE_PCT (protected, stays 0.40
+# for the mxm trail). 2.5% separates the retest-kill class (peaks <=1.28%:
+# #17005 +0.54 / #17013 +0.61 / #17026 +1.28 — armed at 0.40, died on the
+# expected retest) from the V-reversal class that MUST still arm
+# (#16915 +9.96). Fraction, not percent. REVERT = set 0.004.
+BE_ARM_PEAK_PCT = 0.025
 # PRE-ARM BREAKEVEN LOCK SHADOW (brain_auditor #258, 2026-11-14) — zero behavior.
 # Gap-fill BELOW the arm: for never-armed trades (peak never reaches
 # PM_TRAIL_ACTIVATE_PCT), lock at entry once peak fav >= PREARM_LOCK_THR_PCT
@@ -2230,7 +2241,12 @@ PREARM_LOCK_THR_PCT = 0.25  # PERCENT (not fraction — PM_TRAIL_ACTIVATE_PCT is
 # running either way; PREARM_LOCK_SHADOW_ENABLED=False kills BOTH (kill-switch
 # semantics, same as ARM_BE). First read 2026-11-21 (amplify-prearm-breakeven-
 # lock). REVERT = set this flag back to False. Money-path change — CEO GO'd.
-PREARM_LOCK_ENFORCE = True
+# ENFORCE OFF — CEO 2026-11-22 (major-break redesign): after BE-arm moved to
+# 2.5%, prearm's unique domain (peaks 0.25-0.40 micro-peaks) is exactly the
+# class T wants governed by structure stops only; peaks >=2.5% are covered by
+# the BE-clamp. Shadow keeps logging would-fires for the 7d counterfactual
+# review. REVERT = set True.
+PREARM_LOCK_ENFORCE = False
 # AI-TRADER+ EXTREME LONG conf-demote SHADOW (brain_auditor 2026-10-18).
 # RETIRED 2026-10-19 brain_auditor: signal_reporter hard block b0a2467d (09:41,
 # 30d 15T 26.7%WR -$0.71) supersedes — 0 EXTREME trades since, shadow starved.

@@ -148,3 +148,71 @@ Other modified files are runtime/report writes, not code:
 
 **CHANGES REQUIRED BEFORE COMMIT — 1 blocker, 1 high.**
 D1(c), D2.1, D2.2 (implementation) and D2.3 are faithful to the rulings and pass independent re-execution (34/34 fail-safe cases, behavioural birth/clamp/shadow runs, 9+20 regression tests, rc=0 live cycle, exact 4-file scope, `hermes_constants.py` untouched). **D3 as shipped can never pass** (equity shape mismatch → permanent defer → dark ladder, with the test mocking the wrong shape), and **D2.2 does not deliver the ruling's flagship counterfactual** (#17026 arms at +1.28% and loses the same −3.79%). The D1(c) shadow is faithful for the one live instance but structurally over-counts (one-way bias) and flips #17014-class outcomes from +2.04% to ≈−8.79% — both must be reflected in the 2026-11-28 review design before this diff is relied on.
+
+---
+
+# ROUND-2 VERIFICATION (2026-11-22) — PASS
+
+Scope: the same 4-file changeset, now at HEAD (`git diff HEAD -- scripts/ analysis/` = empty → working tree == HEAD). Fixes all landed in commit **b6289f7a** (2026-11-21 20:14:48Z, "watchdog cycle … deep analysis merged" — a sweep commit that also carried the round-1 changeset). Harness: `/tmp/bh/harness_r2.py` → **33/33 ALL PASS**.
+
+## Item 1 — BLOCKER CLOSED (equity parse) ✅
+
+`hyperliquid_exchange.py:513-541` now reads the nested path with a top-level fallback and a `_num` coercion:
+- **Against the REAL raw shape I documented round-1** (`marginSummary.accountValue='16.176435'`, `withdrawable='8.022137'`, no top-level `accountValue`): → `account_value=16.176435` **float**, `withdrawable=8.022137` **float** ✓.
+- `{}` (HL rate-limit) → `account_value=None` (dict, not `{}`) → heat gate takes the **None path** (`_eqv=0 → heat=None → DEFER`), not the unreachable `except` ✓ — exactly as prescribed.
+- Top-level fallback still works (schema drift) ✓; uncoercible nested value → `None`, no exception → fail-safe defer ✓.
+- **LIVE read:** `account_value = 15.829057` (float, >0) — production no longer returns `None`.
+- **Heat gate with the real function:** `11.10 / 15.83 = 0.70 > 0.15 → HEAT-DEFER` with a *real number* instead of permanent `heat=None`; `1.00/15.83 = 0.063 → PASS`; `{}` → `DEFER-none`. Dark ladder structurally gone.
+- **Other callers' arithmetic (all three):** `_get_trade_size_usdt()` → `11.0` (float, no TypeError) ✓; `pump_hunter.get_account_value()` → `15.829057` ✓; `trading_status()` → no raise, `account_value` now float-or-None (only consumer is a `pprint` debug at hyperliquid_exchange.py:2402) ✓. `withdrawable` changed str→float: every consumer already wraps in `float(... or 0)` → no breakage.
+- **INFO (behavior change, intended but new):** the previously-**dead** `withdrawable<=0 → account_value` fallback in `_get_trade_size_usdt` (hyperliquid_exchange.py:884-886) is now live: with `withdrawable='0'` and `accountValue='500.0'` sizing goes `11.0 → 35.0`. At today's balance the min floor still dominates (15.83×0.07 = 1.11 < 11.0), so no live impact now; it only bites on an account > $157 with all funds in positions. Flagging so sizing growth is a conscious consequence, not a surprise.
+- Test: group-10 feeds the REAL raw shape through the fixed function (nested `'16.11'`→16.11, `{}`→None) ✓ and the heat/band groups still pass.
+
+## Item 2 — HIGH disposition: ACCEPTED (no code change; evidence error recorded)
+
+- **Verified no threshold edit:** `_be_armed` unchanged (`auto_trader.py:89-90` `>= PM_TRAIL_ACTIVATE_PCT`), `hermes_constants.py:2056 PM_TRAIL_ACTIVATE_PCT = 0.004` untouched by this changeset. `git log -S` shows no post-round-1 edit to the gate.
+- **Verified the follow-up deep left no checkpoint:** `automation/ceo/checkpoints/` contains only `20261121T163236Z-decision.md` + its selfcheck — **no `20261121T183323Z-decision.md`** ✓ (matches lead's claim).
+- **Verified the folded brief exists:** `automation/ceo/2026-11-22_major-break-redesign.md` (7,126 B, 2026-11-22 22:01) — FOLD-IN A carries the corrected data and explicitly lists "(a) keep 0.40% (the cited class keeps dying)" ✓.
+- **Disposition acceptable: YES** — my round-1 finding stands as the recorded reason, the code correctly implements the ruling *as ruled* (arm on peak ≥0.40%), and the threshold is a CEO decision, not a verifier one.
+- **Operational note (sharper than "can still die"):** all THREE cited incidents clear the gate, so the live 0.40% gate changes nothing for the named class — verified from PG just now:
+  | trade | dir | peak fav | ≥0.40%? | stop at close | kill mechanism |
+  |---|---|---|---|---|---|
+  | #17005 | SHORT | **+0.5917%** (low 58800) | arms | 59209.15 = 59150×**1.001** exactly | BE stop → `manual_sl_hit` −1.20% — **reproduces under the live gate** |
+  | #17013 | SHORT | **+0.6077%** (low 56835.5) | arms | 58322 (loose) | `mfe_exit` +0.10% — not a BE kill either way |
+  | #17026 | LONG | **+1.2786%** (high 60951.5) | arms | 60121.818 = 60182×**0.999** exactly | BE stop → `manual_sl_hit` −3.79% — **reproduces under the live gate** |
+  So until Decision A lands: **the BE-cap can still arm and kill the retest for the #17005/#17026 class; the 0.40% gate only suppresses arming below 0.40% (micro-peak wicks).** The brief's numbers (+0.54/+0.61/+1.28) match mine to rounding (its +0.54 vs my +0.5917 for #17005 is the only gap — both ≥0.40%, conclusion unchanged).
+
+## Item 3 — MEDIUM CLOSED (shadow legacy BE) ✅
+
+`auto_trader.py:617-632` computes `_be_leg` with the **pre-D2.2 in-profit-at-birth formula** and uses it **only** in the two shadow guards.
+- **Byte-faithfulness (proven three ways):**
+  1. Formula: `_be_leg` block is byte-identical to the OLD `_be` block at `b3207603:478-483` (regex match on both, modulo the variable name) ✓.
+  2. Guard text: old active SHORT guard `if _rt > price and _rt < stop and (not _be or _rt <= _be)` (b3207603) vs new `_round_hit = (_rt > price and _rt < stop and (not _be_leg or _rt <= _be_leg))` — identical modulo `_be`→`_be_leg` + line wrap; LONG mirror likewise ✓.
+  3. **Walked the round-1 bias case through both:** entry 60182, price 60100 (in profit), peak 0.14% → live `_be`=0 (D2.2 intact), stop 60800, `_rt`=60500.
+     - OLD code: `_be = 60242.18` → `60500 > _be` → **blocked, no write**.
+     - NEW shadow: `_be_leg = 60182×1.001 = 60242.18` → same → **no log** ✓ (round-1 harness asserted the opposite; that expectation is now correctly inverted).
+     - And the reverse: price 59950 → `_rt`=60000 ≤ 60242.18 → old writes → shadow **logs** ✓; underwater price 60450 → `_be_leg`=0 → logs (old `_be`=0 too) ✓.
+- **No leak:** `_be_leg` appears only at lines 618/621/623/628/632 (AST: loads only at the two shadow guards); live `_be` still stored **only at 518/520** (peak-gated) and no clamp (544/567/590/644/653/667/674) reads `_be_leg` ✓. D2.2 behaviour unchanged — re-verified `PM_TRAIL_ACTIVATE_PCT` gate + fail-safe matrix still ALL PASS in the shipped selfcheck.
+
+## Item 4 — LOW CLOSED (band fail-open) ✅
+
+`brain.py:399-411`: `float(rsi)` wrapped in `try/except (TypeError, ValueError) → return True`.
+- `'garbage'` → True, `[1]` → True, `None` → True, numeric `24.6` SHORT → **still False (blocks)**, `83.39` LONG → **still False** ✓.
+- End-to-end: `add_trade(..., signal_metadata='{"rsi_14": "abc"}')` **no longer raises** — band fails open, proceeds past the gate, no `[brain.py] ❌ REJECTED` marker → the watchdog can never classify a band-block as terminal `error`/rung-burn via this path ✓.
+
+## Item 5 — Suite ✅
+
+- `analysis/test_pending_machine.py` → **10 groups, ALL PENDING-MACHINE TESTS PASS**, rc=0 (group 10 = real raw shape + `{}`→None + band `garbage`/`[1]`).
+- `analysis/test_manual_exit_manager.py` → **20 passed, 0 failed**.
+- `py_compile` hyperliquid_exchange + brain + auto_trader + trade_watchdog → OK; fresh imports OK.
+- Round-1 shipped selfcheck `selfcheck_20261121T163236Z_result1.py` → **ALL PASS** (shadow block still write-free with `_be_leg` inside it).
+
+## Round-2 delta flags (not defects in this changeset — recorded so nothing hides)
+
+1. **"Nothing committed yet" is stale:** the entire round-1+round-2 changeset is **already in HEAD** (b6289f7a, 2026-11-21 20:14Z); `git status` shows only runtime reports + the new untracked brief. Commit hygiene = parent's call, but the working tree is clean for all 4 files.
+2. **Out-of-scope hunks landed in the same files from other agents' commits** (verified non-interacting with my gates): `brain.py` `from pnl_utils import … fee_notional` (line 25) + `_close_trade_impl` fee base `calc_notional → fee_notional` (BUG-099, commit 1ff1cf37); `trade_watchdog.py` MFE-giveback warning const (61), `collect_recent_closed`/`analyze_recent_losses` (275/901/958/981), and a `--selfcheck` fixture block in `main()` (+115, brain_auditor #288/#289). None touch the pending/heat/band paths (my hunks sit at 1676-1924 unchanged in substance).
+3. **`hermes_constants.py` is no longer pristine vs the round-1 promise** — but not by this changeset: the only edit since b3207603 is `LOSERS = set()` → `LOSERS = {'BLUR'}` (another agent). **All five constants this changeset reads are unchanged:** `MAX_PORTFOLIO_HEAT=0.15`, `OVERSOLD_SHORT_RSI_MAX=35`, `SIGNAL_FILTER_RSI_MAX=75`, `PM_TRAIL_ACTIVATE_PCT=0.004`, `MAX_OPEN_POSITIONS=6`.
+4. **INFO:** group-8's `equity-fail` case still mocks a *raising* `get_account_value_curl` (the unreachable-in-production branch); the real failure mode (returns dict with `None`) is covered by group-10 + my harness — both defer correctly.
+
+## Round-2 verdict: **PASS — blocker CLOSED, MEDIUM CLOSED, LOW CLOSED, HIGH disposition accepted (evidence error recorded, threshold correctly left to the CEO, 0.40 gate verified still live).** Round-1 finding #4 (#17014-class winner→loser economics, ≈ −8.79% vs +2.04%) remains open as **guidance for the 2026-11-28 review** — it is a ruling consequence, not a code defect. No new blocking findings from round 2.
+
+*Next verification round belongs to the major-break redesign changeset (`automation/ceo/2026-11-22_major-break-redesign.md`), which is a separate changeset not yet in the tree.*

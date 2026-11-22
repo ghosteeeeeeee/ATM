@@ -1364,6 +1364,133 @@ def _release_pending_lock(fd):
         fd.close()
 
 
+# E1 fill-on-confirmed-momentum (CEO ruling 2026-11-22) — helper result
+# sentinels (distinct from True/False so legacy paths stay byte-identical).
+_MOM_OFF = "off"      # MOMENTUM_CONFIRM_ENABLED=False → legacy behavior, no queries
+_MOM_DEFER = "defer"  # ATR/candle data missing → fail-safe defer one cycle
+
+
+def _momentum_close_confirmed(close, trigger_price, direction, threshold):
+    """Pure E1 predicate: is the closed 1m close displaced past the level
+    by >= threshold in the break direction? LONG = break-above,
+    SHORT = break-below (CEO 2026-11-22)."""
+    if direction == "long":
+        return bool(close >= trigger_price + threshold)
+    return bool(close <= trigger_price - threshold)
+
+
+def _local_atr15(coin):
+    """Result-3 local ATR fallback (deep ruling 2026-11-22): atr_cache's
+    only writer runs AFTER a fill, so get_atr returns None while flat —
+    E1 would defer every fill forever (circular dependency = dark
+    ladder). Compute ATR(15m) = mean True Range of the last 14 CLOSED
+    candles_15m bars (local-data-first SOP); newest closed bar older
+    than 30min (close-time) → None (stale structure = no confirmation
+    basis). Any failure → None (the caller defers, never blind-fills)."""
+    try:
+        import sqlite3 as _sq
+        _c = _sq.connect(f"file:{HERMES_DATA}/candles.db?mode=ro", uri=True)
+        try:
+            _cur = _c.cursor()
+            _cur.execute(
+                "SELECT ts, high, low, close FROM candles_15m "
+                "WHERE token=? AND is_closed=1 ORDER BY ts DESC LIMIT 15",
+                (coin,))
+            rows = _cur.fetchall()
+        finally:
+            _c.close()
+        if not rows or len(rows) < 15:
+            return None
+        # freshness guard: the newest CLOSED 15m bar must have closed
+        # within 30min (bar open ts + 15min)
+        if (time.time() - (float(rows[0][0]) + 900.0)) > 1800.0:
+            return None
+        trs = []
+        for i in range(14):   # rows are DESC: rows[i+1] = the prior bar
+            h, l, pc = (float(rows[i][1]), float(rows[i][2]),
+                        float(rows[i + 1][3]))
+            trs.append(max(h - l, abs(h - pc), abs(l - pc)))
+        atr = sum(trs) / 14.0
+        return atr if (math.isfinite(atr) and atr > 0) else None
+    except Exception:
+        return None
+
+
+def _momentum_confirm(oid, coin, direction, trigger_price, memo):
+    """E1 momentum confirmation (CEO ruling 2026-11-22).
+
+    A fill requires displacement: latest CLOSED 1m candle close beyond the
+    level in the break direction by >= MOMENTUM_ATR_K x ATR(15m) for the
+    coin (atr_cache.get_atr, dollars).
+
+    Returns True (confirmed) / False (data present, not displaced) /
+    _MOM_OFF (flag off → caller keeps today's behavior, NO queries) /
+    _MOM_DEFER (ATR or candle data missing → caller defers one cycle,
+    never blind-fills).
+
+    Lazy: at most one query set per oid per cycle (memo), only called when
+    a fill is otherwise imminent.
+    """
+    if oid in memo:
+        return memo[oid]
+    res = _MOM_DEFER
+    try:
+        import hermes_constants as hc
+        if not getattr(hc, "MOMENTUM_CONFIRM_ENABLED", True):
+            res = _MOM_OFF   # legacy path — return before any data query
+        else:
+            k = float(getattr(hc, "MOMENTUM_ATR_K", 0.5))
+            from atr_cache import get_atr
+            atr = get_atr(coin, "15m")
+            if atr is None or not math.isfinite(float(atr)) or float(atr) <= 0:
+                # Result-3 (deep ruling): local-data-first fallback —
+                # the cache is write-after-fill, so flat = None = every
+                # fill deferred (circular). Compute locally, repair the
+                # shared cache (best-effort), defer only if that fails.
+                atr = _local_atr15(coin)
+                if atr is None:
+                    res = _MOM_DEFER
+                else:
+                    try:
+                        from atr_cache import save_atr
+                        save_atr(coin, atr, "15m")
+                    except Exception:
+                        pass   # cache repair is best-effort, never fatal
+            # res starts as _MOM_DEFER — the gate must test ATR validity
+            # (from either source), not res, or the candle check never runs
+            if (atr is not None and math.isfinite(float(atr))
+                    and float(atr) > 0):
+                # latest CLOSED 1m close — exact pattern of the fallback
+                # price block above (read-only local candles DB).
+                # (runs only when a valid ATR exists — cache or local)
+                import sqlite3 as _sq
+                _c = _sq.connect(f"file:{HERMES_DATA}/candles.db?mode=ro",
+                                  uri=True)
+                try:
+                    _cur = _c.cursor()
+                    # F-2 (agent-6): the price_collector seeder writes the
+                    # CURRENT minute's candle with is_closed=1 (live: 0 rows
+                    # with is_closed=0 all-time) — ts < this minute's floor
+                    # guarantees only ENDED bars feed the confirmation.
+                    _cur.execute("SELECT close FROM candles_1m WHERE token=? "
+                                 "AND is_closed=1 AND ts < ? "
+                                 "ORDER BY ts DESC LIMIT 1",
+                                 (coin, int(time.time() // 60 * 60)))
+                    _r = _cur.fetchone()
+                finally:
+                    _c.close()
+                if not _r:
+                    res = _MOM_DEFER
+                else:
+                    res = _momentum_close_confirmed(
+                        float(_r[0]), trigger_price, direction,
+                        k * float(atr))
+    except Exception:
+        res = _MOM_DEFER   # any failure = fail-safe defer, never crash
+    memo[oid] = res
+    return res
+
+
 def monitor_pending_orders(btc_price):
     """Cross-process-locked wrapper (bug_hunter F1): the pipeline's 1-min
     caller and the watchdog's 30-min caller share this state file — the
@@ -1466,6 +1593,7 @@ def _monitor_pending_orders_impl(btc_price):
                 f"persists)")
     seen_ids = set()
     serial_claimed = False   # one serial-ladder rung fires per cycle
+    _mom_memo = {}           # E1: one momentum-confirm query set per oid per cycle
     for order in cfg["orders"]:
         # Per-order isolation: a malformed entry skips itself, never the cycle
         try:
@@ -1582,6 +1710,12 @@ def _monitor_pending_orders_impl(btc_price):
             _cont = order.get("entry_style") == "continuation"
             _st_prev = state.get(oid)
             _ps = _st_prev.get("status") if isinstance(_st_prev, dict) else None
+            # F-1: per-order, before ANY branch — a rung arriving at the
+            # retested hook with 'retested' state from a PRIOR cycle never
+            # passes the first_break branch, so an in-branch init would
+            # NameError there (caught by per-order isolation = silent
+            # no-fill, which is how group-1's re-cross broke again).
+            _escaped = False
             if _ps == "rejected":
                 if crossed:
                     continue
@@ -1600,6 +1734,28 @@ def _monitor_pending_orders_impl(btc_price):
                         changed = True
                     log(f"pending order {oid}: level reclaimed after first "
                         f"break — armed for the re-cross (multi-touch)")
+                    # E3 BOUNCE SHADOW (deep ruling 2026-11-22 — shadow
+                    # only, flip to live only with CEO approval after 7d):
+                    # the poke-through never confirmed AND closed back
+                    # inside the level = the level REJECTED it = the
+                    # bounce candidate (the opposite side at this level).
+                    # Log-only; fail-off if the constant is missing.
+                    # D1 retest-fade stays parked — this is level
+                    # behavior only.
+                    try:
+                        import hermes_constants as _hc3
+                        if getattr(_hc3, "BOUNCE_SHADOW_ENABLED", False):
+                            _b_side = ("LONG"
+                                       if str(direction).lower() == "short"
+                                       else "SHORT")
+                            log(f"[BOUNCE-SHADOW] would-fill {_b_side} @ "
+                                f"{trigger_price:g} (rung {direction} poke "
+                                f"unconfirmed + closed back inside = "
+                                f"rejection), stop beyond level, size "
+                                f"{order.get('amount_usdt')} USD "
+                                f"{order.get('leverage')}x", "INFO")
+                    except Exception:
+                        pass   # shadow must never affect the fill path
                     continue
                 # STRAIGHT-LINE ESCAPE (CEO takeoff thesis 2026-11-20:
                 # 'when btc takes off it will prob do so in a straight
@@ -1609,38 +1765,111 @@ def _monitor_pending_orders_impl(btc_price):
                 # rare slice the ~70% retest stat leaves out). Qualify the
                 # entry (retested) and fill instead of starving — the
                 # 58736-class death on a one-way move, both directions.
-                try:
-                    import hermes_constants as hc
-                    _esc = float(hc.MULTI_TOUCH_ESCAPE_PCT)
-                except Exception:
-                    _esc = 0.5
-                if ((direction == "long"
-                     and px >= trigger_price * (1 + _esc / 100.0)) or
-                        (direction == "short"
-                         and px <= trigger_price * (1 - _esc / 100.0))):
-                    log(f"pending order {oid}: STRAIGHT-LINE escape "
-                        f"({_esc:.2f}% past the level, no retest) — "
-                        f"qualifying to fill")
-                    _ps = "retested"   # fall through below → the fill
+                # E1 MOMENTUM CONFIRM (CEO 2026-11-22): checked BEFORE the
+                # escape — a displaced close qualifies to fill without the
+                # full 0.5% distance. Escape keeps working exactly as today
+                # with NO confirmation requirement (0.5% ≈ 3.4×ATR15 — it IS
+                # displacement) and needs no data, so it still fires when
+                # ATR/candle data is missing (defer → escape still checked).
+                _mom = _momentum_confirm(oid, coin, direction, trigger_price,
+                                         _mom_memo)
+                if _mom is True:
+                    _ps = "retested"   # confirmed → qualify, fall through → fill
                 else:
-                    continue
+                    try:
+                        import hermes_constants as hc
+                        _esc = float(hc.MULTI_TOUCH_ESCAPE_PCT)
+                    except Exception:
+                        _esc = 0.5
+                    if ((direction == "long"
+                         and px >= trigger_price * (1 + _esc / 100.0)) or
+                            (direction == "short"
+                             and px <= trigger_price * (1 - _esc / 100.0))):
+                        log(f"pending order {oid}: STRAIGHT-LINE escape "
+                            f"({_esc:.2f}% past the level, no retest) — "
+                            f"qualifying to fill")
+                        _ps = "retested"   # fall through below → the fill
+                        # F-1 (agent-6 HIGH): the escape IS the
+                        # displacement (0.5% ≈ 3.4xATR15) — Hook 2's
+                        # memoized re-confirm must not block it (the memo
+                        # returns the same False/DEFER the escape already
+                        # routed around → 'qualifying' logged every cycle,
+                        # never filled).
+                        _escaped = True
+                    else:
+                        if _mom is _MOM_DEFER:
+                            log(f"pending order {oid}: momentum confirm "
+                                f"data missing — fill deferred (fail-safe)",
+                                "WARN")
+                        continue
             if _ps == "first_break" and _cont:
                 _ps = None    # legacy continuation rung (armed pre-flag)
             if _ps == "retested":
                 if not crossed:
                     continue
-                # cross#2 — fall through to stacking/steer = the fill
+                # cross#2 — E1 (CEO 2026-11-22): fill only on confirmed
+                # displacement. Crossed but NOT confirmed → stay retested,
+                # no burn (a later confirmed close fills). Escape-qualified
+                # fills skip the re-confirm (F-1: the escape already proved
+                # displacement by distance).
+                if not _escaped:
+                    _mom = _momentum_confirm(oid, coin, direction,
+                                             trigger_price, _mom_memo)
+                    if _mom is False:
+                        continue
+                    if _mom is _MOM_DEFER:
+                        log(f"pending order {oid}: momentum confirm "
+                            f"data missing — fill deferred (fail-safe)",
+                            "WARN")
+                        continue
+                # True / flag-off / escape — fall through = the fill
             elif crossed:
+                _mom = _momentum_confirm(oid, coin, direction, trigger_price,
+                                         _mom_memo)
                 if not _cont:
-                    if PENDING_ORDERS_CAN_PERSIST:   # F4
-                        state[oid] = {"status": "first_break",
-                                      "ts": time.time(),
-                                      "price": trigger_price}
-                        changed = True
-                    log(f"pending order {oid}: FIRST break seen — no fill "
-                        f"(multi-touch: wait for reclaim + re-cross)")
-                    continue
-                # continuation + crossed → fall through = the fill
+                    if _mom is True:
+                        pass   # E1 confirmed fresh cross → fill (the
+                               # confirmation substitutes for the retest wait)
+                    else:
+                        # not confirmed / flag off → today's behavior exactly
+                        # (first_break, no fill); data missing → defer log
+                        # too (treated as not-confirmed, state still advances
+                        # so the escape below stays reachable).
+                        if _mom is _MOM_DEFER:
+                            log(f"pending order {oid}: momentum confirm "
+                                f"data missing — fill deferred (fail-safe)",
+                                "WARN")
+                        if PENDING_ORDERS_CAN_PERSIST:   # F4
+                            state[oid] = {"status": "first_break",
+                                          "ts": time.time(),
+                                          "price": trigger_price}
+                            changed = True
+                        log(f"pending order {oid}: FIRST break seen — no fill "
+                            f"(multi-touch: wait for reclaim + re-cross)")
+                        continue
+                else:
+                    # continuation + crossed — E1: fill only on confirmed
+                    # displacement. Unconfirmed → state first_break (no
+                    # burn: falls back to the reclaim → re-cross path; the
+                    # legacy first_break→None line above keeps it retrying).
+                    if _mom is True or _mom is _MOM_OFF:
+                        pass   # confirmed / legacy flag-off → fall through = fill
+                    else:
+                        if _mom is _MOM_DEFER:
+                            log(f"pending order {oid}: momentum confirm "
+                                f"data missing — fill deferred (fail-safe)",
+                                "WARN")
+                        else:
+                            log(f"pending order {oid}: continuation cross "
+                                f"unconfirmed (displacement < K×ATR) — "
+                                f"falls back to retest-wait")
+                        if PENDING_ORDERS_CAN_PERSIST:   # F4
+                            state[oid] = {"status": "first_break",
+                                          "ts": time.time(),
+                                          "price": trigger_price}
+                            changed = True
+                        continue
+                # crossed + confirmed → fall through = the fill
             if crossed and (str(oid).startswith("btc-auto-")
                             or order.get("serial") is True):
                 # DIRECTION-AWARE STACKING (CEO 2026-11-21: 'if it fires
@@ -1677,13 +1906,17 @@ def _monitor_pending_orders_impl(btc_price):
                         "status='open'", (coin,))
                     _open_count = int(_cur.fetchone()[0] or 0)
                     # D3 heat numerator (all open rows, all coins —
-                    # portfolio heat, not per-coin): amount_usdt IS
-                    # notional (hyperliquid_exchange:854), no leverage
-                    # multiplication needed.
+                    # portfolio heat, not per-coin): MARGIN basis as of
+                    # 2026-11-22 — amount_usdt IS notional
+                    # (hyperliquid_exchange:854), so divide by leverage.
+                    # The notional form bound at ONE open position (dark
+                    # ladder): heat read 0.70 vs cap 0.15 with a single
+                    # 11.10×10 row → HEAT-DEFER on every fill (28×/day
+                    # verified). Revert = restore SUM(amount_usdt).
                     _cur.execute(
-                        "SELECT COALESCE(SUM(amount_usdt),0) FROM trades "
-                        "WHERE status='open'")
-                    _heat_notional = float(_cur.fetchone()[0] or 0)
+                        "SELECT COALESCE(SUM(amount_usdt/NULLIF(leverage,0)),0) "
+                        "FROM trades WHERE status='open'")
+                    _heat_margin = float(_cur.fetchone()[0] or 0)
                     _cur.close()
                     _c.close()
                 except Exception as _qerr:
@@ -1706,14 +1939,18 @@ def _monitor_pending_orders_impl(btc_price):
                         f"open >= MAX_OPEN_POSITIONS({_max_open}) — add "
                         f"deferred (F-3 aggregate cap)", "INFO")
                     continue
-                # D3 HEAT GATE (CEO deep-run 2026-11-21 ruling GO): heat =
-                # Σ open amount_usdt / account_value, cap =
-                # MAX_PORTFOLIO_HEAT (0.15 — its FIRST reader). Ladder
-                # auto-fills only (btc-auto-*); hand-arms bypass (the
-                # DailyFillCap-manual pattern). DEFER on breach AND on any
-                # equity-read failure (fail-safe — no blind add). Heat logs
-                # every evaluation for calibration (the ruling's metric:
-                # calibrate the cap if it binds >2×/day).
+                # D3 HEAT GATE (CEO deep-run 2026-11-21 ruling GO; formula
+                # re-based to MARGIN 2026-11-22): heat = Σ open
+                # (amount_usdt/leverage) / account_value — the notional form
+                # bound at ONE open position (dark ladder: 0.70 vs 0.15 cap
+                # with a single row), so the numerator is margin now (revert
+                # = restore SUM(amount_usdt)). Cap = MAX_PORTFOLIO_HEAT (0.15
+                # — unchanged, its FIRST reader). Ladder auto-fills only
+                # (btc-auto-*); hand-arms bypass (the DailyFillCap-manual
+                # pattern). DEFER on breach AND on any equity-read failure
+                # (fail-safe — no blind add). Heat logs every evaluation for
+                # calibration (the ruling's metric: calibrate the cap if it
+                # binds >2×/day).
                 if str(oid).startswith("btc-auto-"):
                     try:
                         from hermes_constants import MAX_PORTFOLIO_HEAT
@@ -1723,10 +1960,10 @@ def _monitor_pending_orders_impl(btc_price):
                             _eqv = float(_eq.get("account_value") or 0)
                         else:
                             _eqv = float(_eq or 0)
-                        _heat = (_heat_notional / _eqv) if _eqv > 0 else None
+                        _heat = (_heat_margin / _eqv) if _eqv > 0 else None
                         log(f"pending order {oid}: heat="
                             f"{_heat if _heat is None else round(_heat, 4)} "
-                            f"(notional={_heat_notional:.2f} equity={_eqv:.2f} "
+                            f"(margin={_heat_margin:.2f} equity={_eqv:.2f} "
                             f"cap={MAX_PORTFOLIO_HEAT}) D3 calibration", "INFO")
                         if _heat is None:
                             log(f"pending order {oid}: equity read failed — "

@@ -29,6 +29,19 @@ import trade_watchdog as TW     # noqa: E402
 TW._acquire_pending_lock = lambda: open(os.path.join(_tmp, '.lk'), 'w')
 TW._release_pending_lock = lambda f: f.close()
 _file_loader = TW._load_orders_state   # real file reader (groups 4/5 patch it)
+# E1 (deep run 20261122T220223Z): fills now require momentum confirmation.
+# The MACHINE tests exercise state/fill discipline — stub the confirmation
+# to 'confirmed' so the synthetic crosses fill as asserted; the helper's
+# own contract is tested for real in group 11 (flag-off / ATR-miss paths
+# need no candles; the confirmed/unconfirmed paths are covered by the
+# deep's selfcheck_20261122T220223Z_e1.py + the bug-hunter round).
+# _momentum_confirm is NESTED inside the monitor impl (module patching is
+# dead) — the designed toggle is the FLAG: OFF -> _MOM_OFF sentinel ->
+# byte-identical legacy behavior, which is exactly what the machine tests
+# exercise. Group 11 tests the real helper with the flag in both states.
+import hermes_constants as _HC0
+_mom_flag_orig = getattr(_HC0, 'MOMENTUM_CONFIRM_ENABLED', True)
+_HC0.MOMENTUM_CONFIRM_ENABLED = False
 
 # --- DB/open-position mock (psycopg2 imported inside the gate) ---------
 import psycopg2  # noqa: E402
@@ -44,7 +57,7 @@ class _SC:
     def execute(self, sql, *a):
         if 'COUNT(*)' in sql:
             self._last = ('count',)
-        elif 'SUM(amount_usdt)' in sql:
+        elif 'SUM(' in sql:
             self._last = ('sum',)
         else:
             self._last = ('row',)
@@ -309,6 +322,28 @@ def main():
     assert BRAIN2._prearmed_add_band_ok('SHORT', 'garbage') is True   # fail-open
     assert BRAIN2._prearmed_add_band_ok('LONG', [1]) is True          # fail-open
     print('10 equity parse (nested/coerced/None) + band uncoercible-RSI fail-open ✓')
+
+    # ── 11. E1 helper contract (the REAL nested helper, via the flag) ──
+    import hermes_constants as HC
+    import atr_cache as _AC
+    _orig_atr = getattr(_AC, 'get_atr', None)
+    try:
+        # flag OFF (the module-level state these tests ran under) -> OFF
+        # sentinel, no queries
+        r = TW._momentum_confirm('x', 'BTC', 'long', 60000.0, {})
+        assert r is TW._MOM_OFF, r
+        # flag ON + ATR miss -> DEFER (fail-safe, no candles needed)
+        HC.MOMENTUM_CONFIRM_ENABLED = True
+        if _orig_atr is not None:
+            _AC.get_atr = lambda *a, **k: None
+            try:
+                r = TW._momentum_confirm('y', 'BTC', 'long', 60000.0, {})
+                assert r is TW._MOM_DEFER, r
+            finally:
+                _AC.get_atr = _orig_atr
+        print('11 E1 helper: flag-off -> OFF; flag-on + ATR-miss -> DEFER ✓')
+    finally:
+        HC.MOMENTUM_CONFIRM_ENABLED = False   # leave the machine tests' state
 
     shutil.rmtree(_tmp, ignore_errors=True)
     print('\nALL PENDING-MACHINE TESTS PASS')
