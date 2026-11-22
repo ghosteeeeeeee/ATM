@@ -79,7 +79,12 @@ omits the cost of trading.
 
 ---
 
-## Finding 2 — The gross edge is statistically zero (severity: critical)
+## Finding 2 — ~~The gross edge is statistically zero~~ **SUPERSEDED by Section 7.3**
+
+> **⚠️ This finding is an averaging artifact. Do not act on it.**
+> The aggregate t = -1.96 is the *average* of a **+2.40** population and a **-4.18** population
+> (Section 7.3). The system **does** carry a statistically significant gross edge in 14 signals.
+> What follows is retained only to document how the masking was discovered.
 
 ```
 mean   = -0.00281
@@ -88,10 +93,10 @@ n      =  6584
 t-stat = -1.96   -> cannot reject H0: expectancy = 0
 ```
 
-This is the single most important number in the report. It means the aggregate strategy is a
-coin flip. Six months of signal engineering, regime scanners, Wyckoff integration, linreg_fade,
-confluence gates — the sum total is indistinguishable from randomness before costs are even
-applied.
+~~This is the single most important number in the report. It means the aggregate strategy is a
+coin flip.~~ Six months of signal engineering, regime scanners, Wyckoff integration, linreg_fade,
+confluence gates — the aggregate is indistinguishable from randomness before costs, **because
+two significant opposing populations cancel. Isolated, one of them is significantly positive.**
 
 ---
 
@@ -103,10 +108,12 @@ applied.
 | Exit slippage (measured) | ~$0.082 | 0.69% |
 | **Total** | | **~1.14%** |
 
-To break even the system needs **+1.14% gross expectancy per trade**. It has **-0.025%**.
+To break even the system needs **+1.14% gross expectancy per trade**. It has **-0.025%** *in
+aggregate* — but see Section 7: the 14 payoff > 1.2 signals carry **+0.0496%**, which is a real
+edge that is **23x too small** to clear this bar.
 
 Fees of $209.35 are **11x larger than the gross loss of $18.53**. The system paid $209 to
-discover it has no edge.
+discover that **its edge, however real, cannot pay for its own transaction costs.**
 
 ---
 
@@ -134,7 +141,13 @@ grows.
 
 ---
 
-## Finding 5 — All 30+ signals are one bet (severity: high)
+## Finding 5 — ~~All 30+ signals are one bet~~ **PARTIALLY SUPERSEDED by Section 7.2**
+
+> **⚠️ The "one bet" conclusion is wrong.** Section 7.2 splits the same signals by payoff ratio
+> and finds two populations with **opposite, individually significant** results:
+> payoff > 1.2 → t = **+2.40**; payoff < 1.0 → t = **-1.76**. They are not one bet.
+> What remains true: they are all derived from the same OHLCV candles, so they are *correlated*
+> — but correlated is not identical, and the differentiation by payoff ratio is real.
 
 By-signal cut (real, closed, n >= 40) is a flat line around zero — a few positive, a few
 negative, no barbell:
@@ -186,9 +199,13 @@ contradict this report**. It points at exactly the right conclusion:
    $11.86 positions held for 43 hours.
 4. **Survivorship bias applies to livestreams too.** The failed "$1M challenges" do not get the
    same audience. The visible distribution is conditioned on success.
-5. **Hermes already coded these strategies** (warrior-trading signals: MACD + RSI) — and they
+5. ~~**Hermes already coded these strategies** (warrior-trading signals: MACD + RSI) — and they
    landed in the same flat-around-zero table as everything else. That is the empirical proof
-   that the signal source was never the bottleneck.
+   that the signal source was never the bottleneck.~~ **REVISED (Section 7):** Hermes *did* code
+   these strategies, and they **do** carry a real edge — the payoff > 1.2 group measures
+   **t = +2.40** from the same public OHLCV candles. The signal source was never the bottleneck,
+   and it was also never broken. What separates Hermes from a profitable livestream trader is
+   **cost structure**, not indicator choice: +0.05% gross edge against 1.14% friction.
 
 ---
 
@@ -198,16 +215,23 @@ Any candidate edge must clear, **out-of-sample and with p < 0.05**:
 
 > **+1.14% gross expectancy per trade**
 
-Nothing shipped comes close. The gross side currently measures zero.
+~~Nothing shipped comes close. The gross side currently measures zero.~~ **REVISED (Section 7.6):**
+The 14 payoff > 1.2 signals ship a real gross edge of **+0.0496%** — significant (t = +2.40) but
+**23x too small** to clear the bar. The gap is cost, not signal.
 
 ---
 
-## Recommended actions, in order
+## ~~Recommended actions, in order~~ **SUPERSEDED by "Revised action order" (Section 7)**
+
+> **⚠️ Do not execute this list.** Item 2 ("freeze signal work") directly contradicts Section 7's
+> finding that 14 signals carry a significant positive edge. Use the Revised action order at the
+> end of this document. Retained for history.
 
 1. **Fix the accounting.** Reconcile `pnl_usdt` to exchange-reported net so fees are included.
-   Nothing is measurable until the dashboard tells the truth.
-2. **Freeze signal work for 30 days.** Zero new signals. That layer is provably zero; every hour
-   there is spent on the wrong layer.
+   Nothing is measurable until the dashboard tells the truth. *(still valid — also item 1 below)*
+2. ~~**Freeze signal work for 30 days.** Zero new signals. That layer is provably zero; every hour
+   there is spent on the wrong layer.~~ **WRONG** — see Section 7.2. The correct move is to
+   *concentrate* on 14 signals and cut 23, not to freeze.
 3. **Stop measuring win rate.** Track expectancy, payoff ratio, and cost-per-trade only.
 4. **Hunt structure, not signals** — funding-rate capture, basis, maker rebates, order flow. Or
    accept that sub-$12 swing trading at 1.14% friction is a negative-fee hobby rather than a
