@@ -73,9 +73,11 @@ def main():
         f"fleet payoff 14d: {payoff:.2f} (aw {float(aw):+.3f} / al {float(al):+.3f}) over {np_}T (target >=1.2; baseline ~1.05)")
     # 5c. cost % notional RT 14d = synthetic fee + atr_sl stop-overshoot (exit_slippage_pct)
     #     (baseline ~0.22% = 0.10 fee + 0.12 overshoot; target <=0.15%)
+    #     UNITS: exit_slippage_pct is stored as PERCENT (verified 2026-11-22: stored value ==
+    #     ABS(exit-stop)/stop*100, e.g. 0.1063 == 0.1063%) — divide by 100 before * amount.
     cur.execute("""SELECT COALESCE(SUM(amount_usdt),0),
         COALESCE(SUM(amount_usdt*0.0009),0),
-        COALESCE(SUM(CASE WHEN exit_reason='atr_sl_hit' THEN amount_usdt*COALESCE(exit_slippage_pct,0) ELSE 0 END),0)
+        COALESCE(SUM(CASE WHEN exit_reason='atr_sl_hit' THEN amount_usdt*COALESCE(exit_slippage_pct,0)/100.0 ELSE 0 END),0)
         FROM trades WHERE status='closed' AND close_time > NOW()-INTERVAL '14 days'""", ())
     tot_not, fee_sum, over_sum = cur.fetchone()
     cost_pct = (float(fee_sum) + float(over_sum)) / float(tot_not) * 100 if float(tot_not) else 99.0
