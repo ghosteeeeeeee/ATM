@@ -73,9 +73,32 @@ The dashboard reports **-$18.53** across all 6,584 trades. The exchange reports 
 just the subset. Real total loss is almost certainly **worse than -$350** once the ~2,633 trades
 without fee JSON are counted.
 
+> **⚠️ RECONCILED 2026-11-22 (supersedes the paragraph above — see
+> `brain/analysis/accounting_reconciliation_2026-11-22.md`, script
+> `scripts/accounting_reconciliation.py`):**
+> 1. The "exchange net_pnl" −$350.31 is **NOT exchange-reported** — it is a fee-JSON field
+>    carrying BUG-099 face-value fees (pre-8/22 fee rate **0.7822%** vs post-8/22
+>    **0.1018%** = **7.7× inflation**). The doc's "worse than −$350" is wrong in direction.
+> 2. **Reconciled all-time truth: net-of-true-fees ≈ −$66 to −$98** (gross −$18.49;
+>    BUG-099-corrected −$66.33; post-era-rate model −$97.99; HL taker model −$84.35).
+>    HL ground truth −$128.52 (4,940 rows) is **path-biased** — HL sync covers 95.7% of
+>    atr_sl exits but only 0.3% of profit-monster-trail exits, so it counts losses and
+>    drops wins; it cannot be an all-time total.
+> 3. The ±$111 blob question is **closed: the blob is REAL** — 1,448/1,620 no-HL rows are
+>    profit-monster trail exits (winners by construction, 89% WR); the HL half is 2,004/2,144
+>    atr_sl exits (8.6% WR). Coverage tracks outcome, not accounting. Live exchange fills
+>    (2026-06-14..08-22 window, `--hl-fills`): HL closed_pnl −$1.67 vs internal −$2.58 while
+>    the blob alone is +$37.88 — a phantom blob would read ≈ −$40.46. Arithmetic intact
+>    99.0%, 1 wrong-sign row (id 13109), 0 duplicates.
+> 4. Stored fee-JSON `net_pnl` field is **stale by −$14.42** (embeds gross at fee-write time)
+>    — always compute `pnl_usdt − fee_total` for current values.
+> 5. `exit_slippage_pct` = PG GENERATED `abs(exit_price−stop_loss)/stop_loss*100` — distance
+>    from stop at exit in **percent**, NOT fill slippage (§7.7 corrected in place).
+
 **Nothing downstream is trustworthy until this is reconciled.** Every win rate, every filter
 backtest, every "improvement" measured against `pnl_usdt` was measured against a column that
-omits the cost of trading.
+omits the cost of trading. *(Now reconciled — item 1 above; the KPI layer already switched to
+net-of-fee on 2026-11-20, Phase 0.)*
 
 ---
 
