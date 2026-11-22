@@ -235,6 +235,16 @@ def _save_state(state):
               file=sys.stderr)
 
 
+def _as_count(v):
+    """Consecutive-fail count read out of state. Garbage (string, bool, negative,
+    absurd) -> 0 — fail-open, so a corrupt value can never fabricate an alert."""
+    try:
+        n = int(v)
+        return n if (n == v and 0 <= n <= 10000) else 0
+    except Exception:
+        return 0
+
+
 def _update_state(h_checks, now_iso):
     """Bump per-gate consecutive-fail counters on EVERY run (not just --kanban):
     'consecutive verifier runs' must count all verifier runs. Returns {key: n}.
@@ -248,14 +258,7 @@ def _update_state(h_checks, now_iso):
         consec = {}
     for passed, label in h_checks:
         key = label.split(':', 1)[0].strip()
-        v = consec.get(key, 0)
-        try:
-            n = int(v)
-            if n != v or n < 0 or n > 10000:   # strings/bools/negatives/absurd = garbage
-                n = 0
-        except Exception:
-            n = 0                      # fail-open on garbage values
-        consec[key] = 0 if passed else n + 1
+        consec[key] = 0 if passed else _as_count(consec.get(key, 0)) + 1
     st['consec'] = consec
     st['updated_at'] = now_iso
     _save_state(st)
@@ -268,6 +271,8 @@ def _kanban_lines(r, consec, now_iso):
     equity < $10. Passive-display metrics (jup/HML/pair/ratio/cost/arm-rate) and WR
     never alert. Dedupe by label key so NS1 is not double-reported as Tier-H."""
     lines, seen = [], set()
+    if not isinstance(consec, dict):
+        consec = {}                     # a bad caller must not crash the alert pass
 
     def add(key, text):
         if key not in seen:
@@ -291,10 +296,7 @@ def _kanban_lines(r, consec, now_iso):
         if passed:
             continue
         key = label.split(':', 1)[0].strip()
-        try:
-            n = int(consec.get(key, 0))
-        except Exception:
-            n = 0
+        n = _as_count(consec.get(key, 0))
         if n >= TIER_H_CONSEC_ALERT:
             add(key,
                 f"- [{now_iso}] goal-metrics: ⚠️ [TIER-H] {label} — FAIL x{n} "
