@@ -1819,3 +1819,9 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 26T +0.36 50.0% | 7d 125T +0.44 48.8%
 ### Findings: disk 88% (WARN, recurring); proactive Q = regime-specialists (30d n>=8): worst cells ai-trader-pending SHORT|HIGH 8T 12.5% -0.82, volume-buildup- SHORT|NORMAL 13T 38.5% -0.80, pump-chain+ LONG|EXTREME 39T 41.0% -0.51 — all owned/in-flight (ai-trader cell due 11-22, pump-chain monitor n=11)
 ### Recommendation: none new — disk cleanup owed to weekly deep run; existing queue items stand.
+
+## CEO Status — 20261122T113828Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 30T +0.17 43.3% | 7d 125T +0.26 48.8%
+### Findings: disk 88% used (recurring WARN); 1 open position (bracketed); due≤24h: amplify-jup-long-blocked-clonehunt (11-23, NO-SHIP default). Proactive Q (regime): 15m=LONG_BIAS (11:30Z) vs 4h=NEUTRAL (11:38Z, 15L/17S/97N) — sources disagree, chop undertone → no fresh counter-trend entries, trail-family first.
+### Recommendation: disk cleanup owed to weekly deep run; regime split = hold entries until 15m/4h align.
