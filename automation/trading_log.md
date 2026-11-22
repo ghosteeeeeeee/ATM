@@ -31863,3 +31863,33 @@ BY: auto_1hr
 - unarmed WR 0% cohort 60.0% of closes — stall stack owns fix
 - storm packet bar 3/3 awaits CEO sign-off by 2026-11-26
 BY: auto_1hr
+
+## [2026-11-22 16:55] Hourly Analysis
+
+**Storm:** no storm (window-min -0.16% / at-run +0.54%)
+
+**Trades:** 0 closed last hour | 24h 18 closed
+**PnL NET:** hour $0.00 | 24h NET $-0.32 (gross -0.06, fees 0.26, payoff 2.15, WR 27.8%) | 7d NET $-1.64 (121T, fees 1.84) | 14d NET $-4.06 (230T, fees 3.43) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes — kill policy no trigger (needs 0% n>=3 last hour)
+- 24h losers: atr-trend- 4T 25% net -0.21, atr-trend+ 2T 0% -0.06, pump-chain+ 3T 0% -0.06 (14d n=11<20 monitor)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/18 = 11.1% (<40%); tpsl_utils deployed. manual_trail_hit 3T net +0.27, profit-monster-trail 3T +0.17 earners
+- Boost: none eligible — all signals n<5 in 24h (ai-trader-pending 3T 66.7% +0.27 n<5)
+- Arm rate: unarmed 11/18 = 61.1% below 70%, WR 0% net -$0.68 vs armed 7/7 71.4% net +$0.36 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: not 3 consecutive (08 -0.03, 09 -0.02, 12 +0.15, 13 -0.01) and regime NORMAL (not NEUTRAL) -> no size cut
+- Frequency: 0 close/hr, 0 opens/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.080% < 0.5% (max 0.120)
+- 1 open: BTC ai-trader-pending LONG (13:48, SL 60553 TP 62300)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.32 (fees 0.26 vs gross -0.06); 7d -1.64, 14d -4.06 fee-drag persistent
+- pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
+- unarmed WR 0% cohort 61.1% of closes — stall stack owns fix
+- storm packet bar 3/3 awaits CEO sign-off by 2026-11-26
+BY: auto_1hr
