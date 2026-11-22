@@ -31499,3 +31499,32 @@ BY: auto_1hr
 - pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
 - unarmed WR 7.7% cohort 44.8% of closes — stall stack owns fix
 BY: auto_1hr
+
+## [2026-11-22 04:52] Hourly Analysis
+
+**Storm:** no storm — window-min -0.51% / at-run -0.03%
+
+**Trades:** 0 closed last hour | 24h 29 closed
+**PnL NET:** hour $0.00 | 24h NET $+0.04 (gross +0.61, fees 0.57, payoff 1.53, WR 55.2%) | 7d NET $-1.51 (gross +0.44, fees 1.95) | 14d NET $-4.31 (gross -0.91, fees 3.40) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Last hour: 0 closes -> no 0% n>=3 kill trigger
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/29 = 6.9% (<40%); tpsl_utils deployed. Top 24h buckets: profit-monster-trail 13T net +0.76 (earner), prearm_lock 6T net -0.16, manual_sl_hit 3T net -0.33
+- Kill: pump-chain+ 14d EXTREME 10T 10% net -0.50 / NORMAL 1T 0% net -0.05, n=11 < 20 -> no kill, monitor
+- Boost: none eligible — btc-pump-rider+ 6T 100% net +0.40 already at 1.3 (verified signal_compactor.py:469); pump-chain+ 5T 0% net -0.12 losing; ai-trader-pending 6T 50% net -0.16
+- Arm rate: unarmed 13/29 = 44.8% below 70%, WR 7.7% net -$0.72 vs armed 16/16 93.8% net +$0.76 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 3 neg hrs with closes (23 -0.07, 01 -0.05, 02 -0.14; 00 empty) but regime HIGH not NEUTRAL -> no size cut
+- Frequency: 0 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.264% < 0.5% (max 0.996)
+- 1 open: BTC ai-trader-pending SHORT (02:43)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET +0.04 nearly zero (fees 0.57 vs gross 0.61); 7d NET -1.51, 14d -4.31 fee-drag
+- pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
+- unarmed WR 7.7% cohort 44.8% of closes — stall stack owns fix
+BY: auto_1hr
