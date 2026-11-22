@@ -10,6 +10,7 @@ from datetime import datetime
 sys.path.insert(0, '/root/.hermes/scripts')
 from hyperliquid_exchange import close_position, get_open_hype_positions_curl, get_trade_history
 from hermes_constants import DEFAULT_TRADE_SIZE_USDT
+from pnl_utils import fee_blob
 
 from hermes_log import log
 from paths import TRADES_JSON as PAPER_JSON
@@ -90,11 +91,13 @@ def close_brain(coin, exit_price):
         cur.execute("""
             UPDATE trades SET
                 status='closed', close_time=NOW(), exit_price=%s,
-                pnl_usdt=%s, pnl_pct=%s, exit_reason='manual_close',
+                pnl_usdt=%s, pnl_pct=%s, fees = COALESCE(fees, %s),
+                exit_reason='manual_close',
                 close_reason='manual_close', updated_at=NOW(),
                 trade_duration = EXTRACT(EPOCH FROM (NOW() - open_time))
             WHERE id=%s
-        """, (exit_price or 0.0, pnl_usdt_calc, pnl_pct, trade_id))
+        """, (exit_price or 0.0, pnl_usdt_calc, pnl_pct,
+              fee_blob(calc_notional, pnl_usdt_calc), trade_id))
         conn.commit()
         log(f"Brain: closed trade {trade_id} ({coin} {direction}) entry={entry_price} exit={exit_price}", "PASS")
     finally:

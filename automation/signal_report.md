@@ -1,17 +1,15 @@
 # Signal Performance Report
-**Generated:** 2026-11-22 07:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-22 13:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,933 | **WR:** 51.3% | **PnL:** -117.17%
+- **Total trades (all time):** 3,940 | **WR:** 51.3% | **PnL:** -116.75%
 - **Date range:** 2026-07-29 → 2026-11-22
 
 ---
 
 ## WINNERS (WR > 55%, PnL > 0)
 
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|
-| btc-pump-rider+ | LONG | — | —% | — | 5 | 100.0% | +4.04 | ❓ |
+None found.
 
 ---
 
@@ -25,9 +23,9 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| atr-trend+ | LONG | 2 | 50.0% | +0.22 | ❓ | Needs more data |
-| bb-squeeze+ | LONG | 2 | 50.0% | +0.55 | ENABLED | Needs more data |
-| ai-trader-pending | LONG | 3 | 33.3% | +1.38 | ❓ | Needs more data |
+| ai-trader-pending | SHORT | 2 | 50.0% | +0.16 | ❓ | Needs more data |
+| atr-trend+ | LONG | 3 | 33.3% | +0.17 | ❓ | Needs more data |
+| ai-trader-pending | LONG | 3 | 33.3% | +0.96 | ❓ | Needs more data |
 
 ---
 
@@ -45,10 +43,9 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] atr-trend+ LONG** — WR=50.0%, PnL=+0.22% over 2 trades. Monitor next cycle.
-2. **[WATCH] bb-squeeze+ LONG** — WR=50.0%, PnL=+0.55% over 2 trades. Monitor next cycle.
-3. **[WATCH] ai-trader-pending LONG** — WR=33.3%, PnL=+1.38% over 3 trades. Monitor next cycle.
-4. **[KEEP] 1 winning combos** — btc-pump-rider+. LONG side dominant.
+1. **[WATCH] ai-trader-pending SHORT** — WR=50.0%, PnL=+0.16% over 2 trades. Monitor next cycle.
+2. **[WATCH] atr-trend+ LONG** — WR=33.3%, PnL=+0.17% over 3 trades. Monitor next cycle.
+3. **[WATCH] ai-trader-pending LONG** — WR=33.3%, PnL=+0.96% over 3 trades. Monitor next cycle.
 
 ---
 

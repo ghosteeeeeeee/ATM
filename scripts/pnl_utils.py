@@ -35,6 +35,7 @@ Usage:
   )
 """
 
+import json
 from typing import Literal
 from dataclasses import dataclass
 
@@ -112,6 +113,37 @@ def compute_close_pnl(
     return (round(pnl_pct, 4), pnl_usdt, net_pnl)
 
 
+def fee_blob(calc_notional, gross_pnl=None):
+    """Fees JSON for the trades.fees TEXT column — the shared writer for close
+    paths that had none (guardian paper/orphan/breach close, brain manual_close).
+    position_manager, cascade_flip and brain.py build the same blob inline;
+    the rate here is byte-identical to compute_close_pnl (0.045% x 2 sides),
+    so stored fee_total and the pnl_utils net always agree.
+
+    WHY THIS EXISTS (#196, re-measured #289): a NULL fees row makes every
+    net-of-fee KPI understate cost, because those KPIs are
+    SUM(pnl_usdt) - SUM(fee_total) and SUM skips NULL. Measured 30d:
+    128/653 (19.6%) closed rows had no fee record -> reported 30d net
+    -10.38 vs true -12.15. Close paths that never wrote fees (guardian
+    paper/orphan close, brain manual_close) were the leak.
+    Non-fatal by design: returns None on any error so the close still runs,
+    and returns None when the notional is unknown (0/None) — NULL must stay
+    "unknown", never a false zero-fee claim.
+    """
+    try:
+        notional = abs(float(calc_notional or 0))
+        if notional <= 0:
+            return None
+        side = round(notional * 0.00045, 6)
+        total = round(side * 2, 6)
+        blob = {'entry_fee': side, 'exit_fee': side, 'fee_total': total}
+        if gross_pnl is not None:
+            blob['net_pnl'] = round(float(gross_pnl) - total, 6)
+        return json.dumps(blob)
+    except Exception:
+        return None
+
+
 def compute_hl_pnl_pct(unrealized_pnl: float, position_value: float) -> float:
     """
     Compute pnl_pct from HL's unrealized_pnl and position_value.
@@ -177,3 +209,36 @@ def zero_suspicious_pnl(entry_price: float, exit_price: float) -> tuple[float, f
     to close at entry = no loss/no win.
     """
     return (0.0, 0.0, entry_price)
+
+
+def _fee_blob_selfcheck():
+    """fee_blob must match the compute_close_pnl rate or stored fees and
+    stored net_pnl disagree — the exact class of bug this helper prevents."""
+    for notional in (11.10, 22.30, 16.60):
+        blob = fee_blob(notional, gross_pnl=1.0)
+        if blob is None:
+            raise SystemExit(f'SELFCHECK FAIL: fee_blob({notional}) is None')
+        d = json.loads(blob)
+        expect = round(float(notional or 0) * 0.0009, 6)
+        if abs(d['fee_total'] - expect) > 1e-6:
+            raise SystemExit(f'SELFCHECK FAIL: {notional} fee_total {d["fee_total"]} != {expect}')
+        if abs(d['entry_fee'] + d['exit_fee'] - d['fee_total']) > 1e-9:
+            raise SystemExit(f'SELFCHECK FAIL: {notional} sides do not sum to total')
+        if abs(d['net_pnl'] - (1.0 - d['fee_total'])) > 1e-6:
+            raise SystemExit(f'SELFCHECK FAIL: {notional} net_pnl wrong')
+    # unknown notional or garbage -> None (never a false zero-fee claim)
+    for bad in (0.0, None, 'not-a-number', -1):
+        got = fee_blob(bad, gross_pnl=1.0)
+        if bad == -1:
+            if got is None:
+                raise SystemExit('SELFCHECK FAIL: negative notional should abs() to a valid fee')
+            continue
+        if got is not None:
+            raise SystemExit(f'SELFCHECK FAIL: fee_blob({bad!r}) must be None, got {got}')
+    print('SELFCHECK PASS: fee_blob matches compute_close_pnl rate (0.045% x 2)')
+    return 0
+
+
+if __name__ == '__main__':
+    import sys
+    sys.exit(_fee_blob_selfcheck())
