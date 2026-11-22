@@ -1801,3 +1801,9 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 29T +$0.68 55.2% | 7d 126T +$0.56 48.4%
 ### Findings: regime=SHORT_BIAS (macro gate LONG=REDUCE / SHORT=FULL); disk 88% WARN repeating; 2 decision items due ≤24h (win-side-capture shadow bar, amplify fade-threshold walk)
 ### Recommendation: disk at 88% — schedule a log/data cleanup before it hits 90%.
+
+## CEO Status — 20261121T233827Z
+### Health: pipeline=active (timer-triggered 23:39:00Z, service exits between runs) guardian=active open_pos=0
+### Numbers: 24h 31T +$0.69 54.8% | 7d 127T +$0.38 48.0%
+### Findings: clean — 24h green; regime=LONG_BIAS (macro gate LONG=FULL/SHORT=REDUCE, wr=45%); disk 88% WARN hourly (not critical); 2 decision items due ≤24h (win-side-capture shadow bar, amplify fade-threshold walk — both report-only if silent)
+### Recommendation: disk at 88% — schedule log/gz cleanup before 90%.

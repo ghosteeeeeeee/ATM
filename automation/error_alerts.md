@@ -5199,3 +5199,12 @@
 
 ## Error Alerts — 2026-11-21 21:54 UTC
 - **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-21 22:54 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-21 23:54 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-22 00:00 UTC
+- **[WARN]** (freq_deviation_shadow): `atr-trend-`: FREQ DEVIATION UNDER source=atr-trend- baseline=0.137/h current=0.042/h ratio=0.30 n_base=46 n_cur=1

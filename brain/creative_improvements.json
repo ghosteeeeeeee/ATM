@@ -12030,5 +12030,35 @@
     "category": "audit infrastructure",
     "status": "shipped",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-22T00:45:00Z",
+    "id": "C1-audit287",
+    "idea": "Per-signal MFE-capture leaderboard — target the giveback tune at the bottom quartile, not globally",
+    "rationale": "30d capture on winners runs pump-chain- 0.519 / pump-chain+ 0.525 / volume-buildup- 0.538 / atr-trend- 0.558 / bb-squeeze+ 0.559 vs jup 0.626 and ai-trader 0.810 (n>=10). A single global 0.30->0.20 giveback would hand the same tightening to signals already capturing 0.63-0.81 and to the ones at 0.52.",
+    "expected_impact": "If bottom-quartile capture moves 0.54->0.70 on vb-/pc/atr-trend-: ~+$0.78/30d on volume-buildup- alone (0.162% move x $13 x 37 winners)",
+    "category": "exit quality / offense",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-22T00:45:00Z",
+    "id": "C2-audit287",
+    "idea": "Steer the remaining effort from loss-size to entry-quality — payoff has already recovered 0.73 -> 1.05",
+    "rationale": "Fee-inclusive breakeven WR vs actual: 30d 66.5% vs 52.7% (gap 13.8pt) -> 14d 61.2% vs 48.5% (12.7pt) -> 7d 57.9% vs 48.4% (9.5pt). Payoff (avg win / avg loss) recovered 0.73 -> 0.91 -> 1.05 across the same windows, i.e. the gap closed on the LOSS-SIZE side, which is now ~harvested. The residual 9.5pt is a WR (entry-quality/chop) gap, and fees are 0.0155/trade = 18% of an average win.",
+    "expected_impact": "Redirects new work toward chop/entry filters (the mandate) instead of fourth-and-fifth exit-tightening passes; sets a single standing KPI: gap_to_fee_breakeven_wr",
+    "category": "structural read / steering",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-22T00:45:00Z",
+    "id": "C3-audit287",
+    "idea": "LOW-FREQUENCY KILL-BAR BLIND SPOT — pump-chain+ is on a 12-trade losing streak the 14d n>=20 kill bar structurally cannot reach",
+    "rationale": "pc+ last win 10-30, then 12 straight losses 10-31..11-21 (net -0.53, avg -0.044/trade). 30d n=39 41% -0.51 (binom p=0.168 vs 0.5, NOT significant), 14d n=7 < 20 so the hourly kill screen stays 'monitor' forever while the signal keeps firing ~1.3/day and losing. All-time 187T 74W +2.29 = historically positive, so a disable is noise-trading. Pre-register a REVIEW PACKET trigger (not an auto-disable): 12+ consecutive losses AND 30d net<0 AND 14d n<20 -> CEO one-pager with all-time context.",
+    "expected_impact": "Closes a structural monitoring hole without adding an outcome-selected kill rule; bounded downside documented (12-loss streak costs -0.53 total)",
+    "category": "kill-screen calibration",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

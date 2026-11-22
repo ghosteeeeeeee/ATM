@@ -1,13 +1,21 @@
 {
-  "timestamp": "2026-11-21T22:39:32.764749+00:00",
+  "timestamp": "2026-11-22T00:39:33.629500+00:00",
   "steers": [
+    {
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: BTC + ZORA",
+      "detail": "Both opened within 14 minutes. Correlation risk.",
+      "auto_executable": false,
+      "id": "steer-001"
+    },
     {
       "severity": "warning",
       "category": "health",
       "title": "Signal 'pump-chain+' losing streak: 5 consecutive losses",
       "detail": "Net -0.07 USDT over last 20 trades (window losses: -0.07). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-001"
+      "id": "steer-002"
     },
     {
       "severity": "warning",
@@ -15,27 +23,23 @@
       "title": "Signal 'ai-trader-pending' losing streak: 3 consecutive losses",
       "detail": "Net -0.29 USDT over last 20 trades (window losses: -0.29). Consider disabling or tuning this signal.",
       "auto_executable": false,
-      "id": "steer-002"
+      "id": "steer-003"
     }
   ],
-  "portfolio_health": "good",
+  "portfolio_health": "warning",
   "regime": {
-    "btc_15m": "SHORT_BIAS",
+    "btc_15m": "LONG_BIAS",
     "btc_4h": "LONG_BIAS",
-    "continuum": "BELOW",
+    "continuum": "AT",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_NEG",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
-    "wyckoff_phase": "ACCUMULATION",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "linreg_alignment": 0.0,
+    "wyckoff_phase": "UNKNOWN",
+    "market_phase": "CALM",
+    "trend_quality": "UP"
   },
-  "open_count": 1,
-  "deep_analysis": "One position, one problem. Trade #17038 BTC LONG (opened 20:03:07Z, entry 60,351, meta_rsi 44.6 at signal, confidence 49.5) is -0.31% at 2.6h against a tape that turned against it 2h after entry: 1m crossed below continuum EMA300 at 22:05:58Z after ~25h above and has now held below for 74 consecutive minutes (price 60,171 vs EMA300 60,289, zscore -2.45 STRONG_NEG, trend_quality STRONG_DOWN, velocity SLOW, acceleration NEGATIVE, volume LOW). The trade's premise (continuum-osc+ long) was valid at entry and has degraded since \u2014 but we are NOT issuing an urgent exit on the \"below EMA300\" condition alone: brain_auditor #139 measured that cell (LONG, meta_rsi 45-64, BELOW EMA300) as the PROFITABLE one (+0.03 7d / +1.42 30d) with the bleed sitting AT/ABOVE, and measurement refutation outranks condition persistence. The honest read is that this is a CHOP tape (auto_trader regime CHOP/MANAGE_ONLY, volume LOW, only 2 coins with ATR>0.5% in the last hour among fresh tokens) and the trade has never reached +0.40% MFE \u2014 it is exactly the profile that feeds the never-arm cohort (52/56 hard_max_loss trades never armed). Geometry is fine (SL 59,977 = -0.62%, TP 61,558 = +2.0%, ~1:3.2), so the decision is: hold only while momentum stops making new lows; exit early on continuation rather than donate a full stop to chop. Do not add, do not average.\n\nWrong-side accounting for the open trade: the winning side right now is SHORT \u2014 69 of 127 tokens are 5m SHORT_BIAS vs 3 long, btc_15m SHORT_BIAS, BTC 1m below EMA300 with LEAN_BEAR linreg, and auto_trader scores short +15. Our single slot is on the opposite side. Counterweight (stated, not hidden): btc_4h is still LONG_BIAS, wyckoff ACCUMULATION / market_phase RECOVERY, 1h linreg slope still +0.099, and the regime flip-rate is NORMAL (aggregate 20 flips/24h, BTC 23 \u2014 p50-p75 of the 19-dump distribution, not the >=26 p95 anomaly), so snapshot direction churns about hourly and a single 74-minute below-EMA300 stretch is not a confirmed trend tape. Mixed sources = advisory severity, not urgent.\n\n24h book is actually fine: 30 closes, 56.7% WR, +$0.75. The bleed is specific, not systemic \u2014 every 24h LONG loser fired at meta_rsi >= 48 (BLUR 71.4/70.6/72.7/64.3, ETC 60.0, APT 59.7) on pumps that stalled just below trail arm (prearm_lock with MFE 0.31-0.58), while winners were dip LONGs (WCT 44.8, SOL 49.5) and the HYPE SHORT. Repeated BLUR longs at RSI 64-73 losing four times in 24h is the clearest single finding of the cycle: the winning side was SHORT BLUR, and BLUR is now the steepest confirmed 5m downtrend in the scanner (conf 90.9, r2 0.81, slope -0.111). We are taking that side as this hour's watchlist pick.\n\nPortfolio: 1 of 6 slots used, 0 shorts, all exposure is one counter-tape BTC long \u2014 no correlation cluster, no stale trades (2.6h), no 2%+/5%+/8h+ enforcement triggers this cycle (none met), and no capital tied up in losers. Opportunity cost is low; in_market 58% over 24h with +$0.75 realized.\n\nPattern status: pump-chain+ is NOT a dead signal (7d traffic 7T, 0W, -0.23 \u2014 enabled and emitting, so flagged live, not stale-window) and its recent losses are all high-RSI longs that never armed. ai-trader-pending remains the weakest family (7d 21T/6W/28.6%/-0.14) and bleeds at BOTH RSI extremes \u2014 this cycle re-tested and unchanged (only 1 close since the prior cycle, HYPE +0.07), so the ARM-time RSI band recommendation stands at age=7 cycles unexecuted. Chop-bleed KPI is inside normal band: 7d 79.3% dollar share (46 of 58 losers never armed, gross -$4.87, NULL mfe=0, same-day arm 70.0% on 30 closes) \u2014 neither the >=92% entry-quality breach nor the <=70% exit-ownership breach, so ownership stays with entry quality, not trail distance.",
-  "agent_timestamp": "2026-11-21T22:43:49.562982+00:00",
-  "regime_context": "Four sources at 22:30-22:45Z, named because they disagree:\n1. continuum (1m EMA300): BELOW since 22:05:58Z, 74 consecutive minutes as of write (was ABOVE for ~25h before the cross). price 60,171 vs ema300 60,289, zscore -2.45 STRONG_NEG, trend_quality STRONG_DOWN, linreg LEAN_BEAR (1m -0.0063, 5m -0.0300, 15m -0.0478; 1h still +0.0986), volume_regime LOW, velocity SLOW, acceleration NEGATIVE, wyckoff ACCUMULATION, market_phase RECOVERY.\n2. 5m regime scanner (22:30:04Z): aggregate SHORT_BIAS \u2014 3 long / 69 short / 55 neutral of 127 tokens. Highest-confidence shorts: LTC 92.1, ANIME 91.1, BLUR 90.9, TRB 90.9, NEO 90.5 (NEO on PENALTY list), PUMP 90.4, AVNT 90.1, SYRUP 90.1 \u2014 most already off -0.6% to -1.8% over 16 candles.\n3. Watchdog summary: btc_15m SHORT_BIAS, btc_4h LONG_BIAS, volatility LOW, zscore STRONG_NEG, velocity SLOW, acceleration NEGATIVE, trend_quality STRONG_DOWN.\n4. auto_trader: regime CHOP, decision MANAGE_ONLY, score_long -15 / score_short +15, price 60,192; last 6 decisions all MANAGE_ONLY.\nFlip-rate check (mandatory before direction-flavored prose): aggregate 20 flips/24h, BTC 23 flips/24h over 96 dumps \u2014 inside the normal p50-p75 band (p50 19, p95 26), NOT an anomaly, so any directional steer written here must be re-tested next cycle. Sources disagree (4h LONG vs 15m/5m SHORT vs auto_trader CHOP) and each steer above names which source it keys on.\nStanding refuted steer NOT re-issued: \"keep LONG entries out of meta_rsi 45-64 while 1m below EMA300\" \u2014 measured-refuted #139, the BELOW cell was the profitable one; do not resurrect it as an entry block OR as an blanket exit trigger.",
-  "pattern_alerts": "All PostgreSQL, re-run this cycle (1 close since the prior cycle: HYPE 17039 +0.07). RSI = meta_rsi from (_signal_metadata::json->>'rsi_14')::float \u2014 NOT entry_rsi_14 (DRIFT-E).\n\nP1 \u2014 ai-trader-pending RSI extremes, BOTH directions [URGENT, age=7 cycles unexecuted]\n  7d: 21T / 6W / 28.6% WR / -$0.14 (re-verified this cycle).\n  SHORT extreme: meta_rsi <31 = 9T / 1W / 11.1% / -$1.02, all via the ARM bypass where SHORT_RSI_HARD_FLOOR=45 never runs; latest BTC SHORT at 24.6 closed manual_sl_hit -$0.11 (17032).\n  LONG extreme mirror: BTC LONGs at meta_rsi 83.4 and 66.8 both manual_sl_hit -$0.09 each (17027/17026, 10x).\n  WINNING SIDE: at meta_rsi <31 the paying side was LONG (7d LONG <45 = 12T/7W/+$0.73, our best cell); at meta_rsi >66 the paying side was SHORT (7d SHORT >=65 = 25T/15W/+$0.66). Both pending-bypass directions are trading against the paying cell. Fix = run the same floor/ceiling gates at ARM time for ai-trader-pending that entry signals get.\n\nP2 \u2014 7d meta_rsi band map, direction-split (n, WR, net) [INFO \u2014 the standing evidence base]\n  LONG: <45 = 12T/58%/+$0.73 (pays \u2014 buy dips) | 45-55 = 23T/52%/+$0.02 | 55-65 = 16T/25%/-$0.46 (worst long cell) | >=65 = 18T/44%/+$0.24.\n  SHORT: <45 = 15T/40%/-$0.72 (worst short cell \u2014 oversold chase, BANANA) | 45-55 = 1T/+$0.20 (n too small) | 55-65 = 13T/46%/-$0.20 | >=65 = 25T/60%/+$0.66 (pays \u2014 short strength).\n  24h read is consistent but small-n: every LONG loser fired >=48 meta_rsi, every 24h band net positive.\n  WINNING SIDE for our recent losses: BLUR longs at 64.3-72.7 (4 in 24h, all prearm_lock/atr_sl) should have been SHORTs; ETC LONG 60.0 hard_max_loss -$0.10 should have been no-trade or SHORT. We were late-longing pumps instead of shorting the fade.\n\nP3 \u2014 pump-chain+ live, not dead [WARNING \u2014 steer-001 confirmed, dead-signal check passed]\n  7d: 7T / 0W / -$0.23, emitting now (so NOT a stale-window report; V5/V4/V6 master flags False but the + family still routes traffic \u2014 V6_PLUS True, killed V6 leg was 2026-11-21 #284 for the SHORT cell only).\n  All 5 losses in 24h are LONGs at meta_rsi 48.2-72.7 exiting prearm_lock with MFE 0.31-0.35 \u2014 never armed. Chop entries, not bad exits.\n  Action: ownership is entry quality (see KPI), family is small (-0.23/7d); no new disable proposed \u2014 the shipped HIGH-regime blocks already cover part of it.\n\nP4 \u2014 Chop-bleed share KPI [INFO \u2014 no threshold breach]\n  Dollar share of gross loss from trades that never reached +0.40% MFE: 7d 79.3% (46 of 58 losers, gross -$4.87) | 14d 86.6% (88 of 106, gross -$9.67). NULL mfe_pct losers: 0 in both windows (backfill current). Same-day companion: arm rate 70.0% on 30 closes, day PnL +$0.75.\n  Read: between the <=70% exit-ownership line and the >=92% entry-quality-deterioration line \u2014 neither owner triggered, ownership stays where the 10-25 baseline put it (entry quality, already being worked). Quote measure = dollar share, 7d vs 7d baseline (84.1%)."
+  "open_count": 2
 }

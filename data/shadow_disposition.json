@@ -1570,13 +1570,68 @@
       "kind": "shadow",
       "status": "open",
       "started": "2026-11-08",
-      "deadline": "2026-11-22T00:00:00Z",
+      "deadline": "2026-11-25T00:00:00Z",
       "threshold": "MFE_EXIT_GIVEBACK_PCT 0.30→0.20 and/or PM_TRAIL_DISTANCE_PCT 0.002→0.003 SHADOW: prove no ATR-SL race first — constants:1967 says DO NOT WIDEN 'ATR SL beats wider trails'; ship only if capture 0.57→0.70 improves net30 ≥ +$0.10/day with fk<20%",
       "default_action": "no change (winners capture 56.7% of MFE price today)",
       "owner": "CEO",
       "evidence": "CEO 20261108T180116Z: win-side lever worth +$0.10/day if capture0.57→0.70  BUILD 20261118T230344Z: collector shipped — scripts/position_manager.py:4684-4713 (7c MFE-giveback site) + hermes_constants.py:2167-2168 WIN_CAPTURE_SHADOW=True / WIN_CAPTURE_SHADOW_GIVEBACK=0.20 (LOG-ONLY, analysis-only what-if); commit 8e83dfca pushed rc=0; probe 24/24 incl. exit-path byte-identical vs HEAD; py_compile + linter + selfcheck PASS; first PM run 23:05:34 rc=0; first-live-line pending (armed jup-scope trade touching 0.80xpeak or the live 0.30 exit). Site correction: MFE giveback lives ONLY in position_manager §7c (0 refs in decider_run). READ PROTOCOL 11-22: grep -a 'WIN-CAPTURE-SHADOW]' -> dedup trade_id (per-process set may re-emit across PM restarts) -> join PG by trade_id (exit engine, prices, pnl_usdt, metadata) -> TWO cohorts: (a) live-0.30-fire lines = earlier-exit delta vs 0.80xpeak what-if, (b) whatif-only lines = ADDITIONAL captures -> capture delta vs baseline 0.57, bar 0.70, net30 >= +$0.10/day, fk<20% (PM_TRAIL 0.002->0.003 leg remains BLOCKED-CEO_PROTECTED). Line-ref fix: 'constants:1967 DO NOT WIDEN' now lives at hermes_constants.py:2034 (drift, content intact). SUPERSEDES the earlier 'NO COLLECTOR EXISTS' claim. | COLLECTOR VERIFIED WORKING 20261119T1402Z (builder re-diagnosis): the 0-line alarm was a ROTATION false-positive — pipeline.log rotated 09:07; the real line is in logs/archive/pipeline.log.20261119090701.gz: '2026-11-19 01:37:23 [WIN-CAPTURE-SHADOW] SOL SHORT 16980: peak_mfe=0.58% giveback=30% (what-if 20%) — would-capture=YES' (immediately before its mfe_exit close, same second); replay vs real = BYTE-IDENTICAL; 0 ERROR lines anywhere; second close 16987 peak_fav 0.3763% < arm 0.40% = legitimately out of scope (proved with actual PG values, NOT patched). READ PROTOCOL FIX (rotation-safe, supersedes bare-grep): grep -a 'WIN-CAPTURE' logs/pipeline.log PLUS for g in logs/archive/pipeline.log*.gz; do zgrep -a 'WIN-CAPTURE' $g; done (plain grep misses non-ASCII; bare current-file grep is the 11-08 H1 class bug).",
       "notes": " | BONUS COHORT (CEO 20261113T040327Z): the 11 crash shorts (11-11/13) — wins avg +1.31%, losses avg -3.45%, payoff0.38, BE-WR72.4% vs actual72.7% = EV+0.01%/trade then fees -$0.126 -> net -$0.164. pm_trail capped winners at +2.57% while stops gave -3.0..-3.7. Feed this cohort into the read; NO new proposals. | #264 MEASUREMENT 2026-11-15: capture (price-move/mfe_pct, armed winners, pnl_usdt units) = 0.595 14d (n=128) / 0.589 30d (n=301) vs baseline 0.57, bar 0.70 -> +0.025 improved, 0.105 short of bar. By exit engine 14d: mfe_exit 0.624 / pm_trail 0.584. Shadow STILL NOT BUILT (no log-only giveback-0.20 line exists in position_manager). PM_TRAIL_DISTANCE_PCT leg BLOCKED for auditor (CEO_PROTECTED 'DO NOT WIDEN'). Giveback 0.30->0.20 leg = one log-only line + one shadow flag, needs CEO GO (owner CEO). Prior art: [yolo dash 2026-11-02] arm x giveback grid tested 30% vs 40% (40% loses) — 0.20 NOT in that grid. EXTENDED to 11-22 for CEO GO-or-decline on shadow build. | NO COLLECTOR EXISTS (CEO 20261118T224556Z verified: 0 grep hits in scripts/, 0 log lines, no constants flag; MFE_EXIT_GIVEBACK_PCT still 0.30) — BUILD ordered 2026-11-18 or the11-22 read fails-closed on empty data. Claimed value +$0.10/day.",
-      "last_read": "brain_auditor #285 2026-11-21T08:45Z: collector IS LIVE — 12 [WIN-CAPTURE-SHADOW] lines in logs/pipeline.log since 2026-11-20 19:08Z (BTC SHORT 17007 x2, 17013) = first-live-line requirement satisfied. Capture re-measure (armed winners, price_move/mfe, 14d n=90 = 0.600 / 30d n=299 = 0.581) vs baseline 0.57, bar 0.70 -> +0.03 improved, 0.10 short of bar -> NO SHIP, COLLECT to deadline 11-22 (line count still tiny vs needed sample)."
+      "last_read": "brain_auditor #285 2026-11-21T08:45Z: collector IS LIVE — 12 [WIN-CAPTURE-SHADOW] lines in logs/pipeline.log since 2026-11-20 19:08Z (BTC SHORT 17007 x2, 17013) = first-live-line requirement satisfied. Capture re-measure (armed winners, price_move/mfe, 14d n=90 = 0.600 / 30d n=299 = 0.581) vs baseline 0.57, bar 0.70 -> +0.03 improved, 0.10 short of bar -> NO SHIP, COLLECT to deadline 11-22 (line count still tiny vs needed sample).",
+      "read_20261122": {
+        "ran_at": "2026-11-22T00:45:00Z",
+        "raw_lines": 19,
+        "distinct_trade_ids": 8,
+        "joined_pg": 8,
+        "cohort_a_live030_fire": 8,
+        "cohort_b_whatif_only": 0,
+        "method": "1m candle giveback walk from open_time..close_time; hyp20 = first bar touching peak-0.20*fav (LONG) / peak+0.20*fav (SHORT); delta_usdt = amount*(hyp20-actual_exit)*sgn/entry (pnl_usdt units, #193 guard)",
+        "net_delta_usdt": 0.2609,
+        "window_days": 3,
+        "pace_per_day": 0.087,
+        "bar_pace": "+$0.10/day -> NOT MET (0.87x of bar)",
+        "improved_on": "7 of 8 (only #17039 HYPE -0.0121 negative — trail rode 0.611% fav vs 0.20-giveback 0.579%)",
+        "fk": "0% — no trade would flip win->loser under 0.20",
+        "mean_capture_at_live_exit": 0.549,
+        "baseline_capture": 0.57,
+        "bar_capture": 0.7,
+        "per_trade": [
+          {
+            "id": 16989,
+            "d": 0.0442
+          },
+          {
+            "id": 16994,
+            "d": 0.0182
+          },
+          {
+            "id": 16999,
+            "d": 0.0153
+          },
+          {
+            "id": 17007,
+            "d": 0.0644
+          },
+          {
+            "id": 17013,
+            "d": 0.1009
+          },
+          {
+            "id": 17018,
+            "d": 0.0231
+          },
+          {
+            "id": 17039,
+            "d": -0.0121
+          },
+          {
+            "id": 16980,
+            "d": 0.0069
+          }
+        ],
+        "verdict": "COLLECT EXTENDED to 2026-11-25 — directionally positive (7/8, fk 0) but pace 0.87x of bar and n=8. Read bar at 11-25: n>=40 distinct trade_ids AND pace >= +$0.10/day AND fk<20%. Default stays no change; PM_TRAIL_DISTANCE_PCT 0.002->0.003 leg remains CEO_PROTECTED / blocked.",
+        "note": "cohort_b (whatif-only = additional captures the 0.30 would miss) is 0 — all measured value comes from cohort_a (earlier exit on trades that 0.30 would also exit). If cohort_b stays 0 through 11-25 the mechanism is 'less giveback on same trades', not 'new captures'."
+      },
+      "statused_by": "brain_auditor #287"
     },
     {
       "id": "hml-vol-atr-mult-shadow",
@@ -2025,7 +2080,7 @@
       "stream": "BTC_PUMP_RIDER fade-entry guard: threshold robustness walk + shadow->enforce read (FADE_MIN_DRIFT_PCT 0.10)",
       "kind": "amplify",
       "proposal_type": "(a) param-widen counterfactual on a validated cohort (pc+ fire-level pre15 drift, n=1392 Fisher p=0.008 per guard adoption note)",
-      "status": "open",
+      "status": "done",
       "created_at": "2026-11-20T00:50:00Z",
       "deadline": "2026-11-22T00:00:00Z",
       "owner": "brain_auditor #280 AMPLIFY (weekly emit)",
@@ -2047,7 +2102,33 @@
       },
       "evidence_run281": "walk executed 2026-11-20 (2 days before deadline); formal deadline read 11-22 re-checks counts",
       "notes": "| PRE-REGISTERED FOLLOW-ON (brain_auditor #282 2026-11-20): if the 11-21/22 enforce-limb read stays FAIL-fk AND btc-pump-rider+ LONG 30d n>=20 at WR<40% (today n=11 27.3% -$0.37), open a LONG-leg disable eval as a SEPARATE entry (prior-art check this run: no prior disable of this leg found in session brain).",
-      "last_read": "brain_auditor #285 2026-11-21T08:45Z (early read, 15h to deadline): limb run via brain/analysis/rider_fade_threshold_walk.py (selfcheck PASS) -> shadow_lines=138 (bar 15 MET, 40x the '0 lines' side-find), blocked_net_pnl_usdt=-0.28 (MET), live_n=17 live_blocked_n=9, fk_live_zero=False with blocked live winners [16921,16895,17017] => bar triplet FAIL => default NO FLIP, stays shadow. Threshold walk: keep 0.10 (no adjacent threshold beats it in both halves same-sign; thr<0.20 nets better kept-side but fk 59-66%). ROOT CAUSE of #283's '0 lines in pipeline.log AND archive': tag is written to /var/www/hermes/logs/signals.log (381MB) — the correct path already in this entry's threshold — while /root/.hermes/logs/signals.log is a SECOND live file (mtf_macd + signal_confluence); prior greps used the wrong file. NOTE shipped at btc_pump_rider.py:37. Pre-reg follow-on (#282) NOT opened: btc-pump-rider+ LONG 30d n=12 (need n>=20) at 33.3% WR -0.30. Re-read at deadline for fk only."
+      "last_read": "brain_auditor #285 2026-11-21T08:45Z (early read, 15h to deadline): limb run via brain/analysis/rider_fade_threshold_walk.py (selfcheck PASS) -> shadow_lines=138 (bar 15 MET, 40x the '0 lines' side-find), blocked_net_pnl_usdt=-0.28 (MET), live_n=17 live_blocked_n=9, fk_live_zero=False with blocked live winners [16921,16895,17017] => bar triplet FAIL => default NO FLIP, stays shadow. Threshold walk: keep 0.10 (no adjacent threshold beats it in both halves same-sign; thr<0.20 nets better kept-side but fk 59-66%). ROOT CAUSE of #283's '0 lines in pipeline.log AND archive': tag is written to /var/www/hermes/logs/signals.log (381MB) — the correct path already in this entry's threshold — while /root/.hermes/logs/signals.log is a SECOND live file (mtf_macd + signal_confluence); prior greps used the wrong file. NOTE shipped at btc_pump_rider.py:37. Pre-reg follow-on (#282) NOT opened: btc-pump-rider+ LONG 30d n=12 (need n>=20) at 33.3% WR -0.30. Re-read at deadline for fk only.",
+      "deadline_read_20261122": {
+        "ran_at": "2026-11-22T00:45:00Z",
+        "script": "brain/analysis/rider_fade_threshold_walk.py --selfcheck PASS",
+        "shadow_lines": 204,
+        "line_bar_15": "MET (13.6x)",
+        "live_n": 22,
+        "live_blocked_n": 10,
+        "live_blocked_net_pnl_usdt": -0.25,
+        "blocked_net_negative": "MET",
+        "live_blocked_winner_ids": [
+          16921,
+          16895,
+          17017,
+          17021
+        ],
+        "fk_live_zero": "FAIL (4 would-blocked live winners)",
+        "review_queue_signoff": "ABSENT",
+        "bar_triplet": "FAIL",
+        "threshold_walk": "keep 0.10 — no adjacent threshold beats it in BOTH split-halves same-sign (fwd30 halves all negative same-sign; fwd60 halves NOT same-sign); fk at all thresholds 42-67% >> 20% bar",
+        "verdict": "NO FLIP — BTC_PUMP_RIDER_FADE_BLOCK_MODE stays 'shadow'. Units guard honored (pnl_usdt).",
+        "aging_caveat_disconfirmed": "#280 pre-registered 'fk could re-pass on window aging alone' is now REFUTED: CHIP #16921 / ARB #16895 aged toward the 30d edge and were REPLACED by two fresh 11-21 winners (XPL #17017 +0.07, NXPC #17021 +0.03). FAIL is not a stale-window artifact.",
+        "followon_282_check": "NOT OPENED — pre-reg condition was 'rider LONG 30d n>=20 AND WR<40%'; measured n=22 (>=20) but WR 59.1% (NOT <40%) -> condition unmet, no LONG-leg disable eval.",
+        "ceo_question": "fk limb is calibrated to 0 winners while the net-EV limb reads -0.25 (blocking is net-positive). 10 blocked / 4 winners = 40% fk. Decide: relax fk limb to fk<=40% + net<0, or accept shadow-only permanently. Captain rec: keep shadow (default) until one more 14d read; do NOT relax unilaterally."
+      },
+      "statused_by": "brain_auditor #287",
+      "disposed_at": "2026-11-22T00:45:00Z"
     },
     {
       "id": "amplify-jup-long-blocked-clonehunt",
@@ -2194,6 +2275,24 @@
       "notes": "Do NOT cite raw shadow n without dedup (#239 pseudo-replication). Signal uses atr exit management (:2357).",
       "done_at": "2026-11-21T16:45:00Z",
       "disposition": "CLOSED SUPERSEDED 2026-11-21 (brain_auditor #286): this entry was appended into _doc instead of entries by #257 (commit 919f4d50), so shadow_disposition.py (:570 reads only reg[\"entries\"]) NEVER surfaced it and its 2026-11-20 deadline silently passed. The same work was properly registered and disposed as \"amplify-ema300-underdeploy\" (deadline 2026-11-19, CLOSED NO-SHIP 2026-11-18, audit #274: bar (i) counterfactual-walk FAIL). No measurement is owed. Root-cause guard shipped same run: main() now reports dict entries stranded in _doc."
+    },
+    {
+      "id": "amplify-capture-leaderboard-giveback",
+      "stream": "per-signal MFE-capture leaderboard -> target giveback 0.30->0.20 at the BOTTOM of the capture ranking first (not globally)",
+      "kind": "amplify",
+      "proposal_type": "(a) param-widen counterfactual on a validated cohort (MFE_EXIT_GIVEBACK_PCT 0.30->0.20, per-signal)",
+      "status": "open",
+      "created_at": "2026-11-22T00:45:00Z",
+      "deadline": "2026-11-26T00:00:00Z",
+      "owner": "brain_auditor #287 AMPLIFY (weekly emit)",
+      "evidence": "30d PG capture ratio on WINNERS (exit_move/peak_mfe, mfe>=0.30), n>=10 signals: pump-chain- 0.519 (n=13) | pump-chain+ 0.525 (n=16) | volume-buildup- 0.538 (n=37) | atr-trend- 0.558 (n=30) | bb-squeeze+ 0.559 (n=36) | warrior-sr-confirm+ 0.564 (n=10) | r2v2-long3 0.593 (n=10) | btc-pump-rider+ 0.587 (n=9) | jup_yolo_mirrored 0.626 (n=112) | ai-trader-pending 0.810 (n=18, non-PM-trail exits). Book baseline stated 0.567; bar 0.70. The global 0.30->0.20 giveback read (win-side-capture-shadow, due 11-25) is the MECHANISM proof; this entry adds the TARGETING so a global flip is not applied uniformly to signals already at 0.63-0.81.",
+      "threshold": "BLOCKED until win-side-capture-shadow reaches its 11-25 read bar (n>=40 distinct trade_ids AND pace >= +$0.10/day AND fk<20%). Then SHIP only if ALL: (i) per-signal 1m giveback walk on that signal's own armed winners gives net >= +$0.50/30d pnl_usdt UNITS GUARD (#193); (ii) fk <=20% of that signal's 30d winners; (iii) 7d/14d/30d same-sign; (iv) does NOT touch PM_TRAIL_DISTANCE_PCT (CEO_PROTECTED). Priority order by (0.70-capture)*n*avg_fav: volume-buildup- first (largest n in the bottom quartile), then atr-trend-, then bb-squeeze+.",
+      "measurement": "reuse the 1m giveback walk written for the 11-22 win-capture read (hyp20 vs actual exit, delta_usdt = amount*(hyp20-exit)*sgn/entry), run per signal over 30d armed winners",
+      "default_action": "NO CHANGE — global win-capture still collecting; this entry cannot fire before 11-25",
+      "risk": "low (report + counterfactual only until every bar clears)",
+      "requires": "review-queue sign-off before enforce (standing bar)",
+      "not_a_duplicate_of": "win-side-capture-shadow (GLOBAL giveback read, mechanism proof), amplify-ugb-bypass-armgap (done), amplify-structure-flip-early-exit (different exit lever)",
+      "created_by": "brain_auditor #287"
     }
   ],
   "updated_at": "2026-11-21T12:42:11Z"

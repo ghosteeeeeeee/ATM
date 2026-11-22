@@ -4664,5 +4664,16 @@
     "after": "pure _stranded_entries(reg) (isinstance-guarded, never raises); main() emits \"- ERROR: STRANDED in _doc\" report line + log ERROR + seeds entry_errors; selfcheck asserts live _doc clean + 5 fixtures",
     "rationale": "Make the stranded-entry hole loud instead of silent (file's own MED-1 lesson: one bad JSON value must not kill the run)",
     "impact": "Report-only, zero trading behavior. py_compile PASS, --selfcheck SELFCHECK PASS, bug_hunter PASS (1 MED + 3 LOW all fixed)."
+  },
+  {
+    "timestamp": "2026-11-22T00:50:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #287: dispositioned 2 past-due entries + registered 1 AMPLIFY entry in data/shadow_disposition.json (0 trading-constant changes)",
+    "type": "tweak",
+    "file": "data/shadow_disposition.json",
+    "before": "amplify-rider-fade-threshold-walk status=open deadline 11-22 (read owed); win-side-capture-shadow status=open deadline 11-22 (read owed); 135 entries",
+    "after": "rider-fade -> done / NO FLIP (lines 204, blocked_net -0.25 MET, fk_live FAIL 4 winners 16921/16895/17017/17021, review-queue absent); win-capture -> deadline extended 11-25 with measured +0.0870/day (bar +0.10) n=8 fk=0; NEW amplify-capture-leaderboard-giveback due 11-26; 136 entries, 0 stranded in _doc",
+    "rationale": "Both entries hit their 2026-11-22 00:00Z deadline at this run; the reads were owed and are now measured in-file so the 08:15Z daily runner does not re-derive them. AMPLIFY weekly emit needs >=1 proposal.",
+    "impact": "Report/disposition only — zero trading behavior. shadow_disposition --selfcheck PASS after write."
   }
 ]
