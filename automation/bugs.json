@@ -2032,6 +2032,19 @@
       "root_cause": "Comment written ahead of the code during live calibration; marker tightening shipped without the promised second gate.",
       "found_by": "bug-hunter-sct (skill test of new launch-watcher.mjs)",
       "fix": "Implemented the gate as NOISE_MINTS skip (USDC/WSOL counted as noise with early return before the authority RPC), renamed label to CANDIDATE, pointed the comment at the real gate, added noise= to heartbeat. Verified: watcher restarted pid3683466, npm test green."
+    },
+    {
+      "id": "BUG-115",
+      "title": "SCT getTx patient budget 72s worst case \u2014 a dual-provider throttle can stall a worker (and via all 3, the queue) far past useful delivery",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "bot.js"
+      ],
+      "symptom": "Verified from user review: limited-branch sleeps 2000*(n+1) over 8 attempts sum to 72000ms (old code: 7.5s). One worker stalled that long delays every queued detection behind it; queue sheds oldest past 100. A detection delivered at +72s is stale anyway \u2014 premium guard blocks the entry, but the stall cost is real.",
+      "root_cause": "Patient-retry budget was sized for delivery under throttle without a total-time ceiling; the round-robin makes single-provider recovery fast (~2-4s) so the long budget only binds on dual-provider outages where delivery is stale regardless.",
+      "found_by": "user review (latency-critical verification request)",
+      "fix": "Total deadline of 18s (Date.now() budget checked before each sleep, break \u2192 null \u2192 dropped++ visible). Covers ~2 full provider rotations under single-provider throttle (the common case, unchanged); sheds a hopelessly-stalled worker at 18s instead of 72s. Latency over delivery per user directive. Verified: npm test + selftest pass, bot active/LIVE after restart, commit 4c1f157."
     }
   ],
   "schema": {
