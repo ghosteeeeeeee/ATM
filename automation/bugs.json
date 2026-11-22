@@ -1912,6 +1912,19 @@
       "root_cause": "onLogs callback incremented nothing on arrival; only decoded target trades (detected) and failures were counted, so a silent feed stall and a quiet target produce identical dashboards.",
       "found_by": "own bug test (independent pass over the build, per user request)",
       "fix": "Added state.counts.mentions++ in the onLogs callback and initialized mentions+dropped in counts. Verified after restart: mentions 12 at t+12s, 25 at t+27s, dropped 0 \u2014 feed and read path both healthy in-process."
+    },
+    {
+      "id": "BUG-106",
+      "title": "SCT mentions counter placed after the err guard \u2014 undercounts raw feed ~99%, five-layer triage false-alarms a stall",
+      "severity": "MEDIUM",
+      "status": "FIXED",
+      "files": [
+        "bot.js"
+      ],
+      "symptom": "Layer-2 triage saw mentions frozen (615\u2192615/15s) while the wss socket received 36MB and a standalone listener counted 7783 notifications/60s on the same endpoint.",
+      "root_cause": "state.counts.mentions++ sat below if (err) return in the onLogs callback; ~49/50 target mentions are on-chain failures (InstructionError Custom(7), pump.fun slippage reverts), so the counter only counted the ~1/s clean remainder and read as a dead feed.",
+      "found_by": "bug-hunter-sct skill test run (simultaneous bot-vs-standalone measurement)",
+      "fix": "Moved the increment above the err guard \u2014 mentions now counts raw arrivals (verified 2031\u21926489 in 15s after restart); failed txs still never enter the queue. Skill updated: layer-2 expectation (tens per 15s) and a bug-pattern row documenting the 99%-failed phenomenon."
     }
   ],
   "schema": {
