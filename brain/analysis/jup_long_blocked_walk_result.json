@@ -1,0 +1,110 @@
+{
+  "generated": "2026-11-23T04:44:57.419434+00:00",
+  "n_dedup": 41,
+  "walk_wins": 21,
+  "walk_losses": 18,
+  "walk_net": 0.13,
+  "walk_wr_decided": 53.8,
+  "by_gate": {
+    "CONTINUUM-BLOCK": {
+      "n": 12,
+      "decided": 12,
+      "wr": 75.0,
+      "net": 0.27
+    },
+    "CTX-GATE": {
+      "n": 4,
+      "decided": 4,
+      "wr": 75.0,
+      "net": 0.09
+    },
+    "LONG-RSI-BLOCK": {
+      "n": 4,
+      "decided": 4,
+      "wr": 50.0,
+      "net": 0.0
+    },
+    "LONG-NEUTRAL": {
+      "n": 3,
+      "decided": 2,
+      "wr": 50.0,
+      "net": 0.0
+    },
+    "SPIKE-FILTER": {
+      "n": 3,
+      "decided": 3,
+      "wr": 33.3,
+      "net": -0.04
+    },
+    "LONG-HIGH-70": {
+      "n": 3,
+      "decided": 3,
+      "wr": 66.7,
+      "net": 0.04
+    },
+    "LONG-MIDBAND": {
+      "n": 3,
+      "decided": 3,
+      "wr": 33.3,
+      "net": -0.04
+    },
+    "EXEC-BLOCK": {
+      "n": 2,
+      "decided": 2,
+      "wr": 50.0,
+      "net": 0.0
+    },
+    "LONG-NEUTRAL-CHOP": {
+      "n": 1,
+      "decided": 0,
+      "wr": 0,
+      "net": 0.0
+    },
+    "CONFLUENCE-GATE-BLOCK": {
+      "n": 1,
+      "decided": 1,
+      "wr": 100.0,
+      "net": 0.04
+    },
+    "RR-ENGINE": {
+      "n": 1,
+      "decided": 1,
+      "wr": 0.0,
+      "net": -0.04
+    },
+    "HOT-SET": {
+      "n": 1,
+      "decided": 1,
+      "wr": 0.0,
+      "net": -0.04
+    },
+    "EXEC-RSI-CEILING": {
+      "n": 1,
+      "decided": 1,
+      "wr": 0.0,
+      "net": -0.04
+    },
+    "LONG-RSI-CEILING": {
+      "n": 1,
+      "decided": 1,
+      "wr": 0.0,
+      "net": -0.04
+    },
+    "BTC-CHOP-GATE": {
+      "n": 1,
+      "decided": 1,
+      "wr": 0.0,
+      "net": -0.04
+    }
+  },
+  "fk_pct": 100.0,
+  "pre_walk_wr": 68.3,
+  "post_walk_wr": 51.2,
+  "bars": {
+    "i_n15": true,
+    "ii_net050": false,
+    "iii_fk20": false,
+    "iv_two_gates": false,
+    "v_halves": false
+  }
+}

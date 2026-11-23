@@ -12138,5 +12138,32 @@
     "category": "wrong-side early warning",
     "status": "reported",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-23T04:50:24Z",
+    "idea": "gate_shadow would_win provenance audit — recompute would_win from 5m candles for 30d jup/atr-trend samples; if systematic inflation, quarantine the column and force all clone-hunts through candle-walk only",
+    "rationale": "jup LONG walk: pre 68.3% vs post 53.8% (+14.5pp inflation); #276 already flagged opposite-sign vs shadow_trader",
+    "expected_impact": "prevents future NO-SHIP wasting a full walk cycle; may unblock legitimate blocked-set edges once column is trustworthy",
+    "category": "data integrity",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-23T04:50:24Z",
+    "idea": "btc-pump-rider+ EXTREME LONG winner-cell validation (AMPLIFY #291 registered)",
+    "rationale": "30d 13T 61.5% +0.35 arm 69.2% 11 tokens, 7d 77.8% +0.39 same-sign; no open conflicting entry; sibling SHORT n=0 direction-pure",
+    "expected_impact": "cell-add ready for CEO mult revert 1.0→1.25 if 11-30 read holds",
+    "category": "amplify",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-23T04:50:24Z",
+    "idea": "chop-bleed early-warning: 1-day delta on never-armed $share (82.7→90.5 in 24h) as leading indicator before the 92% tripwire",
+    "rationale": "tripwire only fires at 92% sustained; a +8pp single-day jump was invisible in #290 report",
+    "expected_impact": "earlier entry-quality intervention window",
+    "category": "kpi",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

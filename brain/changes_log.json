@@ -4719,5 +4719,38 @@
     "after": "evidence includes 11-22 interim reads",
     "rationale": "mandated interim reads due 11-22; zero trading behavior",
     "impact": "verdicts unchanged (WIN-CAPTURE continue, floor NO-SHIP stands)"
+  },
+  {
+    "timestamp": "2026-11-23T04:50:24Z",
+    "agent": "brain_auditor",
+    "change": "Audit #291: dispositioned amplify-jup-long-blocked-clonehunt NO SHIP (walk 4/5 bars fail, net +0.13, provenance +14.5pp inflation)",
+    "type": "data",
+    "file": "data/shadow_disposition.json",
+    "before": "status=open due 11-23",
+    "after": "status=done disposition=NO SHIP",
+    "rationale": "candle-walk disproved gate_shadow would_win; fk/split-half/gate-diversity all fail",
+    "impact": "no trading behavior; prevents premature gate exempt"
+  },
+  {
+    "timestamp": "2026-11-23T04:50:24Z",
+    "agent": "brain_auditor",
+    "change": "Audit #291 weekly AMPLIFY: registered amplify-rider-extreme-long-cell (btc-pump-rider+|EXTREME|LONG, 13T +0.35, bars for 11-30)",
+    "type": "data",
+    "file": "data/shadow_disposition.json",
+    "before": "no entry",
+    "after": "open amplify entry deadline 11-30",
+    "rationale": "AMPLIFY mandate: >=1 proposal/run; clean winner cell no conflicting entry",
+    "impact": "cell validation path only; mult stays 1.0 until CEO"
+  },
+  {
+    "timestamp": "2026-11-23T04:50:24Z",
+    "agent": "brain_auditor",
+    "change": "Audit #291: floor-admit mature verdict NO-SHIP final (p=0.2711 at 38d), route CLOSED",
+    "type": "data",
+    "file": "data/shadow_disposition.json",
+    "before": "collecting, p=0.2897",
+    "after": "CLOSED NO-SHIP final",
+    "rationale": "mature window, directional edge never significant",
+    "impact": "stops re-asking floor question every run"
   }
 ]
