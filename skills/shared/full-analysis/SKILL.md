@@ -404,6 +404,84 @@ python3 /root/.hermes/scripts/structure_analysis.py COIN
 reported 1h UPTREND [HH HL] SH=83,189 SL=82,394; those are precisely the
 22:00 high and 19:00 low the CEO read by eye. Same levels, no eyeballing.
 
+### MTF RSI Structure (COMPUTED — run every analysis; CEO 2026-11-23)
+
+Treat the RSI line as its OWN structure: swing highs/lows on the RSI
+series → HH/HL/LH/LL sequences → and, crucially, **structural breaks
+in the RSI itself**. Momentum structure breaks usually LEAD price —
+the RSI loses its last swing-low while price is still above its own
+swing-low = the early warning that the price structure is about to
+follow. This is sequence-structure on the oscillator; §3 (the divergence
+taxonomy) covers the VALUE relationship between price and RSI — use
+both, label each precisely.
+
+**States (per TF, from the last two RSI swings each side):**
+- `RSI-STRUCT BULL` = HH + HL (momentum trending up)
+- `RSI-STRUCT BEAR` = LH + LL (momentum trending down)
+- `RSI-STRUCT MIXED` = transition (e.g., HH+LL = momentum topping,
+  LH+HL = momentum bottoming)
+
+**Break labels (the ask — the break IN the RSI):**
+- `RSI-LOST-LAST-SL` — the RSI closed below its last swing-LOW: the
+  HL chain broke = momentum-structure break bearish, OFTEN BEFORE the
+  price structure breaks (the leading read)
+- `RSI-RECLAIMED-LAST-SH` — the RSI closed above its last swing-HIGH:
+  the LH chain broke = momentum-structure break bullish
+- `RSI-NO-BREAK` — the current RSI sits inside its last swing range
+
+**MTF alignment:** the higher TF's RSI-structure is the context, the
+executing TF's is the trigger: `RSI-BEAR (15m) + RSI-BULL (1h)` = a
+counter-trend bounce inside a bear momentum base (CHOP-shaped);
+`RSI-BEAR (15m) + RSI-BEAR (1h)` = aligned bear momentum (the move has
+the oscillator behind it); an `RSI-LOST-LAST-SL` on the executing TF
+while the higher TFs are still BULL = the earliest exit/avoid warning
+for longs (and the earliest entry warning for fades-of-the-break).
+
+**Feeds the verdict:** (a) in §4 report it as its own line per TF; an
+`RSI-LOST-LAST-SL` on 15m/1h UPGRADES the contrarian/avoid read even
+when the price structure is intact (momentum broke first); (b) in CHOP
+regime the executing-TF RSI-structure IS the momentum read the flag
+says to prefer over the trend scores; (c) never treat an RSI break as
+a fill — it informs DIRECTION/contrarian only (entries stay levels +
+confirmation, per Decision Protocol §1).
+
+```python
+def rsi_series(closes, p=14):
+    g, l = [], []
+    for i in range(1, len(closes)):
+        d = closes[i] - closes[i-1]
+        g.append(max(0.0, d)); l.append(max(0.0, -d))
+    ag = sum(g[:p]) / p; al = sum(l[:p]) / p
+    out = [100.0 - 100.0/(1 + ag/al) if al > 0 else 100.0]
+    for i in range(p, len(closes)):
+        ag = (ag*(p-1) + g[i-1]) / p
+        al = (al*(p-1) + l[i-1]) / p
+        out.append(100.0 - 100.0/(1 + ag/al) if al > 0 else 100.0)
+    return out
+
+def rsi_structure(tf, lb=3):
+    # closes from the local candles DB (the same read as the MTF block)
+    ...closes = [...candles_{tf} close DESC...][::-1]
+    r = rsi_series(closes)
+    # the skill's find_swings(data, lb) works on any series:
+    his = find_swings(r, lb)          # RSI swing-HIGH values
+    los = find_swings([-x for x in r], lb)  # RSI swing-LOW values (negated maxima)
+    los = [-x for x in los]
+    if len(his) < 2 or len(los) < 2:
+        return {'state': 'NA', 'break': 'RSI-NO-BREAK'}
+    state = (('HH' if his[-1] >= his[-2] else 'LH') +
+             '+' + ('HL' if los[-1] >= los[-2] else 'LL'))
+    label = {'HH+HL': 'BULL', 'LH+LL': 'BEAR'}.get(state, 'MIXED')
+    cur = r[-1]
+    if cur < los[-1]:
+        brk = 'RSI-LOST-LAST-SL'
+    elif cur > his[-1]:
+        brk = 'RSI-RECLAIMED-LAST-SH'
+    else:
+        brk = 'RSI-NO-BREAK'
+    return {'state': f'RSI-STRUCT {label} ({state})', 'break': brk}
+```
+
 ### ADX/ATR — Trend Lifecycle (COMPUTED — CEO rules, added 2026-10-27)
 
 ADX measures trend STRENGTH, ATR measures range EXPANSION. Together they
@@ -1046,6 +1124,9 @@ method + numbers whenever the verdict reviews a series of exits.
     column is dead) → pattern: real-breakout / fakeout / exhaustion /
     accumulation / none (per the table above); flag any collector gap
     by name
+  RSI-STRUCT (the RSI's own swings): 1m [state/break] · 5m [...] ·
+    15m [...] · 1h [...] → MTF alignment sentence (the leading-break
+    warnings live in §4)
 
 🧱 1b. STRUCTURE (python3 scripts/structure_analysis.py COIN)
   1m: [state HH/HL tags | SH/SL levels | slope]
@@ -1073,6 +1154,9 @@ method + numbers whenever the verdict reviews a series of exits.
   [key levels]
 
 🔄 4. CONTRARIAN + DIVERGENCE
+  RSI-STRUCT break warnings (the leading reads): [any RSI-LOST-LAST-SL /
+   RSI-RECLAIMED-LAST-SH, with the TF — an executing-TF break while
+   higher TFs disagree = the earliest warning line]
   [contrarian analysis — label divergence type per taxonomy §3]
 
 🎯 5. SCORE
