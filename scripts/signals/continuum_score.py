@@ -1,20 +1,14 @@
 #!/usr/bin/env python3
 """
-continuum_score.py — Fire signals to existing trading system when continuum
-engine reaches extreme scores OR transitions between zones.
+continuum_score.py — Fire signals on continuum score STATE TRANSITIONS.
 
-Two signal modes:
+Two transition signals (T directive 2026-11-23):
 
-1. CONTRARIAN (buy fear, sell greed):
-   Score ≤ 15 → LONG signal (buy the dip when deeply bearish)
-   Score ≥ 85 → SHORT signal (sell the top when deeply bullish)
+1. LONG: score stayed BELOW 50 for an extended period (30+ min),
+   then hits 90+ FOR THE FIRST TIME. (Bear exhaustion → first bullish breakout)
 
-2. MOMENTUM (zone transitions — ride the wave):
-   Score crosses ABOVE 50 from below → LONG (bullish momentum building)
-   Score crosses BELOW 50 from above → SHORT (bearish momentum building)
-
-The momentum signals capture the "trendlines forming" — when BTC's continuum
-score transitions from bear to bull (or vice versa), altcoins follow.
+2. SHORT: after a recent 90+ peak (within 4 hours), score drops
+   back to 0. (Bull exhaustion → full reversal)
 
 Cooldown: 5 minutes between signals per direction.
 """
@@ -29,14 +23,15 @@ from hermes_constants import (
     CONTINUUM_SCORE_ENABLED,
     CONTINUUM_SCORE_LONG_ENABLED,
     CONTINUUM_SCORE_SHORT_ENABLED,
-    CONTINUUM_SCORE_LONG_THRESHOLD,        # ≥ this → SHORT (contrarian)
-    CONTINUUM_SCORE_SHORT_THRESHOLD,       # ≤ this → LONG (contrarian)
     CONTINUUM_SCORE_COOLDOWN_MIN,
     CONTINUUM_SCORE_STALENESS_MIN,
-    CONTINUUM_SCORE_CONF_BASE,
-    CONTINUUM_SCORE_MOMENTUM_ENABLED,      # new: zone-transition signals
-    CONTINUUM_SCORE_MOMENTUM_THRESHOLD,    # new: how far past 50 to trigger
-    CONTINUUM_SCORE_MOMENTUM_CONF,         # new: confidence for momentum signals
+    CONTINUUM_SCORE_BELOW_THRESHOLD,
+    CONTINUUM_SCORE_BELOW_MINUTES,
+    CONTINUUM_SCORE_LONG_TRIGGER,
+    CONTINUUM_SCORE_SHORT_TRIGGER,
+    CONTINUUM_SCORE_SHORT_TOLERANCE,
+    CONTINUUM_SCORE_SHORT_PEAK_WINDOW,
+    CONTINUUM_SCORE_TRANSITION_CONF,
 )
 
 SIGNAL_TYPE_LONG = 'continuum_score_long'
@@ -44,28 +39,35 @@ SIGNAL_TYPE_SHORT = 'continuum_score_short'
 SOURCE_LONG = 'continuum+'
 SOURCE_SHORT = 'continuum-'
 
-# Momentum signals use distinct source tags for signal_compactor differentiation
-SOURCE_MOMENTUM_LONG = 'continuum-mom+'
-SOURCE_MOMENTUM_SHORT = 'continuum-mom-'
-
 CONTINUUM_DB = os.path.join(HERMES_DATA, 'continuum.db')
 
 
-def _get_recent_scores(token: str = 'BTC', limit: int = 5):
-    """Get recent scores from DB. Returns list of (score, price, ts) tuples, oldest first."""
+def _get_recent_scores(token: str = 'BTC', minutes: int = None, limit: int = 500):
+    """Get recent scores from DB as [(score, price, ts), ...] oldest-first.
+
+    If minutes given, only rows within that window (from now).
+    """
     conn = None
     try:
         conn = sqlite3.connect(CONTINUUM_DB, timeout=10)
-        cur = conn.execute(
-            "SELECT state_score, price, ts FROM continuum_states "
-            "WHERE token = ? ORDER BY ts DESC LIMIT ?",
-            (token.upper(), limit)
-        )
+        if minutes is not None:
+            cutoff = int(time.time()) - minutes * 60
+            cur = conn.execute(
+                "SELECT state_score, price, ts FROM continuum_states "
+                "WHERE token = ? AND ts >= ? ORDER BY ts ASC LIMIT ?",
+                (token.upper(), cutoff, limit)
+            )
+        else:
+            cur = conn.execute(
+                "SELECT state_score, price, ts FROM continuum_states "
+                "WHERE token = ? ORDER BY ts DESC LIMIT ?",
+                (token.upper(), limit)
+            )
+            rows = cur.fetchall()
+            rows.reverse()  # oldest-first
+            return [(r[0], r[1], r[2]) for r in rows if r[0] is not None]
         rows = cur.fetchall()
-        if not rows:
-            return []
-        # Reverse to oldest-first
-        return [(r[0], r[1], r[2]) for r in reversed(rows)]
+        return [(r[0], r[1], r[2]) for r in rows if r[0] is not None]
     except Exception as e:
         print(f"[continuum-score] Error reading DB: {e}")
         return []
@@ -74,131 +76,67 @@ def _get_recent_scores(token: str = 'BTC', limit: int = 5):
             conn.close()
 
 
-def _get_latest_score(token: str = 'BTC'):
-    """Get latest continuum score from DB. Returns (score, price, ts) or None."""
-    scores = _get_recent_scores(token, limit=1)
-    if scores:
-        s, p, t = scores[0]
-        if s is not None:
-            return s, p, t
-    return None
-
-
-def detect_contrarian(token: str = 'BTC'):
-    """Detect contrarian signal (buy fear, sell greed at extremes)."""
-    result = _get_latest_score(token)
-    if not result:
-        return None
-    
-    score, price, ts = result
-    
-    # Check staleness
-    age_minutes = (time.time() - ts) / 60
-    if age_minutes > CONTINUUM_SCORE_STALENESS_MIN:
-        return None
-    
-    # Score ≤ 15 → LONG (contrarian: buy when deeply bearish)
-    if score <= CONTINUUM_SCORE_SHORT_THRESHOLD:
-        # Confidence scales with how extreme: score=0 → 90 conf, score=15 → 70 conf
-        extremity = (CONTINUUM_SCORE_SHORT_THRESHOLD - score) / CONTINUUM_SCORE_SHORT_THRESHOLD
-        conf = CONTINUUM_SCORE_CONF_BASE + extremity * 10
-        return {
-            'direction': 'LONG',
-            'confidence': min(92, conf),
-            'value': score,
-            'price': price,
-            'reason': f'contrarian_bear_{score:.1f}',
-        }
-    
-    # Score ≥ 85 → SHORT (contrarian: sell when deeply bullish)
-    if score >= CONTINUUM_SCORE_LONG_THRESHOLD:
-        extremity = (score - CONTINUUM_SCORE_LONG_THRESHOLD) / (100 - CONTINUUM_SCORE_LONG_THRESHOLD)
-        conf = CONTINUUM_SCORE_CONF_BASE + extremity * 10
-        return {
-            'direction': 'SHORT',
-            'confidence': min(92, conf),
-            'value': score,
-            'price': price,
-            'reason': f'contrarian_bull_{score:.1f}',
-        }
-    
-    return None
-
-
-def detect_momentum(token: str = 'BTC'):
-    """
-    Detect momentum signal from zone transitions.
-    
-    When score crosses above 50 from below → LONG (bullish momentum building)
-    When score crosses below 50 from above → SHORT (bearish momentum building)
-    
-    This captures the "trendlines forming" — the early stage of a regime shift
-    that altcoins will follow.
-    """
-    if not CONTINUUM_SCORE_MOMENTUM_ENABLED:
-        return None
-    
-    scores = _get_recent_scores(token, limit=5)
+def detect(token: str = 'BTC'):
+    """Detect state-transition signal (LONG or SHORT)."""
+    # Pull history: long window for peak detection, enough rows for below-50 duration
+    scores = _get_recent_scores(token, minutes=CONTINUUM_SCORE_SHORT_PEAK_WINDOW, limit=2000)
     if len(scores) < 2:
         return None
-    
-    # Check staleness
+
     latest_score, latest_price, latest_ts = scores[-1]
-    if latest_score is None:
-        return None
+
+    # Staleness check
     age_minutes = (time.time() - latest_ts) / 60
     if age_minutes > CONTINUUM_SCORE_STALENESS_MIN:
         return None
-    
-    # Look for zone transition in recent scores
-    prev_score = scores[-2][0]
-    if prev_score is None:
-        return None
-    
-    momentum_threshold = CONTINUUM_SCORE_MOMENTUM_THRESHOLD
-    
-    # Score crossed ABOVE 50 from below — bullish momentum
-    if prev_score < 50 and latest_score >= (50 + momentum_threshold):
-        distance = latest_score - 50
-        conf = CONTINUUM_SCORE_MOMENTUM_CONF + min(10, distance / 2)
-        return {
-            'direction': 'LONG',
-            'confidence': min(88, conf),
-            'value': latest_score,
-            'price': latest_price,
-            'reason': f'momentum_cross_up_{prev_score:.1f}_to_{latest_score:.1f}',
-        }
-    
-    # Score crossed BELOW 50 from above — bearish momentum
-    if prev_score > 50 and latest_score <= (50 - momentum_threshold):
-        distance = 50 - latest_score
-        conf = CONTINUUM_SCORE_MOMENTUM_CONF + min(10, distance / 2)
-        return {
-            'direction': 'SHORT',
-            'confidence': min(88, conf),
-            'value': latest_score,
-            'price': latest_price,
-            'reason': f'momentum_cross_down_{prev_score:.1f}_to_{latest_score:.1f}',
-        }
-    
-    return None
 
+    # ── SHORT: score hit 0 after a recent 90+ peak ────────────────────────────
+    if latest_score <= CONTINUUM_SCORE_SHORT_TRIGGER + CONTINUUM_SCORE_SHORT_TOLERANCE:
+        # Was there a 90+ peak within the window?
+        peak_scores = [s for s, _, _ in scores[:-1] if s >= CONTINUUM_SCORE_LONG_TRIGGER]
+        if peak_scores:
+            peak = max(peak_scores)
+            conf = CONTINUUM_SCORE_TRANSITION_CONF + min(10, peak / 10)
+            return {
+                'direction': 'SHORT',
+                'confidence': min(92, conf),
+                'value': latest_score,
+                'price': latest_price,
+                'reason': f'peak_{peak:.0f}_then_zero',
+            }
 
-def detect(token: str = 'BTC'):
-    """
-    Detect any continuum score signal for a token.
-    Tries contrarian first (higher priority), then momentum.
-    """
-    # Contrarian has priority — extreme scores are stronger signals
-    sig = detect_contrarian(token)
-    if sig:
-        return sig
-    
-    # Then try momentum (zone transitions)
-    sig = detect_momentum(token)
-    if sig:
-        return sig
-    
+    # ── LONG: prolonged below 50, then FIRST hit of 90+ ──────────────────────
+    if latest_score >= CONTINUUM_SCORE_LONG_TRIGGER:
+        # Find where the current "above 90" streak started
+        above_90_start = len(scores) - 1
+        for i in range(len(scores) - 1, -1, -1):
+            if scores[i][0] >= CONTINUUM_SCORE_LONG_TRIGGER:
+                above_90_start = i
+            else:
+                break
+
+        # Must be the FIRST hit — previous row must be below trigger
+        if above_90_start > 0 and scores[above_90_start - 1][0] < CONTINUUM_SCORE_LONG_TRIGGER:
+            # Check extended period below 50 BEFORE this streak
+            below_since = None
+            for i in range(above_90_start - 1, -1, -1):
+                if scores[i][0] < CONTINUUM_SCORE_BELOW_THRESHOLD:
+                    below_since = i
+                else:
+                    break
+
+            if below_since is not None:
+                below_minutes = (scores[above_90_start - 1][2] - scores[below_since][2]) / 60
+                if below_minutes >= CONTINUUM_SCORE_BELOW_MINUTES:
+                    conf = CONTINUUM_SCORE_TRANSITION_CONF + min(10, latest_score / 10)
+                    return {
+                        'direction': 'LONG',
+                        'confidence': min(92, conf),
+                        'value': latest_score,
+                        'price': latest_price,
+                        'reason': f'below50_{below_minutes:.0f}m_then_{latest_score:.0f}',
+                    }
+
     return None
 
 
@@ -206,33 +144,26 @@ def scan_signals():
     """Scan for continuum score signals."""
     if not CONTINUUM_SCORE_ENABLED:
         return 0
-    
-    added = 0
+
     sig = detect('BTC')
     if not sig:
         return 0
-    
+
     direction = sig['direction']
-    
+
     # Layer 1: per-direction kill-switch
     if direction == 'LONG' and not CONTINUUM_SCORE_LONG_ENABLED:
         return 0
     if direction == 'SHORT' and not CONTINUUM_SCORE_SHORT_ENABLED:
         return 0
-    
+
     # Cooldown
     if get_cooldown('BTC', direction=direction):
         return 0
-    
+
     sig_type = SIGNAL_TYPE_LONG if direction == 'LONG' else SIGNAL_TYPE_SHORT
-    
-    # Use different source tags for contrarian vs momentum
-    reason = sig.get('reason', '')
-    if reason.startswith('momentum_'):
-        source = SOURCE_MOMENTUM_LONG if direction == 'LONG' else SOURCE_MOMENTUM_SHORT
-    else:
-        source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
-    
+    source = SOURCE_LONG if direction == 'LONG' else SOURCE_SHORT
+
     sid = add_signal(
         token='BTC',
         direction=direction,
@@ -244,14 +175,13 @@ def scan_signals():
         exchange='hyperliquid',
         timeframe='1m',
     )
-    
+
     if sid:
-        added += 1
         set_cooldown('BTC', direction, hours=CONTINUUM_SCORE_COOLDOWN_MIN / 60.0)
         print(f"[continuum-score] Signal fired: {direction} | Score={sig['value']:.1f} | "
-              f"Conf={sig['confidence']} | reason={reason}")
-    
-    return added
+              f"Conf={sig['confidence']} | reason={sig['reason']}")
+
+    return 1 if sid else 0
 
 
 def run():
@@ -260,31 +190,25 @@ def run():
 
 
 if __name__ == '__main__':
-    # Test mode
-    print("=== Continuum Score Signal Test ===")
-    
-    result = _get_latest_score()
-    if result:
-        score, price, ts = result
-        age = (time.time() - ts) / 60
-        print(f"Current score: {score:.1f}")
-        print(f"Price: ${price:.1f}")
-        print(f"Age: {age:.0f} minutes")
-        print(f"Contrarian LONG threshold: ≤{CONTINUUM_SCORE_SHORT_THRESHOLD}")
-        print(f"Contrarian SHORT threshold: ≥{CONTINUUM_SCORE_LONG_THRESHOLD}")
-        print(f"Momentum threshold: ±{CONTINUUM_SCORE_MOMENTUM_THRESHOLD} past 50")
-        print()
-        
-        sig = detect_contrarian()
+    print("=== Continuum Score Transition Signal Test ===")
+    scores = _get_recent_scores('BTC', minutes=CONTINUUM_SCORE_SHORT_PEAK_WINDOW, limit=2000)
+    print(f"Rows in window: {len(scores)}")
+    if scores:
+        print(f"Latest score: {scores[-1][0]:.1f} @ {scores[-1][2]}")
+        peak = max(s for s, _, _ in scores)
+        print(f"Peak in window: {peak:.1f}")
+
+        # LONG check
+        below_50_streak = 0
+        for i in range(len(scores) - 1, -1, -1):
+            if scores[i][0] < CONTINUUM_SCORE_BELOW_THRESHOLD:
+                below_50_streak += 1
+            else:
+                break
+        print(f"Current streak below 50: {below_50_streak} rows")
+
+        sig = detect()
         if sig:
-            print(f"Contrarian signal: {sig['direction']} | Conf: {sig['confidence']} | reason={sig['reason']}")
+            print(f"SIGNAL: {sig['direction']} | Conf={sig['confidence']} | reason={sig['reason']}")
         else:
-            print("No contrarian signal")
-        
-        sig = detect_momentum()
-        if sig:
-            print(f"Momentum signal: {sig['direction']} | Conf: {sig['confidence']} | reason={sig['reason']}")
-        else:
-            print("No momentum signal")
-    else:
-        print("No continuum data found")
+            print("No signal")

@@ -5756,7 +5756,7 @@ EMA_RECLAIM_COOLDOWN_HOURS       = 0.5     # 30 min cooldown per token
 # continuum_score.py — contrarian + momentum signals from continuum engine
 CONTINUUM_SCORE_ENABLED              = True    # master kill-switch
 CONTINUUM_SCORE_LONG_ENABLED         = True    # LONG direction
-CONTINUUM_SCORE_SHORT_ENABLED        = False   # T directive 2026-10-13 — 0 trades all-time, conf=83% signals expiring as noise
+CONTINUUM_SCORE_SHORT_ENABLED        = True    # re-enabled by T 2026-11-23 — new state-transition logic
 CONTINUUM_SCORE_LONG_THRESHOLD       = 85      # score >= this → SHORT (contrarian sell greed)  [was 95, widened 2026-09-12]
 CONTINUUM_SCORE_SHORT_THRESHOLD      = 15      # score <= this → LONG (contrarian buy fear)    [was 5, widened 2026-09-12]
 CONTINUUM_SCORE_COOLDOWN_MIN         = 5       # minutes between signals per direction
@@ -5767,6 +5767,17 @@ CONTINUUM_SCORE_CONF_BASE            = 82      # base confidence for contrarian 
 CONTINUUM_SCORE_MOMENTUM_ENABLED     = True    # enable zone-transition signals
 CONTINUUM_SCORE_MOMENTUM_THRESHOLD   = 5       # score must be past 50 by this much to trigger
 CONTINUUM_SCORE_MOMENTUM_CONF        = 75      # base confidence for momentum signals
+
+# ── Continuum Score: State-transition signals (T directive 2026-11-23) ────────
+# LONG:  score stayed below 50 for extended period, then FIRST hit of 90+
+# SHORT: after a recent 90+ peak, score drops back to 0
+CONTINUUM_SCORE_BELOW_THRESHOLD      = 50      # score below this = "bear zone"
+CONTINUUM_SCORE_BELOW_MINUTES        = 30      # extended period below 50 required (minutes)
+CONTINUUM_SCORE_LONG_TRIGGER         = 90      # first hit of this after prolonged <50 → LONG
+CONTINUUM_SCORE_SHORT_TRIGGER        = 0       # drop to this after recent 90+ → SHORT
+CONTINUUM_SCORE_SHORT_TOLERANCE      = 1.0     # float-noise tolerance (score≈0 like 2.6e-05 counts)
+CONTINUUM_SCORE_SHORT_PEAK_WINDOW    = 240     # minutes to look back for the 90+ peak
+CONTINUUM_SCORE_TRANSITION_CONF      = 80      # base confidence for transition signals
 
 # ── Continuum Oscillator Signal (continuum_oscillator.py) ─────────────────
 # Thesis: Score oscillates with cadence. Rising score = momentum = LONG.
