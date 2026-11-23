@@ -322,12 +322,15 @@ def chart_trades():
 
 
 def continuum_series(bars):
-    """Continuum state_score aligned to the candle bars: for each 15m bar,
-    the last1m continuum tick inside that bar (local continuum_data.json).
-    Returns an array len(bars) (None = no tick in coverage)."""
+    """Continuum state_score AND zscore_val aligned to the candle bars:
+    for each 15m bar, the last continuum tick inside that bar (local
+    continuum_data.json). Returns (score[], score_cur, z[], z_cur) —
+    None = no tick in coverage."""
     n = len(bars)
     out = [None] * n
+    zout = [None] * n
     cur_val = None
+    z_cur = None
     try:
         d = json.load(open('/var/www/hermes/data/continuum_data.json'))
         hist = d.get('history') or []
@@ -335,24 +338,34 @@ def continuum_series(bars):
         for h in hist:
             ts = h.get('ts')
             sc = h.get('state_score')
-            if ts is None or sc is None:
+            zs = h.get('zscore_val')
+            if ts is None or (sc is None and zs is None):
                 continue
             bar_t = ts - (ts % 900)          # the 15m bucket
-            by_bar[bar_t] = float(sc)        # the last tick wins
+            slot = by_bar.setdefault(bar_t, {})
+            if sc is not None:
+                slot['s'] = float(sc)
+            if zs is not None:
+                slot['z'] = float(zs)
         for i, b in enumerate(bars):
-            v = by_bar.get(b['t'])
-            if v is not None:
-                out[i] = round(v, 3)
-        # the current = the newest tick (even if outside the last bar)
-        newest = None
+            v = by_bar.get(b['t']) or {}
+            if 's' in v:
+                out[i] = round(v['s'], 3)
+            if 'z' in v:
+                zout[i] = round(v['z'], 3)
+        newest_s = newest_z = None
         for h in hist:
             if h.get('state_score') is not None:
-                newest = h
-        if newest:
-            cur_val = round(float(newest['state_score']), 3)
+                newest_s = h
+            if h.get('zscore_val') is not None:
+                newest_z = h
+        if newest_s:
+            cur_val = round(float(newest_s['state_score']), 3)
+        if newest_z:
+            z_cur = round(float(newest_z['zscore_val']), 4)
     except Exception:
         pass
-    return out, cur_val
+    return out, cur_val, zout, z_cur
 
 
 def main():
@@ -378,9 +391,11 @@ def main():
         'trades': chart_trades(),
         'stats': stats(),
     }
-    _cont, _cont_cur = continuum_series(_bars)
+    _cont, _cont_cur, _z, _z_cur = continuum_series(_bars)
     feed['ind']['cont'] = _cont
     feed['ind']['cur']['cont'] = _cont_cur
+    feed['ind']['z'] = _z
+    feed['ind']['cur']['z'] = _z_cur
     tmp = OUT + '.tmp'
     with open(tmp, 'w') as f:
         json.dump(feed, f)

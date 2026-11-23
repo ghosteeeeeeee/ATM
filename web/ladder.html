@@ -172,7 +172,7 @@ tr.hl td { background:#1c2430; }
 
 <script>
 let DATA = null, hlRung = null, rangeMode = 'auto';
-const IND_KEYS = ['rsi','macd','adx','atr','cont'];
+const IND_KEYS = ['rsi','macd','adx','atr','cont','z'];
 let indOn = (()=>{ try{ const s = JSON.parse(localStorage.getItem('ladder_ind_on')||'null');
   const d = {}; IND_KEYS.forEach(k=> d[k] = s && k in s ? !!s[k] : true); return d;
 }catch(e){ const d={}; IND_KEYS.forEach(k=>d[k]=true); return d; } })();
@@ -454,8 +454,8 @@ function drawTrades(ctx, P, x, y, c){
 }
 
 /* ── indicator chart (RSI/MACD/ADX/ATR, same bars) ── */
-const IND_COLORS = { rsi:'#4caf50', macd:'#ef5350', adx:'#fdd835', atr:'#4fc3f7', cont:'#d97706' };
-const IND_NAMES  = { rsi:'RSI', macd:'MACD', adx:'ADX', atr:'ATR', cont:'CONTINUUM' };
+const IND_COLORS = { rsi:'#4caf50', macd:'#ef5350', adx:'#fdd835', atr:'#4fc3f7', cont:'#d97706', z:'#ab47bc' };
+const IND_NAMES  = { rsi:'RSI', macd:'MACD', adx:'ADX', atr:'ATR', cont:'CONTINUUM', z:'Z-SCORE' };
 let hoverIdx = null;
 
 function indRange(){
@@ -540,7 +540,8 @@ function renderIndLegend(){
   const cur = (DATA.ind||{}).cur||{};
   $('ind-legend').innerHTML = IND_KEYS.map(k=>{
     const v = cur[k];
-    const txt = v==null?'—':(k==='atr'? fmt(v,0) : (k==='macd'? (v>=0?'+':'')+v.toFixed(1) : v.toFixed(1)));
+    const txt = v==null?'—':(k==='atr'? fmt(v,0) : (k==='macd'? (v>=0?'+':'')+v.toFixed(1)
+      : (k==='z'? (v>=0?'+':'')+v.toFixed(2) : v.toFixed(1))));
     const on = indOn[k];
     return `<span class="chip ${on?'':'off'}" onclick="toggleInd('${k}')" title="click to toggle ${IND_NAMES[k]}">`+
            `<span style="color:${on?IND_COLORS[k]:'var(--dim)'}">${on?EYE_ON:EYE_OFF}</span>`+
