@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HERMES · LADDER</title>
+<style>
+:root {
+  --bg: #0a0a0f; --card: #12121a; --card2: #16161f; --border: #1e1e2e;
+  --text: #c0c0d0; --dim: #666; --accent: #4fc3f7;
+  --green: #4caf50; --red: #ef5350; --orange: #ff9800; --yellow: #fdd835; --purple: #ab47bc;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'JetBrains Mono',ui-monospace,monospace; font-size:13px; padding:14px; }
+h1 { color:var(--accent); font-size:18px; display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+h1 .sub { color:var(--dim); font-size:11px; font-weight:normal; }
+h2 { color:var(--accent); font-size:12px; letter-spacing:.12em; text-transform:uppercase; margin:14px 0 8px; opacity:.85; }
+.badge { font-size:11px; padding:2px 8px; border-radius:10px; border:1px solid var(--border); color:var(--dim); }
+.badge.fresh { color:var(--green); border-color:var(--green); }
+.badge.stale { color:var(--red); border-color:var(--red); animation:blink 1.2s infinite; }
+@keyframes blink { 50% { opacity:.4; } }
+#price { font-size:34px; font-weight:700; letter-spacing:-.5px; transition:color .3s; }
+#price.up { color:var(--green); text-shadow:0 0 18px rgba(76,175,80,.35); }
+#price.dn { color:var(--red); text-shadow:0 0 18px rgba(239,83,80,.35); }
+#price .chg { font-size:13px; margin-left:10px; font-weight:400; }
+.grid { display:grid; grid-template-columns: 1fr 340px; gap:14px; margin-top:10px; }
+@media (max-width: 1100px){ .grid { grid-template-columns: 1fr; } }
+.card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px; }
+.card.glow { box-shadow:0 0 24px rgba(79,195,247,.08); }
+canvas { display:block; width:100%; height:440px; cursor:crosshair; }
+.toolbar { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+button { background:var(--card2); color:var(--text); border:1px solid var(--border); border-radius:6px;
+  padding:4px 10px; font-family:inherit; font-size:11px; cursor:pointer; }
+button.on { border-color:var(--accent); color:var(--accent); box-shadow:0 0 10px rgba(79,195,247,.25); }
+.stats { display:grid; grid-template-columns: 1fr 1fr; gap:8px; }
+.stat { background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; }
+.stat .k { color:var(--dim); font-size:10px; text-transform:uppercase; letter-spacing:.08em; }
+.stat .v { font-size:19px; font-weight:700; margin-top:2px; }
+.pos { color:var(--green); } .neg { color:var(--red); }
+.mfe-bar { display:flex; height:10px; border-radius:5px; overflow:hidden; margin-top:6px; background:#000; }
+.mfe-bar div { height:100%; }
+.legend { display:flex; gap:14px; font-size:11px; color:var(--dim); margin-top:6px; flex-wrap:wrap; }
+.legend i { display:inline-block; width:16px; height:0; border-top:2px dashed; vertical-align:middle; margin-right:4px; }
+table { width:100%; border-collapse:collapse; font-size:12px; }
+th { color:var(--dim); text-align:left; font-weight:normal; font-size:10px; text-transform:uppercase;
+  letter-spacing:.08em; padding:4px 6px; border-bottom:1px solid var(--border); }
+td { padding:4px 6px; border-bottom:1px solid #14141c; }
+tr:hover td { background:#181824; }
+tr.hl td { background:#1c2430; }
+.tag { font-size:10px; padding:1px 6px; border-radius:8px; border:1px solid var(--border); }
+.tag.long { color:var(--green); border-color:rgba(76,175,80,.5); }
+.tag.short { color:var(--red); border-color:rgba(239,83,80,.5); }
+.tag.cont { color:var(--purple); border-color:rgba(171,71,188,.5); }
+.tag.retested { color:var(--yellow); border-color:rgba(253,216,53,.5); }
+.tag.unfired { color:var(--dim); }
+.mono-r { text-align:right; }
+#readout { position:absolute; pointer-events:none; font-size:11px; color:var(--text); background:rgba(10,10,15,.9);
+  border:1px solid var(--border); border-radius:6px; padding:5px 8px; display:none; z-index:5; white-space:pre; }
+.wrap { position:relative; }
+.foot { color:var(--dim); font-size:10px; margin-top:10px; display:flex; gap:16px; flex-wrap:wrap; }
+.pill { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:4px; }
+</style>
+</head>
+<body>
+<h1>⬢ HERMES · LADDER <span class="sub">btc · ai-trader-pending · live rungs</span>
+  <span class="badge" id="feed-age">…</span>
+  <span class="badge" id="feed-ts">…</span>
+</h1>
+<div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+  <div id="price">—<span class="chg" id="chg15"></span></div>
+  <div class="badge" id="mood">—</div>
+</div>
+
+<div class="grid">
+  <div class="card glow">
+    <div class="toolbar">
+      <button id="btn-auto" class="on">AUTO RANGE</button>
+      <button id="btn-full">FULL LADDER</button>
+      <span class="badge" id="rng-label">—</span>
+      <span style="flex:1"></span>
+      <span class="legend">
+        <span><i style="border-color:var(--green)"></i>long rung</span>
+        <span><i style="border-color:var(--red)"></i>short rung</span>
+        <span><i style="border-color:var(--accent)"></i>live price</span>
+      </span>
+    </div>
+    <div class="wrap">
+      <canvas id="chart"></canvas>
+      <div id="readout"></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <h2 style="margin-top:0">ai-trader-pending · 14d</h2>
+      <div class="stats">
+        <div class="stat"><div class="k">net of cost</div><div class="v" id="s-net">—</div></div>
+        <div class="stat"><div class="k">win rate</div><div class="v" id="s-wr">—</div></div>
+        <div class="stat"><div class="k">trades</div><div class="v" id="s-n">—</div></div>
+        <div class="stat"><div class="k">weighted · 3d hl</div><div class="v" id="s-w">—</div></div>
+        <div class="stat"><div class="k">fees paid</div><div class="v" id="s-fees">—</div></div>
+        <div class="stat"><div class="k">closes / day</div><div class="v" id="s-cpd">—</div></div>
+      </div>
+      <div style="margin-top:10px">
+        <div class="k" style="color:var(--dim);font-size:10px;text-transform:uppercase;letter-spacing:.08em">entry quality · net by MFE</div>
+        <div class="mfe-bar" id="mfe-bar"></div>
+        <div class="legend" id="mfe-legend"></div>
+      </div>
+      <div class="legend" style="margin-top:8px" id="windows"></div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <h2 style="margin-top:0">planned entries · <span id="rung-count">0</span> rungs</h2>
+      <div style="max-height:300px;overflow:auto">
+        <table id="rungs-table">
+          <thead><tr><th></th><th class="mono-r">trigger</th><th class="mono-r">dist</th>
+            <th class="mono-r">SL</th><th>style</th><th>state</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <h2 style="margin-top:0">open · ai-trader-pending</h2>
+      <div id="open-list" style="font-size:12px;color:var(--dim)">—</div>
+    </div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:14px">
+  <h2 style="margin-top:0">recent closes</h2>
+  <div style="max-height:260px;overflow:auto">
+    <table id="trades-table">
+      <thead><tr><th>#</th><th></th><th class="mono-r">entry</th><th class="mono-r">exit</th>
+        <th class="mono-r">net</th><th class="mono-r">MFE</th><th class="mono-r">hold</th>
+        <th>exit</th><th>when</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="foot">
+  <span>feed: <a href="/data/ladder.json" style="color:var(--accent)">/data/ladder.json</a> · refresh 30s</span>
+  <span>chart: closed 15m candles · local DB</span>
+  <span id="foot-note"></span>
+</div>
+
+<script>
+let DATA = null, hlRung = null, rangeMode = 'auto';
+const $ = id => document.getElementById(id);
+
+function fmt(n, d=0){ return (n==null?'—':Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})); }
+function usd(n){ if(n==null) return '—'; const s = n<0?'-':'+'; return s+'$'+Math.abs(n).toFixed(2); }
+function cls(n){ return n>0?'pos':n<0?'neg':''; }
+function hhmm(t){ const d=new Date(t*1000); return String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0'); }
+function mmdd(t){ const d=new Date(t*1000); return (d.getUTCMonth()+1)+'/'+d.getUTCDate(); }
+
+async function load(){
+  try{
+    const r = await fetch('/data/ladder.json', {cache:'no-store'});
+    DATA = await r.json();
+    renderHeader(); renderStats(); renderRungs(); renderTrades(); draw();
+    const age = (Date.now()/1000) - DATA.ts;
+    $('feed-age').textContent = 'feed '+Math.round(age)+'s';
+    $('feed-age').className = 'badge '+(age<90?'fresh':'stale');
+    $('feed-ts').textContent = 'updated '+new Date(DATA.ts*1000).toISOString().slice(11,19)+' UTC';
+  }catch(e){ $('feed-age').textContent='feed ERROR'; $('feed-age').className='badge stale'; }
+}
+
+function renderHeader(){
+  const p = DATA.price, c = DATA.candles;
+  const el = $('price');
+  const last = c[c.length-1], prev = c[c.length-2];
+  const dir = last && prev ? (last.c>=prev.c?'up':'dn') : '';
+  el.className = dir;
+  el.innerHTML = fmt(p,1)+'<span class="chg" id="chg15"></span>';
+  if(last && prev && prev.c){
+    const chg = (last.c/prev.c-1)*100;
+    $('chg15').textContent = (chg>=0?'▲ ':'▼ ')+Math.abs(chg).toFixed(2)+'% 15m';
+    $('chg15').style.color = chg>=0?'var(--green)':'var(--red)';
+  }
+  const a = DATA.price_age_s;
+  $('mood').textContent = a!=null?('price '+Math.round(a)+'s old'):'price stale';
+  $('mood').className = 'badge '+(a!=null&&a<30?'fresh':'stale');
+}
+
+function renderStats(){
+  const s = DATA.stats || {};
+  if(s.error){ $('s-net').textContent='ERR'; return; }
+  const set=(id,v,raw)=>{ const e=$(id); e.textContent=v; if(raw!==undefined) e.className='v '+cls(raw); };
+  set('s-net', usd(s.net), s.net);
+  set('s-wr', (s.wr!=null?s.wr:'—')+'%', s.net);
+  set('s-n', s.n+' · '+s.wins+'W', undefined);
+  set('s-w', usd(s.weighted_net_3d), s.weighted_net_3d);
+  set('s-fees', '-$'+(s.fees!=null?s.fees.toFixed(2):'—'));
+  set('s-cpd', s.closes_per_day!=null?s.closes_per_day:'—');
+  const m = s.mfe_split||{};
+  const tot = Math.max(1,(m.ran?.net||0)+(m.mid?.net||0)+(m.never?.net||0));
+  // bars proportional to |net| (signed colors tell the story)
+  const parts=[['ran',m.ran,'var(--green)'],['mid',m.mid,'#555'],['never',m.never,'var(--red)']];
+  const absTot = parts.reduce((a,p)=>a+Math.abs(p[1]?.net||0),0)||1;
+  $('mfe-bar').innerHTML = parts.map(p=>`<div style="width:${(Math.abs(p[1]?.net||0)/absTot*100).toFixed(1)}%;background:${p[2]}" title="${p[0]}: ${p[1]?.n||0} trades ${usd(p[1]?.net||0)}"></div>`).join('');
+  $('mfe-legend').innerHTML = parts.map(p=>`<span><span class="pill" style="background:${p[2]}"></span>${p[0]} ${p[1]?.n||0} · <span class="${cls(p[1]?.net||0)}">${usd(p[1]?.net||0)}</span></span>`).join('');
+  const w = s.w24||[0,0], w72=s.w72||[0,0], w168=s.w168||[0,0];
+  $('windows').innerHTML = `24h <b class="${cls(w[1])}">${usd(w[1])}</b> (n=${w[0]}) &nbsp;·&nbsp; 72h <b class="${cls(w72[1])}">${usd(w72[1])}</b> (n=${w72[0]}) &nbsp;·&nbsp; 7d <b class="${cls(w168[1])}">${usd(w168[1])}</b> (n=${w168[0]})`;
+  const opens = s.open||[];
+  $('open-list').innerHTML = opens.length? opens.map(o=>
+    `<div style="display:flex;justify-content:space-between;padding:2px 0"><span>#${o.id} <span class="tag ${o.dir.toLowerCase()}">${o.dir}</span> @ ${fmt(o.entry,1)}</span><span class="${cls(o.pnl_pct)}">${o.pnl_pct>0?'+':''}${o.pnl_pct}%</span></div>`).join('')
+    : '<span style="color:var(--dim)">none open</span>';
+}
+
+function renderRungs(){
+  const rs = DATA.rungs||[], p = DATA.price;
+  $('rung-count').textContent = rs.length;
+  const tb = $('rungs-table').querySelector('tbody');
+  tb.innerHTML = rs.map(r=>{
+    const dist = p?((r.trig/p-1)*100):null;
+    const stateTag = r.state==='retested'?'retested':r.state==='first_break'?'first_break':r.state==='rejected'?'rejected':'unfired';
+    return `<tr data-id="${r.id}" onmouseenter="hl('${r.id}')" onmouseleave="hl(null)">
+      <td><span class="tag ${r.dir}">${r.dir[0].toUpperCase()}</span></td>
+      <td class="mono-r">${fmt(r.trig,0)}</td>
+      <td class="mono-r ${dist>=0?'pos':'neg'}">${dist>=0?'+':''}${dist.toFixed(2)}%</td>
+      <td class="mono-r">${fmt(r.sl,0)}</td>
+      <td>${r.style==='continuation'?'<span class="tag cont">cont</span>':'<span class="tag unfired">retest</span>'}</td>
+      <td><span class="tag ${stateTag==='retested'?'retested':'unfired'}">${stateTag}</span></td></tr>`;
+  }).join('');
+}
+function hl(id){ hlRung = id; draw(); }
+
+function renderTrades(){
+  const rs = (DATA.stats||{}).recent||[];
+  $('trades-table').querySelector('tbody').innerHTML = rs.map(r=>`
+    <tr><td>${r.id}</td>
+    <td><span class="tag ${r.dir.toLowerCase()}">${r.dir[0]}</span></td>
+    <td class="mono-r">${fmt(r.entry,0)}</td>
+    <td class="mono-r">${r.exit!=null?fmt(r.exit,0):'—'}</td>
+    <td class="mono-r ${cls(r.net)}">${usd(r.net)}</td>
+    <td class="mono-r">${r.mfe.toFixed(2)}%</td>
+    <td class="mono-r">${r.hold}m</td>
+    <td style="color:var(--dim)">${r.reason||''}</td>
+    <td style="color:var(--dim)">${r.ts?r.ts.slice(5,16).replace('T',' '):''}</td></tr>`).join('');
+}
+
+/* ── chart ─────────────────────────────────────────── */
+function yRange(){
+  const c = DATA.candles||[], rs = DATA.rungs||[];
+  let lo=Infinity, hi=-Infinity;
+  c.forEach(b=>{ lo=Math.min(lo,b.l); hi=Math.max(hi,b.h); });
+  if(rangeMode==='full'){
+    rs.forEach(r=>{ [r.trig,r.sl,r.tp].forEach(v=>{ if(v){ lo=Math.min(lo,v); hi=Math.max(hi,v);} }); });
+    if(DATA.price){ lo=Math.min(lo,DATA.price); hi=Math.max(hi,DATA.price); }
+  }
+  const pad=(hi-lo)*0.08||100;
+  return [lo-pad, hi+pad];
+}
+
+function draw(){
+  if(!DATA||!DATA.candles||!DATA.candles.length) return;
+  const cv = $('chart'), ctx = cv.getContext('2d');
+  const dpr = window.devicePixelRatio||1;
+  const W = cv.clientWidth, H = cv.clientHeight;
+  cv.width = W*dpr; cv.height = H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,W,H);
+  const P = {l:8, r:74, t:10, b:22};
+  const [ylo,yhi] = yRange();
+  const c = DATA.candles;
+  const x = i => P.l + (i+0.5)*(W-P.l-P.r)/c.length;
+  const y = v => P.t + (yhi-v)/(yhi-ylo)*(H-P.t-P.b);
+
+  // grid
+  ctx.strokeStyle='#16161f'; ctx.lineWidth=1; ctx.fillStyle='#555'; ctx.font='10px monospace';
+  const step = niceStep((yhi-ylo)/6);
+  for(let v=Math.ceil(ylo/step)*step; v<=yhi; v+=step){
+    const yy=y(v); ctx.beginPath(); ctx.moveTo(P.l,yy); ctx.lineTo(W-P.r,yy); ctx.stroke();
+    ctx.fillText(fmt(v,0), W-P.r+6, yy+3);
+  }
+  // time grid + labels
+  ctx.textAlign='center';
+  const tstep = Math.max(1, Math.floor(c.length/8));
+  for(let i=0;i<c.length;i+=tstep){
+    const xx=x(i); ctx.beginPath(); ctx.moveTo(xx,P.t); ctx.lineTo(xx,H-P.b); ctx.stroke();
+    ctx.fillStyle='#444'; ctx.fillText(mmdd(c[i].t)+' '+hhmm(c[i].t), xx, H-6);
+  }
+  ctx.textAlign='left';
+
+  // candles
+  const bw = Math.max(2, Math.min(14, (W-P.l-P.r)/c.length*0.7));
+  c.forEach((b,i)=>{
+    const up = b.c>=b.o; ctx.strokeStyle = up?'var(--green)':'#ef5350';
+    ctx.fillStyle = up?'rgba(76,175,80,.85)':'rgba(239,83,80,.85)';
+    const xx=x(i);
+    ctx.beginPath(); ctx.moveTo(xx,y(b.h)); ctx.lineTo(xx,y(b.l)); ctx.stroke();
+    const yo=y(b.o), yc=y(b.c);
+    ctx.fillRect(xx-bw/2, Math.min(yo,yc), bw, Math.max(1,Math.abs(yc-yo)));
+  });
+
+  // rung lines (in-range for auto; all for full)
+  const rs = DATA.rungs||[];
+  rs.forEach(r=>{
+    const inRange = r.trig>=ylo && r.trig<=yhi;
+    if(rangeMode==='auto' && !inRange) return;
+    const yy=y(r.trig);
+    const isLong = r.dir==='long';
+    const hot = hlRung===r.id;
+    ctx.save();
+    ctx.strokeStyle = r.state==='first_break' ? '#ff9800' : (isLong?'rgba(76,175,80,.9)':'rgba(239,83,80,.9)');
+    ctx.globalAlpha = hot?1:(r.state==='retested'?0.9:0.55);
+    ctx.lineWidth = hot?2.5:1.2;
+    ctx.setLineDash(r.style==='continuation'?[2,6]:[7,5]);
+    ctx.beginPath(); ctx.moveTo(P.l,yy); ctx.lineTo(W-P.r,yy); ctx.stroke();
+    // SL tick
+    if(r.sl && r.sl>=ylo && r.sl<=yhi){
+      ctx.globalAlpha*=0.5; ctx.setLineDash([2,4]);
+      ctx.beginPath(); ctx.moveTo(P.l,y(r.sl)); ctx.lineTo(W-P.r,y(r.sl)); ctx.stroke();
+    }
+    // label chip
+    ctx.setLineDash([]); ctx.globalAlpha=1;
+    const lbl = (isLong?'L ':'S ')+fmt(r.trig,0);
+    ctx.font = hot?'bold 10px monospace':'10px monospace';
+    const tw = ctx.measureText(lbl).width+8;
+    ctx.fillStyle = hot?'#1c2430':'rgba(18,18,26,.9)';
+    ctx.fillRect(W-P.r+2, yy-7, tw, 14);
+    ctx.strokeStyle = isLong?'rgba(76,175,80,.7)':'rgba(239,83,80,.7)';
+    ctx.lineWidth=1; ctx.strokeRect(W-P.r+2.5, yy-6.5, tw-1, 13);
+    ctx.fillStyle = r.state==='first_break'?'#ff9800':(isLong?'#4caf50':'#ef5350');
+    ctx.fillText(lbl, W-P.r+6, yy+3.5);
+    ctx.restore();
+  });
+
+  // live price line
+  if(DATA.price && DATA.price>=ylo && DATA.price<=yhi){
+    const yy=y(DATA.price);
+    ctx.save();
+    ctx.strokeStyle='#4fc3f7'; ctx.lineWidth=1.4; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(P.l,yy); ctx.lineTo(W-P.r,yy); ctx.stroke();
+    ctx.setLineDash([]);
+    const lbl = fmt(DATA.price,1);
+    ctx.font='bold 11px monospace';
+    const tw=ctx.measureText(lbl).width+10;
+    ctx.fillStyle='#4fc3f7'; ctx.fillRect(W-P.r+1, yy-8, tw, 16);
+    ctx.fillStyle='#0a0a0f'; ctx.fillText(lbl, W-P.r+6, yy+4);
+    // glow dot at the last candle
+    ctx.fillStyle='#4fc3f7'; ctx.shadowColor='#4fc3f7'; ctx.shadowBlur=10;
+    ctx.beginPath(); ctx.arc(x(c.length-1), yy, 3, 0, 7); ctx.fill();
+    ctx.restore();
+  }
+
+  $('rng-label').textContent = rangeMode==='full'
+    ? 'full ladder · '+fmt(ylo,0)+' – '+fmt(yhi,0)
+    : 'auto · '+fmt(ylo,0)+' – '+fmt(yhi,0);
+}
+
+function niceStep(raw){
+  const e = Math.pow(10, Math.floor(Math.log10(raw)));
+  const f = raw/e;
+  return (f<1.5?1:f<3?2:f<7?5:10)*e;
+}
+
+/* crosshair */
+const cvEl = $('chart'), ro = $('readout');
+cvEl.addEventListener('mousemove', ev=>{
+  if(!DATA) return;
+  const rct = cvEl.getBoundingClientRect();
+  const mx = ev.clientX-rct.left, my = ev.clientY-rct.top;
+  const c = DATA.candles; const W=cvEl.clientWidth, H=cvEl.clientHeight;
+  const P={l:8,r:74,t:10,b:22};
+  const i = Math.round((mx-P.l)/((W-P.l-P.r)/c.length)-0.5);
+  if(i<0||i>=c.length){ ro.style.display='none'; return; }
+  const b = c[i];
+  ro.style.display='block';
+  ro.style.left = Math.min(mx+14, W-190)+'px';
+  ro.style.top = Math.max(6, my-52)+'px';
+  ro.textContent = new Date(b.t*1000).toISOString().slice(0,16).replace('T',' ')+'Z\n'
+    +'O '+fmt(b.o,1)+'  H '+fmt(b.h,1)+'\nL '+fmt(b.l,1)+'  C '+fmt(b.c,1)
+    +'   '+(b.c>=b.o?'+':'')+((b.c/b.o-1)*100).toFixed(2)+'%';
+});
+cvEl.addEventListener('mouseleave', ()=> ro.style.display='none');
+
+$('btn-auto').onclick = ()=>{ rangeMode='auto'; $('btn-auto').classList.add('on'); $('btn-full').classList.remove('on'); draw(); };
+$('btn-full').onclick = ()=>{ rangeMode='full'; $('btn-full').classList.add('on'); $('btn-auto').classList.remove('on'); draw(); };
+window.addEventListener('resize', draw);
+
+load();
+setInterval(load, 30000);
+</script>
+</body>
+</html>

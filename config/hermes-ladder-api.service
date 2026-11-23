@@ -1,0 +1,6 @@
+[Unit]
+Description=Hermes Ladder Dashboard API — rebuild ladder.json (candles, rungs, ai-trader-pending stats)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/ladder_api.py
