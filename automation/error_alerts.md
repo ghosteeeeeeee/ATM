@@ -5486,3 +5486,15 @@
 
 ## Error Alerts — 2026-11-23 17:54 UTC
 - **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-23 18:39 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MULTI_ALT`
+- **NEW** (2x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: Multi-alt weakness: N alts diverging -N.N%+ below TOK`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — CONTAGION+MULTI_ALT+MOMENTUM+BTC_LEVEL`
+- **NEW** (2x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK WARNING: -N.N% | layers: CONTAGION,MULTI_ALT,MOMENTUM,BTC_LEVEL | vol=N.5x eth_div=+N.N% | MULTI_ALT: N weak alts`
+
+## Error Alerts — 2026-11-23 18:54 UTC
+- **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-23 19:39 UTC
+- **REPEATED** (9x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`

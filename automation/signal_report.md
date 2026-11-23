@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-23 13:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-23 19:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,955 | **WR:** 51.3% | **PnL:** -121.19%
+- **Total trades (all time):** 3,958 | **WR:** 51.3% | **PnL:** -122.88%
 - **Date range:** 2026-07-29 → 2026-11-23
 
 ---
@@ -23,7 +23,6 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| ai-trader-pending | LONG | 3 | 33.3% | -0.75 | ❓ | Needs more data |
 | continuation+ | LONG | 2 | 50.0% | -0.21 | ENABLED | Needs more data |
 
 ---
@@ -42,8 +41,7 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] ai-trader-pending LONG** — WR=33.3%, PnL=-0.75% over 3 trades. Monitor next cycle.
-2. **[WATCH] continuation+ LONG** — WR=50.0%, PnL=-0.21% over 2 trades. Monitor next cycle.
+1. **[WATCH] continuation+ LONG** — WR=50.0%, PnL=-0.21% over 2 trades. Monitor next cycle.
 
 ---
 
@@ -55,6 +53,9 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-11-23 | 5869d43 | scripts: BTC hedge-account experiment — SHADOW MODE (2026-11... |
+| 2026-11-23 | cef296e | MTF spike state: the shared detector + the keeper's near-edg... |
+| 2026-11-23 | bbc6c46 | rip-add standing rules formalized: the RIP-CLIMAX gates (the... |
 | 2026-11-23 | 2d4221d | agent-8 findings closed: F1 SL-source capture, F2 falsy-guar... |
 | 2026-11-23 | edc9e63 | keeper §17: the first (closest) bracket sits in a 1-2% band ... |
 | 2026-11-23 | b675ab5 | signals: continuum_score — rewrite to state-transition logic... |
@@ -62,8 +63,5 @@ None found. Top performers are already enabled.
 | 2026-11-22 | 1de08ca | trading: major-break redesign shipped — momentum-confirmatio... |
 | 2026-11-22 | 272ba31 | Daily trading system update (2026-11-22) |
 | 2026-11-21 | 02357b3 | logs: hourly analysis 2026-11-21 03:56 — storm packet cf +2.... |
-| 2026-11-20 | 03d6800 | F6: register MFE_EXIT_* in CEO_PROTECTED_FLAGS (bug-hunter m... |
-| 2026-11-20 | 5c814dc | straight-line escape: no level-starvation on one-way moves +... |
-| 2026-11-20 | eaac17c | scripts: audit #282 — stop-tighten scope-widen REVERT (walk ... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

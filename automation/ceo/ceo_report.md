@@ -1893,3 +1893,9 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 15T -0.36 46.7% | 7d 121T 0.28 51.2%
 ### Findings: clean — disk 89% WARN + gate_shadow capture 0.90 (both pre-existing); rotating Q "regime-specialists" (23%14=9): jup_yolo_mirrored is the regime generalist (7d NORMAL 6T 100% +0.60 / HIGH 8T 87.5% / EXTREME 5T 80%); bleed concentrated in EXTREME specialists atr-trend- 7T 42.9% -0.38 and pump-chain+ 7T 0% -0.23 (n<10, monitor only).
 ### Recommendation: none
+
+## CEO Status — 20261123T193830Z
+### Health: pipeline=active guardian=active open_pos=0
+### Numbers: 24h 16T -1.22 37.5% | 7d 119T -0.57 50.4%
+### Findings: 24h red (37.5% WR) but n=16; 4 control-tower items due ≤24h (first: ai-trader-pending-tag-split 11-24); disk 89% repeated WARN in error_alerts. Proactive Q (23%14=9, regime-specialists): 30d NORMAL 267T 52.8% -0.04 is the only breakeven-big regime — HIGH owns the bleed (189T 50.3% -4.17); specialist cells = bb-squeeze+ NORMAL LONG 64.1% +0.45, jup HIGH SHORT 67.9% +0.29, atr-trend- NORMAL SHORT 68.4% +0.13 — keep alive in NORMAL/HIGH respectively, params already snapshotted by in-flight amplifies.
+### Recommendation: none (HIGH-regime bleed already owned by open amplify entries; disk at 89% worth a cleanup pass by weekly run)
