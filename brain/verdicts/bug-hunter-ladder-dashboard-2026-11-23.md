@@ -272,3 +272,39 @@ Closed bars only gain `is_closed=1` at the fill (**close + 15 min**) or the next
 - **F-2…F-9: CLOSED** (page harness 66+7 checks green, h_err 24/24, suites green).
 - **Three deltas remain:** **A** (per-interval floor — HIGH, one line × 2 files), **B** (same line covers it — MEDIUM), **C** (dev-writer volume guard — MEDIUM, two lines), **D** (cosmetic, one `if` or a comment fix).
 - **Final PASS withheld until A+B+C land** (D at the lead's discretion). Re-verification is cheap: re-run `/tmp/bh/h_f1.py` (expects DELTA A/B/C gone), the page harness, and one live flag sample.
+
+---
+
+# FINAL PASS — fix commit `d562e7a2` (3 files) · verified 2026-11-23 05:50–05:55 UTC
+
+**Verdict: PASS — all three deltas + D closed, independently re-verified. This closes the verify-everything round.**
+
+## Delta re-verification (my harnesses, re-run against this commit — not taken on trust)
+
+| delta | code | controlled (`/tmp/bh/h_f1.py`) | live |
+|---|---|---|---|
+| **A** per-interval floor (1m/5m) | `price_collector.py:198–205` `{1m:60,5m:300,15m:900,1h:3600,4h:14400}[interval]`; `fetch_hl_volume.py:143–145` its own `{1m,5m,15m}` keys (matches its table map — no KeyError path) | **closed 1m bar (ts=F900+5min @ now=F900+10min) → `is_closed=1`** ✓ | closed-1m-bars wrongly flag0: **0** (was 11 at 05:11); **watchdog 1m read age 1.6 min** (was 8.0–12.5) — F-2-era freshness restored ✓ |
+| **B** forming 1h/4h | same line covers it | **forming 1h at hh:20 → `is_closed=0`** ✓ | forming 1h (05:00) flag **0** at 05:52 (flat-900 would have flagged it 1 since 05:15) ✓ |
+| **C** dev-writer gap-fill | `price_collector.py:797–806`: `SELECT is_closed, volume …; if exists and (exists[0]==1 or (exists[1] or 0) > 0): continue` | forming bar `(0, 123.4)` → after `_aggregate_tf` → **`(0, 123.4)` — volume preserved** ✓ (`PASS=6 FAIL=0`) | forming 15m flag0 ✓; newest bars' vol0 is pre-fix residue, heals retroactively at the next BTC seeder fetch (`excluded.volume>0` update) |
+| **D** gated entry triangle | `ladder.html:494–511` `if(i1>=0){ … ctx.restore(); }` — save/restore paired inside the gate, no state leak | — | page harness: **`f7_entry_markers = 16`** (was 17) — pre-window trade draws exit arc + left-edge connector alone, matching the comment ✓ |
+
+**`h_f1.py` → PASS=6 FAIL=0** (forming15m→flag0+volume · completed→flag1 · stale corrected · dev-writer keeps flag0+volume · fill heal→flag1 · closed1m→1 · forming1h→0).
+
+## Full battery re-run (all green)
+
+- `h_f1.py` **6/0** · `h_err.py` **24/24** (F-2 degraded feed + atomicity) · page harness **PHASE1 66/0 + PHASE2 7/0** (incl. F-3 no-throw, F-6 hover stroke, F-9 trig tag, parity ∅/∅, priceMode reload)
+- py_compile **9/9** · `test_pending_machine` **ALL PASS** · `test_manual_exit_manager` **20/20**
+- `node --check` OK · page **HTTP 200** · deployed == repo (`diff` clean) · ladder unit **0 failures since 05:03** · feed age 9.1s, 192 candles, `error:null`, last bar genuinely pre-floor
+- **core invariant holds live:** any-token forming bars flagged closed — **15m = 0, 1m = 0** (the F-1 lie has no instances anywhere in the DB right now)
+
+## Notes (non-blocking, honest residue)
+
+1. **Retroactive heal pending:** the newest ~6 ladder-eligible BTC bars still carry `volume=0` — wiped before `d562e7a2` landed; they correct at the next BTC seeder fetch (≤~2 h under the 4h-fresh skip). The mechanism that caused it is closed (controlled test), so no new wipes occur.
+2. **Closed hourly bar (04:00) reads flag0** until its next seeder rewrite — the per-interval floor changed the flag direction for already-stored rows; this is the *safe* direction (closed-bar-flagged-open → under-report, never a forming-bar lie) and heals on rewrite.
+3. Cosmetic: the main-chart hover stroke is `.35/[2,3]` vs the pane's `.55/[3,3]` (F-6) — same family, intentionally dimmer; no action.
+
+## Round summary (three commits, all verified)
+
+- **Round 1** `f95994e0` verdict: PASS WITH FINDINGS — 1 HIGH (F-1 forming-bar), 2 MEDIUM (F-2 crash-stale, F-3 price-null), LOWs/INFOs; indicator math + alignment proven exact; wiring green; fresh-air ruling = KEEP; mission chain alive 5=5; regression clean.
+- **Round 2** `b2a0be36` → acceptance `f8047a01`: CONDITIONAL PASS — F-1 15m core + F-2…F-9 closed; named deltas A (HIGH, money-path stale 1m reads), B (MEDIUM, 1h/4h residual), C (MEDIUM, dev-writer volume wipe), D (LOW, comment-vs-code).
+- **Round 3** `d562e7a2` → **this section: FINAL PASS.** Every finding from the verify-everything pass is closed and independently re-verified; no open findings remain on the ladder dashboard (API, page, wiring) or its shared seeder root cause.
