@@ -1107,6 +1107,116 @@ This is the placement half of §16: §16 says a tight-band first poke
 lacks conviction; this rule makes the closest bracket require a real
 move (1–2%) to reach it, on both sides, automatically.
 
+### MTF Wyckoff Analysis (COMPUTED)
+
+Wyckoff's accumulation sequence read across timeframes, in T's
+numbering: **1 = the first bottom** (the selling-climax low),
+**2 = the second bottom** (the retest/LPS — "not yet confirmed"
+until it holds and price re-breaks the intervening swing high),
+**3 = the powerful leg** (the markup thrust that follows a
+confirmed 2 — "3 is usually the powerful leg"). Distribution is the
+mirror (the UTAD/SG numbering).
+
+**The computation** (per TF, from the swing structure — reuses
+`find_swings` like the RSI-STRUCT section):
+1. **L1** = the lowest swing low in the lookback (the climax low;
+   label the volume context: a volume spike at L1 = the SC — the
+   selling climax).
+2. **L2** = the #2 candidate. Two cases:
+   (a) a correction is LIVE (price is off its recent high) → L2 =
+   the running low of that pullback — the bottom is FORMING (even
+   before the swing prints); the creek for THIS sequence = the
+   correction's origin high (the level whose re-break confirms it).
+   (b) no live correction → L2 = the most recent PRINTED swing low
+   higher than L1 (the higher-low retest already completed). If
+   neither exists → state `#1 only`.
+   T's read format: "the 1,2 sequence beginnings, with bottom #2 not
+   yet confirmed" = case (a) — the pullback is printing the second
+   bottom and the confirmation (a close above the origin high, the
+   rip's high on the 2026-11-23 tape) hasn't happened.
+3. **The #2 confirmation** needs BOTH: (a) price holds above L1
+   after L2 forms (the higher low holds), AND (b) price breaks
+   ABOVE the swing high that sits between L1 and L2 (the
+   intervening resistance — the creek crossing). Both → `#2
+   CONFIRMED`; L2 present without the break → **`#2 FORMING
+   (unconfirmed)`** (T's current read: "the 1,2 sequence beginnings,
+   with bottom #2 not yet confirmed").
+4. **Leg 3**: once #2 confirms, the markup leg = the expected
+   powerful advance; the measured target = the range height
+   (the box high − L1) projected from the breakout. Report
+   `leg3 pending` until the confirmation, then the run.
+5. **Sub-events** (labels, when they occur): SC (the volume climax
+   at L1) · ST (the secondary test of L1) · **spring** (a dip below
+   L1/box-low that recovers inside = the shakeout — bullish when it
+   recovers) · **SOS** (the wide-range up bar breaking the box high
+   with volume ≥ 1.5× average = the sign of strength) · LPS (the
+   pullback that holds above the broken level).
+6. **MTF aggregation**: the phase read on 1h + 4h (the base) and
+   15m/5m (the sub-structure). The bullish case = the higher-TF
+   sequence at `#2 confirmed` + the executing-TF showing the SOS/LPS;
+   the bearish mirror = distribution with the UTAD unconfirmed.
+
+**Report in §1** as: `WYCKOFF (1h): [phase — ACCUMULATION #2 FORMING
+(unconfirmed) | #2 CONFIRMED → leg3 | DISTRIBUTION ...] · L1 [level]
+(the SC?) · L2 [level] (holds/failed) · the confirmation needs [the
+intervening-SH level] · 4h: [...] · 15m: [sub-event: SOS/spring/LPS
+or none]` and feed §4/§6: an unconfirmed #2 = the wait (the entry
+belongs to the confirmation break, not the second bottom's interior);
+a confirmed #2 + the executing SOS = the leg3 long case.
+
+**Runnable snippet** (closed bars, mirrors the RSI-STRUCT section's
+style; the LIVE-correction case is what T's "#2 not yet confirmed"
+read maps to):
+
+```python
+def wyckoff(closes, lb=3, peak=None, live=None):
+    """T's numbering: 1 = the climax low, 2 = the second bottom
+    (confirmed only when it holds AND price closes back above the
+    creek), 3 = the powerful leg after the confirmation.
+    peak  = the recent high INCLUDING wicks (max of the candles'
+            high since the advance) — the live-correction detection
+            needs it; None = closed-bars-only mode.
+    live  = the current price (the forming bar)."""
+    lows  = [(i, closes[i]) for i in range(lb, len(closes)-lb)
+             if closes[i] == min(closes[i-lb:i+lb+1])]
+    highs = [(i, closes[i]) for i in range(lb, len(closes)-lb)
+             if closes[i] == max(closes[i-lb:i+lb+1])]
+    if len(lows) < 2: return {'state': '#1 only'}
+    i1, L1 = min(lows, key=lambda x: x[1])
+    # LIVE correction (the "#2 FORMING" case): price is ≥0.5% off the
+    # recent wick-peak → the pullback IS the forming second bottom;
+    # its creek = the peak, its running low = the recent bars' floor.
+    if peak and live and live < peak * 0.995 and peak > L1:
+        run_low = min(closes[-6:] + [live])
+        confirmed = closes[-1] > peak or live > peak
+        return {'L1': round(L1), 'L2': round(run_low), 'creek': round(peak),
+                'last_closed': round(closes[-1]),
+                'state': ('#2 CONFIRMED → leg3' if confirmed
+                          else '#2 FORMING (unconfirmed)')}
+    # printed sequence (no live correction running)
+    later = [(i, v) for i, v in lows if i > i1 and v > L1]
+    if not later: return {'state': '#1 only', 'L1': round(L1)}
+    i2, L2 = later[-1]
+    between = [v for i, v in highs if i1 < i < i2]
+    creek = max(between) if between else (peak or max(v for i, v in highs))
+    confirmed = L2 > L1 and closes[-1] > creek
+    return {'L1': round(L1), 'L2': round(L2), 'creek': round(creek),
+            'last_closed': round(closes[-1]),
+            'state': ('#2 CONFIRMED → leg3' if confirmed
+                      else '#2 FORMING (unconfirmed)')}
+```
+
+**Worked example (2026-11-23, BTC):** T's read — "currently looks
+like the 1,2 sequence beginnings, with bottom #2 not yet confirmed,
+3 is usually the powerful leg": L1 = the pre-rip major low (the
+60,386-class 4h support, the climax after the morning's slide), the
++2,900pt rip = the SOS through the creek, and the current
+post-rip consolidation at 63,8xx = **#2 forming** — the higher low
+is printing but unconfirmed until price re-breaks the rip's high
+(64,281); the confirmation unlocks the powerful leg-3 advance (the
+measured target = the box height projected up). Until then the
+interior of #2 = the chop zone (the §12 bracket's home).
+
 ## Analysis Script
 
 **Fast path (2026-10-22):** `python3 scripts/auto_analysis.py` runs the
@@ -1243,6 +1353,10 @@ method + numbers whenever the verdict reviews a series of exits.
   RSI-STRUCT (the RSI's own swings): 1m [state/break] · 5m [...] ·
     15m [...] · 1h [...] → MTF alignment sentence (the leading-break
     warnings live in §4)
+  WYCKOFF (MTF): [phase in T's numbering — 1/2 beginnings · #2
+    forming-unconfirmed / #2 CONFIRMED → leg3 · L1/L2 levels, the
+    SC/spring/SOS labels, the confirmation level, the 4h + 15m
+    sub-reads — per the MTF Wyckoff section]
 
 🧱 1b. STRUCTURE (python3 scripts/structure_analysis.py COIN)
   1m: [state HH/HL tags | SH/SL levels | slope]
