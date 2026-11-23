@@ -32502,3 +32502,32 @@ BY: auto_1hr
 - pump-chain+ 14d n=11 of 20 kill threshold, net -0.55 — revisit if n reaches 20
 - storm packet bar 3/3 awaits CEO sign-off by 2026-11-26
 BY: auto_1hr
+
+## [2026-11-23 13:53] Hourly Analysis
+
+**Storm:** no storm (window-min -0.05% / at-run -0.05%)
+
+**Trades:** 0 closed last hour | 24h 14 closed (6W 8L)
+**PnL NET:** hour $0.00 | 24h NET $-0.82 (gross -0.65, fees 0.17, payoff 0.36, WR 42.9%) | 7d NET $-1.73 (122T) | 14d NET $-4.55 (232T) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Kill policy: 0 closes last hour — no trigger; ai-trader-pending 4T 25% net -0.50 24h (0 closes last hour, CEO trades) -> monitor
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/14 = 7.1% (<40%); tpsl_utils deployed; manual_sl_hit 3T net -0.53 dominant loser, trail_arm_timeout 3T net -0.22 second
+- Boost: none eligible (no n>=5 with WR>55% net>0; max n is 4)
+- Arm rate: unarmed 6/14 = 42.9% below 70%, WR 16.7% net -$0.76 vs armed 8/8 62.5% net -$0.06 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 09 +0.01, 10 -0.28, 11 0.00 — not 3 consecutive negative; regime NORMAL/HIGH not NEUTRAL -> no size cut
+- Frequency: 0 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.313% < 0.5% (max 0.639)
+- 1 open: BTC jup_yolo_mirrored LONG 13:09 SL 60760 TP 62160
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.82 (fees 0.17 vs gross -0.65), payoff 0.36 — fee-drag + low payoff; 7d -1.73, 14d -4.55
+- unarmed WR 16.7% cohort 42.9% of closes, net -0.76 — stall stack owns fix
+- pump-chain+ 14d n=11 of 20 kill threshold, net -0.55 — revisit if n reaches 20
+- storm packet bar 3/3 awaits CEO sign-off by 2026-11-26
+BY: auto_1hr
