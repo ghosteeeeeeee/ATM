@@ -849,6 +849,28 @@ def _ladder_keeper(decision, summary):
         atr1 = float((sd.get('1h') or {}).get('atr') or 0)
         if not (price and atr15 and atr1):
             return
+        # MTF SPIKE STATE (CEO 2026-11-23): in a spike the keeper
+        # derives BOTH sides at the band's near edge — the closer
+        # shorts (the reversal catch) and the pullback-completion longs
+        # (+1%, the recovery catch). The FILL still waits for the
+        # higher high (the watchdog's RIP-CLIMAX gates): the placement
+        # is ready, the fill is gated. Shared detector (no watchdog
+        # import — circular).
+        try:
+            from spike_state import spike_state as _spike_state
+            _spk, _spk_why = _spike_state('BTC')
+        except Exception:
+            _spk, _spk_why = None, ''
+        try:
+            import hermes_constants as _hc18
+            _near_pct = float(_hc18.BRACKET_MIN_NEAR_PCT) / 100.0
+        except Exception:
+            _near_pct = 0.01
+        if _spk:
+            DB.log_event('INFO', f"ladder_keeper: SPIKE STATE {_spk} "
+                                 f"({_spk_why}) — the near-edge "
+                                 f"placement mode ({_near_pct*100:g}% "
+                                 f"both sides)")
         p_path = os.path.join(HERMES_DATA, 'pending_orders.json')
         s_path = os.path.join(HERMES_DATA, 'pending_orders_state.json')
         # F-4: config read-modify-write under EX flock — a manual
@@ -1020,6 +1042,11 @@ def _ladder_keeper(decision, summary):
             # short side + WARN spam — the old F2 class).
             if trig:
                 trig = _band_clamp(price, trig, 'short')   # §17 band
+                if _spk:
+                    # the spike-mode: the near edge (the closer short —
+                    # the reversal catch; the clamp snaps the round)
+                    trig = _band_clamp(price,
+                                       price * (1 - _near_pct), 'short')
             if trig and reach_lo <= trig < price:
                 # CEO 2026-11-20 (#17004: price×1.006 lost in 3min):
                 # fresh-air stops sit at MAJOR STRUCTURE — the 1h swing
@@ -1093,6 +1120,11 @@ def _ladder_keeper(decision, summary):
             for o in orders)
         if not long_ready and sh1h:
             trig = _band_clamp(price, round(sh1h + 60), 'long')   # §17 band
+            if _spk:
+                # the spike-mode: the near edge (+1% — the pullback-
+                # completion / recovery catch; the clamp snaps the round)
+                trig = _band_clamp(price,
+                                   price * (1 + _near_pct), 'long')
             # ITM guard + F-6 reach guard: the derived rung must itself
             # be within reach (else every cycle would duplicate it)
             if price < trig <= reach_hi:

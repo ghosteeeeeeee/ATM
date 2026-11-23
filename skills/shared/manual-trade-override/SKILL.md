@@ -496,6 +496,32 @@ data (the level + precheck + R:R still govern every fill). The
 winner-gate (add only while winning) and the LONG-ceiling band
 exemption are unchanged. REVERT: `RIP_RSI_TOP = 0`.
 
+### SPIKE-MODE PLACEMENT (CEO, 2026-11-23 — "detect the spike and set short levels closer, set longs for completion of pullback")
+
+While `spike_state.spike_state(coin)` reports a spike ('up'/'down'),
+the keeper derives **both sides at the band's near edge** (the 1% —
+the tight bracket): the shorts closer (the reversal catch) and the
+longs at the pullback-completion bounce (+1% — the recovery catch).
+Calm tape → the structure placement as usual (the tests pin the two
+modes apart: the spike short 60,500 / long 62,000 vs the calm short
+60,000 at the far edge).
+
+**The composition (do not lose this):** the placement being close
+does NOT make the fill easy — the RIP-CLIMAX gates still defer every
+`btc-auto-*` ladder fill until the higher high (the confirmation) or
+the cool-off. *Placement ready, fill gated* = the CEO's "we should
+almost be trying not to get into a trade... wait for higher high...
+we want moves with the momentum, continuing."
+
+**The size decision (recorded, no change):** rip-adds stay at the
+$11.10 floor — halving is floor-blocked (the live run_cycle:
+`size 6.77 < HL min 11.0 — floored`) — and the risk-per-add is cut
+three other ways: the gates (the climax-end adds never fill), the
+tight add-stop (the bounded loss), the winner-gate (winners only).
+On the 64,500 replay the gates defer BOTH adds (the full loss
+avoided) where half-size would have kept half the loss plus the
+fees.
+
 ## Related Skills
 
 - `signal-lab` — for testing signal logic

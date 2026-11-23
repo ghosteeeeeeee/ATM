@@ -1227,6 +1227,42 @@ is printing but unconfirmed until price re-breaks the rip's high
 measured target = the box height projected up). Until then the
 interior of #2 = the chop zone (the §12 bracket's home).
 
+### MTF Spike State (COMPUTED)
+
+Whether the tape is in a SPIKE state (CEO 2026-11-23: "detect the
+spike... we should almost be trying not to get into a trade — wait
+for higher high — we want moves with the momentum, continuing").
+
+**The detection** (any trips; the direction from the tripping
+detector — shared with the keeper via `spike_state.spike_state()`):
+1. **The RSI top/bottom** — the 1m RSI topped ≥ `RIP_RSI_TOP` (90)
+   or bottomed ≤ 10 within `RIP_RSI_WINDOW` (180 bars) → up/down.
+2. **The z-tier** — the continuum at STRONG (POS → up / NEG → down).
+3. **The vertical range** — the window's close-range ≥
+   `SPIKE_RANGE_PCT` (3%) with the last close in the top/bottom
+   third → up/down.
+
+**What the state means for placement** (the keeper's spike-mode): in
+the spike state the keeper derives **both sides at the band's near
+edge** (the 1% — the tight bracket): the shorts closer (the reversal
+catch) and the longs at the pullback-completion bounce (+1% — the
+recovery catch). **The placement is READY, the fill WAITS** — the
+RIP-CLIMAX gates still defer every ladder fill until the higher
+high (the confirmation) or the cool-off: "almost not trying to get
+into a trade" is the gates' job, not the placement's.
+
+**The state expires** when the window ages out / the z normalizes /
+the RSI recovers → the keeper returns to the structure placement.
+
+**The size decision (recorded, no change):** rip-adds stay at the
+$11.10 floor — halving is floor-blocked (the live run_cycle:
+`size 6.77 < HL min 11.0 — floored`) — and the risk-per-add is cut
+three other ways: the gates (the climax-end adds never fill), the
+tight add-stop (the bounded loss), the winner-gate (winners only).
+On the 64,500 replay the gates defer BOTH adds (the full loss
+avoided) where half-size would have kept half the loss plus the
+fees.
+
 ## Analysis Script
 
 **Fast path (2026-10-22):** `python3 scripts/auto_analysis.py` runs the
@@ -1411,6 +1447,10 @@ method + numbers whenever the verdict reviews a series of exits.
     = LOW-LIKELIHOOD flags per §16)]
   BRACKET DISTANCE: [closest short X.X% / closest long X.X% — both
     within [1%,2%] per §17? flag if out of band]
+  SPIKE STATE: [active-up / active-down / none — which detector(s)
+    tripped · placement mode [near-edge bracket (spike) / structure
+    (calm)] · fill gates [DEFERRING (the RIP-CLIMAX gates) / clear] —
+    per the MTF Spike State section]
 
 ═══════════════════════════════════════════
 ```

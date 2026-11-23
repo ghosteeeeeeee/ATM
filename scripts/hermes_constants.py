@@ -2231,6 +2231,15 @@ RIP_RSI_WINDOW = 180      # the 1m bars to look back for the top (3h)
 RIP_PEAK_ZONE_ATR = 1.0   # the creek zone: within 1x ATR1h below the recent peak
 RIP_Z_TIER_MARK = 'STRONG'  # the continuum tier marker (|z| >= 2)
 
+# MTF SPIKE STATE (CEO 2026-11-23 — the placement rules; the detection
+# lives in scripts/spike_state.py, shared by the keeper (the
+# placement) and the watchdog gates (the fill deferral)). The keeper's
+# spike-mode derives BOTH sides at the band's near edge (the closer
+# shorts + the pullback-completion longs); the fill still waits for
+# the higher high (the RIP-CLIMAX gates). REVERT: RIP_RSI_TOP=0
+# no-ops the state too.
+SPIKE_RANGE_PCT = 3.0   # the window's close-range >= 3% = the vertical move
+
 MOMENTUM_ATR_K = 0.5           # E1 displacement: fill requires closed-1m close beyond level >= K x ATR(15m). REVERT via MOMENTUM_CONFIRM_ENABLED.
 MOMENTUM_CONFIRM_ENABLED = True  # E1 master switch (trade_watchdog fill gate). False = legacy fill-on-cross, byte-identical. REVERT = False.
 BOUNCE_SHADOW_ENABLED = True   # E3 bounce-trigger SHADOW (log-only would-fires at level rejection). False = silent. Flip to live only with CEO approval after 7d data.
