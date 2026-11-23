@@ -42,6 +42,38 @@ PAUSE_MARKER = os.path.join(HERMES_DATA, 'vacation_pause.json')
 # write a SIZE REDUCE flag that the pipeline reads to cut position sizes to minimum.
 # New trades still come in (WR can recover), losses are minimized.
 SIZE_REDUCE_MARKER = os.path.join(HERMES_DATA, 'vacation_size_reduce.json')
+# Verdict 20261123T144950Z §3 (two-owners-one-file): an `r2_tier` marker on this
+# SAME file is a DRAWDOWN clamp owned by brain/analysis/goal_metrics_check.py
+# (_maybe_write_dd_tier). A WR/pnl recovery — BH-SR-1 clear or auto-resume — is a
+# different risk domain and must NOT release it. The ONLY legitimate release of an
+# r2_tier marker is R1 recovery (goal_metrics_check restores/removes it). Dedupe
+# sidecar for the skip log: exact marker bytes last logged, so the 30-min timer
+# emits one line per marker state instead of one per run.
+R2_SKIP_SEEN = os.path.join(HERMES_DATA, 'vacation_r2_skip.seen')
+
+
+def r2_skip_logged_once():
+    """Log the r2_tier clear-skip once per distinct marker state (deduped across
+    the 30-min guardrail timer via the R2_SKIP_SEEN sidecar).
+
+    Verdict 20261123T144950Z §3: guardrail never deletes an r2_tier marker —
+    WR recovery does not release a DD tier. Caller must have ALREADY skipped the
+    clear; a sidecar failure here degrades to logging every run, never to a
+    missed guard."""
+    try:
+        with open(SIZE_REDUCE_MARKER, 'rb') as f:
+            cur = f.read()
+        try:
+            with open(R2_SKIP_SEEN, 'rb') as f:
+                if f.read() == cur:
+                    return                      # already logged this exact state
+        except FileNotFoundError:
+            pass
+        with open(R2_SKIP_SEEN, 'wb') as f:
+            f.write(cur)
+    except Exception:
+        pass                                    # dedupe failure -> log anyway
+    log("[R2-TIER] guardrail clear skipped — DD tier is risk-domain, WR recovery does not release")
 
 
 def check_guardrails():
@@ -238,12 +270,21 @@ def resume_trading(reason):
         try:
             if os.path.exists(SIZE_REDUCE_MARKER):
                 _rel = None
+                _r2 = False
                 try:
                     with open(SIZE_REDUCE_MARKER) as _f:
-                        _rel = json.load(_f).get('release')
+                        _d = json.load(_f)
+                    if isinstance(_d, dict):
+                        _rel = _d.get('release')
+                        _r2 = bool(_d.get('r2_tier'))
                 except Exception:
                     _rel = None        # unreadable -> no explicit release (old rule)
-                if _rel == 'first_green_24h':
+                    _r2 = False        # ...and no known r2 -> old rule (clear as before)
+                if _r2:
+                    # Verdict 20261123T144950Z §3: resume = WR recovery; a DD
+                    # clamp is a different risk domain — keep the marker.
+                    r2_skip_logged_once()
+                elif _rel == 'first_green_24h':
                     try:
                         _net = fee_net_24h()
                     except Exception:
@@ -453,12 +494,17 @@ def main():
     _sr_release = None
     _sr_net24 = None
     _sr_release_ok = None       # None = no explicit release -> use BH-SR-1 rule
+    _sr_r2 = False              # verdict 20261123T144950Z §3: r2_tier = DD clamp
     if not should_resume and os.path.exists(SIZE_REDUCE_MARKER):
         try:
             with open(SIZE_REDUCE_MARKER) as _sr_f:
-                _sr_release = json.load(_sr_f).get('release')
+                _sr_d = json.load(_sr_f)
+            if isinstance(_sr_d, dict):
+                _sr_release = _sr_d.get('release')
+                _sr_r2 = bool(_sr_d.get('r2_tier'))
         except Exception:
             _sr_release = None  # unreadable marker -> no explicit release (old rule)
+            _sr_r2 = False      # ...and no known r2 -> old rule (clear as before)
         if _sr_release == 'first_green_24h':
             try:
                 _sr_net24 = fee_net_24h()   # None = not computable
@@ -491,15 +537,22 @@ def main():
         # above (clear iff 24h fee-net >= 0); without that key this branch is
         # the untouched BH-SR-1 rule.
         try:
-            os.remove(SIZE_REDUCE_MARKER)
-            if _sr_release_ok is not None:
-                log(f"▶️ [VACATION-GUARDRAIL] Size-reduce cleared on release=first_green_24h: "
-                    f"24h fee-net {_sr_net24:+.2f} >= 0 (BH-SR-1 WR rule bypassed, CEO 20261104T172347Z)")
-                write_alert('INFO', f'Size-reduce cleared: release=first_green_24h, '
-                                    f'24h fee-net {_sr_net24:+.2f}', data)
+            if _sr_r2:
+                # Verdict 20261123T144950Z §3: r2_tier is a DRAWDOWN clamp —
+                # BH-SR-1 WR recovery is a different risk domain and does not
+                # release it. Release = R1 recovery in goal_metrics_check only.
+                # Wins over a carried release='first_green_24h' key too.
+                r2_skip_logged_once()
             else:
-                log(f"▶️ [VACATION-GUARDRAIL] Size-reduce auto-cleared: WR {data['wr_7d']}% recovered")
-                write_alert('INFO', f'Size-reduce cleared: WR {data["wr_7d"]}%', data)
+                os.remove(SIZE_REDUCE_MARKER)
+                if _sr_release_ok is not None:
+                    log(f"▶️ [VACATION-GUARDRAIL] Size-reduce cleared on release=first_green_24h: "
+                        f"24h fee-net {_sr_net24:+.2f} >= 0 (BH-SR-1 WR rule bypassed, CEO 20261104T172347Z)")
+                    write_alert('INFO', f'Size-reduce cleared: release=first_green_24h, '
+                                        f'24h fee-net {_sr_net24:+.2f}', data)
+                else:
+                    log(f"▶️ [VACATION-GUARDRAIL] Size-reduce auto-cleared: WR {data['wr_7d']}% recovered")
+                    write_alert('INFO', f'Size-reduce cleared: WR {data["wr_7d"]}%', data)
         except Exception:
             pass
     elif should_pause:

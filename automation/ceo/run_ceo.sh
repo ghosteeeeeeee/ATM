@@ -21,6 +21,12 @@ STATUS="$CEO_DIR/ceo_prompt_status.md"
 TASK="$CEO_DIR/ceo_task_${TS}.md"
 REPORT="$CEO_DIR/ceo_report.md"
 
+# R2 DD-tier cadence (verdict 20261123T144950Z §3 side-find b): nothing else
+# runs the goal verifier — re-land the drawdown clamp on this 4h CEO cadence.
+# Bare run = state update + r2 money-path events only (no --kanban); a non-zero
+# rc is goal-not-met and must never break the status run.
+python3 brain/analysis/goal_metrics_check.py >> "$CEO_LOG_DIR/goal_metrics-${TS}.log" 2>&1 || true
+
 # ── Session lock notice (status run is READ-ONLY; check but never take) ─────
 LOCK_NOTE=""
 if [ -f "$LOCK_FILE" ]; then
