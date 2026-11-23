@@ -90,6 +90,9 @@ tr.hl td { background:#1c2430; }
     <div class="toolbar">
       <button id="btn-auto" class="on">AUTO RANGE</button>
       <button id="btn-full">FULL LADDER</button>
+      <span style="width:8px"></span>
+      <button id="btn-candles" class="on">CANDLES</button>
+      <button id="btn-line">LINE</button>
       <span class="badge" id="rng-label">—</span>
       <span style="flex:1"></span>
       <span class="legend">
@@ -174,7 +177,8 @@ tr.hl td { background:#1c2430; }
 <script>
 let DATA = null, hlRung = null, rangeMode = 'auto';
 const IND_KEYS = ['rsi','macd','adx','atr','cont','z'];
-const RGAP = 105;   // right-edge breathing room: the last tick sits RGAP px off the
+const RGAP = 105;
+let priceMode = (()=>{ try{ return localStorage.getItem('ladder_price_mode')==='line' ? 'line' : 'candles'; }catch(e){ return 'candles'; } })();   // right-edge breathing room: the last tick sits RGAP px off the
 // chart box's right edge (CEO 2026-11-23) — both charts, all series
 let indOn = (()=>{ try{ const s = JSON.parse(localStorage.getItem('ladder_ind_on')||'null');
   const d = {}; IND_KEYS.forEach(k=> d[k] = s && k in s ? !!s[k] : true); return d;
@@ -340,15 +344,27 @@ function draw(){
     ctx.fillRect(x(i)-bw/2, H-P.b-bh, bw, bh);
   });
 
-  // candles
-  c.forEach((b,i)=>{
-    const up = b.c>=b.o; ctx.strokeStyle = up?'var(--green)':'#ef5350';
-    ctx.fillStyle = up?'rgba(76,175,80,.85)':'rgba(239,83,80,.85)';
-    const xx=x(i);
-    ctx.beginPath(); ctx.moveTo(xx,y(b.h)); ctx.lineTo(xx,y(b.l)); ctx.stroke();
-    const yo=y(b.o), yc=y(b.c);
-    ctx.fillRect(xx-bw/2, Math.min(yo,yc), bw, Math.max(1,Math.abs(yc-yo)));
-  });
+  if(priceMode==='candles'){
+    // candles
+    c.forEach((b,i)=>{
+      const up = b.c>=b.o; ctx.strokeStyle = up?'var(--green)':'#ef5350';
+      ctx.fillStyle = up?'rgba(76,175,80,.85)':'rgba(239,83,80,.85)';
+      const xx=x(i);
+      ctx.beginPath(); ctx.moveTo(xx,y(b.h)); ctx.lineTo(xx,y(b.l)); ctx.stroke();
+      const yo=y(b.o), yc=y(b.c);
+      ctx.fillRect(xx-bw/2, Math.min(yo,yc), bw, Math.max(1,Math.abs(yc-yo)));
+    });
+  } else {
+    // bold white line of the closes (the minimal view)
+    ctx.save();
+    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2.2;
+    ctx.shadowColor = 'rgba(255,255,255,.45)'; ctx.shadowBlur = 7;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    c.forEach((b,i)=> i? ctx.lineTo(x(i), y(b.c)) : ctx.moveTo(x(i), y(b.c)));
+    ctx.stroke();
+    ctx.restore();
+  }
 
   // rung lines (in-range for auto; all for full)
   const rs = DATA.rungs||[];
@@ -641,8 +657,15 @@ cvEl.addEventListener('mouseleave', ()=>{ ro.style.display='none'; hoverIdx=null
 
 $('btn-auto').onclick = ()=>{ rangeMode='auto'; $('btn-auto').classList.add('on'); $('btn-full').classList.remove('on'); draw(); };
 $('btn-full').onclick = ()=>{ rangeMode='full'; $('btn-full').classList.add('on'); $('btn-auto').classList.remove('on'); draw(); };
+$('btn-candles').onclick = ()=>{ priceMode='candles';
+  try{ localStorage.setItem('ladder_price_mode','candles'); }catch(e){}
+  $('btn-candles').classList.add('on'); $('btn-line').classList.remove('on'); draw(); };
+$('btn-line').onclick = ()=>{ priceMode='line';
+  try{ localStorage.setItem('ladder_price_mode','line'); }catch(e){}
+  $('btn-line').classList.add('on'); $('btn-candles').classList.remove('on'); draw(); };
 window.addEventListener('resize', ()=>{ draw(); drawInd(hoverIdx); });
 
+if(priceMode==='line'){ $('btn-line').classList.add('on'); $('btn-candles').classList.remove('on'); }
 load();
 setInterval(load, 30000);
 </script>
