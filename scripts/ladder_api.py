@@ -184,7 +184,11 @@ def stats():
                 for k, v in buckets.items()},
             'open': [{'id': o[0], 'dir': o[1], 'entry': float(o[2] or 0),
                       'sl': float(o[3] or 0) if o[3] else None,
-                      'pnl_pct': float(o[4] or 0), 'amt': o[5]}
+                      'pnl_pct': float(o[4] or 0),
+                      # psycopg2 returns Decimal for numeric columns —
+                      # float() it or the feed dies the moment an open
+                      # row exists (it was latent while the list was empty)
+                      'amt': float(o[5] or 0)}
                      for o in opens],
             'recent': recs[:25],
         }

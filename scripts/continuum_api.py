@@ -43,10 +43,13 @@ def export():
         if row:
             output['current'] = _row_to_dict(row)
         
-        # History (last 24 hours = ~2880 ticks at 30s intervals)
+        # History (last 48 hours = ~5760 ticks at 30s intervals) — widened
+        # from 24h (2026-11-23, CEO: the ladder chart shows 45h of candles
+        # and the continuum line only covered the right half; the DB has
+        # rows back to 2026-08-12, the window was the only limit)
         cur = conn.execute(
             "SELECT * FROM continuum_states WHERE token='BTC' AND ts > ? ORDER BY ts",
-            (int(time.time()) - 86400,)
+            (int(time.time()) - 172800,)
         )
         output['history'] = [_row_to_dict(r) for r in cur.fetchall()]
         
