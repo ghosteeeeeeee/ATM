@@ -3,7 +3,7 @@ Description=Hermes Ladder API Timer — refresh ladder.json every 60s (page poll
 
 [Timer]
 OnBootSec=30sec
-OnUnitActiveSec=60sec
+OnUnitActiveSec=15sec
 Persistent=true
 
 [Install]

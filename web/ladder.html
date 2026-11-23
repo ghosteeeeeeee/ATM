@@ -174,7 +174,7 @@ tr.hl td { background:#1c2430; }
 <script>
 let DATA = null, hlRung = null, rangeMode = 'auto';
 const IND_KEYS = ['rsi','macd','adx','atr','cont','z'];
-const RGAP = 70;   // right-edge breathing room: the last tick sits RGAP px off the
+const RGAP = 105;   // right-edge breathing room: the last tick sits RGAP px off the
 // chart box's right edge (CEO 2026-11-23) — both charts, all series
 let indOn = (()=>{ try{ const s = JSON.parse(localStorage.getItem('ladder_ind_on')||'null');
   const d = {}; IND_KEYS.forEach(k=> d[k] = s && k in s ? !!s[k] : true); return d;
@@ -217,9 +217,16 @@ function renderHeader(){
     $('chg15').textContent = (chg>=0?'▲ ':'▼ ')+Math.abs(chg).toFixed(2)+'% 15m';
     $('chg15').style.color = chg>=0?'var(--green)':'var(--red)';
   }
-  const a = DATA.price_age_s;
+  // The price's TRUE current age = its age when the feed snapshotted it
+  // + the time since that snapshot (the old code showed the frozen age
+  // for up to a 30s poll lag on top of the collector's 60s design
+  // cadence — the '76s old' red flash: the30s threshold was
+  // mathematically unreachable-green. Fresh = within the collector's
+  // 60s design ceiling + margin; red only on a REAL stall.)
+  const a = (DATA.price_age_s!=null && DATA.ts!=null)
+    ? DATA.price_age_s + (Date.now()/1000 - DATA.ts) : null;
   $('mood').textContent = a!=null?('price '+Math.round(a)+'s old'):'price stale';
-  $('mood').className = 'badge '+(a!=null&&a<30?'fresh':'stale');
+  $('mood').className = 'badge '+(a!=null&&a<75?'fresh':'stale');
 }
 
 function renderStats(){
