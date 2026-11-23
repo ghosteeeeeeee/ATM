@@ -1,231 +1,449 @@
 {
-  "timestamp": "2026-11-23T08:57:42Z",
-  "run": 292,
+  "timestamp": "2026-11-23T20:55:00Z",
+  "run": 293,
   "session_brain_stats": {
-    "queries_run": 12,
-    "useful_hits": 8,
-    "noise_hits": 4
+    "queries_run": 8,
+    "useful_hits": 7,
+    "noise_hits": 1
   },
   "questions_asked": [
     {
-      "question": "what did we say about ai-trader-pending short rsi below 35",
+      "question": "what did we say about ai-trader manual BTC trades stops",
       "results_found": 5,
       "cited": true
     },
     {
-      "question": "have we tried blocking shorts when rsi oversold before",
-      "results_found": 4,
-      "cited": true
-    },
-    {
-      "question": "atr-trend short losing band rsi 60-72",
+      "question": "have we tried dampening or half-sizing losing ai-trader entries",
       "results_found": 5,
       "cited": true
     },
     {
-      "question": "long meta rsi 45-60 bleeding worst cell",
+      "question": "bb-squeeze trail_arm_timeout exits",
       "results_found": 5,
       "cited": true
     },
     {
-      "question": "chop bleed entry quality 92 percent tripwire",
-      "results_found": 2,
-      "cited": false
-    },
-    {
-      "question": "btc-pump-rider extreme long cell amplify",
-      "results_found": 2,
-      "cited": false
-    },
-    {
-      "question": "what did we say about jup long blocked walk provenance",
-      "results_found": 0,
-      "cited": false
-    },
-    {
-      "question": "win capture giveback verdict",
-      "results_found": 2,
-      "cited": false
-    },
-    {
-      "question": "prearmed short skip knife gate CEO catch these shorts",
+      "question": "entry_price hl_entry_price mismatch stale fill reconciliation",
       "results_found": 4,
-      "cited": true
+      "cited": false
     },
     {
-      "question": "have we tried half size dampen oversold short instead of block",
+      "question": "ai-trader-pending NORMAL SHORT winner cell size boost",
       "results_found": 4,
-      "cited": true
+      "cited": false
     },
     {
-      "question": "pc- fade decay flip rate dropping demote contrarian",
-      "results_found": 4,
-      "cited": true
-    },
-    {
-      "question": "bb-squeeze normal long winner cell amplify",
+      "question": "manual_sl_hit ai-trader stop too tight structure stop",
       "results_found": 4,
       "cited": true
     }
   ],
   "trade_summary_24h": {
-    "trades": 14,
-    "wr": 35.7,
-    "pnl": -0.41,
+    "24h": {
+      "trades": 16,
+      "wr": 37.5,
+      "pnl": -1.22
+    },
     "7d": {
       "trades": 118,
-      "wr": 50.8,
-      "pnl": 0.24
+      "wr": 50.0,
+      "pnl": -0.62
     },
     "14d": {
-      "trades": 227,
-      "wr": 47.6,
-      "pnl": -0.86
+      "trades": 229,
+      "wr": 48.5,
+      "pnl": -1.1
     },
-    "worst_24h": "ai-trader-pending SHORT x2 -$0.37 (RSI 27.0/17.3 knife-zone prearmed fills)",
-    "open": "BTC #17060 LONG continuum-osc+ @61527, EMA300 ABOVE +0.2%, hold condition intact"
+    "30d": {
+      "trades": 652,
+      "wr": 52.0,
+      "pnl": -4.76
+    },
+    "open_trades": 0,
+    "by_signal_24h": [
+      [
+        "ai-trader-auto",
+        "LONG",
+        2,
+        -0.82,
+        0.0
+      ],
+      [
+        "ai-trader-pending",
+        "SHORT",
+        2,
+        -0.37,
+        0.0
+      ],
+      [
+        "bb-squeeze+",
+        "LONG",
+        4,
+        -0.18,
+        25.0
+      ],
+      [
+        "hh-hl+",
+        "LONG",
+        1,
+        -0.12,
+        0.0
+      ],
+      [
+        "ai-trader-pending",
+        "LONG",
+        1,
+        -0.11,
+        0.0
+      ],
+      [
+        "continuation+",
+        "LONG",
+        2,
+        -0.03,
+        50.0
+      ],
+      [
+        "warrior-sr-confirm+",
+        "LONG",
+        1,
+        0.01,
+        100.0
+      ],
+      [
+        "continuum-osc+,jup_yolo_mirrored",
+        "LONG",
+        1,
+        0.02,
+        100.0
+      ],
+      [
+        "jup_yolo_mirrored",
+        "LONG",
+        2,
+        0.38,
+        100.0
+      ]
+    ],
+    "exit_families_7d": [
+      [
+        "manual_sl_hit",
+        13,
+        0.0,
+        -1.92
+      ],
+      [
+        "hard_max_loss",
+        10,
+        0.0,
+        -0.97
+      ],
+      [
+        "atr_sl_hit",
+        10,
+        0.0,
+        -0.92
+      ],
+      [
+        "cut-loser-CL-T1",
+        4,
+        0.0,
+        -0.48
+      ],
+      [
+        "prearm_lock",
+        12,
+        8.3,
+        -0.13
+      ],
+      [
+        "trail_arm_timeout",
+        5,
+        20.0,
+        -0.2
+      ],
+      [
+        "profit-monster-trail",
+        41,
+        100.0,
+        2.63
+      ],
+      [
+        "mfe_exit",
+        9,
+        88.9,
+        0.57
+      ],
+      [
+        "manual_trail_hit",
+        7,
+        85.7,
+        0.71
+      ],
+      [
+        "atr_tp_hit",
+        1,
+        100.0,
+        0.29
+      ]
+    ],
+    "armed_vs_unarmed": {
+      "7d": {
+        "armed": [
+          64,
+          81.3,
+          2.89
+        ],
+        "unarmed": [
+          53,
+          11.3,
+          -3.53
+        ]
+      },
+      "14d": {
+        "armed": [
+          120,
+          83.3,
+          6.99
+        ],
+        "unarmed": [
+          109,
+          10.1,
+          -8.09
+        ]
+      }
+    },
+    "chop_bleed_mfe_lt_040_7d": {
+      "losers": 55,
+      "never_armed": 44,
+      "pct": 80.0,
+      "gate": 92.0,
+      "breach": false
+    },
+    "arm_rate_7d": 54.7,
+    "atp_14d": {
+      "trades": 52,
+      "pnl": -0.69,
+      "wr": 36.5
+    },
+    "ai_trader_7d": {
+      "trades": 23,
+      "pnl": -0.92,
+      "wr": 34.8
+    }
   },
   "shadow_analysis": {
-    "contrarian": "join re-ran 08:30Z (mandate): overall flip 49.5% n=2644 decided. pc- n=124 flip 54.0% (DECAYED from 64.6% n=350 — edge fading), rider n=2520 flip 49.2% do-NOT. Live pc- LONG since 10-27: 38T 39.5% WR $0.00 fee-negative. Per-signal only, DEMOTE stands for 11-25 watch.",
-    "floor_admit": "join fresh 04:31Z: floor_only 49.6% n=2117 vs always 46.9% n=498, p=0.2711 — NO-SHIP final already adjudicated #291, route CLOSED.",
-    "oscillator": "archived fossil 2026-10-27 — not answerable",
-    "wyckoff": "retired — not answerable",
-    "rr_shadow": "orphaned, mtime stale — not answerable",
-    "shadow_trader": "exit A/B pm_trail +20,875 (n=55957, 100%) vs hard_max -27,116 (0%) / rr -9,999 / cut_loser -2,362 (0%) = TRAIL-OR-NOTHING. Gates all block negative-EV cohorts (BTC-CRASH 43% would-win avg -0.17).",
-    "overall": "3/6 answerable (contrarian join + floor join + shadow_trader); oscillator/wyckoff/rr dead by design."
+    "contrarian_join": "RE-RAN 2026-11-23T20:30:42Z (mandate, no systemd producer). decided=2662, flip-WR 49.5% (WINNER 1319 / LOSER 1343 / SHALLOW 7). pump-chain- flip 55.0% (71/129) — vs 54.0% at #292, still far below the 64.6% promote-era reading; btc-pump-rider+ 49.3% (1248/2533). Token heterogeneity: rider chi2=349.9 p=1.6e-42 HETEROGENEOUS, pump-chain- p=0.0054 HETEROGENEOUS -> per-signal/per-token only, never blanket. DEMOTE pre-positioned for 11-25 stands.",
+    "shadow_trader": "RE-RAN 20:33Z. 138,847 signals / 137,670 closed. EXIT A/B: pm_trail n=56753 WR100% +21,167.84 vs hard_max n=28931 0% -27,702.90, rr_engine -10,209.30, cut_loser -2,365.43 = TRAIL-OR-NOTHING, unchanged. GATES: every blocked cohort avg-negative (CONFLUENCE-EXPIRY 19053 @46% -0.13, COMBO-STALE 8681 -0.16, BTC-CRASH 2492 -0.17, SHORT-RSI-HARD-FLOOR 1095 @52% -0.10) = gates justified.",
+    "floor_admit": "CLOSED #291 — final NO-SHIP p=0.2711 at 38d, route CLOSED. Not re-run.",
+    "oscillator": "ARCHIVED 2026-10-27 (fossil) — none.",
+    "wyckoff": "RETIRED — no outcome column.",
+    "rr_shadow": "ORPHANED (0-byte data/rr_shadow_audit_7d.json, no producer) — none.",
+    "overall": "3/6 answerable (contrarian + shadow_trader live, floor closed). Both live sources re-ran this run. New source this run: none."
   },
   "drift_findings": [
-    "Watchdog steer LONG meta_rsi 45-60 (30d 173T -$3.03) re-measured: 7d 33T +0.07 FLAT, fisher p=0.178 vs <45, fk 39.6% — fails ship bars, stays advisory (matches watchdog wording).",
-    "Watchdog steer atr-trend- 60-72 re-measured: 7d 12T -$0.35 / 14d 20T -$0.42 / 30d 22T -$0.36 all negative BUT n<20 at 7d, >=72 pays (+0.15 7d) — INSUFFICIENT for change, monitor.",
-    "Watchdog steer atp SHORT <35 re-measured: 14d 28T 35.7% -$1.20, welch p=0.0514 (marginal), split-half same-sign (-0.53/-0.67), 30d 30T -$1.17 — BUT fk=66.7% (blocks 10/15 winners) fails the <20% bar for a BLOCK. Root cause: prearmed auto-ladder FIRST entries skip knife by CEO directive 2026-11-20 ('we need to catch these shorts'); ADDS already blocked (D2.3, verified live 02:43:19 reject). Cannot disable (no_signal_enable_disable + CEO domain)."
+    {
+      "id": "D1-size-reduce-r2-inert",
+      "finding": "data/vacation_size_reduce.json flipped to size_multiplier=0.25 at 2026-11-23T15:32:26Z (reason 'R2-TIER R1 -77.0% < -50% of equity', r2_tier=true) — but the DD clamp's only lever has ZERO teeth at the current base.",
+      "evidence": "logs/pipeline.log 20:35:39 [SIZE-REDUCE-SHADOW] base=11.00 x0.25 -> 2.75 floored to 11.00 (effective cut 0%) NO-OP: base already at HL floor. Same inertness class documented for 0.5x on 2026-11-04 (decider_run.py:369-371). Post-reduce opens: 1 trade (#17076 SOL SHORT amount 19.90 > pre-reduce avg 11.98) = no measurable cut.",
+      "active_brake": "DailyFillCap ENGAGED since 20:29Z — 15/15 opens, 24h fee-net -1.41, blocked SOL SHORT jup_yolo_mirrored. That is the ONLY live risk brake right now.",
+      "impact": "A declared drawdown clamp that reports 0% effective cut gives false comfort. If the fill cap releases (fee-net goes green), the R1 -77% DD tier will slow nothing.",
+      "action": "PROPOSED to CEO (money-sizing / brake domain — not shippable by auditor)."
+    },
+    {
+      "id": "D2-entry-vs-hl-entry-divergence",
+      "finding": "7 of 652 (1.07%) HL trades in 30d have entry_price != hl_entry_price. 6/7 are ai-trader BTC. Worst: #17067 ai-trader-auto LONG recorded entry_price=63604 while hl_entry_price (HL ground-truth fill) = 64248 = 1.013% error.",
+      "impact": "pnl_pct is computed off entry_price: recorded -17.97 (lev 10) vs actual ~-27.8. Recorded pnl_usdt -0.41 vs corrected ~-0.63. Across the 7 rows: recorded -0.60 vs corrected -0.79 = $0.19 understated loss/30d. Also corrupts gap filters, R:R and any entry-based counterfactual.",
+      "root_cause_hypothesis": "Two independent readers of 'HL entry' write the two columns: hl-sync-guardian (pos_data['entry_px']) always writes hl_entry_price and writes entry_price only when delta>0.1%; position_manager rewrites entry_price from hl_positions[coin]['entry_px'] but not hl_entry_price. With two concurrent open rows for the same coin (#17066+#17067 both open 14:28-16:04) the coin-keyed lookup can only correct one snapshot, so the columns diverge. NOT VERIFIED — writer not pinned.",
+      "action": "NO SHIP (would be a bandaid). Disposition registered: entry-hl-entry-invariant. Session brain: no prior art found for this defect."
+    },
+    {
+      "id": "D3-atp-short-rsiband-decomposition",
+      "finding": "atp SHORT splits clean by entry RSI and the split is stable across 14d and 30d: RSI<35 = 29T -$1.21 34.5% WR (30d) / 28T -$1.20 35.7% (14d) vs RSI>=35 = 11T +$1.45 45.5% (30d) / 9T +$1.47 55.6% (14d). Band detail 30d: <35 29T -1.21 | 35-45 7T +0.13 | 45-55 3T +0.60 | >=55 1T +0.72.",
+      "root_cause": "SHORT_RSI_HARD_FLOOR=45 blocks every other source — all-shorts with RSI<35 over 30d = 29 trades, and ALL 29 are ai-trader-pending (prearmed first entries skip the knife, CEO 2026-11-20). The leak is a path exemption, not a missing filter.",
+      "fk_check": "BLOCK kills 10 of the 15 atp-SHORT winners in 30d = fk 66.7% FAIL (bar <20%). Confirms #292's NO-BLOCK verdict. DAMPEN (half-size, fk=0) preserves every trade and banks ~half the bleed: +$0.60/14d and +$0.60/30d.",
+      "action": "#292 half-size dampen RE-SURFACED to CEO with this stronger evidence. Not re-proposed as new work."
+    },
+    {
+      "id": "D4-ai-trader-auto-first-live-day",
+      "finding": "ai-trader-auto (auto_trader.py phase-1 live legs) produced its first 2 live trades ever: #17066 and #17067 BTC LONG, both manual_sl_hit, both -$0.41, 0% WR, opened 13:58 and 14:28, both closed 16:04. Lifetime n=2.",
+      "verdict": "INSUFFICIENT (n=2) — MONITOR, not a target. Owned by disposition ai-trader-pending-tag-split (due 11-24) which splits the cohort for separate judging. Also: both were LONG into a dump (BTC fell 63.6k -> 62.5k by 16:04) — but 48h autopsy below says wrong-side is refuted.",
+      "note": "Both are PROFIT_MONSTER_BYPASS (session: 'ai-trader+, ai-trader-, and ai-trader are now in PROFIT_MONSTER_BYPASS_SIGNALS', ugb_pt exit 2026-10-31) which is why 14d shows 0/52 ai-trader profit-monster-trail exits and manual_sl_hit 24T -$3.35 = the #1 loss engine, 100% ai-trader."
+    }
   ],
   "recurring_problems": [
-    "Chop-bleed: 7d 90.3% / 14d 87.2% / 30d 91.8% dollar share never-armed — still UNDER 92% gate (was 90.5% at #291). Arm rate 7d LONG 51.4% (tripwire <50 NOT tripped). Entry-side bleed continues, route closed on detect-time axes (#96/#190/#192).",
-    "Prearmed knife-zone SHORT first entries: 30d 30T -$1.17 — CEO-intentional catch population, adds blocked, first entries free. Losers cluster at manual_sl_hit (12/28)."
+    "manual_sl_hit is the #1 loss exit family for the 2nd+ run (7d 13T -$1.92, 14d 24T -$3.35) and 100% of those 14d rows are ai-trader. ai-trader bypasses PM trail by design (ugb_pt exit 2026-10-31) so it rides to SL/TP only. Owner: exit-stack / manual_exit_manager — NOT re-opened here.",
+    "chop-bleed still the structural story (armed 14d 83.3% +6.99 vs unarmed 10.1% -8.09) but the 7d dollar reading is 80.0% = BELOW the 92% push gate for the first recent run — no escalation this run per pre-registered protocol.",
+    "ai-trader family under repeated watchdog scrutiny (3rd+ run): steer-001 again this run. Net-positive over 30d (+0.13 14d) but 36.5% WR and RSI-band bleed."
   ],
   "missing_implementations": [
-    "gate_shadow would_win provenance audit (CREATIVE #1 from #291) — no artifact exists yet, still open",
-    "win_capture_shadow.json missing (due 11-25) — shadow file never created, verdict will have nothing to read unless producer ships first"
+    {
+      "idea": "entry_price / hl_entry_price single-writer invariant",
+      "status": "DISCOVERED THIS RUN, no prior art found in session brain",
+      "owner": "disposition entry-hl-entry-invariant"
+    },
+    {
+      "idea": "DD-tier (r2_tier) needs a non-size brake when base is at HL_MIN_NOTIONAL",
+      "status": "DISCOVERED THIS RUN, prior art = the 0.5x inertness note only",
+      "owner": "CEO proposal"
+    },
+    {
+      "idea": "win_capture_shadow.json producer (due 11-25)",
+      "status": "STILL MISSING since #292 side-find — producer never shipped",
+      "owner": "11-25"
+    }
   ],
   "creative_improvements": [
     {
-      "date": "2026-11-23T08:57:42Z",
-      "idea": "Prearmed knife-zone first-entry HALF-SIZE dampen (size_mult 1.0→0.5 when prearmed SHORT fill has fill-time RSI<35)",
-      "rationale": "FK-proof alternative to a block: preserves CEO 'catch these shorts' directive while cutting the -$1.20/14d bleed in half (+$0.60/14d). Pattern already exists (FADE_EXEMPT_KNIFE_SIZE_MULT=0.5). Welch p=0.0514 marginal, split-half same-sign. Session prior art: FADE_EXEMPT half-size pattern [calwndar 2026-10-31]; prearmed skip is CEO 2026-11-20 [brain.py docstring].",
-      "expected_impact": "+$0.60/14d saved, winners still fire at half size (no fk kill)",
-      "category": "entry sniper / sizing",
-      "status": "proposed_ceo",
-      "risk": "low",
-      "bars": "n=28>=15 PASS | p=0.0514 MARGINAL | split-half same-sign PASS | fk n/a (size not block) | prior-art: half-size pattern exists, dampen-on-prearmed is NEW"
+      "date": "2026-11-23T20:55:00Z",
+      "idea": "When the DD-tier (r2_tier) size clamp would floor out at HL_MIN_NOTIONAL, fall back to a fill-rate lever (tighten DAILY_FILL_CAP_MAX) instead of writing an inert size_multiplier",
+      "rationale": "Live proof this run: [SIZE-REDUCE-SHADOW] base=11.00 x0.25 -> 2.75 floored to 11.00 (effective cut 0%) NO-OP. R1 is at -77% and the clamp it wrote removes 0% of risk. DailyFillCap (max 15/24h) is the only brake with teeth, and it is engaged right now only because 24h fee-net is negative — it releases the moment fees go green, independent of the drawdown.",
+      "expected_impact": "Gives the R2 DD clamp an actual lever; today it reports protection it does not deliver.",
+      "category": "risk brake",
+      "status": "suggested",
+      "risk": "medium (changes live brake behaviour — CEO/money domain, #208)",
+      "shipped": false
     },
     {
-      "date": "2026-11-23T08:57:42Z",
-      "idea": "pc- fade edge-decay early warning: join flip 64.6%→54.0% while live cohort 39.5% WR fee-negative",
-      "rationale": "watch-contrarian-live due 11-25 already; pre-position the DEMOTE conversation now with fresh numbers instead of at deadline. Session: flip conversion autopsy [calwndar 2026-10-31].",
-      "expected_impact": "avoid 2 more weeks of fee-negative live fade if decay holds",
-      "category": "kill/monitor",
+      "date": "2026-11-23T20:55:00Z",
+      "idea": "Make hl_entry_price the single source of fill truth and have every writer of entry_price write hl_entry_price in the same statement",
+      "rationale": "7/652 30d HL rows disagree between the two columns; worst row #17067 is off 1.013% and its pnl_pct is misstated -17.97 vs ~-27.8. Two independent writers (hl-sync-guardian always-writes hl_entry_price; position_manager rewrites entry_price only) can never be made consistent by patching either one alone.",
+      "expected_impact": "Removes a whole class of silent PnL / gap-filter / R:R corruption; $0.19/30d today, unbounded if a second concurrent position opens again.",
+      "category": "data integrity",
       "status": "suggested",
-      "risk": "low"
+      "risk": "low (column consistency only, no trading behaviour) — but NOT shipped: root writer not pinned",
+      "shipped": false
     },
     {
-      "date": "2026-11-23T08:57:42Z",
-      "idea": "gate_shadow would_win provenance audit (#291 C1 still unbuilt): recompute would_win from 5m candles for a 200-row sample, quarantine if systematic bias",
-      "rationale": "jup walk already proved +14.5pp inflation on one signal; every clonehunt/threshold that reads gate_shadow is poisoned until audited.",
-      "expected_impact": "restores trust in shadow gate metrics",
-      "category": "data quality",
+      "date": "2026-11-23T20:55:00Z",
+      "idea": "Treat the ai-trader prearmed-first-entry path as a named floor-exemption cohort and audit it as one unit (it is currently the only path under SHORT_RSI_HARD_FLOOR=45)",
+      "rationale": "all-shorts RSI<35 over 30d = 29 trades, 29/29 ai-trader-pending, net -$1.21. Every other source is airtight. Naming the exemption makes the leak visible in the gate-leak census instead of hiding inside 'ai-trader is noisy'.",
+      "expected_impact": "Makes the exemption auditable; the fk-proof remediation is already proposed (half-size dampen).",
+      "category": "entry sniper",
       "status": "suggested",
-      "risk": "low"
+      "risk": "low (reporting/audit only)",
+      "shipped": false
     }
   ],
   "config_changes_applied": [],
   "changes_from_last_run": [
     {
-      "change": "#291 jup-long walk NO SHIP disposition",
-      "verified": "PASS — status=done, bars recorded (net +0.13, fk 100%)"
+      "item": "#292 dispositioned 3 watchdog steers (atp SHORT<35, LONG 45-60, atr-trend- 60-72)",
+      "verified": "PASS — all three still hold their dispositions; atp SHORT<35 re-measured this run and the split is same-sign at 14d AND 30d (strengthens the pending dampen, does not reopen the block)"
     },
     {
-      "change": "#291 amplify-rider-extreme-long-cell registered",
-      "verified": "PASS — status=open, deadline 11-30, not duplicated"
+      "item": "#292 half-size dampen PROPOSED to CEO (p=0.0514 marginal)",
+      "verified": "STILL OPEN — no ratify/veto yet. Re-surfaced with fk=66.7% explanation and the floor-bypass root cause."
     },
     {
-      "change": "#291 floor-join NO-SHIP final",
-      "verified": "PASS — join fresh 04:31Z p=0.2711, route stays CLOSED"
+      "item": "#292 contrarian join re-ran 08:30Z (pc- 54.0% decayed)",
+      "verified": "PASS — re-ran again 20:30Z per mandate: pc- 55.0% (71/129), overall 49.5% n=2662. DEMOTE pre-position for 11-25 unchanged."
     },
     {
-      "change": "#291 contrarian re-ran mandate",
-      "verified": "PASS — re-ran again this run 08:30Z"
+      "item": "#292 side-find: win_capture_shadow.json missing (due 11-25)",
+      "verified": "STILL MISSING — producer never shipped. Re-flagged."
     },
     {
-      "change": "#291 chop-bleed 1-day delta creative (C3)",
-      "verified": "PARTIAL — measured inline (90.5%→90.3%), no standing early-warning script shipped"
+      "item": "#291 floor final NO-SHIP / route CLOSED",
+      "verified": "PASS — not reopened, not re-run."
+    },
+    {
+      "item": "#291 amplify-rider-extreme-long-cell (due 11-30)",
+      "verified": "PASS — still open, not duplicated this run."
     }
   ],
-  "kill_screen_14d": [
-    "ai-trader-pending LONG 15T 26.7% -$0.20 — CEO domain, n=15 borderline, net tiny — monitor",
-    "ai-trader-pending SHORT 37T 40.5% +$0.27 — NET POSITIVE, not a kill candidate",
-    "0 other sub-50% n>=15 rows"
-  ],
+  "kill_screen_14d": "0 candidates. Only sub-50% n>=15 signal is ai-trader-pending (50T 38.0% net +$0.13 — POSITIVE, so no kill) and it is CEO-domain + already carries the dampen proposal. atp LONG 13T -$0.14 = n<20 tiny.",
   "autopsy_48h": {
-    "n": 22,
-    "never_adverse": 6,
-    "recovered": 13,
-    "never": 3,
+    "method": "brain/analysis/recovery_replay.py — adverse-first anchor (open-anchored replay is VACUOUS, do not cite)",
+    "selfcheck": "PASS",
+    "n": 17,
+    "never_adverse": 5,
+    "recovered_after_adverse": 10,
+    "never_traded_back": 2,
     "never_list": [
-      "KAS atr-trend- cut-loser -$0.11",
-      "BLUR pump-chain+ prearm_lock -$0.02",
-      "RESOLV atr-trend+ prearm_lock -$0.01"
+      [
+        "17047",
+        "KAS",
+        "SHORT",
+        "atr-trend-",
+        "cut-loser-CL-T1",
+        -0.11
+      ],
+      [
+        "17045",
+        "RESOLV",
+        "LONG",
+        "atr-trend+",
+        "prearm_lock",
+        -0.01
+      ]
     ],
-    "verdict": "WRONG-SIDE REFUTED 143rd consecutive run (#61 p=0.116, #84 t=-0.04)"
+    "verdict": "WRONG-SIDE REFUTED 144th consecutive run (prior valid refs: #61 opposite-side p=0.116, #84 forward-return t=-0.04). Both NEVER cohort trades immaterial (<= $0.11).",
+    "chop_note": "8/10 24h losers are unarmed (mfe<0.40) — chop entries, not wrong-side entries. The 2 armed losers are the ai-trader-auto BTC LONGs (mfe 1.42/1.30 — they DID reach trail arm and still gave it back)."
   },
-  "tripwires": {
-    "chop_bleed_92": "NOT breached (7d 90.3%)",
-    "arm_rate_long_lt50": "NOT tripped (51.4%)",
-    "route_reopen": "NOT tripped",
-    "coupled_sl_revert": "threshold not met"
-  },
+  "tripwires": [
+    {
+      "name": "chop-bleed >=92% (7d, mfe<0.40 dollar basis)",
+      "value": "80.0% (44/55)",
+      "state": "NOT BREACHED — first sub-gate reading in recent runs (was 90.3% at #292). No escalation."
+    },
+    {
+      "name": "7d LONG arm-rate <50%",
+      "value": "overall 7d arm 54.7%",
+      "state": "NOT TRIPPED"
+    },
+    {
+      "name": "watchdog steer-001 atp losing streak",
+      "value": "3 consecutive, -0.28/20",
+      "state": "OWNED — dampen proposal pending CEO"
+    },
+    {
+      "name": "size-reduce file",
+      "value": "0.25x, r2_tier=true, written 15:32:26Z",
+      "state": "ACTIVE BUT INERT (effective cut 0%) — new state this run"
+    }
+  ],
   "readiness": {
-    "open": 1,
-    "action": "HOLD BTC #17060 while 1m holds above EMA300 (61346, price 61468 +0.2%, ABOVE). Exit on 15-30min sustained close below. Entry in 45-60 band = no-edge chop trade, direction aligned with line.",
-    "fresh_entries": "None recommended — flip-rate high churn, no trend tape. Trail-family first, size 1.0x.",
-    "size_reduce": "absent = 1.0x"
+    "as_of": "2026-11-23 20:55 UTC",
+    "open_trades": 0,
+    "steers": "1 (atp pending losing streak — non-auto)",
+    "regime": "btc_15m SHORT_BIAS / btc_4h LONG_BIAS (DISAGREE = chop) / continuum BELOW / vol LOW / zscore NEG / velocity SLOW / accel NEGATIVE / volume LOW / wyckoff DISTRIBUTION / market RECOVERY / trend_quality STRONG_DOWN",
+    "call": "0 open = CORRECT for chop. NO fresh counter-trend entries while the two BTC timeframes disagree; no entries while DailyFillCap is ENGAGED (15/15, fee-net -1.41); trail-family first when a side sustains 15-30m WITH volume; size 1.0x nominal — the 0.25x DD marker is inert, so the effective brake is the fill cap, not size.",
+    "flip_kpi": "MET this week (prearm enforce 11-20). Weekly AMPLIFY: 2 proposals registered this run (see shadow_disposition)."
   },
   "next_actions": [
-    "11-24: ai-trader tag-split, brake-counterfactual, gate-cross-tab, regime-tension (shadow_disposition)",
-    "11-25: WIN-CAPTURE VERDICT (file missing — ship producer first), bbsqueeze reband, structure-flip, watch-contrarian (pc- DEMOTE with decay numbers), pcfade, hotset-pin",
-    "11-26: storm waiver (CEO) + capture-leaderboard",
-    "CEO: prearmed knife half-size dampen RATIFY/VETO · pc- fade demote pre-position · gate_shadow provenance audit go",
-    "Next run: rider-cell 7d re-read, chop-bleed re-measure, atp knife cohort re-check"
+    "11-24: ai-trader-pending-tag-split (now must also cover ai-trader-auto, first live day n=2) | brake-counterfactual-shadow | gate-interaction-cross-tab | regime-gate-tension-check",
+    "11-25: WIN-CAPTURE producer still missing — SHIP IT | watch-contrarian-live pc- DEMOTE GO/NO-GO (flip now 55.0% n=129) | bbsqueeze reband | structure-flip | pcfade | hotset-pin",
+    "11-26: storm-confl-waiver (CEO) | capture-leaderboard",
+    "11-27/28: pc-plus-weight-monitor | linregfade-volgate | stop-family-entry-filter | other-gate-short-withhold | jup-short-walk | reentry-study | cell-conf-tilt | r2v2-clonehunt | longbypass-dual-basis | maker-entry-fill-walk | prearm-enforce-day7",
+    "11-29: tape-at-long-remeasure | 11-30: rider-cell read + long-rsi-floor30 + hl-copy-plus",
+    "CEO OWED: (1) atp SHORT RSI<35 half-size dampen RATIFY/VETO — now with floor-bypass root cause + fk 66.7% + 14d/30d same-sign; (2) R2 DD-clamp inert — give the drawdown tier a non-size lever or accept that only DailyFillCap is real; (3) entry_price/hl_entry_price invariant — GO on disposition; (4) standing: V6 kill, storm bar 11-26."
   ],
   "citations": [
     [
-      "signal analyst",
-      "2026-10-24",
-      "CASHCAT entered SHORT at RSI 15.5 — already oversold, price bounced immediately. Root cause: RSI floor"
-    ],
-    [
-      "calwndar",
-      "2026-10-31",
-      "FADE_EXEMPT_KNIFE_SIZE_MULT half-size pattern on validated cells only"
-    ],
-    [
-      "calwndar",
-      "2026-10-31",
-      "CONTRARIAN-LIVE flip conversion autopsy — flips die in two funnels"
-    ],
-    [
-      "calwndar",
-      "2026-10-31",
-      "we're blocking shorts, system seems long biased"
+      "ai-trader watchdog recs",
+      "2026-10-06",
+      "Manual BTC trades (30d): LONG 3T 1W 33.3% WR, SHORT 3T 0W 0% WR, total 6T 1W 16.7% WR -$0.25. These losses drag down..."
     ],
     [
       "signal analyst",
       "2026-10-24",
-      "RSI 45-55 SHORT is the BEST band (69% WR) — 45-60 long cell inversion noted"
+      "Approved: 1. Lift size reduce 30% -> 50% 2. Disable ai-trader+ automated entries, keep manual"
+    ],
+    [
+      "ugb_pt exit",
+      "2026-10-31",
+      "ai-trader+, ai-trader-, and ai-trader are now in PROFIT_MONSTER_BYPASS_SIGNALS"
     ],
     [
       "🧠 ai-trader live trades",
       "2026-10-15",
-      "Oversold shorts still firing: GMT SHORT RSI 3.45 — Do not execute"
+      "BTC SHORT ... manual_sl_hit ai-trader-pending — stop too tight? full-analysis"
+    ],
+    [
+      "shadow mode",
+      "2026-10-17",
+      "Disable ai-trader automated entries ... size reduce in guard"
     ]
   ]
 }

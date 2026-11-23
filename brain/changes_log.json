@@ -4785,5 +4785,49 @@
     "after": "proposal lodged: size_mult 0.5 when prearmed SHORT fill-time RSI<35",
     "rationale": "FK-proof alternative to block (fk would be 66.7%), preserves CEO catch directive, +$0.60/14d",
     "impact": "awaiting CEO RATIFY/VETO — zero behavior until approved"
+  },
+  {
+    "timestamp": "2026-11-23T20:55:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #293: contrarian outcome join re-ran (mandate) — overall flip 49.5% n=2662, pump-chain- 55.0% (71/129), rider 49.3% (1248/2533), token-het p=1.6e-42",
+    "type": "data",
+    "file": "data/contrarian_outcome_join.json",
+    "before": "2026-11-23T08:30Z (pc- 54.0%)",
+    "after": "2026-11-23T20:30:42Z (pc- 55.0%)",
+    "rationale": "mandate — no systemd producer, sat stale otherwise",
+    "impact": "feeds the 11-25 pc- DEMOTE read"
+  },
+  {
+    "timestamp": "2026-11-23T20:55:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #293: registered amplify-vbo-short-killreview + amplify-atp-short-normal-cell (weekly AMPLIFY mandate, 2 proposals)",
+    "type": "creative",
+    "file": "data/shadow_disposition.json",
+    "before": "13 open amplify entries",
+    "after": "15 open amplify entries",
+    "rationale": "weekly offense mandate requires >=1 proposal per run",
+    "impact": "offense pipeline; both default NO-SHIP"
+  },
+  {
+    "timestamp": "2026-11-23T20:55:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #293: registered disposition entry-hl-entry-invariant (7/652 30d HL rows have entry_price != hl_entry_price, worst 1.013%) — NO code ship, root writer unpinned",
+    "type": "data",
+    "file": "data/shadow_disposition.json",
+    "before": "n/a",
+    "after": "open eval disposition due 2026-11-26",
+    "rationale": "data-integrity defect found this run; shipping a one-liner would be a bandaid",
+    "impact": "pins the invariant question for a proper root-cause pass"
+  },
+  {
+    "timestamp": "2026-11-23T20:55:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #293 creative: R2 DD-clamp inertness (size_multiplier 0.25 floors to $11 min = effective cut 0%) PROPOSED to CEO — not shipped",
+    "type": "creative",
+    "file": "brain/creative_improvements.json",
+    "before": "n/a",
+    "after": "logged + CEO proposal",
+    "rationale": "drawdown clamp reports protection it does not deliver",
+    "impact": "CEO decision on a non-size lever"
   }
 ]

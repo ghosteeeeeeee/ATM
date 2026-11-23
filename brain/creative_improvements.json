@@ -12193,5 +12193,32 @@
     "category": "data quality",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-23T20:55:00Z",
+    "idea": "DD-tier (r2_tier) size clamp falls back to a fill-rate lever (tighten DAILY_FILL_CAP_MAX) when base would floor out at HL_MIN_NOTIONAL",
+    "rationale": "Live proof 20:35:39 [SIZE-REDUCE-SHADOW] base=11.00 x0.25 -> 2.75 floored to 11.00 (effective cut 0%) NO-OP. R1 at -77% and the clamp removes 0% of risk; DailyFillCap is the only brake with teeth and it releases on green fee-net regardless of the drawdown.",
+    "expected_impact": "Gives the R2 DD clamp an actual lever instead of a no-op marker",
+    "category": "risk brake",
+    "status": "suggested",
+    "risk": "medium (CEO/money domain #208) — NOT shipped"
+  },
+  {
+    "date": "2026-11-23T20:55:00Z",
+    "idea": "Single-writer invariant: every writer of entry_price writes hl_entry_price in the same statement",
+    "rationale": "7/652 30d HL rows disagree; #17067 off 1.013% (entry 63604 vs HL fill 64248), pnl_pct -17.97 vs actual ~-27.8. Two independent writers (hl-sync-guardian always-writes hl_entry_price; position_manager rewrites entry_price only) can never be reconciled by patching one side.",
+    "expected_impact": "removes silent PnL / gap-filter / R:R corruption; $0.19/30d today",
+    "category": "data integrity",
+    "status": "suggested",
+    "risk": "low — NOT shipped, root writer unpinned"
+  },
+  {
+    "date": "2026-11-23T20:55:00Z",
+    "idea": "Name the ai-trader prearmed-first-entry path as a floor-exemption cohort in the gate-leak census",
+    "rationale": "all-shorts RSI<35 over 30d = 29 trades, 29/29 ai-trader-pending, net -$1.21. Every other source is airtight against SHORT_RSI_HARD_FLOOR=45. Naming it makes the leak visible instead of hiding in 'ai-trader is noisy'.",
+    "expected_impact": "auditable exemption; remediation already proposed (fk-proof half-size dampen)",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low (reporting only)"
   }
 ]
