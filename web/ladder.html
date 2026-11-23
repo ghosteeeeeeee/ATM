@@ -318,8 +318,18 @@ function draw(){
   }
   ctx.textAlign='left';
 
-  // candles
+  // volume histogram in the bottom band (its own scale: the max = 20% of the plot)
   const bw = Math.max(2, Math.min(14, (W-P.l-P.r)/c.length*0.7));
+  const vmax = Math.max(1, ...c.map(b=>b.v||0));
+  const vband = (H-P.t-P.b) * 0.20;
+  c.forEach((b,i)=>{
+    const v = b.v||0; if(!v) return;
+    const bh = Math.max(1, (v/vmax)*vband);
+    ctx.fillStyle = (b.c>=b.o) ? 'rgba(76,175,80,.32)' : 'rgba(239,83,80,.32)';
+    ctx.fillRect(x(i)-bw/2, H-P.b-bh, bw, bh);
+  });
+
+  // candles
   c.forEach((b,i)=>{
     const up = b.c>=b.o; ctx.strokeStyle = up?'var(--green)':'#ef5350';
     ctx.fillStyle = up?'rgba(76,175,80,.85)':'rgba(239,83,80,.85)';
@@ -574,7 +584,8 @@ cvEl.addEventListener('mousemove', ev=>{
   ro.style.top = Math.max(6, my-52)+'px';
   let txt = new Date(b.t*1000).toISOString().slice(0,16).replace('T',' ')+'Z\n'
     +'O '+fmt(b.o,1)+'  H '+fmt(b.h,1)+'\nL '+fmt(b.l,1)+'  C '+fmt(b.c,1)
-    +'   '+(b.c>=b.o?'+':'')+((b.c/b.o-1)*100).toFixed(2)+'%';
+    +'   '+(b.c>=b.o?'+':'')+((b.c/b.o-1)*100).toFixed(2)+'%'
+    +'\nV '+(b.v>=1000? (b.v/1000).toFixed(1)+'k' : fmt(b.v,0));
   // any trade opening/closing in this bar
   (DATA.trades||[]).forEach(t=>{
     const bar0=b.t, bar1=b.t+900;

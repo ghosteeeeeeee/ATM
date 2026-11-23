@@ -38,14 +38,15 @@ def candles(n=180):
     try:
         cur = con.cursor()
         cur.execute(
-            "SELECT ts, open, high, low, close FROM candles_15m "
+            "SELECT ts, open, high, low, close, volume FROM candles_15m "
             "WHERE token='BTC' AND is_closed=1 ORDER BY ts DESC LIMIT ?",
             (n,))
         rows = list(reversed(cur.fetchall()))
     finally:
         con.close()
     return [{'t': int(r[0]), 'o': float(r[1]), 'h': float(r[2]),
-             'l': float(r[3]), 'c': float(r[4])} for r in rows]
+             'l': float(r[3]), 'c': float(r[4]),
+             'v': float(r[5] or 0)} for r in rows]
 
 
 def rungs():
