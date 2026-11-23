@@ -21,7 +21,7 @@ Every hour, train rolling-window classifiers that answer **"chance BTC goes up i
 ### 2.1 Target
 - Asset: **BTC only** (v1). Horizons **H ∈ {15m, 1h, 4h}** (candle tiers; 1m/5m excluded from horizons — 1m depth ~30d is too thin for honest OOS and 5m adds little beyond 15m).
 - Label at candle close t: `r = close(t+H)/close(t) − 1` → **up** if `r ≥ ε_H`, **down** if `r ≤ −ε_H`, else **side**.
-- Deadbands (CLI defaults, documented, fixed — labels must be stable across retrains for calibration comparability): `ε = 5bps·√(H_minutes/60)` → **15m: 5bps, 1h: 10bps, 4h: 20bps**. Every report prints the ε in use. (If ever used for a trading decision, ε becomes neighbor-test territory — not now.)
+- Deadbands (CLI defaults, documented, fixed — labels must be stable across retrains for calibration comparability): **pinned table ε = 5bps·√(H_minutes/15) → 15m: 5bps, 1h: 10bps, 4h: 20bps** (v1.0 errata: the original `√(H/60)` formula yielded 2.5/5/10 and contradicted the table — the pinned table governs; builder implemented the corrected formula per deviation note 1). Every report prints the ε in use. (If ever used for a trading decision, ε becomes neighbor-test territory — not now.)
 - Lookahead rule: features from closed bars ≤ t only; label uses t+H (evaluation-only). Never a feature.
 
 ### 2.2 Features (full-analysis factor set, computed from LOCAL `data/candles.db` only — skill's data-source rule, no API)
