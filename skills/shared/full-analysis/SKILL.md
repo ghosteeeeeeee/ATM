@@ -685,6 +685,16 @@ own wider SL). Never stack TPs at the same level — the add's TP sits BEFORE
 the original's (e.g. add TP 82,600 vs system TP 83,687). Chop-regime adds are
 half-size or skipped.
 
+**RIP-CLIMAX GATES (CEO, formalized 2026-11-23 — the standing rules
+in manual-trade-override):** every `btc-auto-*` ladder fill checks
+`_rip_climax_defer` first — the RSI divergence (the 1m top ≥90
+collapsed <75 below the window high), the creek zone (within 1×ATR1h
+below the recent peak — the entry belongs to the close above = leg3),
+or the z-tier STRONG → **DEFER (the rung stays armed)** until the
+confirmation, the fresh breakout, or the cool-off. The 64,603 autopsy
+that earned them: the adds caught the pre-65k wick, the RSI called it
+41min early, and the stop saved 613pts (no stop change).
+
 **RIP-ADD EXEMPTION (CEO, 2026-11-23):** "btc is in straight up
 mode, ripping through our rungs with no re-tests — as it rips
 through we should be adding." Root cause of the missing adds: the

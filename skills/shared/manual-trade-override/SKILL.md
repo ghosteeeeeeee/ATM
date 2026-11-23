@@ -455,6 +455,47 @@ participates on a merged position, and attribution corrupts either way.
     mid-plunge fill leaks accepted (CEO: accept). A safe trade with no
     drawdown stays in — the stop is the only thing that takes it out.
 
+### RIP-ADD STANDING RULES (CEO, formalized 2026-11-23 — the 64,603 wick autopsy)
+
+The 64,603 autopsy (both tranches #17066/#17067 at 63,604, −$0.82):
+the price wicked to 64,603 (the Wyckoff creek + the 1h SH) and FAILED
+to close above; the momentum crashed at **64,500 with 65k
+psychological right ahead** (the §11 liquidity-collection before the
+round number); the exit was at 62,461 — and the price then fell to
+61,680, **781pts below our exit**.
+
+**The verdict: the WICK, not the stop.**
+- The 1m RSI topped at **92.6 at 13:46 — 41 minutes BEFORE the price
+  peak** (the divergence; the CEO: "1m RSI had called it correctly").
+- The adds filled with the RSI already collapsed (63.3 and 48.6).
+- ADX/ATR/Z all at spike levels (ATR1m 9×, ADX1m 55, z STRONG_POS).
+- **The stop was CORRECT and saved money**: the trail raised it
+  61,848 → 62,553 during the rise; the crash hit it (fill 62,461,
+  92pts slippage); the original stop would have exited **613pts
+  worse**. No stop change — ever, on this evidence.
+
+**The rules (enforced in trade_watchdog as `_rip_climax_defer` on
+every `btc-auto-*` ladder fill):** a rip-fill **DEFERS** (the rung
+stays armed, no state burn) on ANY of:
+1. **The RSI divergence** — the 1m RSI topped ≥ `RIP_RSI_TOP` (90)
+   within `RIP_RSI_WINDOW` (180 bars) and collapsed below
+   `RIP_RSI_BELOW` (75) while the price holds in the near-high band
+   BELOW the window high (the resistance holding at the climax). The
+   price AT/ABOVE the high = the fresh breakout / the leg3 — never
+   deferred.
+2. **The creek zone** — the price within `RIP_PEAK_ZONE_ATR` (1×)
+   ATR1h below the recent hour's high: the Wyckoff confirmation is
+   ahead; the entry belongs to the close above it (leg3), not the
+   interior.
+3. **The z-tier STRONG** (|z| ≥ 2) — the spike context.
+
+The fill resumes when: the price breaks the peak (the confirmation →
+leg3), the fresh breakout (the price at new highs), or the cool-off
+(the window ages out / the RSI recovers ≥75). Fail-open on missing
+data (the level + precheck + R:R still govern every fill). The
+winner-gate (add only while winning) and the LONG-ceiling band
+exemption are unchanged. REVERT: `RIP_RSI_TOP = 0`.
+
 ## Related Skills
 
 - `signal-lab` — for testing signal logic
