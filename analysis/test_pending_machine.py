@@ -185,7 +185,7 @@ def main():
     MODE[0] = 'dbdown'
     setup([mk('a', 57000)])
     assert not steers(TW.monitor_pending_orders(56900.0), 'a'), 'dbdown defers'
-    MODE[0] = 'ok'; OPEN[0] = ('1', 'SHORT'); COUNT[0] = 6
+    MODE[0] = 'ok'; OPEN[0] = ('1', 'SHORT', 1.5); COUNT[0] = 6
     setup([mk('a', 57000)])
     assert not steers(TW.monitor_pending_orders(56900.0), 'a'), 'cap defers'
     COUNT[0] = 2
@@ -267,7 +267,7 @@ def main():
     assert len(steers(TW.monitor_pending_orders(56900.0), 'btc-ceo-x')) == 1, \
         'hand-arms bypass heat'
     # ADD branch carries the band flag; flat fill does not
-    NOTIONAL[0] = 50.0; OPEN[0] = ('1', 'SHORT'); COUNT[0] = 1
+    NOTIONAL[0] = 50.0; OPEN[0] = ('1', 'SHORT', 1.5); COUNT[0] = 1
     setup([mk('a', 57000)])
     s = TW.monitor_pending_orders(56900.0)
     assert steers(s, 'a')[0]['action']['order'].get('prearmed_add') is True, \

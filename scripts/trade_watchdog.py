@@ -1894,8 +1894,8 @@ def _monitor_pending_orders_impl(btc_price):
                                           connect_timeout=5)
                     _cur = _c.cursor()
                     _cur.execute(
-                        "SELECT id, direction FROM trades WHERE token=%s "
-                        "AND status='open' LIMIT 1", (coin,))
+                        "SELECT id, direction, pnl_pct FROM trades WHERE "
+                        "token=%s AND status='open' LIMIT 1", (coin,))
                     _open = _cur.fetchone()
                     # F-3 (agent-3): MAX_OPEN_POSITIONS exists but nothing
                     # read it on this path — the keeper self-replenishes
@@ -1982,16 +1982,41 @@ def _monitor_pending_orders_impl(btc_price):
                 if _open:
                     _open_dir = str(_open[1] or "").lower()
                     if _open_dir == str(direction or "").lower():
-                        log(f"pending order {oid}: {coin} #{_open[0]} "
-                            f"{_open_dir} open — firing as ADD (CEO "
-                            f"2026-11-21: adds on winners, both sides)",
-                            "INFO")
-                        # D2.3: the ADD carries the band flag so brain
-                        # re-applies the RSI band first-entry --prearmed
-                        # skips (explicit flag > implicit DB check — no
-                        # race, per the ruling's evidence #8).
-                        order["prearmed_add"] = True
-                        # fall through → steer (exec gets --force)
+                        # ADD-TO-WINNERS (CEO 2026-11-23, clarified: "if
+                        # we are in a trade and the trade is winning, and
+                        # a rung fires — we should be adding. if a trade
+                        # is losing then we shouldn't add and double
+                        # down"). The open trade must be IN PROFIT
+                        # (pnl_pct > 0, the open-row unleveraged
+                        # price-%); underwater or unknown → defer: the
+                        # rung stays armed (no state burn), fills
+                        # normally once flat, or adds once green. The
+                        # CEO notes the losing case is rare (a loser
+                        # usually stops out before the next rung trips)
+                        # — the gate is cheap and absolute.
+                        try:
+                            _pnl = float(_open[2] or 0)
+                        except (TypeError, ValueError, IndexError):
+                            _pnl = 0.0   # short/odd row = unknown → defer
+                        if _pnl > 0:
+                            log(f"pending order {oid}: {coin} #{_open[0]} "
+                                f"{_open_dir} open and WINNING "
+                                f"(pnl {_pnl:+.2f}%) — firing as ADD "
+                                f"(add-to-winners, both sides)", "INFO")
+                            # D2.3: the ADD carries the band flag so
+                            # brain re-applies the RSI band first-entry
+                            # --prearmed skips (explicit flag > implicit
+                            # DB check — no race, per the ruling's
+                            # evidence #8).
+                            order["prearmed_add"] = True
+                            # fall through → steer (exec gets --force)
+                        else:
+                            log(f"pending order {oid}: {coin} #{_open[0]} "
+                                f"{_open_dir} open NOT in profit "
+                                f"(pnl {_pnl:+.2f}%) — add deferred, rung "
+                                f"stays armed (no double-down on a loser)",
+                                "INFO")
+                            continue
                     else:
                         log(f"pending order {oid}: {coin} #{_open[0]} "
                             f"opposite {_open_dir} open — stays armed (no "

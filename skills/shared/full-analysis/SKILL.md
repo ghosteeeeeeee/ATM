@@ -681,6 +681,17 @@ own wider SL). Never stack TPs at the same level — the add's TP sits BEFORE
 the original's (e.g. add TP 82,600 vs system TP 83,687). Chop-regime adds are
 half-size or skipped.
 
+**WINNER-CONDITION (CEO, clarified 2026-11-23):** an add fires ONLY
+while the open trade is WINNING (pnl > 0). "If we are in a trade and
+the trade is winning, and a rung fires (trip 62k in profit → trip
+63k) — we should be adding. If a trade is losing we shouldn't add and
+double down" — an underwater or unknown-PnL position defers the add
+(the rung stays armed: it fills normally once flat, or adds once the
+position turns green; a loser usually stops out before the next rung
+trips, so the deferred case is rare). Enforced in the monitor's
+add-gate (trade_watchdog), tested: winning→ADD, losing/NULL→defer,
+flat→fill.
+
 **Ladder adds (CEO 2026-11-21: 'if it fires and another btc trade is open,
 it should add — same for the long side'):** the ladder adds AS LEVELS —
 each rung that crosses while a SAME-direction BTC position is open fires as
