@@ -1843,3 +1843,29 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 14T +0.05 42.9% | 7d 113T +0.56 51.3%
 ### Findings: clean — timer-based pipeline fires each minute (is-active inactive between runs is normal); disk 88% WARN repeating; regime Q: 23:30Z scanner aggregate LONG_BIAS but 103/127 NEUTRAL = range tape, chop pin likely still applies
 ### Recommendation: prune logs/data to get disk under 85% before it becomes critical
+
+## CEO Deep Run — 20261123T002156Z
+
+**Decision: (a) KEEP the fresh-air continuation rungs as-is.** No code change, no edit dispatch — re-evaluate at the scheduled 2026-11-29 7-day gate.
+
+### Evidence (verified this session, not from the brief)
+- **True `entry_style=continuation` class = n=2, both winners:** #17007 +$0.20 (mfe_exit +8.6%), #17015 +$0.09 (HL_CLOSED) — net **+$0.29**. The brief misattributed #17004 (−$0.15, CEO-dictated rung) and #17008 (−$0.12, retest-style rung) to this class per `pending_orders_state.json`; even the broad 11-20-era slide-catching window nets −$0.01. **This is not the bleeding point.**
+- **"Five armed" stale:** 58736 and 55796 already fired (both winners). Three unfired remain: 59,282 / 58,943 / 58,696 (SL 60,228–60,404), BTC ~61,347 ⇒ ~3.5–4.3% below price, idle.
+- **E1 live and loaded:** `MOMENTUM_CONFIRM_ENABLED=True` (constants:2210), shipped commit `1de08caf` 11-22 22:29Z; watchdog re-execs per timer cycle (last 00:09–00:17Z), pipeline restarted 00:30Z. **Zero fills yet under E1** — the experiment has not run; deciding (b)/(c) now = deciding on zero post-fix data.
+- **4d baseline (PG re-run):** n=76, WR 51.3%, +$0.71; MFE split never-ran n=18 −$1.71 (entire loss side — E1's target, already shipped) vs ran≥1.0 n=15 +$1.64.
+- **(c) is partially built-in:** fresh-air derives only when price is below BOTH 1h and 15m swing floors with sh1h present (structure required, reach-bounded ≤3·ATR1h) — an uptrend keeps floors below price ⇒ ordinary level rungs instead. The (c) failure mode is triple-filtered (both-floors-broken + E1 displacement) with zero observed instances; a 4h gate needs new plumbing the keeper doesn't have.
+- **(b) re-opens the documented gap:** the straight-line escape is unreachable for pure-air rungs (`first_break and not _cont`, watchdog:1744) ⇒ 58736-class starvation returns, against T's 11-20 directive. Yesterday's redesign ruling (E1) explicitly accommodated continuation rungs — reversing it on n=2 fails the verification rules.
+
+### Work items dispatched
+**None** — option (a) is a no-code decision; dispatching edits would reverse yesterday's ruling without evidence. Sideways finds logged: (1) trivial comment inaccuracy watchdog:1711 (#17004 attribution); (2) margin-heat fold-in B not yet exercised with an open position post-ship — verify next `heat(margin)=` line; (3) disk 88% WARN still owed.
+
+### Result files
+- `automation/ceo/checkpoints/20261123T002156Z-decision.md` (full rationale + evidence)
+
+### Metric checkpoint (measure 7d — 2026-11-29)
+| Metric | Baseline now | Target |
+|---|---|---|
+| Continuation fills under E1 | n=0 (class all-time n=2 +$0.29) | collect; fills with MFE≥1.0% = gate working |
+| Never-ran share (7d) | 23.7% (18/76, 4d) | <15% (existing gate) |
+| Never-ran net (7d) | −$1.71 (4d) | ≥ −$0.50 |
+| (c) counterfactual | not collected | tag each continuation fill's 4h trend at arm time; losses clustering in 4h-uptrend arms = ship (c) with data |
