@@ -357,13 +357,23 @@ def continuum_series(bars):
 
 def main():
     price, age = live_price()
-    _bars = candles()
+    # One shared window: 48h of candles (192 x 15m), indicators computed
+    # over a PADDED history (192 + 120 warmup bars) then sliced back to
+    # the window — RSI/MACD/ADX/ATR warmups (14/26/~40 bars) are absorbed
+    # so every displayed bar carries a value (CEO: "the full window").
+    _N = 192
+    _WARM = 120
+    _full = candles(_N + _WARM)
+    _ind_full = indicators(_full)
+    _bars = _full[-_N:] if len(_full) >= _N else _full
+    _ind = {k: (v[-len(_bars):] if isinstance(v, list) else v)
+            for k, v in _ind_full.items()}
     feed = {
         'ts': int(time.time()),
         'price': price,
         'price_age_s': round(age, 1) if age is not None else None,
         'candles': _bars,
-        'ind': dict(indicators(_bars)),   # extended below with continuum
+        'ind': _ind,
         'rungs': rungs(),
         'trades': chart_trades(),
         'stats': stats(),
