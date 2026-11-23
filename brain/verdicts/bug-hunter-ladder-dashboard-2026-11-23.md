@@ -217,3 +217,58 @@ Supporting evidence lines (verbatim): *"True `entry_style=continuation` class = 
 Everything the brief asked to prove, proved: **(Aii)** alignment proven (exact after shipped rounding at k=0, zero shift hits at ±1..3, EMA/cont/z bucket-aligned, warmup sufficient); **(Aiii)** the forming-15m bar **is** presented as closed — live-proven today with a named one-line fix and a severity raised to HIGH because the same lie feeds signal_compactor and 6 signal files; **(Aiv)** no unconverted Decimal/bytes/DateTime anywhere (live-shaped 22/22) — and the historical 02:43 crash confirms the fixed path was the real one; **(Av)** atomic write sound, one crash path (candles.db) named; **(Avi)** client-safe edges; **(Avii)** rung filter exact; **(B)** 61/61 harness checks, parity table empty both directions, LOCAL claim confirmed, favicon/div/`node --check` clean; **(C)** all three locations resolve, units synced, perms 644 — with the 60→15 s silent cadence change called out; **(D)** fresh-air ruling = **KEEP as-is, no code, nothing pending on the lead**; **(E)** mission chain alive, 5 = 5 consistent; **(F)** all suites green, one live run_cycle rc=0, logs clean, git scope uncontaminated.
 
 **Recommended order:** F-1 (seeder `is_closed` guard — one line, fixes ladder + signal readers together) → F-2 (crash→degraded) → F-3 (price=null render) → F-4 docs/cadence reconcile → F-5..F-12 as touch-ups.
+
+---
+
+# ACCEPTANCE ROUND — fix commit `b2a0be36` (6 files) · verified 2026-11-23 05:03–05:40 UTC
+
+**Verdict: CONDITIONAL PASS — the 15m core of F-1 and F-2/F-3/F-4/F-5/F-6/F-7/F-9 are verified closed, but the F-1 sites deviate from the prescription in three ways (DELTA A/B/C) plus one cosmetic (D). NOT appending a clean PASS: three deltas need one more small fix.**
+
+## What is verified closed (all independently re-run, not taken on trust)
+
+| finding | evidence |
+|---|---|
+| **F-1 site (a)** `price_collector._store_candles` | per-row flag `1 if r[1] < int(time.time()//900)*900 else 0` bound as the 8th parameter; `ON CONFLICT … SET … is_closed=excluded.is_closed` (`price_collector.py:191–207`). Controlled tmp-DB tests (`/tmp/bh/h_f1.py`): forming bar → **flag0 + real volume kept**; completed-bar fetch → **flag1**; stale flag0 on a closed row → **corrected to 1 on re-fetch** ✓ |
+| **F-1 site (b)** `fetch_hl_volume.store_candles` | explicit `is_closed` column in the INSERT (no more column-`DEFAULT 1`), same floor rule (`fetch_hl_volume.py:138–149`) ✓ |
+| **F-1 site (c)** ladder read belt | `candles()` now `AND ts < int(time.time()//900)*900` (`ladder_api.py:40–47`); live feed's last bar genuinely pre-floor (checked at 05:15 and 05:36) ✓ |
+| **one live tick — honest flag** | samples 05:11 / 05:36: BTC forming 15m bar `is_closed=0`; **ANY-token forming bars flagged closed right now: 15m = 0, 1m = 0**; completed bars flip to 1 (04:45 flag0 at 05:11 → flag1 by 05:15 via the close+15min fill). The F-1 lie is gone for the current window, all tokens ✓ |
+| **dev-writer flag consistency** | `_aggregate_tf`'s "window already closed" skip (`price_collector.py:783–784`) leaves the forming bar flag0 in the controlled test ✓ — but it wipes **volume** (DELTA C below) |
+| **F-2** | `candles()` wrapped → `_feed_err` + `error` field + `candles=[]` + `ind.cur` present (`ladder_api.py:426–434`); `/tmp/bh/h_err.py` **24/24** (degraded feed: `error='candles:OperationalError'`, candles=[], cur all-None, stats+rungs intact); **degraded page end-to-end**: load() no-throw, badge stays an age (not feed ERROR), rungs table + stats + price placeholder all render (page harness) ✓ |
+| **F-3** | `dist==null?'—':…` (`ladder.html:274`) — harness: `renderRungs(price=null)` no throw, em-dash rendered ✓ |
+| **F-4** | all three texts now 15s: timer Description (repo **and** `/etc` — `diff` clean), `AGENTS.md:281`, `ladder_api.py:10`; live cadence 15s ✓ |
+| **F-5** | n<32 early return carries `'cur'` all-None (`ladder_api.py:216–220`) ✓ |
+| **F-6** | `draw()` reads `hoverIdx` and strokes the vertical `rgba(79,195,247,.35)` (`ladder.html:433–441`); harness asserts the stroke present after hover ✓ (style is `.35/[2,3]` vs the pane's `.55/[3,3]` — cosmetic difference, same family) |
+| **F-7** | opened-before-window trade: exit arc drawn + connector from `P.l`; both-outside trade skipped — harness arc count 17 = 16 baseline + 1 (exit), both-out contributes 0 ✓ |
+| **F-9** | `stateTag==='triggered'` → `tag trig` accent class + `.tag.trig` CSS ✓ (harness asserts `tag trig` + `>triggered<`) |
+| **F-8/F-10/F-11/F-12** | accepted no-code, as noted ✓ |
+| regressions re-run | py_compile **9/9** (incl. price_collector, fetch_hl_volume); `test_pending_machine` **ALL PASS**; `test_manual_exit_manager` **20/20**; `node --check` on the current script OK; page **200**; deployed == repo; feed healthy (192 candles, `ind.cur` present, `error:null`); round-1 selfchecks stand (b2a0be36 does not touch their files) |
+
+## DELTAS — why this is not a clean PASS
+
+### DELTA A — HIGH — the flat 900 s floor is not per-interval (money-path reads go stale)
+`price_collector.py:198` computes `_now_floor = int(time.time() // 900) * 900` **inside the multi-interval `_store_candles`** (and `fetch_hl_volume.py:~141` mirrors it) — my prescription was *"TF per interval"*. Consequence for 1m/5m: a **closed** bar whose `ts` is inside the current 15m window is flagged **0**.
+- Controlled proof (`h_f1.py`): a 1m bar 5 min old at now=F900+10min → `is_closed=0`.
+- **Live proof:** `closed 1m bars (ts<floor60, ≥floor900) wrongly flagged 0: 11` at 05:11; **watchdog-confirm-equivalent read age 12.5 min (05:11) and 8.0 min (05:36)** — pre-fix the F-2 ts-guard gave ≤1 min old closes; the read oscillates 0→16 min within every 15m window.
+- Readers now fed up-to-16-min-stale 1m closes: `trade_watchdog.py:1136` (BTC latest close), `:1475` (E1 confirm), `:1644` (rung cross — the F-2 ruling says this must be the freshest), `decider_run.py:6240/6501/6505/6544/6548`, `contrarian_monitor.py:41`, `verify_ema300_dip_buyer.py:22`.
+- **Fix (one line, both sites):** `_tf = {'1m':60,'5m':300,'15m':900,'1h':3600,'4h':14400}[interval]; _now_floor = int(time.time() // _tf) * _tf`.
+
+### DELTA B — MEDIUM (residual, not a regression) — the F-1 class survives for 1h/4h
+Same flat floor: the **forming hourly bar** is flagged 1 from `:15` after each hour boundary until `:00` — **45 of every 60 minutes** (controlled proof: at hh:20 the forming bar stores `is_closed=1`; 4h analogously ~3h45/4h). Pre-fix it was always-1, so this is a partial fix, not a regression — but the HIGH's root is only closed for 15m (and 5m forming is correctly 0; 5m/1h/4h recent-closed rows are affected as in A). Unguarded 1h/4h readers: `mtf_macd.py:103`, `hzscore.py:90`, `ema300_breakthrough`, regime scanners. The **same per-interval floor fix closes A and B together**.
+
+### DELTA C — MEDIUM (new) — the dev-writer wipes the seeder's real volume once the flags are honest
+The "window already closed" skip (`price_collector.py:783–784`) protects only `flag1` rows — it was accidentally also protecting **volume**, because the old lie kept the forming bar at flag1. With honest flags the forming bar is flag0, so the dev-writer's `INSERT OR REPLACE … volume=0` now overwrites the seeder's real kline **on every aggregator run (~45 s)**.
+- Controlled proof (`h_f1.py`, isolated tmp DBs): forming bar `(0, 123.4)` → after `_aggregate_tf` → **`(0, 0.0)`** — volume wiped.
+- **Live proof:** the newest **5 ladder-eligible BTC bars have volume 0.0** (`[0,0,0,0,0, 117.9, 401.3, 798.1, 233.3, 138.4]` at 05:36) — bars serve volume=0 from close until the next seeder fetch (BTC slow-seed cadence ≈2 h under the 4h-fresh skip; the close+15 min fill also writes vol0). This re-opens the 2026-10-05 "zero-volume 15m candles break volume signals" class, bounded by the fetch cadence; the ladder's volume histogram is empty for the newest bars (visible in the live feed).
+- **Fix (two lines):** in the dev-writer loop `SELECT is_closed, volume …; if exists and (exists[0] == 1 or exists[1]): continue` — i.e. never overwrite a row that already carries real volume (gap-fill only, which was the BUG-048 intent).
+
+### DELTA D — LOW — F-7 comment vs code
+`drawTrades`'s comment says *"skip the entry triangle"* for an opened-before-window trade, but the triangle block is unconditional: it draws at `px=P.l` at the **exit's** y with the B/S letter (harness: **17** entry markers where a skip would give 16). Cosmetic (the marker sits on the axis at the wrong price); either guard it with `if(i1>=0)` or fix the comment.
+
+### INFO — the chart's right edge moved back ~15–30 min (by design of honest flags)
+Closed bars only gain `is_closed=1` at the fill (**close + 15 min**) or the next seeder fetch (≤~2 h), so the ladder's newest candle is now the bar that closed up to ~15–30 min ago (live: 05:11 → newest eligible was 04:30/04:45; 05:36 → 05:00 while 05:15 was still flag0). Pre-fix the right edge showed the *forming* bar (fresh but wrong); now it is *correct but late*. If the CEO wants a fresher right edge, the options are: run the fill at close (clock permitting), fetch BTC more often, or have the ladder accept `ts+900 <= now` rows carrying a `tick_agg` provenance — not recommended without C fixed first.
+
+## Acceptance call
+- **15m root cause (F-1 core): CLOSED and live-proven** — no forming bar (15m or 1m, any token) is flagged closed; the belt holds; completed bars flip to 1.
+- **F-2…F-9: CLOSED** (page harness 66+7 checks green, h_err 24/24, suites green).
+- **Three deltas remain:** **A** (per-interval floor — HIGH, one line × 2 files), **B** (same line covers it — MEDIUM), **C** (dev-writer volume guard — MEDIUM, two lines), **D** (cosmetic, one `if` or a comment fix).
+- **Final PASS withheld until A+B+C land** (D at the lead's discretion). Re-verification is cheap: re-run `/tmp/bh/h_f1.py` (expects DELTA A/B/C gone), the page harness, and one live flag sample.
