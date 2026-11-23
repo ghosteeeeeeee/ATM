@@ -173,9 +173,40 @@ Z = (Price - N-bar Mean) / N-bar StdDev
 - Lower TFs HIGH, higher TFs LOW = bounce in downtrend
 - Lower TFs LOW, higher TFs HIGH = dip in uptrend
 
-### MTF Volume Analysis
+### MTF Volume Analysis (COMPUTED — run every analysis)
 
-Volume confirmation across timeframes tells you if a move is real:
+Volume confirmation across timeframes tells you if a move is real.
+
+**Run this every analysis** (local candles DB first — same pattern as
+the other computed sections):
+
+```python
+import sqlite3
+con = sqlite3.connect('file:/root/.hermes/data/candles.db?mode=ro', uri=True)
+def vol_ratio(tf, window_bars):
+    cur = con.cursor()
+    cur.execute(f"SELECT volume FROM candles_{tf} WHERE token='BTC' "
+                f"AND is_closed=1 ORDER BY ts DESC LIMIT {21*window_bars}")
+    vols = [r[0] or 0 for r in cur.fetchall()]
+    if len(vols) < 21*window_bars: return None
+    # bars are DESC: [0] = newest window of `window_bars` bars
+    recent = sum(vols[:window_bars]) / window_bars
+    base = sum(vols[window_bars:21*window_bars]) / (20*window_bars)
+    return (recent/base) if base > 0 else None
+ratios = {tf: vol_ratio(tf, n) for tf, n in
+          (('1m',1), ('5m',1), ('15m',1), ('1h',1))}
+```
+
+**⚠️ DATA-INTEGRITY RULE (added 2026-11-23):** a `None`/`0.00x` ratio
+means the RECENT bars carry no volume (a collector gap — 5m/15m/1h
+historical volume exists but recent closed bars read 0), NOT a market
+condition. In that case: (a) fall back to aggregating the 1m volume
+into that TF's window (the 1m path writes real volume), (b) report the
+fallback explicitly ("15m vol via 1m-agg: X.XXx — collector gap"),
+and (c) never print a dead column as `0.00x` beside the market reads —
+a zero printed as a fact is worse than a missing number. Verify the
+gap at the source (which writer stopped) before trusting any MTF
+volume pattern that day.
 
 **Per-TF volume ratio** (current vs 20-bar average):
 - **>1.5x** = 🔥 Surge (strong conviction)
@@ -1011,6 +1042,10 @@ method + numbers whenever the verdict reviews a series of exits.
 
 📊 1. MULTI-TIMEFRAME
   [TF results — label forming-candle reads "(forming)"]
+  MTF VOLUME: 1m X.XXx · 5m X.XXx · 15m X.XXx (via 1m-agg if the
+    column is dead) → pattern: real-breakout / fakeout / exhaustion /
+    accumulation / none (per the table above); flag any collector gap
+    by name
 
 🧱 1b. STRUCTURE (python3 scripts/structure_analysis.py COIN)
   1m: [state HH/HL tags | SH/SL levels | slope]
