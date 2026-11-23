@@ -32531,3 +32531,32 @@ BY: auto_1hr
 - pump-chain+ 14d n=11 of 20 kill threshold, net -0.55 — revisit if n reaches 20
 - storm packet bar 3/3 awaits CEO sign-off by 2026-11-26
 BY: auto_1hr
+
+## [2026-11-23 14:55] Hourly Analysis
+
+**Storm:** FIRED — 🌩️ [STORM-READINESS] window-min +0.10% / at-run +2.81% (pump gate: |at-run|>=1.5) | blocked 302 (combo-key-stale 125, compaction_stale_10min 59, expired-hotset 25, spike-filter-long 23, pump-chain-long-high 16, long-high-70 10, long-rsi-ceiling 10, confluence single-type 9, short-regime-gate 5, pump-chain-rsi-max-long 5, short-rsi-floor-knife 4, vol-gate-override-0.0 3, rr-engine 2, maxxed-vol 2, long-midband 2, other 3) | true-starvation 73 RSI>=35 (302 raw, deduped first-fire-per-token 73; 73 walked, 0 skipped; 70 EXPIRED + 3 SKIPPED) | counterfactual $+3.05 (touch 35/73) | waiver: SHADOW=True ENFORCE=False — counterfactual POSITIVE -> **streak 8th positive, BAR MET 3/3 stands** (deadline 2026-11-26 per shadow_disposition.json file truth) — bar met does NOT auto-flip: default KEEP shadow + CEO NO-CONVERT 2026-11-08 stands; split: blocked LONGs $+8.97 (57, touch 31/57) = gates suppressed pump LONG winners, blocked SHORTs $-5.86 (16, touch 4/16) = gates correctly kept pump-side SHORT losers out — PUMP packet, waiver SHORT-side scope, cf LONG-driven: flag for CEO at sign-off, no auto action
+
+**Trades:** 1 closed last hour (1W 0L) | 24h 15 closed (7W 8L)
+**PnL NET:** hour $+0.28 | 24h NET $-0.54 (gross -0.36, fees 0.18, payoff 0.68, WR 46.7%) | 7d NET $-1.45 (121T) | 14d NET $-4.02 (231T) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Kill policy: 1 close last hour (win) — no trigger; ai-trader-pending 4T 25% net -0.50 24h (CEO all-BTC) -> monitor
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/15 = 6.7% (<40%); tpsl_utils deployed; manual_sl_hit 3T net -0.53 dominant loser, trail_arm_timeout 3T net -0.22 second
+- Boost: none eligible (max n=4: ai-trader-pending 4T 25% net -0.50, bb-squeeze+ 4T 25% net -0.22)
+- Arm rate: unarmed 7/15 = 46.7% below 70%, WR 28.6% net -$0.48 vs armed 8/8 62.5% net -$0.06 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 09 +0.01, 10 -0.28, 11 0.00, 13 +0.28 — not 3 consecutive; no size cut
+- Frequency: 1 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.306% < 0.5% (max 0.639)
+- 2 open: BTC ai-trader-auto LONG 13:58 SL 61848 TP 64235, BTC ai-trader-auto LONG 14:28 SL 61681 TP 65222
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.54 (fees 0.18 vs gross -0.36), payoff 0.68 — fee-drag + low payoff; 7d -1.45, 14d -4.02
+- unarmed WR 28.6% cohort 46.7% of closes, net -0.48 — stall stack owns fix
+- pump-chain+ 14d n=11 of 20 kill threshold, net -0.55 — revisit if n reaches 20
+- storm packet bar 3/3 + 8th positive awaits CEO sign-off by 2026-11-26
+BY: auto_1hr
