@@ -92,6 +92,7 @@ def get_all_open_positions():
             FROM trades
             WHERE server = 'Hermes' AND status = 'open'
               AND entry_price > 0 AND current_price > 0
+              AND (signal IS NULL OR signal NOT LIKE '%%-hedge')
               {bypass_clauses}
             ORDER BY pnl_pct DESC
         """, params)

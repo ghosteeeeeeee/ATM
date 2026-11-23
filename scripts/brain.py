@@ -728,10 +728,13 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         return None
 
     # Duplicate open check (local DB constraint)
+    # HEDGE: '-hedge' experiment rows are invisible to gating — they must not
+    # block (or be blocked by) real opens (spec 2026-11-23).
     conn_check = get_db_connection()
     cur_check = conn_check.cursor()
     cur_check.execute(
-        "SELECT id FROM trades WHERE token=%s AND server=%s AND status='open'", (token, server))
+        "SELECT id FROM trades WHERE token=%s AND server=%s AND status='open' "
+        "AND (signal IS NULL OR signal NOT LIKE '%%-hedge')", (token, server))
     dup_row = cur_check.fetchone()
     if dup_row and not force:
         print(f"[brain.py] ❌ REJECTED: {token} {direction} — DUPLICATE: open trade exists in PostgreSQL (id={dup_row[0]})")
@@ -749,11 +752,14 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
     try:
         conn_orphan = get_db_connection()
         cur_orphan = conn_orphan.cursor()
+        # HEDGE: '-hedge' rows carry a real hl_entry_price and are never orphans —
+        # exclude so a lingering hedge twin can't fail the next open as "stale".
         cur_orphan.execute("""
             SELECT id, paper, hl_entry_price, open_time
             FROM trades
             WHERE token=%s AND server=%s AND status='open'
               AND (hl_entry_price IS NULL OR hl_entry_price = 0)
+              AND (signal IS NULL OR signal NOT LIKE '%%-hedge')
             LIMIT 1
         """, (token, server))
         orphan_row = cur_orphan.fetchone()
@@ -1125,6 +1131,17 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
             sys.exit(1)
     finally:
         cur.close(); conn.close()
+
+    # ── Step 4b: hedge-experiment leg (spec 2026-11-23) ─────────────────────
+    # Shadow/live opposite-position twin of this trade. Own row, own stops,
+    # independent exits. Gates (mode/signal/coin/paper) live in hedge_leg;
+    # a hedge failure NEVER affects the main trade.
+    try:
+        from hedge_leg import maybe_open_hedge
+        maybe_open_hedge(int(trade_id))
+    except Exception as _hedge_err:
+        print(f"[brain.py] ⚠️ hedge leg skipped (main trade #{trade_id} unaffected): "
+              f"{type(_hedge_err).__name__}: {_hedge_err}")
 
     # ── Step 5: Place SL + TP on HL ── DISABLED 2026-05-17 ───────────────
     # TP/SL is now managed LOCALLY by position_manager via DB.

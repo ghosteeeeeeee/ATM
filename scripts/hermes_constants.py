@@ -6230,3 +6230,16 @@ BTC_CHOP_STANDALONE_SHADOW = True
 #   at n=5-8; MIN_N=5 vs the house bar n>=15 is the question).
 #   False = stop logging; the hard block still fires either way.
 SETUP_RECALL_SHADOW = True
+
+# ─── BTC hedge-account experiment (spec: plans/2026-11-23_btc-hedge-account-spec.md) ───
+# When an ai-trader-pending/ai-trader-auto BTC trade opens for real, open a
+# 1:1 opposite hedge leg as its own trades row (signal suffix '-hedge'),
+# tracked and stopped independently by the existing exit machinery.
+# polarity: 'off' = never; 'shadow' = paper hedge rows only (real main legs
+#   untouched, zero money, zero impact on real gating — CURRENT);
+#   'live' = real account-2 orders — hedge_leg.py REFUSES this until account-2
+#   exit routing is built (fail-closed), do not flip before that work lands.
+HEDGE_MODE = 'shadow'
+HEDGE_SIGNALS = ('ai-trader-pending', 'ai-trader-auto')
+HEDGE_COINS = ('BTC',)
+HEDGE_SIZE_MULT = 1.0     # 1:1 same notional as the main leg (CEO decision 2026-11-23)

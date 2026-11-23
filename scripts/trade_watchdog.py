@@ -2037,16 +2037,20 @@ def _monitor_pending_orders_impl(btc_price):
                     # 'we are in a trade and it is winning' question).
                     _cur.execute(
                         "SELECT id, direction, pnl_pct FROM trades WHERE "
-                        "token=%s AND status='open' ORDER BY id ASC "
+                        "token=%s AND status='open' "
+                        "AND (signal IS NULL OR signal NOT LIKE '%%-hedge') "
+                        "ORDER BY id ASC "
                         "LIMIT 1", (coin,))
                     _open = _cur.fetchone()
                     # F-3 (agent-3): MAX_OPEN_POSITIONS exists but nothing
                     # read it on this path — the keeper self-replenishes
                     # rungs, so the add count was bounded only by margin.
                     # Enforce the constant as the aggregate stack cap.
+                    # HEDGE: '-hedge' twins are shadow/invisible to gating.
                     _cur.execute(
                         "SELECT COUNT(*) FROM trades WHERE token=%s AND "
-                        "status='open'", (coin,))
+                        "status='open' "
+                        "AND (signal IS NULL OR signal NOT LIKE '%%-hedge')", (coin,))
                     _open_count = int(_cur.fetchone()[0] or 0)
                     # D3 heat numerator (all open rows, all coins —
                     # portfolio heat, not per-coin): MARGIN basis as of
@@ -2058,7 +2062,8 @@ def _monitor_pending_orders_impl(btc_price):
                     # verified). Revert = restore SUM(amount_usdt).
                     _cur.execute(
                         "SELECT COALESCE(SUM(amount_usdt/NULLIF(leverage,0)),0) "
-                        "FROM trades WHERE status='open'")
+                        "FROM trades WHERE status='open' "
+                        "AND (signal IS NULL OR signal NOT LIKE '%-hedge')")
                     _heat_margin = float(_cur.fetchone()[0] or 0)
                     _cur.close()
                     _c.close()

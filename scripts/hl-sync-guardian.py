@@ -771,7 +771,7 @@ def get_db_open_trades():
     """Get open trades from paper DB where exchange = Hyperliquid. Includes 'id' for Step 8."""
     r = subprocess.run([
         'psql', '-U', 'postgres', '-d', 'brain', '-t', '-c',
-        "SELECT id, token, direction, entry_price, leverage, amount_usdt, paper FROM trades WHERE status = 'open' AND exchange = 'Hyperliquid' AND (signal IS NULL OR signal NOT IN ('pump_hunter'))"
+        "SELECT id, token, direction, entry_price, leverage, amount_usdt, paper FROM trades WHERE status = 'open' AND exchange = 'Hyperliquid' AND (signal IS NULL OR signal NOT IN ('pump_hunter')) AND (signal IS NULL OR signal NOT LIKE '%-hedge')"
     ], capture_output=True, text=True, timeout=10)
     if r.returncode != 0:
         log(f'get_db_open_trades FAILED: {r.stderr}', 'FAIL')
@@ -798,7 +798,7 @@ def get_all_open_trades():
     """Get ALL open trades (paper and real) from DB."""
     r = subprocess.run([
         'psql', '-U', 'postgres', '-d', 'brain', '-t', '-c',
-        "SELECT token, direction, entry_price, leverage, amount_usdt, paper FROM trades WHERE status = 'open' AND (signal IS NULL OR signal NOT IN ('pump_hunter'))"
+        "SELECT token, direction, entry_price, leverage, amount_usdt, paper FROM trades WHERE status = 'open' AND (signal IS NULL OR signal NOT IN ('pump_hunter')) AND (signal IS NULL OR signal NOT LIKE '%-hedge')"
     ], capture_output=True, text=True, timeout=10)
     if r.returncode != 0:
         log(f'get_all_open_trades FAILED: {r.stderr}', 'FAIL')
@@ -873,6 +873,7 @@ def add_orphan_trade(token: str, direction: str, entry_price: float,
                    %s, %s, %s::jsonb
             WHERE NOT EXISTS (
                 SELECT 1 FROM trades WHERE token=%s AND server='Hermes' AND status='open'
+                AND (signal IS NULL OR signal NOT LIKE '%%-hedge')
             )
             RETURNING id
         """, (token, direction, amount_usdt, entry_price, entry_price,
@@ -1227,6 +1228,7 @@ def reconcile_hype_to_paper(hl_pos, prices):
                        highest_price, lowest_price
                 FROM trades
                 WHERE token=%s AND status = 'open' AND exchange = 'Hyperliquid'
+                AND (signal IS NULL OR signal NOT LIKE '%%-hedge')
                 LIMIT 1
             """, (coin,))
             row = cur.fetchone()
@@ -1359,7 +1361,8 @@ def reconcile_hype_to_paper(hl_pos, prices):
                     try:
                         cur_dup = conn_dup.cursor()
                         cur_dup.execute(
-                            "SELECT id, signal, direction FROM trades WHERE token=%s AND status='open' AND signal NOT IN ('pump_hunter') LIMIT 1",
+                            "SELECT id, signal, direction FROM trades WHERE token=%s AND status='open' AND signal NOT IN ('pump_hunter') "
+                            "AND (signal IS NULL OR signal NOT LIKE '%%-hedge') LIMIT 1",
                             (coin.upper(),))
                         dup_row = cur_dup.fetchone()
                     finally:
@@ -1820,6 +1823,7 @@ def sync_pnl_from_hype(prices):
                    signal, _signal_metadata
             FROM trades
             WHERE status='open' AND exchange='Hyperliquid'
+            AND (signal IS NULL OR signal NOT LIKE '%-hedge')
         """)
 
         updated = 0
@@ -2015,6 +2019,7 @@ def _check_hard_stops(prices: dict):
             FROM trades
             WHERE status='open' AND exchange='Hyperliquid'
             AND stop_loss IS NOT NULL AND stop_loss > 0
+            AND (signal IS NULL OR signal NOT LIKE '%-hedge')
         """)
         rows = cur.fetchall()
         cur.close()
@@ -2367,7 +2372,7 @@ def _check_stale_rotation(trade: dict, pnl_pct: float, prices: dict,
     # Find tokens in hot-set with higher speed than this trade's token
     # Exclude: same token, opposite direction (conflicts), tokens already have open positions
     # BUG-FIX: hd (hot-set direction) was extracted but never checked — now enforced
-    db_cur.execute("SELECT token, direction FROM trades WHERE status='open' AND exchange='Hyperliquid'")
+    db_cur.execute("SELECT token, direction FROM trades WHERE status='open' AND exchange='Hyperliquid' AND (signal IS NULL OR signal NOT LIKE '%-hedge')")
     open_by_dir = {}
     for r in db_cur.fetchall():
         open_by_dir.setdefault(r[0].upper(), set()).add(r[1].upper())
@@ -2760,6 +2765,7 @@ def close_orphan_paper_trades(hl_pos, prices):
                    _signal_metadata
             FROM trades
             WHERE status = 'open' AND paper = true AND exchange = 'Hyperliquid'
+            AND (signal IS NULL OR signal NOT LIKE '%-hedge')
         """)
         all_paper_trades = cur2.fetchall()
         conn2.close()
@@ -3734,6 +3740,7 @@ def _sweep_blocklist_trades(prices):
             WHERE status = 'open'
               AND paper = TRUE
               AND exchange = 'Hyperliquid'
+              AND (signal IS NULL OR signal NOT LIKE '%-hedge')
         """)
         for (trade_id, token, direction, entry_px, lev, trade_sig) in cur.fetchall():
             ht = token.upper()
@@ -3986,6 +3993,7 @@ def _check_and_close_breached_trades(hl_pos: dict, prices: dict, db_trades: list
                         _st_cur.execute(
                             "SELECT id, signal, stop_loss FROM trades "
                             "WHERE token=%s AND status='open' "
+                            "AND (signal IS NULL OR signal NOT LIKE '%%-hedge') "
                             "ORDER BY id DESC LIMIT 1", (coin.upper(),))
                         _st_row = _st_cur.fetchone()
                     finally:
@@ -4723,7 +4731,9 @@ def sync():
                         cur_orphan = conn_orphan.cursor()
                         cur_orphan.execute(
                             "SELECT id FROM trades WHERE token=%s AND status='open' "
-                            "AND exchange='Hyperliquid' LIMIT 1",
+                            "AND exchange='Hyperliquid' "
+                            "AND (signal IS NULL OR signal NOT LIKE '%%-hedge') "
+                            "LIMIT 1",
                             (coin.upper(),))
                         orphan_row = cur_orphan.fetchone()
                         close_ok = False  # default: not confirmed close (dedup/no-record cases)
@@ -4830,6 +4840,7 @@ def sync():
                     SELECT id, token FROM trades
                     WHERE status='open' AND exchange='Hyperliquid'
                     AND guardian_closed=FALSE
+                    AND (signal IS NULL OR signal NOT LIKE '%-hedge')
                 """)
                 safe_to_close = {str(r[0]): r[1] for r in cur_guard.fetchall()}
                 cur_guard.close()

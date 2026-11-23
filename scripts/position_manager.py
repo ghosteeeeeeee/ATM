@@ -450,6 +450,7 @@ def get_position_count(server: str = SERVER_NAME) -> int:
             WHERE status = 'open'
               AND server = %s
               AND (signal IS NULL OR signal NOT IN ('pump_hunter'))
+              AND (signal IS NULL OR signal NOT LIKE '%%-hedge')
         """, (server,))
         row = cur.fetchone()
         return int(row["cnt"]) if row else 0
@@ -497,6 +498,7 @@ def is_position_open(token: str, server: str = SERVER_NAME) -> bool:
               AND server = %s
               AND LOWER(token) = LOWER(%s)
               AND (signal IS NULL OR signal NOT IN ('pump_hunter'))
+              AND (signal IS NULL OR signal NOT LIKE '%%-hedge')
         """, (server, token))
         row = cur.fetchone()
         return int(row["cnt"]) > 0 if row else False
@@ -592,13 +594,20 @@ def check_atr_tp_sl_hits(open_positions: List[Dict]) -> List[Dict]:
     # While a coin has >1 open row, only the LEADING (oldest) row's
     # stop triggers: the trailing structure/round stop governs the
     # stack, so an add row's tight BE-cap can never preempt the ride.
-    # TP checks stay per-row; the add's own SL governs again once flat.
+    # TP checks stay per-row; the add row's own SL governs again once flat.
+    # HEDGE (2026-11-23): key is (token, DIRECTION) — a hedge twin is an
+    # OPPOSITE-direction row on a different account with its own stops; keyed
+    # by token alone the main row always led and the hedge leg's SL could
+    # never fire. Same-direction stacks keep exact old behavior (their
+    # leader is unchanged; opposite rows are different leaders).
     _leader = {}
     for _p in open_positions or []:
         _t = str(_p.get('token', '')).upper()
+        _d = str(_p.get('direction', '')).upper()
         _i = _p.get('id')
-        if _t and _i is not None and (_t not in _leader or _i < _leader[_t]):
-            _leader[_t] = _i
+        _k = (_t, _d)
+        if _t and _i is not None and (_k not in _leader or _i < _leader[_k]):
+            _leader[_k] = _i
     for pos in open_positions:
         token = str(pos.get('token', '')).upper()
         trade_id = pos.get('id')
@@ -637,7 +646,7 @@ def check_atr_tp_sl_hits(open_positions: List[Dict]) -> List[Dict]:
             continue
 
         hit = None
-        _is_leader = (_leader.get(token, trade_id) == trade_id)
+        _is_leader = (_leader.get((token, direction), trade_id) == trade_id)
         if direction == 'LONG':
             if cur <= sl and _is_leader:
                 hit = 'atr_sl_hit'
@@ -1319,6 +1328,10 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
         experiment = row['experiment']
         sl_dist = row['sl_distance']
         signal_type = row['signal']  # fallback for record_signal_outcome
+        # HEDGE twin rows (spec 2026-11-23): their P&L is shadow/counterfactual —
+        # it must never drive REAL risk controls (loss cooldown, streaks,
+        # loss-direction analysis). Exits/trail still run normally.
+        _is_hedge_row = str(signal_type or '').endswith('-hedge')
         # P0 (review fix #4): capture entry RSI NOW — the HL-realized-pnl backfill
         # below rebinds `row` to a 2-column fetch, which would shadow this value
         # and null entry_rsi_band on exactly the live (HL-confirmed) closes.
@@ -1425,11 +1438,15 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
         log(f"[Position Manager] close_paper_position trade_id={trade_id} reason='{reason}' "
               f"pnl_usdt_val={pnl_usdt_val} is_loss={is_loss}")
         if is_loss:
-            log(f"[Position Manager] >>> LOSS DETECTED — calling set_loss_cooldown({token}, {direction})")
-            set_loss_cooldown(token, direction)
-            log(f"[Position Manager] >>> set_loss_cooldown returned — verify in loss_cooldowns.json")
-            # Post-mortem: if we lost on a direction, was the market moving against us first?
-            _analyze_loss_direction(token, direction, entry_price, current_price)
+            if _is_hedge_row:
+                log(f"[Position Manager] trade_id={trade_id} HEDGE row — skipping "
+                    f"loss cooldown / direction analysis (shadow P&L never gates real trades)")
+            else:
+                log(f"[Position Manager] >>> LOSS DETECTED — calling set_loss_cooldown({token}, {direction})")
+                set_loss_cooldown(token, direction)
+                log(f"[Position Manager] >>> set_loss_cooldown returned — verify in loss_cooldowns.json")
+                # Post-mortem: if we lost on a direction, was the market moving against us first?
+                _analyze_loss_direction(token, direction, entry_price, current_price)
         else:
             # SENTINEL: Check if hype_realized_pnl_usdt has a hidden loss that we missed
             try:
@@ -1446,7 +1463,7 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
 
         # ── Trigger win: clear loss streak since WIN confirms this was the right direction ──
         is_win = pnl_usdt_val > 0
-        if is_win and LOSS_STREAK_RESET_WIN:
+        if is_win and LOSS_STREAK_RESET_WIN and not _is_hedge_row:
             clear_loss_streak(token, direction)
 
         # ── Compute MFE/MAE — price history first, tracked extremes fallback ──
@@ -1598,7 +1615,15 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
         # vacation pause marker — only by the LIVE_TRADING_ENABLED constant.
         # A pause gates opens only; protective exits must always mirror to HL
         # or DB/HL diverge (DB close commits, HL position stays open).
-        if HYPE_AVAILABLE and LIVE_TRADING_ENABLED:
+        if _is_hedge_row:
+            # HEDGE twin (spec 2026-11-23): NEVER touch the main account's HL
+            # state. mirror_close / cancel_all_open_orders act BY TOKEN on the
+            # main account — running them for a hedge row would close the main
+            # leg's real position and cancel its trigger orders. Shadow rows
+            # have no HL position of their own; account-2 live routing is a
+            # separate, not-yet-built path (hedge_leg refuses live mode).
+            pass
+        elif HYPE_AVAILABLE and LIVE_TRADING_ENABLED:
             hype_token = hype_coin(token)
             # DB already committed above — row lock released
 
@@ -2798,16 +2823,43 @@ def refresh_current_prices(server: str = SERVER_NAME):
         except Exception:
             pass
 
-    if not hl_positions:
-        log(f"  [Position Manager] No HL position data available (rate limited + no cache)")
-        return positions
-
     # Fetch live mids for current_price (more accurate than deriving from unrealized_pnl)
     try:
         mids = hc.get_allMids()
     except Exception as e:
         log(f"  [Position Manager] Failed to fetch mids: {e}")
         mids = {}
+
+    if not hl_positions:
+        log(f"  [Position Manager] No HL position data available (rate limited + no cache or account flat)")
+        # Still push fresh mids into current_price (DB + in-memory) so per-row
+        # stop/trail checks keep firing. A hedge twin routinely outlives the
+        # main leg while the account is FLAT — frozen prices would freeze its
+        # stops (spec 2026-11-23). No PnL guesswork here: current_price only.
+        if mids:
+            _flat_conn = get_db_connection()
+            _flat_cur = _flat_conn.cursor() if _flat_conn else None
+            for pos in positions:
+                try:
+                    _tok = str(pos.get('token') or '').upper()
+                    _cp = round(float(mids.get(_tok, '0')), 6)
+                    if _cp <= 0:
+                        continue
+                    pos['current_price'] = _cp
+                    if _flat_cur:
+                        _flat_cur.execute(
+                            "UPDATE trades SET current_price = %s, updated_at = NOW() "
+                            "WHERE id = %s AND status = 'open'", (_cp, pos.get('id')))
+                except Exception:
+                    continue
+            try:
+                if _flat_conn:
+                    _flat_conn.commit()
+                    _flat_cur.close()
+                    _flat_conn.close()
+            except Exception:
+                pass
+        return positions
 
     # Warn if paper trading without HL access
     if not HYPE_AVAILABLE:
@@ -2845,6 +2897,43 @@ def refresh_current_prices(server: str = SERVER_NAME):
                         """, (cur_price, trade_id))
                     except Exception:
                         pass
+
+            # HEDGE twin (spec 2026-11-23): hl_data is keyed BY COIN — it holds
+            # the MAIN leg's position, so the ground-truth path would stamp the
+            # opposite row with the main leg's signed pnl_usdt / entry re-anchor.
+            # Mids are global, so a mids-based direction-aware update is exact
+            # for both shadow and (future) account-2 live legs.
+            if str(pos.get('signal') or '').endswith('-hedge') and direction in ('LONG', 'SHORT'):
+                if cur_price > 0 and entry > 0:
+                    _raw = ((cur_price - entry) / entry if direction == 'LONG'
+                            else (entry - cur_price) / entry) * 100
+                    _pnl_pct = _raw * leverage
+                    _hi = float(pos.get('highest_price') or 0) or 0
+                    _lo = float(pos.get('lowest_price') or 0) or 0
+                    if _hi <= 0:
+                        _hi = entry if direction == 'SHORT' else cur_price
+                    if _lo <= 0:
+                        _lo = entry if direction == 'LONG' else cur_price
+                    _hi = max(_hi, cur_price)
+                    _lo = min(_lo, cur_price)
+                    pos['current_price'] = cur_price
+                    pos['pnl_pct'] = _pnl_pct
+                    pos['highest_price'] = _hi
+                    pos['lowest_price'] = _lo
+                    updated += 1
+                    if db_cur:
+                        try:
+                            db_cur.execute("""
+                                UPDATE trades
+                                SET pnl_pct = %s, current_price = %s,
+                                    highest_price = %s, lowest_price = %s,
+                                    updated_at = NOW()
+                                WHERE id = %s AND status = 'open'
+                            """, (_pnl_pct, cur_price, _hi, _lo, trade_id))
+                            db_conn.commit()
+                        except Exception as e:
+                            log(f"  [Position Manager] hedge PnL persist failed for {trade_id}: {e}")
+                continue
 
             # Get HL authoritative data for this token
             hl_data = hl_positions.get(token)

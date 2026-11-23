@@ -632,6 +632,7 @@ def get_open_positions():
             FROM trades
             WHERE server = 'Hermes' AND status = 'open'
               AND entry_price > 0 AND current_price > 0
+              AND (signal IS NULL OR signal NOT LIKE '%-hedge')
             ORDER BY open_time DESC
         """)
         rows = cur.fetchall()

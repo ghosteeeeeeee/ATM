@@ -3429,7 +3429,8 @@ def execute_trade(token, direction, price, confidence, source,
         _dup_conn = pg_connect(host='/var/run/postgresql', database='brain', user='postgres')
         _dup_cur = _dup_conn.cursor()
         _dup_cur.execute(
-            "SELECT id, pnl_pct FROM trades WHERE server='Hermes' AND token=%s AND direction=%s AND status='open' LIMIT 1",
+            "SELECT id, pnl_pct FROM trades WHERE server='Hermes' AND token=%s AND direction=%s AND status='open' "
+            "AND (signal IS NULL OR signal NOT LIKE '%%-hedge') LIMIT 1",
             (token.upper(), direction.upper()))
         _dup_row = _dup_cur.fetchone()
         _dup_cur.close(); _dup_conn.close()
