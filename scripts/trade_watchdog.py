@@ -1416,6 +1416,111 @@ def _local_atr15(coin):
         return None
 
 
+def _rip_climax_defer(coin, price):
+    """RIP-CLIMAX GATES (CEO formalized 2026-11-23 after the 64,603
+    wick autopsy). Returns (defer, reason): a ladder rip-fill WAITS when
+    the momentum context says CLIMAX, not fresh. Three trips (any =
+    defer):
+      (a) the RSI divergence: the 1m RSI topped >= RIP_RSI_TOP in the
+          window and has since collapsed below RIP_RSI_BELOW while the
+          price sits near its window high — the momentum crashed into
+          the top (the 64,500 case: the 92.6 top at 13:46, then 48.6 at
+          the 14:28 fill).
+      (b) the creek zone: the price within RIP_PEAK_ZONE_ATR*ATR1h BELOW
+          the recent peak (the max 1h high) — the Wyckoff confirmation
+          level is ahead; the entry belongs to the close above it
+          (leg3), not the interior.
+      (c) the continuum z-tier STRONG (|z| >= 2) — the spike context.
+    The rung stays armed (no state burn): the fill waits for the
+    confirmation (the close above the peak), the fresh breakout (the
+    price at new highs), or the cool-off (the window ages out).
+    Fail-open on any data problem — the level + precheck + R:R still
+    govern every fill."""
+    try:
+        import hermes_constants as hc
+        top = float(getattr(hc, 'RIP_RSI_TOP', 90.0) or 0)
+        below = float(getattr(hc, 'RIP_RSI_BELOW', 75.0) or 0)
+        win = int(getattr(hc, 'RIP_RSI_WINDOW', 180) or 180)
+        zone = float(getattr(hc, 'RIP_PEAK_ZONE_ATR', 1.0) or 0)
+        tier_mark = str(getattr(hc, 'RIP_Z_TIER_MARK', 'STRONG') or '')
+    except Exception:
+        return False, ''
+    if not (top and below and zone):
+        return False, ''   # REVERT (RIP_RSI_TOP=0) no-ops the gates
+    try:
+        import sqlite3
+        from paths import HERMES_DATA
+        db = os.path.join(HERMES_DATA, 'candles.db')
+        con = sqlite3.connect(f'file:{db}?mode=ro', uri=True)
+        cur = con.cursor()
+        cur.execute("SELECT close FROM candles_1m WHERE token=? "
+                    "AND is_closed=1 ORDER BY ts DESC LIMIT ?",
+                    (coin, max(win, 200)))
+        closes = [r[0] for r in cur.fetchall()][::-1]
+        cur.execute("SELECT high, low, close FROM candles_1h WHERE token=? "
+                    "AND is_closed=1 ORDER BY ts DESC LIMIT 30", (coin,))
+        h1 = cur.fetchall()
+        con.close()
+    except Exception:
+        return False, ''   # no data → fail-open
+    if len(closes) < 60 or len(h1) < 5:
+        return False, ''
+    # (a) the RSI divergence
+    g, l = [], []
+    for i in range(1, len(closes)):
+        d = closes[i] - closes[i - 1]
+        g.append(max(0.0, d)); l.append(max(0.0, -d))
+    p = 14
+    if len(g) < p:
+        return False, ''
+    ag, al = sum(g[:p]) / p, sum(l[:p]) / p
+    rsi = [100.0 - 100.0 / (1 + ag / al) if al > 0 else 100.0]
+    for i in range(p, len(closes)):
+        ag = (ag * (p - 1) + g[i - 1]) / p
+        al = (al * (p - 1) + l[i - 1]) / p
+        rsi.append(100.0 - 100.0 / (1 + ag / al) if al > 0 else 100.0)
+    rmax = max(rsi[-min(win, len(rsi)):])
+    rnow = rsi[-1]
+    px_hi = max(closes[-min(win, len(closes)):])
+    # the trip = the price in the near-high band BELOW the window high
+    # (the resistance holding at the climax). The price AT/ABOVE the
+    # high = the fresh breakout / the leg3 — never deferred here (the
+    # test-4 case: after a >=90 top, the breakout with the RSI still
+    # recovering must fill).
+    if (rmax >= top and rnow < below
+            and px_hi * 0.995 <= price < px_hi):
+        return True, (f"RSI divergence: the 1m RSI topped {rmax:.0f} "
+                      f"(>= {top:.0f}) and collapsed to {rnow:.0f} "
+                      f"(< {below:.0f}) while the price {price:.0f} holds "
+                      f"below the window high {px_hi:.0f}")
+    # (b) the creek zone (the recent peak = the last hour's 1m closes'
+    # high — the closed 1h data can't see the forming bar's wick, which
+    # is how 64,603 looked at fill time; the ATR1h = the TR mean of the
+    # last 14 bars)
+    peak = max(closes[-60:])
+    trs = []
+    for i in range(1, len(h1)):
+        hi, lo, pc = h1[i][0], h1[i][1], h1[i - 1][2]
+        trs.append(max(hi - lo, abs(hi - pc), abs(lo - pc)))
+    atr = sum(trs[-14:]) / min(14, len(trs)) if trs else 0
+    if atr and price < peak and (peak - price) <= zone * atr:
+        return True, (f"creek zone: the price {price:.0f} is within "
+                      f"{zone:g}x ATR1h ({atr:.0f}) below the recent peak "
+                      f"{peak:.0f} — the confirmation level is ahead")
+    # (c) the z-tier STRONG
+    try:
+        _wp = getattr(sys.modules.get('paths'), 'WWW_DATA',
+                      '/var/www/hermes/data')
+        with open(os.path.join(_wp, 'continuum_data.json')) as f:
+            _tier = str((json.load(f).get('current') or {})
+                        .get('zscore_tier', '') or '')
+        if tier_mark and tier_mark in _tier.upper():
+            return True, f"z-tier {_tier} (|z| >= 2) — the spike context"
+    except Exception:
+        pass
+    return False, ''
+
+
 def _momentum_confirm(oid, coin, direction, trigger_price, memo):
     """E1 momentum confirmation (CEO ruling 2026-11-22).
 
@@ -1883,6 +1988,19 @@ def _monitor_pending_orders_impl(btc_price):
                 #   opposite dir    → still waits (netting would close a
                 #                      live trade = violates the stay-in
                 #                      doctrine; no accidental flips)
+                # RIP-CLIMAX GATES (CEO formalized 2026-11-23): the
+                # ladder rip-fill defers when the momentum context says
+                # climax — the rung stays armed, the fill waits for the
+                # confirmation (the close above the peak = leg3), the
+                # fresh breakout, or the cool-off. btc-ceo hand-arms are
+                # out of scope (T's explicit orders).
+                if str(order.get('id', '')).startswith('btc-auto'):
+                    _defer, _why = _rip_climax_defer(coin, px)
+                    if _defer:
+                        log(f"pending order {oid}: RIP-CLIMAX defer — "
+                            f"{_why}; rung stays armed (the fill waits "
+                            f"for the confirmation/cool-off)", "INFO")
+                        continue
                 # Throttle: serial one-rung-per-cycle below keeps adds to
                 # one per cycle even on a straight slice.
                 try:

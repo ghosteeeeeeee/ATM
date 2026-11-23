@@ -2218,6 +2218,19 @@ ARM_BE_SHADOW_ENABLED = True  # Revert: set False.
 BRACKET_MIN_NEAR_PCT = 1.0   # >=1% from price (not too close)
 BRACKET_MAX_FAR_PCT = 2.0    # <=2% from price (not too far)
 
+# RIP-CLIMAX GATES (CEO formalized 2026-11-23 — the 64,603 wick
+# autopsy: the 1m RSI topped at 92.6 at 13:46, 41min BEFORE the price
+# peak 64,603; the adds filled at the top (RSI 63.3 / 48.6); the
+# momentum crashed at 64,500 with 65k psychological ahead — the §11
+# liquidity-collection before the round number). The gates DEFER a
+# ladder rip-fill when the momentum context says CLIMAX, not fresh.
+# REVERT: set RIP_RSI_TOP to 0 (the gates no-op).
+RIP_RSI_TOP = 90.0        # the recent 1m RSI peak that marks the climax top
+RIP_RSI_BELOW = 75.0      # the current RSI below this after the top = the divergence
+RIP_RSI_WINDOW = 180      # the 1m bars to look back for the top (3h)
+RIP_PEAK_ZONE_ATR = 1.0   # the creek zone: within 1x ATR1h below the recent peak
+RIP_Z_TIER_MARK = 'STRONG'  # the continuum tier marker (|z| >= 2)
+
 MOMENTUM_ATR_K = 0.5           # E1 displacement: fill requires closed-1m close beyond level >= K x ATR(15m). REVERT via MOMENTUM_CONFIRM_ENABLED.
 MOMENTUM_CONFIRM_ENABLED = True  # E1 master switch (trade_watchdog fill gate). False = legacy fill-on-cross, byte-identical. REVERT = False.
 BOUNCE_SHADOW_ENABLED = True   # E3 bounce-trigger SHADOW (log-only would-fires at level rejection). False = silent. Flip to live only with CEO approval after 7d data.
