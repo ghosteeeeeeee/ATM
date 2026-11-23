@@ -592,7 +592,9 @@ def cascade_flip_v2(
             try:
                 cur_seq = conn_seq.cursor()
                 cur_seq.execute(
-                    "SELECT id FROM trades WHERE token = %s AND status = 'open' ORDER BY id DESC LIMIT 1",
+                    "SELECT id FROM trades WHERE token = %s AND status = 'open' "
+                    "AND (signal IS NULL OR signal NOT LIKE '%%-hedge') "
+                    "ORDER BY id DESC LIMIT 1",
                     (token.upper(),)
                 )
                 row_seq = cur_seq.fetchone()

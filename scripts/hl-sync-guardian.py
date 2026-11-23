@@ -587,6 +587,7 @@ def _backfill_hl_pnl_recent_closes():
               AND is_guardian_close = FALSE
               AND close_time > NOW() - INTERVAL '5 minutes'
               AND pnl_usdt IS NOT NULL
+              AND (signal IS NULL OR signal NOT LIKE '%-hedge')
             ORDER BY close_time DESC
             LIMIT 5
         ''')

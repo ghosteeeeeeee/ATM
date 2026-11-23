@@ -321,7 +321,8 @@ def _get_open_hl_tokens() -> set:
         from _secrets import BRAIN_DB_DICT
         conn = psycopg2.connect(**BRAIN_DB_DICT)
         cur = conn.cursor()
-        cur.execute("SELECT LOWER(token) FROM trades WHERE status='open' AND server='Hermes'")
+        cur.execute("SELECT LOWER(token) FROM trades WHERE status='open' AND server='Hermes' "
+                    "AND (signal IS NULL OR signal NOT LIKE '%-hedge')")
         tokens = {row[0] for row in cur.fetchall()}
         cur.close(); conn.close()
     except Exception as e:

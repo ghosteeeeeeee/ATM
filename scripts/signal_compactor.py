@@ -330,7 +330,8 @@ def _get_open_tokens() -> set:
         conn = psycopg2.connect(host='/var/run/postgresql', database='brain',
                                 user='postgres', connect_timeout=5)
         cur = conn.cursor()
-        cur.execute("SELECT LOWER(token) FROM trades WHERE status='open' AND server='Hermes'")
+        cur.execute("SELECT LOWER(token) FROM trades WHERE status='open' AND server='Hermes' "
+                    "AND (signal IS NULL OR signal NOT LIKE '%-hedge')")
         tokens = {row[0] for row in cur.fetchall()}
         cur.close()
     except Exception as e:
@@ -1119,6 +1120,7 @@ def _check_directional_cap(direction: str) -> str | None:
             SELECT direction, COUNT(*) as cnt
             FROM trades
             WHERE status = 'open' AND server = 'Hermes'
+              AND (signal IS NULL OR signal NOT LIKE '%-hedge')
             GROUP BY direction
         """)
         counts = {row[0]: row[1] for row in cur.fetchall()}

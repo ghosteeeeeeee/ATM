@@ -61,6 +61,7 @@ def close_brain(coin, exit_price):
             SELECT id, direction, entry_price, amount_usdt, hl_notional_usdt, leverage
             FROM trades
             WHERE token = %s AND status = 'open' AND exchange = 'Hyperliquid'
+              AND (signal IS NULL OR signal NOT LIKE '%%-hedge')
             ORDER BY id DESC LIMIT 1
         """, (coin,))
         row = cur.fetchone()
@@ -176,7 +177,8 @@ def main():
         # Try brain for direction/entry
         conn = psycopg2.connect(**BRAIN_DB)
         cur = conn.cursor()
-        cur.execute("SELECT direction, entry_price FROM trades WHERE token=%s AND status='open' AND exchange='Hyperliquid' LIMIT 1", (coin,))
+        cur.execute("SELECT direction, entry_price FROM trades WHERE token=%s AND status='open' AND exchange='Hyperliquid' "
+                    "AND (signal IS NULL OR signal NOT LIKE '%%-hedge') LIMIT 1", (coin,))
         row = cur.fetchone()
         conn.close()
         if row:

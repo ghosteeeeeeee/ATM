@@ -86,6 +86,7 @@ def check_guardrails():
             SELECT COALESCE(SUM(pnl_usdt), 0), COUNT(*),
                    ROUND(100.0*SUM(CASE WHEN pnl_usdt>0 THEN 1 ELSE 0 END)/NULLIF(COUNT(*),0), 1)
             FROM trades WHERE status='closed' AND close_time > NOW() - INTERVAL '24 hours'
+              AND (signal IS NULL OR signal NOT LIKE '%-hedge')
         """)
         pnl_24h, n_24h, wr_24h = cur.fetchone()
 
@@ -94,6 +95,7 @@ def check_guardrails():
             SELECT COALESCE(SUM(pnl_usdt), 0), COUNT(*),
                    ROUND(100.0*SUM(CASE WHEN pnl_usdt>0 THEN 1 ELSE 0 END)/NULLIF(COUNT(*),0), 1)
             FROM trades WHERE status='closed' AND close_time > NOW() - INTERVAL '48 hours'
+              AND (signal IS NULL OR signal NOT LIKE '%-hedge')
         """)
         pnl_48h, n_48h, wr_48h = cur.fetchone()
 
@@ -102,6 +104,7 @@ def check_guardrails():
             SELECT COALESCE(SUM(pnl_usdt), 0), COUNT(*),
                    ROUND(100.0*SUM(CASE WHEN pnl_usdt>0 THEN 1 ELSE 0 END)/NULLIF(COUNT(*),0), 1)
             FROM trades WHERE status='closed' AND close_time > NOW() - INTERVAL '7 days'
+              AND (signal IS NULL OR signal NOT LIKE '%-hedge')
         """)
         pnl_7d, n_7d, wr_7d = cur.fetchone()
 
@@ -150,6 +153,7 @@ def fee_net_24h():
             WHERE status = 'closed'
               AND close_time > NOW() - INTERVAL '24 hours'
               AND fees LIKE '{%'
+              AND (signal IS NULL OR signal NOT LIKE '%-hedge')
         """)
         return float(cur.fetchone()[0] or 0)
     except Exception:

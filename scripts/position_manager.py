@@ -1460,7 +1460,8 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
                     if hype_val < 0:
                         log(f"[Position Manager] ⚠️  ALERT: is_loss=False but hype_realized_pnl_usdt={hype_val} < 0 — cooldown may be missed!")
                         log(f"[Position Manager] ⚠️  This means the loss was confirmed by HL but not recorded in cooldown! Calling set_loss_cooldown as fallback.")
-                        set_loss_cooldown(token, direction)
+                        if not _is_hedge_row:   # HEDGE defense-in-depth: shadow never gates
+                            set_loss_cooldown(token, direction)
             except Exception:
                 pass
 
@@ -1758,19 +1759,25 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
             # P0 (review fix #4): use the value captured BEFORE the HL-backfill
             # rebinds `row` — live (HL-confirmed) closes previously nulled the band
             _entry_rsi = _entry_rsi_raw
-            record_signal_outcome(
-                token=token,
-                direction=direction,
-                pnl_pct=round(actual_pnl_pct, 4),
-                pnl_usdt=round(actual_pnl_usdt, 4),
-                signal_type=signal_type or 'unknown',
-                confidence=confidence,
-                trade_id=trade_id,
-                mfe_pct=mfe_pct_val,  # Thesis Validation System: pass MFE for thesis validation
-                mae_pct=mae_pct_val,
-                exit_reason=reason,
-                entry_rsi_band=_rsi_band(_entry_rsi),
-            )
+            # HEDGE (bug-hunter B1, 2026-11-23): signal_outcomes rows are read by
+            # direction gates with NO signal_type filter (signal_compactor
+            # get_directional_outcome → direction-LOCK ×0.5/0.0 penalties on ALL
+            # real signals). Shadow hedge outcomes must never be recorded there —
+            # the trades table remains the experiment's record.
+            if not _is_hedge_row:
+                record_signal_outcome(
+                    token=token,
+                    direction=direction,
+                    pnl_pct=round(actual_pnl_pct, 4),
+                    pnl_usdt=round(actual_pnl_usdt, 4),
+                    signal_type=signal_type or 'unknown',
+                    confidence=confidence,
+                    trade_id=trade_id,
+                    mfe_pct=mfe_pct_val,  # Thesis Validation System: pass MFE for thesis validation
+                    mae_pct=mae_pct_val,
+                    exit_reason=reason,
+                    entry_rsi_band=_rsi_band(_entry_rsi),
+                )
         except Exception as rso_err:
             log(f"[Position Manager] record_signal_outcome error (non-fatal): {rso_err}")
 
@@ -1780,36 +1787,42 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
         # lived in brain.close_trade() (brain.py:872) which is only invoked from
         # hype-sync.py — a dead timer (last fire Aug 8). Result: ~141 closes
         # produced zero Hebbian writes. Wire it here, single-source. Fail-open.
-        try:
-            from hebbian_engine import HebbianEngine
-            HebbianEngine().learn_trade_outcome(
-                token=token,
-                signal=signal_type or 'unknown',
-                direction=direction,
-                pnl_pct=round(actual_pnl_pct, 4),
-                exit_reason=reason,
-                leverage=int(leverage),
-                close_time=now,
-            )
-        except Exception as hebb_err:
-            log(f"[Position Manager] Hebbian learn_trade_outcome error (non-fatal): {hebb_err}")
+        # HEDGE (bug-hunter B3): hebbian trade_log feeds SHARED token/direction
+        # synapses + correlation token_chains → entry_gates.hebbian_gate can
+        # hard-block real trades from shadow P&L. Skip hedge rows.
+        if not _is_hedge_row:
+            try:
+                from hebbian_engine import HebbianEngine
+                HebbianEngine().learn_trade_outcome(
+                    token=token,
+                    signal=signal_type or 'unknown',
+                    direction=direction,
+                    pnl_pct=round(actual_pnl_pct, 4),
+                    exit_reason=reason,
+                    leverage=int(leverage),
+                    close_time=now,
+                )
+            except Exception as hebb_err:
+                log(f"[Position Manager] Hebbian learn_trade_outcome error (non-fatal): {hebb_err}")
 
         # ── Correlation engine: ingest for pump chain learning ──────────────
         # Independent of Hebbian — runs even if Hebbian fails.
-        try:
-            from correlation_engine import CorrelationEngine
-            from datetime import timezone as _tz_corr
-            _corr = CorrelationEngine()
-            _corr.ingest_trade(
-                token=token,
-                signal=signal_type or "unknown",
-                direction=direction or "unknown",
-                won=bool(actual_pnl_pct > 0),
-                pnl_pct=float(actual_pnl_pct or 0),
-                close_time=now.isoformat() if hasattr(now, 'isoformat') else str(now)
-            )
-        except Exception as corr_err:
-            pass  # fail-open
+        # HEDGE: shadow closes pollute token_chains — skip.
+        if not _is_hedge_row:
+            try:
+                from correlation_engine import CorrelationEngine
+                from datetime import timezone as _tz_corr
+                _corr = CorrelationEngine()
+                _corr.ingest_trade(
+                    token=token,
+                    signal=signal_type or "unknown",
+                    direction=direction or "unknown",
+                    won=bool(actual_pnl_pct > 0),
+                    pnl_pct=float(actual_pnl_pct or 0),
+                    close_time=now.isoformat() if hasattr(now, 'isoformat') else str(now)
+                )
+            except Exception as corr_err:
+                pass  # fail-open
 
         # Loss cooldown — block re-entry after loss (prevents revenge trading)
         # HEDGE (2026-11-23): shadow hedge P&L must never block real re-entries —
@@ -1840,7 +1853,9 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
             compact_rounds_val = row_cr[0] or 0 if row_cr else 0
         except Exception:
             compact_rounds_val = 0
-        _bridge_signal_history_to_patterns(token, direction, trade_id, is_win, compact_rounds_val)
+        # HEDGE: shadow is_win must never rewrite real trade_patterns rows — skip.
+        if not _is_hedge_row:
+            _bridge_signal_history_to_patterns(token, direction, trade_id, is_win, compact_rounds_val)
 
         return True
     except Exception as e:
