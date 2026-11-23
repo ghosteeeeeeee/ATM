@@ -32,7 +32,12 @@ canvas { display:block; width:100%; height:440px; cursor:crosshair; }
 #ind-chart { height:440px; }
 .ind-legend { display:flex; gap:14px; flex-wrap:wrap; font-size:12px; align-items:center; }
 .ind-legend .chip { display:inline-flex; align-items:center; gap:6px; padding:3px 10px;
-  border:1px solid var(--border); border-radius:12px; background:var(--card2); }
+  border:1px solid var(--border); border-radius:12px; background:var(--card2);
+  cursor:pointer; user-select:none; transition:opacity .15s, border-color .15s; }
+.ind-legend .chip:hover { border-color:var(--accent); }
+.ind-legend .chip.off { opacity:.35; }
+.ind-legend .chip.off .val { text-decoration:line-through; }
+.ind-legend .eye { width:13px; height:13px; display:inline-block; }
 .ind-legend .swatch { width:14px; height:3px; border-radius:2px; display:inline-block; }
 .ind-legend .val { font-weight:700; }
 .ind-note { color:var(--dim); font-size:10px; }
@@ -167,6 +172,15 @@ tr.hl td { background:#1c2430; }
 
 <script>
 let DATA = null, hlRung = null, rangeMode = 'auto';
+const IND_KEYS = ['rsi','macd','adx','atr','cont'];
+let indOn = (()=>{ try{ const s = JSON.parse(localStorage.getItem('ladder_ind_on')||'null');
+  const d = {}; IND_KEYS.forEach(k=> d[k] = s && k in s ? !!s[k] : true); return d;
+}catch(e){ const d={}; IND_KEYS.forEach(k=>d[k]=true); return d; } })();
+const EYE_ON = '<svg class="eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF = '<svg class="eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+function toggleInd(k){ indOn[k] = !indOn[k];
+  try{ localStorage.setItem('ladder_ind_on', JSON.stringify(indOn)); }catch(e){}
+  renderIndLegend(); drawInd(hoverIdx); }
 const $ = id => document.getElementById(id);
 
 function fmt(n, d=0){ return (n==null?'—':Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})); }
@@ -472,7 +486,8 @@ function drawInd(hover){
 
   // the four series, each min-max normalized over the visible window
   const series = DATA.ind;
-  ['rsi','macd','adx','atr','cont'].forEach(k=>{
+  IND_KEYS.forEach(k=>{
+    if(!indOn[k]) return;
     const arr = series[k]||[];
     let lo=Infinity, hi=-Infinity, any=false;
     arr.forEach(v=>{ if(v!=null){ lo=Math.min(lo,v); hi=Math.max(hi,v); any=true; } });
@@ -501,7 +516,8 @@ function drawInd(hover){
     // the four values at the hover index
     ctx.font='10px monospace';
     let ty = P.t+12;
-    ['rsi','macd','adx','atr','cont'].forEach(k=>{
+    IND_KEYS.forEach(k=>{
+      if(!indOn[k]) return;
       const v = (DATA.ind[k]||[])[hover];
       ctx.fillStyle = IND_COLORS[k];
       ctx.fillText(IND_NAMES[k]+': '+(v==null?'—':v), P.l+6, ty);
@@ -512,11 +528,14 @@ function drawInd(hover){
 
 function renderIndLegend(){
   const cur = (DATA.ind||{}).cur||{};
-  $('ind-legend').innerHTML = ['rsi','macd','adx','atr','cont'].map(k=>{
+  $('ind-legend').innerHTML = IND_KEYS.map(k=>{
     const v = cur[k];
     const txt = v==null?'—':(k==='atr'? fmt(v,0) : (k==='macd'? (v>=0?'+':'')+v.toFixed(1) : v.toFixed(1)));
-    return `<span class="chip"><span class="swatch" style="background:${IND_COLORS[k]}"></span>`+
-           `<span style="color:${IND_COLORS[k]}">${IND_NAMES[k]}</span>`+
+    const on = indOn[k];
+    return `<span class="chip ${on?'':'off'}" onclick="toggleInd('${k}')" title="click to toggle ${IND_NAMES[k]}">`+
+           `<span style="color:${on?IND_COLORS[k]:'var(--dim)'}">${on?EYE_ON:EYE_OFF}</span>`+
+           `<span class="swatch" style="background:${on?IND_COLORS[k]:'var(--dim)'}"></span>`+
+           `<span style="color:${on?IND_COLORS[k]:'var(--dim)'}">${IND_NAMES[k]}</span>`+
            `<span class="val">${txt}</span></span>`;
   }).join('');
 }
