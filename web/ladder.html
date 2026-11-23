@@ -28,6 +28,13 @@ h2 { color:var(--accent); font-size:12px; letter-spacing:.12em; text-transform:u
 .card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px; }
 .card.glow { box-shadow:0 0 24px rgba(79,195,247,.08); }
 canvas { display:block; width:100%; height:440px; cursor:crosshair; }
+#ind-chart { height:440px; }
+.ind-legend { display:flex; gap:14px; flex-wrap:wrap; font-size:12px; align-items:center; }
+.ind-legend .chip { display:inline-flex; align-items:center; gap:6px; padding:3px 10px;
+  border:1px solid var(--border); border-radius:12px; background:var(--card2); }
+.ind-legend .swatch { width:14px; height:3px; border-radius:2px; display:inline-block; }
+.ind-legend .val { font-weight:700; }
+.ind-note { color:var(--dim); font-size:10px; }
 .toolbar { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
 button { background:var(--card2); color:var(--text); border:1px solid var(--border); border-radius:6px;
   padding:4px 10px; font-family:inherit; font-size:11px; cursor:pointer; }
@@ -72,6 +79,7 @@ tr.hl td { background:#1c2430; }
 </div>
 
 <div class="grid">
+  <div>
   <div class="card glow">
     <div class="toolbar">
       <button id="btn-auto" class="on">AUTO RANGE</button>
@@ -88,6 +96,17 @@ tr.hl td { background:#1c2430; }
       <canvas id="chart"></canvas>
       <div id="readout"></div>
     </div>
+  </div>
+
+  <div class="card glow" style="margin-top:14px">
+    <div class="toolbar" style="justify-content:space-between">
+      <div class="ind-legend" id="ind-legend"></div>
+      <span class="ind-note">RSI/MACD/ADX/ATR · same 15m bars · each series scaled 0–100 over the window (shapes) — raw values on the chips</span>
+    </div>
+    <div class="wrap">
+      <canvas id="ind-chart"></canvas>
+    </div>
+  </div>
   </div>
 
   <div>
@@ -159,7 +178,8 @@ async function load(){
   try{
     const r = await fetch('/data/ladder.json', {cache:'no-store'});
     DATA = await r.json();
-    renderHeader(); renderStats(); renderRungs(); renderTrades(); draw();
+    renderHeader(); renderStats(); renderRungs(); renderTrades(); renderIndLegend();
+    draw(); drawInd(hoverIdx);
     const age = (Date.now()/1000) - DATA.ts;
     $('feed-age').textContent = 'feed '+Math.round(age)+'s';
     $('feed-age').className = 'badge '+(age<90?'fresh':'stale');
@@ -350,6 +370,98 @@ function draw(){
     : 'auto · '+fmt(ylo,0)+' – '+fmt(yhi,0);
 }
 
+/* ── indicator chart (RSI/MACD/ADX/ATR, same bars) ── */
+const IND_COLORS = { rsi:'#4caf50', macd:'#ef5350', adx:'#fdd835', atr:'#4fc3f7' };
+const IND_NAMES  = { rsi:'RSI', macd:'MACD', adx:'ADX', atr:'ATR' };
+let hoverIdx = null;
+
+function indRange(){
+  const c = DATA.candles||[], ind = DATA.ind||{};
+  let lo=Infinity, hi=-Infinity;
+  c.forEach((b,i)=>{ lo=Math.min(lo,b.l); hi=Math.max(hi,b.h); });
+  const pad=(hi-lo)*0.08||100;
+  return [lo-pad, hi+pad];
+}
+
+function drawInd(hover){
+  if(!DATA||!DATA.ind||!DATA.candles) return;
+  const cv = $('ind-chart'), ctx = cv.getContext('2d');
+  const dpr = window.devicePixelRatio||1;
+  const W = cv.clientWidth, H = cv.clientHeight;
+  cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,W,H);
+  const P={l:8,r:74,t:10,b:22};
+  const c = DATA.candles;
+  const [ylo,yhi] = indRange();
+  const x = i => P.l + (i+0.5)*(W-P.l-P.r)/c.length;
+  const y = v => P.t + (yhi-v)/(yhi-ylo)*(H-P.t-P.b);
+
+  // grid (the same time grid as the main chart)
+  ctx.strokeStyle='#16161f'; ctx.lineWidth=1; ctx.fillStyle='#555'; ctx.font='10px monospace';
+  const step = niceStep((yhi-ylo)/6);
+  for(let v=Math.ceil(ylo/step)*step; v<=yhi; v+=step){
+    const yy=y(v); ctx.beginPath(); ctx.moveTo(P.l,yy); ctx.lineTo(W-P.r,yy); ctx.stroke();
+    ctx.fillText(fmt(v,0), W-P.r+6, yy+3);
+  }
+  ctx.textAlign='center';
+  const tstep = Math.max(1, Math.floor(c.length/8));
+  for(let i=0;i<c.length;i+=tstep){
+    const xx=x(i); ctx.beginPath(); ctx.moveTo(xx,P.t); ctx.lineTo(xx,H-P.b); ctx.stroke();
+    ctx.fillStyle='#444'; ctx.fillText(mmdd(c[i].t)+' '+hhmm(c[i].t), xx, H-6);
+  }
+  ctx.textAlign='left';
+
+  // the four series, each min-max normalized over the visible window
+  const series = DATA.ind;
+  ['rsi','macd','adx','atr'].forEach(k=>{
+    const arr = series[k]||[];
+    let lo=Infinity, hi=-Infinity, any=false;
+    arr.forEach(v=>{ if(v!=null){ lo=Math.min(lo,v); hi=Math.max(hi,v); any=true; } });
+    if(!any || hi===lo) return;
+    const yy = v => P.t + 8 + (hi-v)/(hi-lo)*(H-P.t-P.b-16);   // the normalized pane
+    ctx.strokeStyle = IND_COLORS[k];
+    ctx.lineWidth = 1.6;
+    ctx.globalAlpha = 0.92;
+    ctx.beginPath();
+    let started = false;
+    arr.forEach((v,i)=>{
+      if(v==null){ started=false; return; }
+      const px=x(i), py=yy(v);
+      if(!started){ ctx.moveTo(px,py); started=true; } else ctx.lineTo(px,py);
+    });
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  });
+
+  // hover vertical (synced with the main chart)
+  if(hover!=null && hover>=0 && hover<c.length){
+    const xx=x(hover);
+    ctx.strokeStyle='rgba(79,195,247,.55)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(xx,P.t); ctx.lineTo(xx,H-P.b); ctx.stroke();
+    ctx.setLineDash([]);
+    // the four values at the hover index
+    ctx.font='10px monospace';
+    let ty = P.t+12;
+    ['rsi','macd','adx','atr'].forEach(k=>{
+      const v = (DATA.ind[k]||[])[hover];
+      ctx.fillStyle = IND_COLORS[k];
+      ctx.fillText(IND_NAMES[k]+': '+(v==null?'—':v), P.l+6, ty);
+      ty += 13;
+    });
+  }
+}
+
+function renderIndLegend(){
+  const cur = (DATA.ind||{}).cur||{};
+  $('ind-legend').innerHTML = ['rsi','macd','adx','atr'].map(k=>{
+    const v = cur[k];
+    const txt = v==null?'—':(k==='atr'? fmt(v,0) : (k==='macd'? (v>=0?'+':'')+v.toFixed(1) : v.toFixed(1)));
+    return `<span class="chip"><span class="swatch" style="background:${IND_COLORS[k]}"></span>`+
+           `<span style="color:${IND_COLORS[k]}">${IND_NAMES[k]}</span>`+
+           `<span class="val">${txt}</span></span>`;
+  }).join('');
+}
+
 function niceStep(raw){
   const e = Math.pow(10, Math.floor(Math.log10(raw)));
   const f = raw/e;
@@ -358,6 +470,17 @@ function niceStep(raw){
 
 /* crosshair */
 const cvEl = $('chart'), ro = $('readout');
+const indEl = $('ind-chart');
+indEl.addEventListener('mousemove', ev=>{
+  if(!DATA) return;
+  const rct = indEl.getBoundingClientRect();
+  const mx = ev.clientX-rct.left;
+  const c = DATA.candles, W=indEl.clientWidth, P={l:8,r:74};
+  const i = Math.round((mx-P.l)/((W-P.l-P.r)/c.length)-0.5);
+  if(i>=0 && i<c.length){ hoverIdx=i; draw(); drawInd(i); }
+});
+indEl.addEventListener('mouseleave', ()=>{ hoverIdx=null; draw(); drawInd(null); });
+
 cvEl.addEventListener('mousemove', ev=>{
   if(!DATA) return;
   const rct = cvEl.getBoundingClientRect();
@@ -367,6 +490,7 @@ cvEl.addEventListener('mousemove', ev=>{
   const i = Math.round((mx-P.l)/((W-P.l-P.r)/c.length)-0.5);
   if(i<0||i>=c.length){ ro.style.display='none'; return; }
   const b = c[i];
+  hoverIdx = i; drawInd(i);
   ro.style.display='block';
   ro.style.left = Math.min(mx+14, W-190)+'px';
   ro.style.top = Math.max(6, my-52)+'px';
@@ -374,11 +498,11 @@ cvEl.addEventListener('mousemove', ev=>{
     +'O '+fmt(b.o,1)+'  H '+fmt(b.h,1)+'\nL '+fmt(b.l,1)+'  C '+fmt(b.c,1)
     +'   '+(b.c>=b.o?'+':'')+((b.c/b.o-1)*100).toFixed(2)+'%';
 });
-cvEl.addEventListener('mouseleave', ()=> ro.style.display='none');
+cvEl.addEventListener('mouseleave', ()=>{ ro.style.display='none'; hoverIdx=null; draw(); drawInd(null); });
 
 $('btn-auto').onclick = ()=>{ rangeMode='auto'; $('btn-auto').classList.add('on'); $('btn-full').classList.remove('on'); draw(); };
 $('btn-full').onclick = ()=>{ rangeMode='full'; $('btn-full').classList.add('on'); $('btn-auto').classList.remove('on'); draw(); };
-window.addEventListener('resize', draw);
+window.addEventListener('resize', ()=>{ draw(); drawInd(hoverIdx); });
 
 load();
 setInterval(load, 30000);

@@ -194,13 +194,102 @@ def stats():
     return out
 
 
+def indicators(bars):
+    """RSI(14) Wilder · MACD line (EMA12-EMA26) · ADX(14) Wilder ·
+    ATR(14) Wilder — computed from the same closed 15m bars (stdlib).
+    Returns per-bar arrays aligned to `bars` (None = warmup) + currents.
+    """
+    n = len(bars)
+    rsi = [None] * n
+    macd = [None] * n
+    adx = [None] * n
+    atr = [None] * n
+    if n < 32:
+        return {'rsi': rsi, 'macd': macd, 'adx': adx, 'atr': atr}
+    closes = [b['c'] for b in bars]
+
+    # RSI(14), Wilder smoothing
+    ag = al = None
+    for i in range(1, n):
+        ch = closes[i] - closes[i - 1]
+        g, l = max(ch, 0.0), max(-ch, 0.0)
+        if i <= 14:
+            if i == 14:
+                ag = sum(max(closes[j] - closes[j - 1], 0.0)
+                         for j in range(1, 15)) / 14.0
+                al = sum(max(closes[j - 1] - closes[j], 0.0)
+                         for j in range(1, 15)) / 14.0
+                rsi[i] = 100.0 - 100.0 / (1.0 + (ag / al if al else 100.0))
+        else:
+            ag = (ag * 13 + g) / 14.0
+            al = (al * 13 + l) / 14.0
+            rsi[i] = 100.0 - 100.0 / (1.0 + (ag / al if al else 100.0))
+
+    # MACD line (EMA12 - EMA26); the line is the plotted series
+    e12 = e26 = closes[0]
+    for i, c in enumerate(closes):
+        e12 += (c - e12) * (2.0 / 13.0)
+        e26 += (c - e26) * (2.0 / 27.0)
+        if i >= 26:
+            macd[i] = e12 - e26
+
+    # TR / +DM / -DM with Wilder smoothing -> ATR(14), +DI/-DI, DX, ADX(14)
+    tr_s = pdm_s = ndm_s = None
+    dxs = []
+    adx_v = None
+    prev = bars[0]
+    for i in range(1, n):
+        h, l, pc = bars[i]['h'], bars[i]['l'], bars[i - 1]['c']
+        ph, pl = prev['h'], prev['l']
+        tr = max(h - l, abs(h - pc), abs(l - pc))
+        up, dn = h - ph, pl - l
+        pdm_i = up if (up > dn and up > 0.0) else 0.0
+        ndm_i = dn if (dn > up and dn > 0.0) else 0.0
+        if i <= 14:
+            tr_s = (tr_s or 0.0) + tr
+            pdm_s = (pdm_s or 0.0) + pdm_i
+            ndm_s = (ndm_s or 0.0) + ndm_i
+            if i == 14:
+                atr[i] = tr_s / 14.0
+        else:
+            tr_s = tr_s - tr_s / 14.0 + tr
+            pdm_s = pdm_s - pdm_s / 14.0 + pdm_i
+            ndm_s = ndm_s - ndm_s / 14.0 + ndm_i
+            atr[i] = tr_s / 14.0
+            pdi = 100.0 * pdm_s / tr_s if tr_s else 0.0
+            ndi = 100.0 * ndm_s / tr_s if tr_s else 0.0
+            dx = 100.0 * abs(pdi - ndi) / (pdi + ndi) if (pdi + ndi) else 0.0
+            dxs.append(dx)
+            if len(dxs) == 14:
+                adx_v = sum(dxs) / 14.0
+                adx[i] = adx_v
+            elif len(dxs) > 14:
+                adx_v = (adx_v * 13.0 + dx) / 14.0
+                adx[i] = adx_v
+        prev = bars[i]
+
+    def last_valid(a):
+        for v in reversed(a):
+            if v is not None:
+                return round(v, 4)
+        return None
+    return {'rsi': [None if v is None else round(v, 3) for v in rsi],
+            'macd': [None if v is None else round(v, 2) for v in macd],
+            'adx': [None if v is None else round(v, 3) for v in adx],
+            'atr': [None if v is None else round(v, 2) for v in atr],
+            'cur': {'rsi': last_valid(rsi), 'macd': last_valid(macd),
+                    'adx': last_valid(adx), 'atr': last_valid(atr)}}
+
+
 def main():
     price, age = live_price()
+    _bars = candles()
     feed = {
         'ts': int(time.time()),
         'price': price,
         'price_age_s': round(age, 1) if age is not None else None,
-        'candles': candles(),
+        'candles': _bars,
+        'ind': indicators(_bars),
         'rungs': rungs(),
         'stats': stats(),
     }
@@ -209,7 +298,8 @@ def main():
         json.dump(feed, f)
     os.replace(tmp, OUT)
     print(f"[ladder_api] price={price} candles={len(feed['candles'])} "
-          f"rungs={len(feed['rungs'])} stats_n={feed['stats'].get('n')}")
+          f"ind={feed['ind'].get('cur')} rungs={len(feed['rungs'])} "
+          f"stats_n={feed['stats'].get('n')}")
 
 
 if __name__ == '__main__':
