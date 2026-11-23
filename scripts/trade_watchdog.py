@@ -2016,6 +2016,22 @@ def _monitor_pending_orders_impl(btc_price):
                             # DB check — no race, per the ruling's
                             # evidence #8).
                             order["prearmed_add"] = True
+                            # RIP-ADD EXEMPTION (CEO 2026-11-23: "as it
+                            # rips through we should be adding" — the
+                            # straight-up mode refuted by three band
+                            # rejections at RSI 77-91 in one rip): an
+                            # ESCAPE-qualified fill (0.5% straight-line =
+                            # displacement proven by distance) carries
+                            # band_exempt so brain skips the LONG-add
+                            # RSI ceiling. The KNIFE (short <35) is never
+                            # exempt — BANANA stands. Scope: the escape
+                            # cycle only (_escaped is per-cycle; a later
+                            # E1-only fill correctly loses the flag).
+                            if _escaped:
+                                order["band_exempt"] = True
+                                log(f"pending order {oid}: rip-add "
+                                    f"band exemption attached (escape-"
+                                    f"qualified, ceiling skipped)", "INFO")
                             # fall through → steer (exec gets --force)
                         else:
                             log(f"pending order {oid}: {coin} #{_open[0]} "
@@ -2067,6 +2083,7 @@ def _monitor_pending_orders_impl(btc_price):
                         # rebuilt payload must carry it or the ADD loses
                         # the gate (the F2 dropped-key class).
                         "prearmed_add": order.get("prearmed_add"),
+                        "band_exempt": order.get("band_exempt"),
                         # Per-order trail profile (CEO 2026-11-09) — same
                         # bridging rule: payload carries them or they're lost.
                         "skip_be_lock": order.get("skip_be_lock"),
@@ -2168,13 +2185,23 @@ def _execute_pending_order_impl(order):
         # position flip inside that window would net instead of add
         # (bounded: one rung size). Upgrade path: exec-side direction
         # assert if flips ever show in the log.
+        # TAG-SPLIT (CEO Phase1 item3, disposition ai-trader-pending-tag-split
+        # due 2026-11-24, shipped early by brain_auditor #293): btc-auto-ladder-*
+        # fills tag ai-trader-auto so the auto cohort is judged separately from
+        # CEO-armed btc-ceo-*/manual pendings (gate ONLY auto if <40% WR n>=30).
+        # Consumers already expect the tag: auto_trader live_attribution
+        # (LIKE 'ai-trader-auto%'), manual_exit_manager MANAGED_TAGS, position_manager.
+        # --force scope and --prearmed behavior unchanged (id-based, not tag-based).
+        _sig = ("ai-trader-auto"
+                if str(order.get("id", "")).startswith("btc-auto-")
+                else "ai-trader-pending")
         cmd = [
             sys.executable, os.path.join(SCRIPTS_DIR, "brain.py"),
             "trade", "add",
             str(order["coin"]), str(order["direction"]),
             f'{float(order["amount_usdt"]):.2f}', f'{float(order["trigger_price"]):.8g}',
             "--real",
-            "--signal", "ai-trader-pending",
+            "--signal", _sig,
             "--strategy", "ai-trader",
             "--confidence", f'{float(order.get("confidence", 65)):.0f}',
             "--leverage", str(int(order["leverage"])),
@@ -2192,6 +2219,8 @@ def _execute_pending_order_impl(order):
         cmd.append("--prearmed")
         if order.get("prearmed_add"):
             cmd.append("--prearmed-add")
+        if order.get("band_exempt"):
+            cmd.append("--band-exempt")   # rip-add: skip the ceiling only
         log(f"AUTO-EXEC pending order {oid}: {' '.join(cmd[4:])}")
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=120,
                            cwd=SCRIPTS_DIR)

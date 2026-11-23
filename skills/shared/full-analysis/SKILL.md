@@ -685,6 +685,20 @@ own wider SL). Never stack TPs at the same level — the add's TP sits BEFORE
 the original's (e.g. add TP 82,600 vs system TP 83,687). Chop-regime adds are
 half-size or skipped.
 
+**RIP-ADD EXEMPTION (CEO, 2026-11-23):** "btc is in straight up
+mode, ripping through our rungs with no re-tests — as it rips
+through we should be adding." Root cause of the missing adds: the
+straight-line escape already qualifies the rip-fill, but brain's
+D2.3 add-band (ceiling: LONG ADD RSI > 75 → REJECTED) killed three
+rip-adds in one move at RSI 77-91 — the band was blocking adds in
+the exact conditions where momentum IS the quality. Now: an
+ESCAPE-qualified fill (0.5% straight-line = displacement proven by
+distance) carries `band_exempt` and brain skips **only the LONG-add
+ceiling** — the SHORT knife (RSI < 35) is NEVER exempt (the BANANA
+lesson stands), and E1-only fills keep the band (their displacement
+evidence is weaker). The winner-gate still rules: a losing open
+defers the rip-add like any add.
+
 **WINNER-CONDITION (CEO, clarified 2026-11-23):** an add fires ONLY
 while the open trade is WINNING (pnl > 0). "If we are in a trade and
 the trade is winning, and a rung fires (trip 62k in profit → trip

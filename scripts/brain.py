@@ -421,6 +421,7 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
                flipped_from_trade: bool = False,
                prearmed: bool = False,
                prearmed_add: bool = False,
+               band_exempt: bool = False,
                regime: str = None,
                volatility_regime: str = None,  # NEW: FLAT/NORMAL/HIGH/EXTREME
                # ── Signal indicator fields (captured at entry from hotset) ──
@@ -491,11 +492,20 @@ def add_trade(token: str, side_type: str, amount_usdt: float, entry_price: float
         if not _prearmed_add_band_ok(direction, _band_rsi):
             from hermes_constants import (OVERSOLD_SHORT_RSI_MAX,
                                           SIGNAL_FILTER_RSI_MAX)
-            if direction == 'SHORT':
+            # RIP-ADD EXEMPTION (CEO 2026-11-23: "as it rips through we
+            # should be adding" — three rip-adds were band-killed at RSI
+            # 77-91 in one straight-up move). An escape-qualified fill
+            # (band_exempt) skips ONLY the LONG-add ceiling: the rip's
+            # momentum IS the quality. The SHORT knife (RSI < 35) is
+            # NEVER exempt — the BANANA lesson stands untouched.
+            if band_exempt and direction == 'LONG':
+                print(f"[brain.py] rip-add band exemption (CEO 2026-11-23): {token} LONG ADD RSI {_band_rsi} > ceiling — escape-qualified fill, ceiling skipped (knife/short side never exempt)")
+            elif direction == 'SHORT':
                 print(f"[brain.py] ❌ REJECTED: {token} {direction} — prearmed ADD SHORT RSI {_band_rsi} < knife {OVERSOLD_SHORT_RSI_MAX} (D2.3 band: adds need quality, first entries catch)")
+                return None
             else:
                 print(f"[brain.py] ❌ REJECTED: {token} {direction} — prearmed ADD LONG RSI {_band_rsi} > ceiling {SIGNAL_FILTER_RSI_MAX} (D2.3 band: adds need quality, first entries catch)")
-            return None
+                return None
 
     # ── SHORT oversold hard floor (defense-in-depth, all entry paths) ────
     # Root cause 2026-10-06: LTC pump-chain- SHORT entered with entry_rsi_14=9.90
@@ -1700,6 +1710,8 @@ if __name__ == "__main__":
                                 help="Mark this trade as flipped from original signal direction")
         add_parser.add_argument("--prearmed", action="store_true", default=False,
                                 help="Pre-armed level order (ladder rung / CEO arm via pending pipeline) — skips ONLY the SHORT knife/floor RSI gates; all other gates intact (CEO 2026-11-20)")
+        add_parser.add_argument("--band-exempt", action="store_true", default=False,
+                                help="Rip-add: escape-qualified fill — skip the LONG-add RSI ceiling only (the short knife never exempt; CEO 2026-11-23)")
         add_parser.add_argument("--prearmed-add", action="store_true", default=False,
                                 help="Ladder ADD on a prearmed level — re-applies the D2.3 RSI band (SHORT <35 / LONG >75 rejected) that first-entry --prearmed skips (CEO 2026-11-21)")
         add_parser.add_argument("--signal-z-score", type=float, dest="signal_z_score",
@@ -1795,6 +1807,7 @@ if __name__ == "__main__":
                 force=args.force,
                 prearmed=args.prearmed,
                 prearmed_add=args.prearmed_add,
+                band_exempt=getattr(args, 'band_exempt', False),
                 regime=args.regime,
                 signal_z_score=args.signal_z_score,
                 signal_rsi_14=args.signal_rsi_14,
