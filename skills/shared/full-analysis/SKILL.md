@@ -308,11 +308,15 @@ import sys, json, time
 d = json.load(sys.stdin)
 h = [e for e in d['history'] if e.get('token') == 'BTC']
 now = h[-1]['ts']
-hours = {}
-for e in h:
-    if e['ts'] < now - 86400: continue
-    hours[time.gmtime(e['ts']).tm_hour] = 'ABOVE' if e['price'] > e['ema300'] else 'BELOW'
-states = [hours[k] for k in sorted(hours)]
+win = sorted((e for e in h if e['ts'] >= now - 86400), key=lambda e: e['ts'])
+states, seen = [], set()   # BUG FIXED 2026-11-23: hour-of-day buckets
+# broke chronology across midnight (a phantom day-wrap flip — true 5,
+# reported 6). Absolute-hour key, ts-ordered.
+for e in win:
+    k = e['ts'] // 3600
+    if k in seen: continue
+    seen.add(k)
+    states.append('ABOVE' if e['price'] > e['ema300'] else 'BELOW')
 flips = sum(1 for a, b in zip(states, states[1:]) if a != b)
 print(f'24h hourly EMA300 flips: {flips} ({\"CHOP\" if flips >= 2 else \"TREND\"} regime)')
 "

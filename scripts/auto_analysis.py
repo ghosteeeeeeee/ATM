@@ -26,7 +26,15 @@ CONTINUUM = os.path.join('/var/www/hermes/data', 'continuum_data.json')
 # ---------- engines (same logic as the skill) ----------
 
 def chop_flips_24h(coin='BTC'):
-    """Hourly EMA300-position flips in the last 24h (skill chop check)."""
+    """Hourly EMA300-position flips in the last 24h (skill chop check).
+
+    BUG FIXED (CEO double-check 2026-11-23): the old version bucketed by
+    HOUR-OF-DAY (`tm_hour`) and sorted the bucket keys — the 24h window's
+    day-wrap then counted a PHANTOM flip (today 13:00 BELOW sitting next
+    to yesterday 14:00 ABOVE in sorted order). True count was 5 where it
+    reported 6; near a boundary (true 1 vs reported 2) it could
+    misclassify the regime itself. Now: ts-ordered with the ABSOLUTE
+    hour key (ts//3600) — chronology holds across midnight."""
     try:
         with open(CONTINUUM) as f:
             d = json.load(f)
@@ -34,13 +42,17 @@ def chop_flips_24h(coin='BTC'):
         if not h:
             return None, None
         now = h[-1]['ts']
-        hours = {}
-        for e in h:
-            if e['ts'] < now - 86400:
+        win = sorted((e for e in h if e['ts'] >= now - 86400),
+                     key=lambda e: e['ts'])
+        states = []
+        seen = set()
+        for e in win:
+            k = e['ts'] // 3600
+            if k in seen:
                 continue
-            hours[time.gmtime(e['ts']).tm_hour] = 'ABOVE' if e['price'] > e['ema300'] else 'BELOW'
-        states = [hours[k] for k in sorted(hours)]
-        flips = sum(1 for a, b in zip(states, states[1:]) if a != b)
+            seen.add(k)
+            states.append('ABOVE' if e['price'] > e['ema300'] else 'BELOW')
+        flips = sum(1 for x, y in zip(states, states[1:]) if x != y)
         c = d.get('current', {})
         return flips, c
     except Exception:
