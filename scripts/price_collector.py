@@ -195,7 +195,14 @@ def _store_candles(token: str, interval: str, candles: list):
             # accel_300, ema300_breakthrough, ...) computed signal math
             # off the partial close. Closed = only bars whose open time
             # is before the current 15m window's start.
-            _now_floor = int(time.time() // 900) * 900
+            # DELTA A/B (agent-1): the floor must be PER-INTERVAL — a flat
+            # 900s floor marked completed 1m/5m bars inside the current
+            # 15m window as open (staling the E1 confirm reads to ~12min)
+            # and still marked the forming 1h/4h bars closed for 45min
+            # of every hour. One floor per table interval fixes both.
+            _tf = {'1m': 60, '5m': 300, '15m': 900,
+                   '1h': 3600, '4h': 14400}[interval]
+            _now_floor = int(time.time() // _tf) * _tf
             _rows = [(r[0], r[1], r[2], r[3], r[4], r[5], r[6],
                       1 if r[1] < _now_floor else 0) for r in rows]
             c.executemany(f"""
@@ -787,11 +794,16 @@ def _aggregate_tf(ph_conn, candle_conn, tf_seconds: int, table: str):
     # INSERT OR REPLACE would overwrite is_closed=1 with is_closed=0 otherwise.
     for (token, open_px, high, low, close_px, bar_count) in dev_rows:
         exists = candle_cur.execute(
-            f"SELECT is_closed FROM {table} WHERE token=? AND ts=?",
+            f"SELECT is_closed, volume FROM {table} WHERE token=? AND ts=?",
             (token, current_window)
         ).fetchone()
-        if exists and exists[0] == 1:
-            continue  # window already closed — do not overwrite with is_closed=0
+        # DELTA C (agent-1): with honest flags the FORMING bar is 0, so the
+        # old closed-only skip let this INSERT OR REPLACE wipe the seeder's
+        # real volume with 0 every cycle (the 2026-10-05 zero-volume class;
+        # live: the newest bars served volume=0). Gap-fill ONLY: skip when
+        # the window is closed OR the row already carries a real volume.
+        if exists and (exists[0] == 1 or (exists[1] or 0) > 0):
+            continue  # closed or already has volume — never clobber
         candle_cur.execute(f"""
             INSERT OR REPLACE INTO {table}
                 (token, ts, open, high, low, close, volume, is_closed)

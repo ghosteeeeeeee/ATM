@@ -140,7 +140,9 @@ def store_candles(token: str, interval: str, candles: list):
             if existing is None or (existing[0] is not None and existing[0] == 0):
                 # F-1: the column's DEFAULT 1 marked the FORMING bar closed —
                 # set the flag honestly (the same floor rule as the seeder).
-                _nf = int(time.time() // 900) * 900
+                # DELTA A/B: per-interval floor (the same rule as the seeder)
+                _tf = {'1m': 60, '5m': 300, '15m': 900}[interval]
+                _nf = int(time.time() // _tf) * _tf
                 c.execute(
                     f"INSERT OR REPLACE INTO {table} (token, ts, open, high, low, close, volume, is_closed) "
                     f"VALUES (?, ?, ?, ?, ?, ?, ?, ?)",

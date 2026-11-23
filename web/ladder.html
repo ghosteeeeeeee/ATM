@@ -491,19 +491,23 @@ function drawTrades(ctx, P, x, y, c){
         ctx.restore();
       }
     }
-    // entry triangle: BUY below the point (up), SELL above (down)
-    const off = isLong ? 13 : -13;
-    const cy = py + off, s = 5.5;
-    ctx.save();
-    ctx.fillStyle = col; ctx.strokeStyle = '#0a0a0f'; ctx.lineWidth=1;
-    ctx.beginPath();
-    if(isLong){ ctx.moveTo(px, cy-s); ctx.lineTo(px-s, cy+s*0.7); ctx.lineTo(px+s, cy+s*0.7); }
-    else { ctx.moveTo(px, cy+s); ctx.lineTo(px-s, cy-s*0.7); ctx.lineTo(px+s, cy-s*0.7); }
-    ctx.closePath(); ctx.fill(); ctx.stroke();
-    ctx.font='bold 9px monospace'; ctx.fillStyle=col;
-    ctx.textAlign='center';
-    ctx.fillText(isLong?'B':'S', px, cy + (isLong? -8 : 13));
-    ctx.textAlign='left';
+    // entry triangle (only when the entry is inside the window — for a
+    // pre-window open the exit arc + connector tell the story alone)
+    if(i1>=0){
+      const off = isLong ? 13 : -13;
+      const cy = py + off, s = 5.5;
+      ctx.save();
+      ctx.fillStyle = col; ctx.strokeStyle = '#0a0a0f'; ctx.lineWidth=1;
+      ctx.beginPath();
+      if(isLong){ ctx.moveTo(px, cy-s); ctx.lineTo(px-s, cy+s*0.7); ctx.lineTo(px+s, cy+s*0.7); }
+      else { ctx.moveTo(px, cy+s); ctx.lineTo(px-s, cy-s*0.7); ctx.lineTo(px+s, cy-s*0.7); }
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.font='bold 9px monospace'; ctx.fillStyle=col;
+      ctx.textAlign='center';
+      ctx.fillText(isLong?'B':'S', px, cy + (isLong? -8 : 13));
+      ctx.textAlign='left';
+      ctx.restore();
+    }
     // exit dot (hollow, outcome-colored)
     if(px2!=null){
       ctx.beginPath(); ctx.arc(px2, py2, 4.2, 0, 7);
