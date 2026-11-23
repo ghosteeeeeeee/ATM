@@ -1,0 +1,12 @@
+[Unit]
+Description=Hermes Direction Matrix — BTC P(up/side/down) hourly retrain + predict
+# Spec: brain/plans/direction-matrix-spec.md §2.6 (operator-ordered 2026-11-22).
+# LOCAL data/candles.db only (mode=ro, SELECT-only). Writes data/dir_matrix_*.jsonl,
+# data/dir_matrix_state.json, data/dir_matrix_models/*.joblib. Informational v1 —
+# ZERO trading-path touch (any consumer needs validated status + shadow + CEO approval).
+# Modeled on hermes-freq-deviation-shadow.service (oneshot, same unit style).
+[Service]
+Type=oneshot
+WorkingDirectory=/root/.hermes
+ExecStart=/usr/bin/python3 /root/.hermes/scripts/dir_matrix.py predict
+TimeoutStartSec=300

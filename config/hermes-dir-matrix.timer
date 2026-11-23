@@ -1,0 +1,10 @@
+[Unit]
+Description=Hermes Direction Matrix Timer — hourly
+# Spec: brain/plans/direction-matrix-spec.md §2.6 — retrain cadence hourly (§2.3).
+# Enable pending deploy: systemctl daemon-reload && systemctl enable --now hermes-dir-matrix.timer
+[Timer]
+OnCalendar=hourly
+Persistent=true
+
+[Install]
+WantedBy=timers.target
