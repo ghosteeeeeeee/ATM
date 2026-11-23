@@ -7,7 +7,7 @@
   "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
   "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
  ],
- "updated": "2026-11-23T01:20:00Z",
+ "updated": "2026-11-23T02:00:00Z",
  "entries": [
   {
    "id": "flip-contrarian-pc",
@@ -2404,6 +2404,34 @@
    "disposition": "EXECUTED 2026-11-22 \u2014 APPROVE WITH MODIFICATIONS (verdict 20261122T221140Z) shipped: formal KPI snapshot on goal_progress.json + ceo_dashboard, NS2/R1 gated + --kanban on goal_metrics_check, WR target card killed. Reporting-only: no trading file, no constants. | FOLD RETIRED 2026-11-23 (CEO 20261123T004841Z ruling1, T asked the CEO to rule): old wording retired \u2014 limb1 verified MET (-$4.31 since11-04), limb2 broken by construction (references the retired 7-metric verifier). REPLACEMENT LIVE: circuit-breaker NS1 < -0.010 AND NS2 < -$8.00 on 3 consecutive runs -> CEO recommends shadow-only to T (alert-only, no auto-action). Fresh check: NS1 -0.0067 holds, NS2 -10.78 breached -> 1/2 NOT FIRING.",
    "done_at": "2026-11-22",
    "action_taken": "EXECUTED on existing surfaces only, zero trading behavior. (1) scripts/self_learner.py: _formal_kpi_snapshot() now feeds data/goal_progress.json a formal KPI snapshot from PG through goal_metrics_check.collect(); the stale targets{win_rate 0.40, daily_pnl 0.05, min_sharpe 1.0} block is gone (it rendered \"WR 30d (target 40%)\" on the CEO dashboard); SELF_LEARNER_WR_TARGET itself untouched \u2014 it still drives the kill-underperformer heuristic. (2) brain/analysis/goal_metrics_check.py: NS2 promoted from book-30d info line to a gate, R1 added (peak-to-trough of DAILY cumulative fee-net over 30d, % of live clearinghouse equity, dollar-DD fallback when equity unavailable), --kanban appends FAIL lines to automation/ceo/ceo_kanban.md, consecutive-run state in brain/analysis/.goal_metrics_state.json (fail-open). The frozen Tier-H 10 untouched. (3) web/ceo_dashboard.html: formal-KPI card row (NS1/NS2/R1/health) + WR demoted to \"diagnostic, no target\" (deployed to /var/www/hermes). (4) this registry entry. Constants untouched (no DRAWDOWN_TIER/KELLY wiring \u2014 R2 is T's money-sizing call)."
+  },
+  {
+   "id": "r2-drawdown-tier-wiring",
+   "kind": "eval",
+   "disposition": "WIRE-IT",
+   "status": "done",
+   "started": "2026-11-23",
+   "done_at": "2026-11-23",
+   "deadline": "2026-11-23T00:00:00Z",
+   "owner": "CEO ruling 20261123T004841Z (build: agent-10)",
+   "stream": "DD tier-2 sizing clamp via existing vacation_size_reduce.json path (dead config activation)",
+   "threshold": "R1 (30d max DD % of equity) crosses -50% -> write size_multiplier=DRAWDOWN_TIER_2_MULT (0.25); recovery -> restore/remove. Write-on-change idempotent, fail-open on missing equity, snapshot+restore any pre-existing guardrail file byte-exact.",
+   "default_action": "n/a \u2014 executed per ruling (T asked CEO to rule; money-sizing by CEO verdict, not auto-flip)",
+   "evidence": "DONE r2-drawdown-tier-wiring: EXECUTED 2026-11-23 (CEO 20261123T004841Z ruling 2 WIRE IT, lazy path) \u2014 goal_metrics_check._maybe_write_dd_tier live; real verifier run wrote /root/.hermes/data/vacation_size_reduce.json {\"size_reduce\":true,\"size_multiplier\":0.25,\"r2_tier\":true} (R1 -73.4% < -50%); reader replay OK decider_run:376-381 + brain.py:839 (22.30->5.58 floored 11.10; 44.44->11.11 real cut above floor); idempotent mtime-stable, fail-open probe (R1 None) no-op, recovery probe -44.2 restored + [R2-TIER] restored line, guardrail snapshot byte-exact; floor-eaten constraint in docstring; PATH CORRECTION: reader lives at HERMES_DATA (data/), NOT /var/www \u2014 brief's path would have been a silent no-op; commit 07c344a3."
+  },
+  {
+   "id": "arm-rate-control-tower",
+   "kind": "eval",
+   "disposition": "BUILD",
+   "status": "done",
+   "started": "2026-11-23",
+   "done_at": "2026-11-23",
+   "deadline": "2026-11-23T00:00:00Z",
+   "owner": "CEO ruling 20261123T004841Z (build: agent-10)",
+   "stream": "arm-rate split (trailing_activated) promoted to control tower \u2014 display-only, never a goal",
+   "threshold": "one PG query -> control_tower.json arm_rate {armed_n/wr/net, unarmed_n/wr/net, 7d} + HTML section labeled 'operational \u2014 never a goal'",
+   "default_action": "n/a \u2014 display only, no gating ever",
+   "evidence": "DONE arm-rate-control-tower: EXECUTED 2026-11-23 (CEO ruling 3 BUILD display-only) \u2014 control_tower.json arm_rate = 51T/94.1%/+2.49 vs 65T/18.5%/-3.67 fill-cap basis (gross +3.40/-2.82 = known numbers exact); trailing_activated marker verified (mfe40 candidate 62/54 rejected); HTML curl-verified on served page; commit 07c344a3."
   }
  ],
  "updated_at": "2026-11-22T22:49:32Z"
