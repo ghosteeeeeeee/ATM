@@ -4752,5 +4752,38 @@
     "after": "CLOSED NO-SHIP final",
     "rationale": "mature window, directional edge never significant",
     "impact": "stops re-asking floor question every run"
+  },
+  {
+    "timestamp": "2026-11-23T08:58:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #292: dispositioned measurements for 3 watchdog steers (atp SHORT<35, LONG 45-60, atr-trend- 60-72) — all advisory/monitor, 0 ships",
+    "type": "data",
+    "file": "brain/audit_recommendations.json",
+    "before": "steers age=2 unexecuted",
+    "after": "measured with bars, citations logged",
+    "rationale": "watchdog routed measurements to brain auditor",
+    "impact": "no trading behavior change; CEO gets half-size dampen proposal"
+  },
+  {
+    "timestamp": "2026-11-23T08:58:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #292: contrarian outcome join re-ran (mandate) — pc- flip decayed 64.6%→54.0%, live cohort fee-negative",
+    "type": "data",
+    "file": "data/contrarian_outcome_join.json",
+    "before": "04:31Z join",
+    "after": "08:30Z join, 2644 decided, flip 49.5%",
+    "rationale": "Step-2b mandate: join has no systemd producer, run unconditionally",
+    "impact": "feeds 11-25 watch-contrarian-live DEMOTE pre-position"
+  },
+  {
+    "timestamp": "2026-11-23T08:58:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #292 creative: prearmed knife-zone half-size dampen PROPOSED to CEO (not shipped — p=0.0514 marginal, review-queue channel)",
+    "type": "creative",
+    "file": "brain/creative_improvements.json",
+    "before": "prearmed first entries full size at RSI<35 (30d -$1.17)",
+    "after": "proposal lodged: size_mult 0.5 when prearmed SHORT fill-time RSI<35",
+    "rationale": "FK-proof alternative to block (fk would be 66.7%), preserves CEO catch directive, +$0.60/14d",
+    "impact": "awaiting CEO RATIFY/VETO — zero behavior until approved"
   }
 ]

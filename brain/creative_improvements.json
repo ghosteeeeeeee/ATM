@@ -12165,5 +12165,33 @@
     "category": "kpi",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-23T08:57:42Z",
+    "idea": "Prearmed knife-zone first-entry HALF-SIZE dampen (size_mult 1.0→0.5 when prearmed SHORT fill has fill-time RSI<35)",
+    "rationale": "FK-proof alternative to a block: preserves CEO 'catch these shorts' directive while cutting the -$1.20/14d bleed in half (+$0.60/14d). Pattern already exists (FADE_EXEMPT_KNIFE_SIZE_MULT=0.5). Welch p=0.0514 marginal, split-half same-sign. Session prior art: FADE_EXEMPT half-size pattern [calwndar 2026-10-31]; prearmed skip is CEO 2026-11-20 [brain.py docstring].",
+    "expected_impact": "+$0.60/14d saved, winners still fire at half size (no fk kill)",
+    "category": "entry sniper / sizing",
+    "status": "proposed_ceo",
+    "risk": "low",
+    "bars": "n=28>=15 PASS | p=0.0514 MARGINAL | split-half same-sign PASS | fk n/a (size not block) | prior-art: half-size pattern exists, dampen-on-prearmed is NEW"
+  },
+  {
+    "date": "2026-11-23T08:57:42Z",
+    "idea": "pc- fade edge-decay early warning: join flip 64.6%→54.0% while live cohort 39.5% WR fee-negative",
+    "rationale": "watch-contrarian-live due 11-25 already; pre-position the DEMOTE conversation now with fresh numbers instead of at deadline. Session: flip conversion autopsy [calwndar 2026-10-31].",
+    "expected_impact": "avoid 2 more weeks of fee-negative live fade if decay holds",
+    "category": "kill/monitor",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-23T08:57:42Z",
+    "idea": "gate_shadow would_win provenance audit (#291 C1 still unbuilt): recompute would_win from 5m candles for a 200-row sample, quarantine if systematic bias",
+    "rationale": "jup walk already proved +14.5pp inflation on one signal; every clonehunt/threshold that reads gate_shadow is poisoned until audited.",
+    "expected_impact": "restores trust in shadow gate metrics",
+    "category": "data quality",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
