@@ -881,19 +881,16 @@ def _ladder_keeper(decision, summary):
                 not in ('fired', 'error', 'rejected')
 
         def _side_mult(side):
-            """CEO 2026-11-13 position sizing: ADD ON WINNERS, REMOVE FROM
-            LOSERS — a derived rung doubles (2x base) when the side's last
-            5 closed BTC trades net positive (short side: +3.75% → 2x);
-            losers stay at base (the HL $11 min-notional floor makes
-            shrink-below-base impossible — 'remove from losers' = no
-            pyramid + serial cuts, not smaller notional)."""
-            try:
-                rows = DB.recent_attribution(5) or []
-                net = sum(float(r.get('pnl_pct') or 0) for r in rows
-                          if str(r.get('direction', '')).upper() == side)
-                return 2.0 if net > 0 else 1.0
-            except Exception:
-                return 1.0
+            """Rung sizing EQUALIZED (CEO 2026-11-23: 'why is short 2x
+            position size of long, shouldnt they be the same') — both
+            sides derive at the $11.10 base. This RETIRES the 2026-11-13
+            add-on-winners double FOR RUNG DERIVATION (the short side
+            was at 2x because its last-5 netted positive); the
+            add-on-winners doctrine remains for TRADE-level adds (the
+            ladder ADD path uses the rung's configured size).
+            REVERT: restore the recent_attribution branch (return 2.0 if
+            net > 0 else 1.0)."""
+            return 1.0
 
         orders = pcfg.get('orders', [])
         appended = []
@@ -926,6 +923,11 @@ def _ladder_keeper(decision, summary):
                 return (price - t) if _s == 'short' else (t - price)
 
             _near = min(_cand, key=_dist)
+            # CEO dictations under test carry band_exempt (e.g. the
+            # 61,750 sub-62k wick experiment) — the band never fights
+            # a flagged level; the outcomes adjust the skill at review.
+            if _near.get('band_exempt'):
+                continue
             _pct = _dist(_near) / price * 100.0
             if _bmin <= _pct <= _bmax:
                 continue

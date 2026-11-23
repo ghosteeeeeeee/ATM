@@ -1056,6 +1056,14 @@ auto_trader's run invoke):**
    CEO-dictated levels) are never touched.
 3. Report the closest-bracket distance % in §6 every analysis; out of
    band at report time = flag it.
+4. **`band_exempt` = the experiment flag** (CEO 2026-11-23): a
+   CEO-dictated level may be placed OUT of band on purpose, carrying
+   `band_exempt: true` — the pre-pass never fights a flagged level.
+   The current one: **long 61,750** (0.41% from price, under the 62k
+   round, wick-accepted by the CEO: "highly likely to get wicked
+   though — add that too, we'll adjust the skill depending on how they
+   go"). The outcomes of exempt levels are evidence for the band's
+   review — collect them at the 11-29 gate alongside the metrics.
 
 This is the placement half of §16: §16 says a tight-band first poke
 lacks conviction; this rule makes the closest bracket require a real

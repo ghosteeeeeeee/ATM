@@ -379,9 +379,15 @@ duplicate real trade #16832).
     **1h-major-ceiling reclaim** (trigger = sh1h + 60, SL = sh1h −
     0.6·ATR15, TP = trigger + 3·ATR1h AT ARM TIME). All keeper legs
     `serial` + `dynamic_sl:false`. **POSITION SIZING (CEO 2026-11-13:
-    "add on winners, remove from losers")** — derived rungs size at
-    **2× base ($22.20) when the side's last-5 closed BTC trades net
-    positive**, base ($11.10) otherwise; the HL $11 min-notional floor
+    "add on winners, remove from losers")** — ~~derived rungs size at
+    2× base ($22.20) when the side's last-5 closed BTC trades net
+    positive~~ **EQUALIZED (CEO 2026-11-23: 'why is short 2x position
+    size of long, shouldnt they be the same'): both sides derive at
+    the $11.10 base** — the winner-double is retired FOR RUNG
+    DERIVATION (all 82 armed BTC rungs re-sized to $11.10); the
+    add-on-winners doctrine remains for TRADE-level adds (the ladder
+    ADD path uses the rung's configured size). REVERT: restore the
+    recent_attribution branch in `_side_mult`. The HL $11 min-notional floor
     means losers cannot shrink below base — "removing from losers" is
     expressed as no pyramid + serial cuts, not smaller notional.
     **LEVERAGE: CEO trial 10x on the next few orders (2026-11-14)** —
