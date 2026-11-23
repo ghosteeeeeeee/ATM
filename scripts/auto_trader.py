@@ -760,6 +760,51 @@ def tweak_structure_fixed(decision, open_positions):
     return tweaks
 
 
+def _band_clamp(price, trig, direction):
+    """§17 (CEO 2026-11-23): the closest bracket sits in a
+    [BRACKET_MIN_NEAR_PCT, BRACKET_MAX_FAR_PCT]% band from price —
+    not too close (the wick class, §16), not too far (never/late
+    fills). Snaps to the nearest 250-round INSIDE the band; keeps the
+    clamped edge if no round fits (a 1%-band always fits one)."""
+    try:
+        import hermes_constants as hc
+        lo = float(hc.BRACKET_MIN_NEAR_PCT) / 100.0
+        hi = float(hc.BRACKET_MAX_FAR_PCT) / 100.0
+    except Exception:
+        lo, hi = 0.01, 0.02
+    if direction == 'short':
+        near_edge = price * (1 - lo)   # the nearest acceptable trigger
+        far_edge = price * (1 - hi)    # the farthest acceptable trigger
+        t = trig
+        if t > near_edge:
+            t = near_edge              # too close → push out
+        elif t < far_edge:
+            t = far_edge               # too far → pull in
+        lo_b, hi_b = far_edge, near_edge
+    else:
+        near_edge = price * (1 + lo)
+        far_edge = price * (1 + hi)
+        t = trig
+        if t < near_edge:
+            t = near_edge
+        elif t > far_edge:
+            t = far_edge
+        lo_b, hi_b = near_edge, far_edge
+    # nearest 250-round INSIDE the band (CEO's picks are 250-rounds;
+    # the too-far long edge snaps to 62,250 exactly)
+    for cand in (round(t / 250.0) * 250,
+                 int(t // 250) * 250,
+                 (int(t // 250) + 1) * 250):
+        if lo_b <= cand <= hi_b and cand != t:
+            if abs(cand - t) <= 250:
+                return cand if abs(cand - t) == min(
+                    abs(x - t) for x in (round(t / 250.0) * 250,
+                                         int(t // 250) * 250,
+                                         (int(t // 250) + 1) * 250)
+                    if lo_b <= x <= hi_b) else t
+    return t
+
+
 def _ladder_keeper(decision, summary):
     """Rule-13 AUTO-REPLENISH — BOTH SIDES (CEO 2026-11-13: "figure out why
     the next short was not already ready to fire... you better be ready for
@@ -855,6 +900,58 @@ def _ladder_keeper(decision, summary):
         reach_lo = price - 3.0 * atr1
         reach_hi = price + 3.0 * atr1
 
+        # §17 PRE-PASS (CEO 2026-11-23: "not a one-off — you need to
+        # do this, as does the keeper and watcher"): the nearest armed
+        # rung per side out of the [MIN,MAX]% band → re-level it
+        # (trigger snaps to the nearest 250-round inside the band; SL
+        # and TP move by the SAME delta — the reclaim offset and the
+        # disaster depth are preserved). In-band rungs (incl.
+        # CEO-dictated levels) are never touched.
+        relevelled = []
+        try:
+            import hermes_constants as _hc17
+            _bmin = float(_hc17.BRACKET_MIN_NEAR_PCT)
+            _bmax = float(_hc17.BRACKET_MAX_FAR_PCT)
+        except Exception:
+            _bmin, _bmax = 1.0, 2.0
+        for _side in ('short', 'long'):
+            _cand = [o for o in orders if o.get('coin') == 'BTC'
+                     and o.get('direction') == _side
+                     and o.get('trigger_price') and _unfired(o)]
+            if not _cand:
+                continue
+
+            def _dist(o, _s=_side):
+                t = float(o['trigger_price'])
+                return (price - t) if _s == 'short' else (t - price)
+
+            _near = min(_cand, key=_dist)
+            _pct = _dist(_near) / price * 100.0
+            if _bmin <= _pct <= _bmax:
+                continue
+            _new = _band_clamp(price, float(_near['trigger_price']), _side)
+            _old = float(_near['trigger_price'])
+            if _new == _old:
+                continue
+            _d = _new - _old
+            _near['trigger_price'] = _new
+            # TP: always move by the delta (the 3·ATR distance from the
+            # trigger is what's preserved). SL: only on a PULL-IN
+            # (the trigger moving toward price) — otherwise the reclaim
+            # stop would sit too close to the new entry (a 37pt stop);
+            # on a PUSH-OUT the SL stays at its structure (the reclaim
+            # gap legitimately grows with the deeper entry).
+            _tv = _near.get('target')
+            if _tv:
+                _near['target'] = round(float(_tv) + _d, 2)
+            _pull_in = ((_side == 'short' and _d > 0) or
+                        (_side == 'long' and _d < 0))
+            if _pull_in:
+                _sv = _near.get('sl')
+                if _sv:
+                    _near['sl'] = round(float(_sv) + _d, 2)
+            relevelled.append((_side, _old, _new, _near.get('id')))
+
         # ── SHORT side: an unfired BTC rung within reach below price = ready
         short_ready = any(
             o.get('coin') == 'BTC' and o.get('direction') == 'short'
@@ -873,6 +970,9 @@ def _ladder_keeper(decision, summary):
             # within reach, else next cycle would duplicate it.
             trig1h = round(sl1h - 60) if sl1h else 0
             trig = trig1h
+            _src1h = (trig == trig1h)   # §17: captured BEFORE the band
+            # clamp (a clamped trig breaks the trig==trig1h identity —
+            # the SL/note source branches must key on this instead)
             # FALLBACK (CEO Q 2026-11-14 'if it drops further is there a
             # short ready'): during a fast slide the 1h zigzag floor lags
             # ABOVE price → the ITM guard blocks the arm and the short
@@ -901,13 +1001,14 @@ def _ladder_keeper(decision, summary):
                 # dark side. No structure, no arm.)
                 trig = round(price * 0.997)
                 fresh_air = True
+            trig = _band_clamp(price, trig, 'short')   # §17 band
             if trig and reach_lo <= trig < price:
                 # CEO 2026-11-20 (#17004: price×1.006 lost in 3min):
                 # fresh-air stops sit at MAJOR STRUCTURE — the 1h swing
                 # high + 0.1·ATR1h (the lag's line convention), never an
                 # arbitrary percentage: 'have some conviction to hold
                 # till (major) resistance is broken'.
-                sl = (round(sl1h + 0.60 * atr15) if trig == trig1h
+                sl = (round(sl1h + 0.60 * atr15) if _src1h
                       else (round(sh1h + 0.10 * atr1) if fresh_air
                             else round(sl15 + 0.60 * atr15)))
                 # ponytail: TP gap fixed at arm time (3·ATR1h THEN, never
@@ -921,11 +1022,14 @@ def _ladder_keeper(decision, summary):
                 # fresh-air arms (live proof: trigger58736 labeled
                 # 'sl1h 61320−60'; one note carried two contradictory SLs).
                 if fresh_air:
+                    _fa = (f"price {price:.0f}×0.997"
+                           if trig == round(price * 0.997)
+                           else f"price {price:.0f}×0.997 → band-clamped {trig}")
                     _src = (f"FRESH-AIR continuation: trigger {trig} "
-                            f"(price {price:.0f}×0.997), SL {sl} = "
+                            f"({_fa}), SL {sl} = "
                             f"sh1h+0.1·ATR1h MAJOR structure")
                     _ev = "FRESH-AIR"
-                elif trig == trig1h:
+                elif _src1h:
                     _src = (f"1h MAJOR-floor break: trigger {trig} "
                             f"(sl1h {sl1h:.0f}−60), SL {sl} = "
                             f"sl1h+0.6·ATR15 reclaim (break failed)")
@@ -966,7 +1070,7 @@ def _ladder_keeper(decision, summary):
             and price <= float(o.get('trigger_price') or 0) <= reach_hi
             for o in orders)
         if not long_ready and sh1h:
-            trig = round(sh1h + 60)
+            trig = _band_clamp(price, round(sh1h + 60), 'long')   # §17 band
             # ITM guard + F-6 reach guard: the derived rung must itself
             # be within reach (else every cycle would duplicate it)
             if price < trig <= reach_hi:
@@ -991,6 +1095,18 @@ def _ladder_keeper(decision, summary):
                              f"dynamic_sl:false. Trend-is-your-friend ride leg.")})
                 appended.append(('ladder_keeper_long', oid, f"long @ {trig} (1h major ceiling {sh1h:.0f}, SL {sl}, TP {tp})"))
 
+        if relevelled:
+            pcfg['orders'] = orders
+            tmp = p_path + '.tmp'
+            with open(tmp, 'w') as f:
+                json.dump(pcfg, f, indent=1)
+            os.replace(tmp, p_path)
+            for _side, _old, _new, _oid in relevelled:
+                DB.log_event('INFO',
+                             f"ladder_keeper: §17 re-level {_side} {_oid} "
+                             f"trigger {_old} → {_new} (band {_bmin}-"
+                             f"{_bmax}% from price {price:.0f}, SL/TP moved "
+                             f"by the same delta)")
         if appended:
             pcfg['orders'] = orders
             tmp = p_path + '.tmp'

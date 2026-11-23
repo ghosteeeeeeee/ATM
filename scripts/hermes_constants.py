@@ -2206,6 +2206,15 @@ WIN_CAPTURE_SHADOW_GIVEBACK = 0.20  # ANALYSIS-ONLY what-if giveback — never a
 # would-fires only. Flip live only with CEO GO + v6 exit-stack integration.
 ARM_BE_SHADOW_ENABLED = True  # Revert: set False.
 # ── major-break redesign constants (CEO 2026-11-22) ──────────────────────────
+# §17 (CEO 2026-11-23): the first (closest) bracket sits in this
+# distance band from price — not too close (wicks) / not too far
+# (never fills). CEO examples: a short at 0.92% = too close, a long at
+# 2.04% = too far; his picks 60,250/62,250 ≈ 1.5%/1.8%. The keeper
+# clamps derivations into the band and re-levels out-of-band rungs.
+# REVERT: set both to 0 (the clamp becomes a no-op).
+BRACKET_MIN_NEAR_PCT = 1.0   # >=1% from price (not too close)
+BRACKET_MAX_FAR_PCT = 2.0    # <=2% from price (not too far)
+
 MOMENTUM_ATR_K = 0.5           # E1 displacement: fill requires closed-1m close beyond level >= K x ATR(15m). REVERT via MOMENTUM_CONFIRM_ENABLED.
 MOMENTUM_CONFIRM_ENABLED = True  # E1 master switch (trade_watchdog fill gate). False = legacy fill-on-cross, byte-identical. REVERT = False.
 BOUNCE_SHADOW_ENABLED = True   # E3 bounce-trigger SHADOW (log-only would-fires at level rejection). False = silent. Flip to live only with CEO approval after 7d data.
