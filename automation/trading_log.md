@@ -32415,3 +32415,32 @@ BY: auto_1hr
 - pump-chain+ 14d n=11 of 20 kill threshold, net -0.55 — revisit if n reaches 20
 - storm packet bar 3/3 awaits CEO sign-off by 2026-11-26
 BY: auto_1hr
+
+## [2026-11-23 10:55] Hourly Analysis
+
+**Storm:** no storm (window-min -0.59% / at-run +0.27%)
+
+**Trades:** 3 closed last hour (0W 3L) | 24h 15 closed (6W 9L)
+**PnL NET:** hour $-0.28 (TURBO hh-hl+ atr_sl_hit -0.13, PURR/LDO bb-squeeze+ trail_arm_timeout -0.07/-0.08) | 24h NET $-0.68 (gross -0.50, fees 0.18, payoff 0.58, WR 40.0%) | 7d NET $-1.73 (121T) | 14d NET $-4.55 (231T) | **size-reduce: file absent -> 1.0x**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Kill policy: 3 closes last hour but no signal hit 3+ trades with 0% WR (bb-squeeze+ 2T 0% net -0.15, hh-hl+ 1T 0% — both n<3) -> no trigger; ai-trader-pending 6T 33.3% net -0.36 24h loser, 0 closes last hour, all-BTC CEO trades -> monitor
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/15 = 6.7% (<40%); tpsl_utils deployed; manual_sl_hit 3T net -0.53 dominant loser, trail_arm_timeout 3T net -0.22 second
+- Boost: none eligible (no signal n>=5 with WR>55% net>0; ai-trader-pending 6T 33% net -0.36 is the only n>=5)
+- Arm rate: unarmed 6/15 = 40.0% below 70%, WR 16.7% net -$0.76 vs armed 9/9 55.6% net +$0.08 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 01-04 negative then 05-08 0 closes breaks, 09 +0.01, 10 -0.28 = streak 1 not 3; regime NORMAL/HIGH not NEUTRAL -> no size cut
+- Frequency: 3 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.280% < 0.5% (max 0.639)
+- 0 open positions
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.68 (fees 0.18 vs gross -0.50), payoff 0.58 — fee-drag + low payoff; 7d -1.73, 14d -4.55 (worsening)
+- unarmed WR 16.7% cohort 40% of closes, net -0.76 — stall stack owns fix
+- pump-chain+ 14d n=11 of 20 kill threshold, net -0.55 (EXTREME 10T 10% WR) — revisit if n reaches 20
+- storm packet bar 3/3 awaits CEO sign-off by 2026-11-26
+BY: auto_1hr
