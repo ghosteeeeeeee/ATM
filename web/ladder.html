@@ -153,7 +153,7 @@ tr.hl td { background:#1c2430; }
     </div>
 
     <div class="card" style="margin-top:14px">
-      <h2 style="margin-top:0">open · ai-trader-pending</h2>
+      <h2 style="margin-top:0">open positions</h2>
       <div id="open-list" style="font-size:12px;color:var(--dim)">—</div>
     </div>
   </div>
@@ -257,7 +257,7 @@ function renderStats(){
   $('windows').innerHTML = `24h <b class="${cls(w[1])}">${usd(w[1])}</b> (n=${w[0]}) &nbsp;·&nbsp; 72h <b class="${cls(w72[1])}">${usd(w72[1])}</b> (n=${w72[0]}) &nbsp;·&nbsp; 7d <b class="${cls(w168[1])}">${usd(w168[1])}</b> (n=${w168[0]})`;
   const opens = s.open||[];
   $('open-list').innerHTML = opens.length? opens.map(o=>
-    `<div style="display:flex;justify-content:space-between;padding:2px 0"><span>#${o.id} <span class="tag ${o.dir.toLowerCase()}">${o.dir}</span> @ ${fmt(o.entry,1)}</span><span class="${cls(o.pnl_pct)}">${o.pnl_pct>0?'+':''}${o.pnl_pct}%</span></div>`).join('')
+    `<div style="display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid #14141c"><span>#${o.id} ${o.coin} <span class="tag ${o.dir.toLowerCase()}">${o.dir}</span> @ ${fmt(o.entry,1)} <span style="color:var(--dim);font-size:10px">${o.signal||''}</span></span><span class="${cls(o.pnl_pct)}" style="white-space:nowrap">${o.pnl_pct>0?'+':''}${o.pnl_pct}%</span></div>`).join('')
     : '<span style="color:var(--dim)">none open</span>';
 }
 
