@@ -2211,7 +2211,10 @@ ARM_BE_SHADOW_ENABLED = True  # Revert: set False.
 # (never fills). CEO examples: a short at 0.92% = too close, a long at
 # 2.04% = too far; his picks 60,250/62,250 ≈ 1.5%/1.8%. The keeper
 # clamps derivations into the band and re-levels out-of-band rungs.
-# REVERT: set both to 0 (the clamp becomes a no-op).
+# REVERT: git revert the §17 commit (edc9e636+). Setting both to 0 is
+# NOT a no-op: the pre-pass would slam the nearest rung to exactly
+# price (instant-cross) and derivations would go dark (price==price
+# guards reject).
 BRACKET_MIN_NEAR_PCT = 1.0   # >=1% from price (not too close)
 BRACKET_MAX_FAR_PCT = 2.0    # <=2% from price (not too far)
 

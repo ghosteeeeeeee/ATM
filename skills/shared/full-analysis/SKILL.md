@@ -850,11 +850,13 @@ and resistance.** The stop-limit process IS the backup strategy.
   fires (evidence: the 68,551/68,557 pair — 6pts, serial-safe; and the
   three-way check that caught a 3pt overlap on 73,594-class rungs).
   `serial:true` then guarantees no stacking on top of it.
-  **SIZING — add-on-winners (CEO 2026-11-13):** rungs size at **2× base
-  ($22.20) when the side's last-5 closed trades net positive**, base
-  ($11.10) otherwise (HL $11 floor = losers can't shrink; "remove from
-  losers" = no pyramid + serial cuts). The keeper enforces it
-  (`_side_mult`); apply the same table when deriving by hand.
+  **SIZING — EQUALIZED (CEO 2026-11-23):** rungs size at the **$11.10
+  base on BOTH sides** — the 2026-11-13 add-on-winners 2× ($22.20) is
+  retired for rung derivation (T: "why is short 2x position size of
+  long, shouldnt they be the same"). `_side_mult` returns 1.0 (HL $11
+  floor still applies); the add-on-winners doctrine remains for
+  TRADE-level adds (the ladder ADD path uses the rung's configured
+  size). REVERT: restore the recent_attribution branch in `_side_mult`.
 - Market entries in no-edge states are the #16283/#16291/#16317 pattern —
   paying the sweep tax for information the bracket gets for free by
   waiting. The bracket converts indecision into defined-risk optionality:
@@ -1061,10 +1063,17 @@ auto_trader's run invoke):**
    band (all styles, both sides).
 2. **Existing rungs get re-leveled** — the keeper's pre-pass finds the
    nearest rung per side; if it is out of band, its trigger snaps to
-   the nearest 250-round inside the band and the SL moves by the SAME
-   delta (the reclaim offset is preserved; the TP stays — the R:R is
-   re-checked ≥1.0 planned after the move). In-band rungs (including
-   CEO-dictated levels) are never touched.
+   the nearest 250-round inside the band; the TP ALWAYS moves by the
+   same delta (the 3·ATR distance from the trigger is what's
+   preserved) and the SL moves only on a PULL-IN (else the reclaim
+   stop would sit too close to the new entry — a 37pt stop); a
+   PUSH-OUT keeps the SL at its structure (the reclaim gap grows with
+   the deeper entry). The post-move R:R is REPORTED in §6 — a
+   push-out that drops planned R:R below 1.0 is a report item, not an
+   automatic rejection. In-band rungs are never touched;
+   **CEO-dictated levels always carry `band_exempt`** — T's
+   dictations are never touched, in or out of band (the band governs
+   the KEEPER's derivations, not his levels).
 3. Report the closest-bracket distance % in §6 every analysis; out of
    band at report time = flag it.
 4. **`band_exempt` = the experiment flag** (CEO 2026-11-23): a

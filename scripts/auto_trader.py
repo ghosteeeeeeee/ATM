@@ -922,7 +922,8 @@ def _ladder_keeper(decision, summary):
                 t = float(o['trigger_price'])
                 return (price - t) if _s == 'short' else (t - price)
 
-            _near = min(_cand, key=_dist)
+            _near = min(_cand, key=_dist)   # (dictations carry
+            # band_exempt from their config note — see below)
             # CEO dictations under test carry band_exempt (e.g. the
             # 61,750 sub-62k wick experiment) — the band never fights
             # a flagged level; the outcomes adjust the skill at review.
@@ -937,6 +938,10 @@ def _ladder_keeper(decision, summary):
                 continue
             _d = _new - _old
             _near['trigger_price'] = _new
+            _near['note'] = (str(_near.get('note') or '') +
+                             f" | §17 re-level {int(_old)} → {int(_new)} "
+                             f"({time.strftime('%Y-%m-%d %H:%M')} UTC, "
+                             f"band {_bmin}-{_bmax}%)")
             # TP: always move by the delta (the 3·ATR distance from the
             # trigger is what's preserved). SL: only on a PULL-IN
             # (the trigger moving toward price) — otherwise the reclaim
@@ -972,9 +977,6 @@ def _ladder_keeper(decision, summary):
             # within reach, else next cycle would duplicate it.
             trig1h = round(sl1h - 60) if sl1h else 0
             trig = trig1h
-            _src1h = (trig == trig1h)   # §17: captured BEFORE the band
-            # clamp (a clamped trig breaks the trig==trig1h identity —
-            # the SL/note source branches must key on this instead)
             # FALLBACK (CEO Q 2026-11-14 'if it drops further is there a
             # short ready'): during a fast slide the 1h zigzag floor lags
             # ABOVE price → the ITM guard blocks the arm and the short
@@ -1003,7 +1005,21 @@ def _ladder_keeper(decision, summary):
                 # dark side. No structure, no arm.)
                 trig = round(price * 0.997)
                 fresh_air = True
-            trig = _band_clamp(price, trig, 'short')   # §17 band
+            # F1 (agent-8 HIGH): the source capture must happen AFTER
+            # every derivation (1h-floor / sl15-fallback / fresh-air) —
+            # capturing right after `trig = trig1h` made it a constant
+            # True, so fallback/fresh-air arms took the 1h SL source
+            # (wrong stop + a self-contradicting note; both classes
+            # fire live). Captured here: still BEFORE the clamp, whose
+            # identity-breaking is the reason it exists.
+            _src1h = (trig == trig1h)
+            # F2 (agent-8 HIGH): never clamp a falsy trig — a degenerate
+            # structure (classify() <2 swings → trig 0/-20) must stay
+            # falsy so the reach/falsy guards reject it (clamping it
+            # would arm a doomed rung = permanently unfired = dark
+            # short side + WARN spam — the old F2 class).
+            if trig:
+                trig = _band_clamp(price, trig, 'short')   # §17 band
             if trig and reach_lo <= trig < price:
                 # CEO 2026-11-20 (#17004: price×1.006 lost in 3min):
                 # fresh-air stops sit at MAJOR STRUCTURE — the 1h swing
@@ -1033,12 +1049,16 @@ def _ladder_keeper(decision, summary):
                     _ev = "FRESH-AIR"
                 elif _src1h:
                     _src = (f"1h MAJOR-floor break: trigger {trig} "
-                            f"(sl1h {sl1h:.0f}−60), SL {sl} = "
+                            f"(sl1h−60 = {trig1h}"
+                            f"{' → band-clamped ' + str(trig) if trig != trig1h else ''}), "
+                            f"SL {sl} = "
                             f"sl1h+0.6·ATR15 reclaim (break failed)")
                     _ev = "1h-floor"
                 else:
                     _src = (f"15m fresher-low break: trigger {trig} "
-                            f"(sl15 {sl15:.0f}−60), SL {sl} = "
+                            f"(sl15−60 = {round(sl15 - 60)}"
+                            f"{' → band-clamped ' + str(trig) if trig != round(sl15 - 60) else ''}), "
+                            f"SL {sl} = "
                             f"sl15+0.6·ATR15 reclaim (break failed)")
                     _ev = "15m-fresh-low"
                 orders.append({
@@ -1104,11 +1124,16 @@ def _ladder_keeper(decision, summary):
                 json.dump(pcfg, f, indent=1)
             os.replace(tmp, p_path)
             for _side, _old, _new, _oid in relevelled:
+                _pull = ((_side == 'short' and _new > _old) or
+                         (_side == 'long' and _new < _old))
                 DB.log_event('INFO',
                              f"ladder_keeper: §17 re-level {_side} {_oid} "
                              f"trigger {_old} → {_new} (band {_bmin}-"
-                             f"{_bmax}% from price {price:.0f}, SL/TP moved "
-                             f"by the same delta)")
+                             f"{_bmax}% from price {price:.0f}; "
+                             + ("TP+SL moved by the delta (pull-in)"
+                                if _pull else
+                                f"TP moved by the delta, SL kept at the "
+                                f"structure (push-out)"))
         if appended:
             pcfg['orders'] = orders
             tmp = p_path + '.tmp'
