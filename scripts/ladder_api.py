@@ -104,7 +104,8 @@ def stats():
             "SELECT id, direction, entry_price, exit_price, exit_reason, "
             "pnl_usdt, fees, amount_usdt, leverage, open_time, close_time, "
             "highest_price, lowest_price "
-            "FROM trades WHERE status='closed' AND signal='ai-trader-pending' "
+            "FROM trades WHERE status='closed' "
+            "AND signal IN ('ai-trader-pending', 'ai-trader-auto') "
             "AND close_time > (now() - interval '14 days') "
             "ORDER BY close_time DESC")
         rows = cur.fetchall()

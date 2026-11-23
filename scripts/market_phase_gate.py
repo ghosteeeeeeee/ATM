@@ -111,7 +111,8 @@ FAMILY_MAP = {
     'Wyckoff': ['wyckoff', 'wyckoff+', 'wyckoff-', 'wyckoff_accumulation', 'wyckoff_distribution'],
     # added 2026-10-19 signal_reporter — ai-trader family was 'Other' (ungated composition);
     # EXTREME LONG/SHORT + NORMAL manual now regime-blocked via volatility_gate_v2 SIGNAL_TYPE_OVERRIDES
-    'AI_Trader': ['ai-trader', 'ai-trader+', 'ai-trader-', 'ai-trader-manual', 'ai-trader-pending'],
+    'AI_Trader': ['ai-trader', 'ai-trader+', 'ai-trader-', 'ai-trader-manual', 'ai-trader-pending',
+                  'ai-trader-auto'],  # auto-ladder tag-split (brain_auditor #293) — exact lookup, without this the tag falls to 'Other' (ungated composition)
 }
 
 # Reverse lookup: signal_type → family

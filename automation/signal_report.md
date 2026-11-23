@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-23 01:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-23 13:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,947 | **WR:** 51.3% | **PnL:** -116.47%
+- **Total trades (all time):** 3,955 | **WR:** 51.3% | **PnL:** -121.19%
 - **Date range:** 2026-07-29 → 2026-11-23
 
 ---
@@ -23,7 +23,8 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| ai-trader-pending | SHORT | 2 | 50.0% | -0.14 | ❓ | Needs more data |
+| ai-trader-pending | LONG | 3 | 33.3% | -0.75 | ❓ | Needs more data |
+| continuation+ | LONG | 2 | 50.0% | -0.21 | ENABLED | Needs more data |
 
 ---
 
@@ -41,7 +42,8 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] ai-trader-pending SHORT** — WR=50.0%, PnL=-0.14% over 2 trades. Monitor next cycle.
+1. **[WATCH] ai-trader-pending LONG** — WR=33.3%, PnL=-0.75% over 3 trades. Monitor next cycle.
+2. **[WATCH] continuation+ LONG** — WR=50.0%, PnL=-0.21% over 2 trades. Monitor next cycle.
 
 ---
 
@@ -53,6 +55,9 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-11-23 | 2d4221d | agent-8 findings closed: F1 SL-source capture, F2 falsy-guar... |
+| 2026-11-23 | edc9e63 | keeper §17: the first (closest) bracket sits in a 1-2% band ... |
+| 2026-11-23 | b675ab5 | signals: continuum_score — rewrite to state-transition logic... |
 | 2026-11-23 | 7423113 | scripts: pump-chain v6 VETO EXECUTED (short-only restore, EX... |
 | 2026-11-22 | 1de08ca | trading: major-break redesign shipped — momentum-confirmatio... |
 | 2026-11-22 | 272ba31 | Daily trading system update (2026-11-22) |
@@ -60,8 +65,5 @@ None found. Top performers are already enabled.
 | 2026-11-20 | 03d6800 | F6: register MFE_EXIT_* in CEO_PROTECTED_FLAGS (bug-hunter m... |
 | 2026-11-20 | 5c814dc | straight-line escape: no level-starvation on one-way moves +... |
 | 2026-11-20 | eaac17c | scripts: audit #282 — stop-tighten scope-widen REVERT (walk ... |
-| 2026-11-20 | 9cdf09e | scripts: net-of-fee net_pnl KPI, PREARM enforce GO, preserve... |
-| 2026-11-19 | a037e7a | ceo-deep 20261119T225832Z result-1: atr-trend ride_it exit t... |
-| 2026-11-19 | 1c9ef17 | scripts: brain_auditor audit #279 — steer root-cause + fade-... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

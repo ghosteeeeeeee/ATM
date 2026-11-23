@@ -32617,3 +32617,31 @@ BY: auto_1hr
 - pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
 - storm packet bar 3/3 + 8th positive awaits CEO sign-off by 2026-11-26
 BY: auto_1hr
+
+## [2026-11-23 17:55] Hourly Analysis
+
+**Storm:** FIRED — window-min -1.55% / at-run -0.67% (dump gate) | blocked 170 | true-starvation 31 RSI>=35 | counterfactual $-1.40 (touch 28/31) | waiver SHADOW=True ENFORCE=False → **bar RESET 0/3** (neg cf, #250 precedent), deadline 2026-11-26
+**Trades:** 0 closed last hour | 24h 16 closed (6W 10L)
+**PnL NET:** hour $0.00 | 24h NET $-1.41 (gross -1.22, fees 0.19, payoff 0.48, WR 37.5%) | 7d NET $-2.28 (122T) | 14d NET $-4.75 (231T) | **size-reduce: 0.25x (r2_tier true, R2-TIER R1)**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Kill policy: 0 closes last hour — no trigger
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/16 = 6.3% (<40%); tpsl_utils deployed; manual_sl_hit 5T net -1.37 dominant (all CEO BTC), trail_arm_timeout 3T net -0.22 second
+- Boost: none eligible (max n=4: bb-squeeze+ 4T 25% net -0.22; jup_yolo_mirrored 2T 100% net +0.35 but n<5)
+- Arm rate: unarmed 9/16 = 56.3% below 70%, WR 22.2% net -1.32 vs armed 7/7 57.1% net -0.09 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 10 -0.28, 11 0.00, 13 +0.28, 16 -0.84 — not 3 consecutive; regime NORMAL/HIGH not NEUTRAL -> no size cut
+- Frequency: 0 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.341% < 0.5% (max 0.639)
+- 0 open
+
+**Open Questions:**
+- 24h NET -1.41 (fees 0.19 vs gross -1.22), payoff 0.48; 7d -2.28, 14d -4.75 — worsened again
+- Storm bar RESET 0/3 by negative cf — SHORT-side cf +2.47 positive (waiver scope), LONG-side -3.83 drag; needs 3 fresh positive storms before 11-26
+- unarmed WR 22.2% cohort 56.3% of closes, net -1.32 — stall stack owns fix
+- pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
+- size-reduce 0.25x r2_tier active
+BY: auto_1hr

@@ -1875,3 +1875,21 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 16T -0.13 43.8% | 7d 118T +0.28 50.8%
 ### Findings: disk 89% (>=85% warn, log compression freeing ~0MB); HIGH regime 14d is the bleed pocket (-1.61 over 81T, 45.7%) vs NORMAL +0.79. Regime-specialist read (rotating Q): ai-trader-pending SHORT only earns in NORMAL (+1.00, 27T) and collapses in HIGH (-0.82, 12.5% WR); atr-trend- SHORT ~60% WR in HIGH/NORMAL but negative PnL = R:R not entry; jup SHORT and btc-pump-rider+ LONG are consistent across regimes.
 ### Recommendation: HIGH-regime is loss-size not entry quality (60% WR cells negative) — no lever now; disk at 89% needs a real cleanup pass (log compression freeing 0MB).
+
+## CEO Status — 20261123T073829Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 17T -0.24 41.2% | 7d 118T +0.24 50.8%
+### Findings: clean — disk 89% WARN recurring in error_alerts (3x today); regime-specialist read (7d, n>=5): atr-trend- SHORT EXTREME 42.9% -0.38 vs HIGH 63.6% +0.07, pump-chain+ LONG EXTREME 0% -0.23 (small n, watch only)
+### Recommendation: schedule disk cleanup (89% used, no data risk yet); no metric action — 7d GREEN, open_pos 1 bracketed
+
+## CEO Status — 20261123T113829Z
+### Health: pipeline=active (timer-fired, service running 11:39Z) guardian=active open_pos=0
+### Numbers: 24h 16T -0.49 43.8% | 7d 122T +0.09 50.8%
+### Findings: disk 89% used repeated WARN (≥85% since 07:54Z); atr-trend- freq deviation UNDER (0.000/h vs 0.140 baseline) — signal silent, monitor; 24h mildly red (-0.49) within chop norm. Rotating Q (23%14=9, regime-specialists): 30d n≥10 WR≥65% cells = jup_yolo_mirrored SHORT HIGH 28T 67.9% +0.29 · volume-buildup- SHORT HIGH 18T 77.8% +0.25 · atr-trend- SHORT NORMAL 19T 68.4% +0.13 — all SHORT/HIGH-vol specialists, params already snapshotted in audits.
+### Recommendation: disk at 89% — schedule cleanup/log-rotation before it trips health critical; atr-trend- silence (0 fires) worth a producer check at next deep run.
+
+## CEO Status — 20261123T153830Z
+### Health: pipeline=active guardian=active open_pos=2
+### Numbers: 24h 15T -0.36 46.7% | 7d 121T 0.28 51.2%
+### Findings: clean — disk 89% WARN + gate_shadow capture 0.90 (both pre-existing); rotating Q "regime-specialists" (23%14=9): jup_yolo_mirrored is the regime generalist (7d NORMAL 6T 100% +0.60 / HIGH 8T 87.5% / EXTREME 5T 80%); bleed concentrated in EXTREME specialists atr-trend- 7T 42.9% -0.38 and pump-chain+ 7T 0% -0.23 (n<10, monitor only).
+### Recommendation: none

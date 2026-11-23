@@ -1,4 +1,4 @@
-# Shadow disposition report — 2026-11-23T04:49:21.445861+00:00
+# Shadow disposition report — 2026-11-23T15:43:31.349898+00:00
 registry: 146 entries (open=35)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
@@ -124,7 +124,7 @@ registry: 146 entries (open=35)
 - OPEN hl-copy-plus-shadow: deadline=2026-11-30T00:00:00Z | (no parseable source)
 - OPEN hotset-pin-approved-shadow: deadline=2026-11-25T00:00:00Z | (no parseable source)
 - OPEN amplify-pumpchain-normal-short-early: deadline=2026-12-02T00:00:00Z | (no parseable source)
-- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 4004 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 3.6d
+- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 4488 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 4.0d
 - DONE amplify-rider-fade-threshold-walk: ? (?)
 - DONE amplify-jup-long-blocked-clonehunt: NO SHIP — walk executed 2026-11-23T04:44Z (brain_auditor #291). Bars: (i) n=41 PASS | (ii) walk net +0.13 < +0.50 FAIL | (iii) fk=100% FAIL (every live-winner token-day also in blocked set — token-day unit wrong for multi-fire/day jup; see side-find) | (iv) only CONTINUUM-BLOCK n>=5 net>0 FAIL (need >=2 gates) | (v) split-half H1 +0.27 / H2 -0.13 FAIL. Provenance suspect CONFIRMED: pre-walk would_win 68.3% vs 5m-walk 53.8% same 41 events (gate_shadow would_win inflated +14.5pp vs candle truth). Result: brain/analysis/jup_long_blocked_walk_result.json. Do NOT re-propose without gate_shadow would_win audit + event-level (not token-day) unit. (?)
 - OPEN stop-family-entry-filter-shadow: deadline=2026-11-27T00:00:00Z | (no parseable source)

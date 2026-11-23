@@ -1447,6 +1447,7 @@ def _rip_climax_defer(coin, price):
         return False, ''
     if not (top and below and zone):
         return False, ''   # REVERT (RIP_RSI_TOP=0) no-ops the gates
+    con = None
     try:
         import sqlite3
         from paths import HERMES_DATA
@@ -1461,7 +1462,13 @@ def _rip_climax_defer(coin, price):
                     "AND is_closed=1 ORDER BY ts DESC LIMIT 30", (coin,))
         h1 = cur.fetchall()
         con.close()
+        con = None
     except Exception:
+        if con is not None:
+            try:
+                con.close()
+            except Exception:
+                pass
         return False, ''   # no data → fail-open
     if len(closes) < 60 or len(h1) < 5:
         return False, ''
@@ -1498,11 +1505,22 @@ def _rip_climax_defer(coin, price):
     # is how 64,603 looked at fill time; the ATR1h = the TR mean of the
     # last 14 bars)
     peak = max(closes[-60:])
+    # F-1 (agent-11 MEDIUM): h1 is DESC (newest first) — the
+    # chronologically-previous close of h1[i] is h1[i+1] (the OLDER
+    # neighbor), and trs is newest-first so the recent 14 = trs[:14].
+    # The shipped version paired h1[i-1] (the NEWER bar) and took
+    # trs[-14:] (the OLDEST 14 of 30, ~16-30h stale): the live ATR
+    # came out 572.3 vs the correct 784.0 = -27%, narrowing the creek
+    # zone and UNDER-deferring (failing toward the fill). Measured on
+    # candles.db by agent-11; the correct pattern already exists at
+    # the _local_atr15 helper (rows[i+1]).
     trs = []
-    for i in range(1, len(h1)):
-        hi, lo, pc = h1[i][0], h1[i][1], h1[i - 1][2]
+    # mirror _local_atr15 exactly: the NEWEST 14 bars (i=0..13), each
+    # paired with its OLDER neighbor's close (rows[i+1] in DESC)
+    for i in range(min(14, len(h1) - 1)):
+        hi, lo, pc = h1[i][0], h1[i][1], h1[i + 1][2]
         trs.append(max(hi - lo, abs(hi - pc), abs(lo - pc)))
-    atr = sum(trs[-14:]) / min(14, len(trs)) if trs else 0
+    atr = sum(trs) / len(trs) if trs else 0
     if atr and price < peak and (peak - price) <= zone * atr:
         return True, (f"creek zone: the price {price:.0f} is within "
                       f"{zone:g}x ATR1h ({atr:.0f}) below the recent peak "
@@ -2201,7 +2219,12 @@ def _monitor_pending_orders_impl(btc_price):
                         # rebuilt payload must carry it or the ADD loses
                         # the gate (the F2 dropped-key class).
                         "prearmed_add": order.get("prearmed_add"),
-                        "band_exempt": order.get("band_exempt"),
+                        # F-2 (agent-11 LOW): only the ESCAPE context
+                        # exempts brain's ceiling — the config's
+                        # band_exempt key is the §17 PLACEMENT
+                        # exemption (a different meaning) and must not
+                        # ride along to the fill.
+                        "band_exempt": bool(_escaped),
                         # Per-order trail profile (CEO 2026-11-09) — same
                         # bridging rule: payload carries them or they're lost.
                         "skip_be_lock": order.get("skip_be_lock"),
