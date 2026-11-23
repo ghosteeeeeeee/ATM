@@ -96,6 +96,7 @@ tr.hl td { background:#1c2430; }
         <span><i style="border-color:var(--green)"></i>long rung</span>
         <span><i style="border-color:var(--red)"></i>short rung</span>
         <span><i style="border-color:var(--accent)"></i>live price</span>
+        <span><i style="border-color:#e0e0e0"></i>EMA200</span>
       </span>
     </div>
     <div class="wrap">
@@ -372,6 +373,31 @@ function draw(){
     ctx.restore();
   });
 
+  // EMA200 (white line, computed in the API over a padded history)
+  const ema = DATA.ema200||[];
+  let emaPts = [];
+  ema.forEach((v,i)=>{ if(v!=null && v>=ylo && v<=yhi) emaPts.push([x(i), y(v)]); });
+  if(emaPts.length>1){
+    ctx.save();
+    ctx.strokeStyle = 'rgba(224,224,224,.9)'; ctx.lineWidth = 1.8;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    emaPts.forEach((p,i)=> i? ctx.lineTo(p[0],p[1]) : ctx.moveTo(p[0],p[1]));
+    ctx.stroke();
+    // right-edge label chip
+    const last = emaPts[emaPts.length-1];
+    ctx.font = '10px monospace';
+    const lbl = 'EMA200';
+    const tw = ctx.measureText(lbl).width + 8;
+    ctx.fillStyle = 'rgba(224,224,224,.14)';
+    ctx.fillRect(W-P.r+2, last[1]-7, tw, 14);
+    ctx.strokeStyle = 'rgba(224,224,224,.6)'; ctx.lineWidth = 1;
+    ctx.strokeRect(W-P.r+2.5, last[1]-6.5, tw-1, 13);
+    ctx.fillStyle = '#e0e0e0';
+    ctx.fillText(lbl, W-P.r+6, last[1]+3.5);
+    ctx.restore();
+  }
+
   // trade markers: buy/sell at the entries + the exit dots + connector
   drawTrades(ctx, P, x, y, c);
 
@@ -587,6 +613,8 @@ cvEl.addEventListener('mousemove', ev=>{
     +'O '+fmt(b.o,1)+'  H '+fmt(b.h,1)+'\nL '+fmt(b.l,1)+'  C '+fmt(b.c,1)
     +'   '+(b.c>=b.o?'+':'')+((b.c/b.o-1)*100).toFixed(2)+'%'
     +'\nV '+(b.v>=1000? (b.v/1000).toFixed(1)+'k' : fmt(b.v,0));
+  const _e = (DATA.ema200||[])[i];
+  if(_e!=null) txt += '   E200 '+fmt(_e,0);
   // any trade opening/closing in this bar
   (DATA.trades||[]).forEach(t=>{
     const bar0=b.t, bar1=b.t+900;

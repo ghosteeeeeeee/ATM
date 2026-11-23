@@ -321,6 +321,47 @@ def chart_trades():
     return out
 
 
+def ema200_series(bars):
+    """EMA200 of the closes, computed over a padded history (600 closed
+    15m bars — the SMA200 seed absorbs the warmup) and aligned to the
+    chart bars by their 15m bucket. Returns (series[], cur)."""
+    n = len(bars)
+    out = [None] * n
+    cur_val = None
+    try:
+        con = sqlite3.connect(
+            f"file:{os.path.join(HERMES_DATA, 'candles.db')}?mode=ro",
+            uri=True)
+        try:
+            cur = con.cursor()
+            cur.execute(
+                "SELECT ts, close FROM candles_15m WHERE token='BTC' "
+                "AND is_closed=1 ORDER BY ts DESC LIMIT 600")
+            rows = list(reversed(cur.fetchall()))
+        finally:
+            con.close()
+        if len(rows) < 200:
+            return out, cur_val
+        closes = [float(r[1]) for r in rows]
+        # seed = SMA(200), then the recursive EMA200
+        k = 2.0 / 201.0
+        e = sum(closes[:200]) / 200.0
+        by_ts = {}
+        for i in range(200, len(closes)):
+            e += (closes[i] - e) * k
+            by_ts[rows[i][0] - (rows[i][0] % 900)] = round(e, 2)
+        for i, b in enumerate(bars):
+            v = by_ts.get(b['t'])
+            if v is not None:
+                out[i] = v
+        cur_val = by_ts.get(rows[-1][0] - (rows[-1][0] % 900))
+        if cur_val is None and out:
+            cur_val = next((v for v in reversed(out) if v is not None), None)
+    except Exception:
+        pass
+    return out, cur_val
+
+
 def continuum_series(bars):
     """Continuum state_score AND zscore_val aligned to the candle bars:
     for each 15m bar, the last continuum tick inside that bar (local
@@ -396,6 +437,9 @@ def main():
     feed['ind']['cur']['cont'] = _cont_cur
     feed['ind']['z'] = _z
     feed['ind']['cur']['z'] = _z_cur
+    _ema, _ema_cur = ema200_series(_bars)
+    feed['ema200'] = _ema
+    feed['ema200_cur'] = _ema_cur
     tmp = OUT + '.tmp'
     with open(tmp, 'w') as f:
         json.dump(feed, f)
