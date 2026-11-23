@@ -113,6 +113,18 @@ vs train: e.g. 15m side freq 0.303→0.188, and the model over-calls `down`
    after the true close → calls are logged when the anchor bar is marked closed, and
    `resolve` joins only from `is_closed=1` (never mid-bar). Predictions use only
    closed-bar features ≤ anchor; no post-anchor data enters any fit.
+   **[CORRECTED per review HIGH-1, 2026-11-23]** The above collector-lag claim was
+   wrong for seeder rows: `price_collector._store_candles` marks the exchange's
+   **forming** API candle `is_closed=1` immediately (review evidence: 1h ts=02:00
+   row `is_closed=1` at 02:27Z carrying current price, 89 min premature) — not one
+   bar period after true close. So live `predict`/`query` could anchor features on a
+   not-yet-final bar (the builder's own gate run was during a seeder-inactive window
+   and is unaffected). Fix applied in `scripts/dir_matrix.py`: the fetch predicate now
+   requires the bar to be fully closed at the run anchor (`ts + interval_seconds <=
+   anchor_epoch`, parameterized, anchor printed) in addition to `is_closed=1`, for
+   every tier (15m/1h/4h = 900/3600/14400 s); forming bars are excluded from
+   `train`/`predict`/`validate` regardless of collector state (selfcheck asserts it),
+   and historical paths are deterministic under a pinned anchor.
 7. **Timer not enabled** (freq-shadow "enable pending deploy" precedent — CEO deploys).
 8. **Spec §2.7 protocol gap**: mandatory code-review + bug_hunter subagent rounds were
    **not run** — this builder is a subagent at max delegation depth and cannot spawn

@@ -48,7 +48,9 @@ Reproduce (one-liners, every mode):
   python3 scripts/dir_matrix.py validate           # writes brain/analysis/direction-matrix-validation.md
 
 Data: LOCAL data/candles.db ONLY (SQLite mode=ro, cursors closed in finally,
-tables candles_<tf>, column ts = bar OPEN time, is_closed=1 filter). NO external API.
+tables candles_<tf>, column ts = bar OPEN time, is_closed=1 AND bar fully closed
+at the run anchor (ts + interval <= anchor — is_closed alone is NOT trusted, the
+API seeder marks the forming candle is_closed=1; review HIGH-1)). NO external API.
 """
 
 import argparse
@@ -82,7 +84,10 @@ EPS_BPS = {'15m': 5.0, '1h': 10.0, '4h': 20.0}       # 5*sqrt(H_min/15), spec-fi
 FEATURE_TFS = ('5m', '15m', '1h', '4h')              # spec §2.2 TF set (1m omitted)
 MOM_MIN = (60, 240, 1440)                            # momentum windows (minutes)
 WINDOW_DAYS = 30                                     # rolling window (spec §2.3)
-FETCH_DAYS = 41                                      # 30d window + 11d feature warmup
+# Per-tier fetch depth (review MED-2): 30d window + EMA warmup headroom per tier.
+# 4h EMA300 = 50d needs 85d (30d window + 50d + margin); DB holds ~33d (5m) /
+# ~90d (15m/1h/4h) — fetch_tier prints a clamp note if the DB is shallower.
+FETCH_DAYS = {'5m': 33, '15m': 35, '1h': 45, '4h': 85}
 TEST_FRAC = 0.20                                     # walk-forward k (spec §2.5)
 LOW_N_FLAG = 300                                     # UNSTABLE-LOW-N threshold (spec §2.3)
 RANDOM_STATE = 42                                    # fixed -> byte-identical reruns
@@ -125,8 +130,17 @@ MODES (data):
            [--horizon 15m|1h|4h|all] [--json]
   validate pre-registered walk-forward gate -> brain/analysis/direction-matrix-validation.md
            with data-pin header (window bounds + row count + sha of candle slice)
-  --selfcheck  label/eps math, no-lookahead, scaler-train-only, brier math,
-           resolve join arithmetic, determinism (fixed random_state)
+  --selfcheck  label/eps math, no-lookahead, forming-bar exclusion, scaler-train-only,
+           brier math, resolve join arithmetic, determinism (fixed random_state)
+
+fetch depth per tier (30d window + EMA warmup headroom; clamped to DB depth, note printed):
+  5m: 33d (DB holds ~33d — binding tier) · 15m: 35d · 1h: 45d (EMA300=12.5d+margin)
+  4h: 85d (EMA300=50d + 30d window + margin; DB holds ~90d)
+anchor: a bar is fetched only if fully closed at the run anchor (ts + interval <=
+  anchor) — is_closed=1 alone is not trusted (API seeder marks the forming candle
+  closed; review HIGH-1). predict/query anchor = wall clock at run start (printed);
+  validate/train/historical paths use the run's now_ts (pinnable -> reproducible
+  historical recomputes regardless of collector state).
 
 Data: LOCAL data/candles.db only (mode=ro, SELECT-only, cursors closed in finally).
 """
@@ -208,21 +222,42 @@ def write_state(state):
 
 # ───────────────────────── data fetch (SELECT-only) ─────────────────────────
 
-def fetch_tier(tf, min_open_ts):
-    """Closed candles for one tier from local candles.db. ts = bar OPEN time."""
-    iv = TF_MIN[tf]
+def fetch_sql(tf):
+    """Fetch predicate for one tier. Parameterized (interval seconds + anchor).
+
+    is_closed=1 alone is NOT trusted: the API seeder marks the FORMING candle
+    is_closed=1 (review HIGH-1), so a bar is kept only when fully closed at the
+    run anchor: ts + interval_seconds <= anchor_epoch.
+    """
+    ivs = TF_MIN[tf] * 60
     sql = (f'SELECT ts, open, high, low, close, volume FROM candles_{tf} '
-           'WHERE token = ? AND is_closed = 1 AND ts >= ? ORDER BY ts')
-    rows = sq(sql, (TOKEN, int(min_open_ts)))
+           'WHERE token = ? AND is_closed = 1 AND ts >= ? AND ts + ? <= ? '
+           'ORDER BY ts')
+    return sql, ivs
+
+
+def fetch_tier(tf, min_open_ts, anchor_epoch):
+    """Closed candles for one tier from local candles.db. ts = bar OPEN time.
+    Only bars fully closed at anchor_epoch are returned (see fetch_sql)."""
+    sql, ivs = fetch_sql(tf)
+    rows = sq(sql, (TOKEN, int(min_open_ts), ivs, int(anchor_epoch)))
     if not rows:
         raise SystemExit(f'[DIR-MATRIX] no closed rows for candles_{tf} '
-                         f'(token={TOKEN}, ts>={int(min_open_ts)}) — cannot continue')
+                         f'(token={TOKEN}, ts>={int(min_open_ts)}, '
+                         f'ts+{ivs}<={int(anchor_epoch)}) — cannot continue')
     a = np.asarray(rows, dtype=float)
+    first = int(a[0, 0])
+    # note only when the DB is genuinely shallower than requested (first bar more
+    # than one interval past fetch_start; grid alignment alone does not count)
+    if first > int(min_open_ts) + ivs:
+        print(f'[DIR-MATRIX] {tf}: DB depth {(int(anchor_epoch) - first) / 86400:.1f}d '
+              f'< requested {FETCH_DAYS[tf]}d (starts {iso(first)}) — clamped to '
+              f'available history', file=sys.stderr)
     return {
         'ts': a[:, 0].astype(np.int64),
         'open': a[:, 1], 'high': a[:, 2], 'low': a[:, 3],
         'close': a[:, 4], 'volume': a[:, 5],
-        'closed_at': a[:, 0].astype(np.int64) + iv * 60,   # bar close time
+        'closed_at': a[:, 0].astype(np.int64) + ivs,       # bar close time
     }
 
 
@@ -345,16 +380,26 @@ def classify(r, horizon):
 def build_dataset(horizon, now_ts=None):
     """Fetch local candles, compute features/labels for one horizon.
 
-    Returns dict: anchors, closes, X (DataFrame), y (-1 = label not yet known),
-    r, usable (window rows with known label + no NaN features), pin (data-pin), meta.
+    now_ts is the run ANCHOR: a bar is fetched only if fully closed at it
+    (ts + interval <= anchor), so a forming bar marked is_closed=1 by the
+    seeder can never enter (review HIGH-1). predict passes wall clock at run
+    start; validate/train/historical callers pass (or pin) their own timestamp
+    — a pinned anchor reproduces historical results regardless of collector
+    state. Returns dict: anchors, closes, X (DataFrame), y (-1 = label not yet
+    known), r, usable (window rows with known label + no NaN features), pin
+    (data-pin), meta.
     """
-    now_ts = int(now_ts or time.time())
+    anchor = int(now_ts or time.time())
     base = horizon
     iv = TF_MIN[base]
     step = HORIZONS[horizon] // iv
-    fetch_start = now_ts - FETCH_DAYS * 86400
+    fetch_starts = {tf: anchor - FETCH_DAYS[tf] * 86400 for tf in FEATURE_TFS}
+    print(f'[DIR-MATRIX] {horizon}: fetch anchor={iso_z(anchor)} '
+          f'(keep ts+interval <= anchor) depth='
+          + ' '.join(f'{tf}:{FETCH_DAYS[tf]}d' for tf in FEATURE_TFS),
+          file=sys.stderr)
 
-    tiers = {tf: fetch_tier(tf, fetch_start) for tf in FEATURE_TFS}
+    tiers = {tf: fetch_tier(tf, fetch_starts[tf], anchor) for tf in FEATURE_TFS}
     b = tiers[base]
     anchors = b['closed_at']
     closes = b['close']
@@ -396,11 +441,12 @@ def build_dataset(horizon, now_ts=None):
         'sha256': h.hexdigest(),
     }
     return {
-        'horizon': horizon, 'iv': iv, 'step': step, 'now': now_ts,
+        'horizon': horizon, 'iv': iv, 'step': step, 'now': anchor,
+        'anchor': anchor,
         'anchors': anchors, 'closes': closes, 'X': X, 'y': y, 'r': r,
         'window_mask': window_mask, 'usable': usable, 'feat_ok': feat_ok,
         'T_last': T_last, 'window_start': window_start,
-        'fetch_start': fetch_start, 'tier_first': tier_first, 'pin': pin,
+        'fetch_start': fetch_starts[base], 'tier_first': tier_first, 'pin': pin,
         'feature_names': list(X.columns),
     }
 
@@ -573,11 +619,12 @@ def do_resolve(now_ts=None):
 # ───────────────────────── modes ─────────────────────────
 
 def mode_train(args):
+    now_ts = int(time.time())          # run anchor (printed per horizon)
     print(f'[DIR-MATRIX] train · {eps_line()}')
     print(f'[DIR-MATRIX] data: {CANDLES_DB} (mode=ro, SELECT-only) · '
           f'window={WINDOW_DAYS}d · C=1.0 L2 · random_state={RANDOM_STATE}')
     for h in HORIZONS:
-        ds = build_dataset(h)
+        ds = build_dataset(h, now_ts)
         mask = ds['usable']
         n = int(mask.sum())
         if n < 30:
@@ -644,7 +691,7 @@ def mode_predict(args):
     })
 
     for h in HORIZONS:
-        ds = build_dataset(h)
+        ds = build_dataset(h, now_ts)   # anchor = wall clock at run start (printed)
         spacing = max(3600, ds['iv'] * 60)
         anchors = [ds['T_last']]
         if args.backfill > 0:
@@ -871,10 +918,13 @@ def walk_forward(h, ds):
 
 
 def mode_validate(args):
+    now_ts = int(time.time())          # run anchor; historical test/label
+    # timestamps stay the window's own anchors (train_mask_at bounds every
+    # label bar at its row anchor) -> deterministic regardless of collector state
     print(f'[DIR-MATRIX] validate (spec §2.5 walk-forward) · {eps_line()}')
     results, pins = {}, {}
     for h in HORIZONS:
-        ds = build_dataset(h)
+        ds = build_dataset(h, now_ts)
         pins[h] = ds['pin']
         results[h] = walk_forward(h, ds)
         print(f'validate {h}: n_window={results[h]["n_window"]} '
@@ -927,6 +977,14 @@ def mode_validate(args):
         p = pins[h]
         lines.append(f'| {p["tier"]} (H={h}) | [{iso(p["window_start"])} .. '
                      f'{iso(p["window_end"])}] | {p["rows"]} | `{p["sha256"]}` |')
+    lines.append('')
+    lines.append(f'- Fetch: per-tier depth ' +
+                 ', '.join(f'{tf}={FETCH_DAYS[tf]}d' for tf in FEATURE_TFS) +
+                 ' (30d window + EMA warmup headroom; 5m ~33d DB depth binds, '
+                 'clamped-to-DB note printed when the DB is shallower) · anchor: '
+                 'bars kept only if `ts + interval <= anchor` at run start '
+                 '(forming-bar exclusion, review HIGH-1 — is_closed=1 alone is '
+                 'not trusted; seeder marks the forming candle closed).')
     lines.append('')
     lines.append('## Gate definitions (pre-registered §2.5, judged per horizon, never pooled)')
     lines.append('')
@@ -1039,6 +1097,24 @@ def selfcheck():
     chk(classify(1.9e-3, '4h') == 1, '4h r=+19bps -> side (eps 20)')
     chk(classify(20e-4, '4h') == 0, '4h r=+20bps -> up')
     chk(classify(-2.1e-3, '4h') == 2, '4h r=-21bps -> down')
+
+    # 1b) forming-bar exclusion (review HIGH-1): the fetch predicate must drop a
+    #     bar with ts+iv > anchor even when the seeder lied and set is_closed=1
+    sql, ivs = fetch_sql('15m')
+    conn = sqlite3.connect(':memory:')
+    try:
+        conn.execute('CREATE TABLE candles_15m (token TEXT, ts INTEGER, open REAL, '
+                     'high REAL, low REAL, close REAL, volume REAL, is_closed INTEGER)')
+        anchor = 1_700_000_000 - (1_700_000_000 % 900)
+        conn.execute('INSERT INTO candles_15m VALUES (?,?,?,?,?,?,?,?)',
+                     (TOKEN, anchor - 900, 1.0, 1.0, 1.0, 1.0, 1.0, 1))  # closes at anchor
+        conn.execute('INSERT INTO candles_15m VALUES (?,?,?,?,?,?,?,?)',
+                     (TOKEN, anchor - 450, 1.0, 1.0, 1.0, 1.0, 1.0, 1))  # FORMING, is_closed=1
+        got = conn.execute(sql, (TOKEN, anchor - 3600, ivs, anchor)).fetchall()
+    finally:
+        conn.close()
+    chk(len(got) == 1 and int(got[0][0]) == anchor - 900,
+        'forming bar (ts+iv > anchor) excluded even if is_closed=1')
 
     # 2) no-lookahead: features at row i unchanged when data after i is removed;
     #    alignment always picks the LAST bar with closed_at <= anchor
@@ -1161,7 +1237,8 @@ def main(argv=None):
                     help='validate: output markdown path')
     ap.add_argument('--selfcheck', action='store_true',
                     help='run the assertion suite (label/eps, no-lookahead, '
-                         'scaler-train-only, brier, resolve join, determinism)')
+                         'forming-bar exclusion, scaler-train-only, brier, '
+                         'resolve join, determinism)')
     args = ap.parse_args(argv)
 
     if args.selfcheck:
