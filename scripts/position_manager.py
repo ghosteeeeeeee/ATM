@@ -1091,7 +1091,10 @@ def _record_signal_outcome(token: str, direction: str, pnl_pct: float, pnl_usdt:
     # get_cooldown() can find them. get_cooldown() checks JSON FIRST (streak-based)
     # then falls back to PostgreSQL (flat 1h). Writing to both ensures coverage
     # even if JSON is empty/expired or the JSON-only path is bypassed.
-    if is_win == 0:  # loss
+    # HEDGE (2026-11-23): shadow hedge P&L must never block real re-entries —
+    # this is the SECOND cooldown writer in the close path (first is guarded in
+    # close_paper_position); found by the live-fire test leaking BTC:SHORT.
+    if is_win == 0 and not str(signal_type or '').endswith('-hedge'):  # loss
         set_loss_cooldown(token, direction)
 
 
@@ -1809,8 +1812,11 @@ def close_paper_position(trade_id: int, reason: str, exit_detail: str = None) ->
             pass  # fail-open
 
         # Loss cooldown — block re-entry after loss (prevents revenge trading)
+        # HEDGE (2026-11-23): shadow hedge P&L must never block real re-entries —
+        # this is THE site that fired in the live-fire test (leaked BTC:SHORT
+        # despite the guard at the is_loss block above; three writers total).
         is_win = 1 if float(actual_pnl_usdt or 0) > 0 else 0
-        if is_win == 0:
+        if is_win == 0 and not _is_hedge_row:
             try:
                 set_loss_cooldown(token, direction)
             except Exception as lc_err:
