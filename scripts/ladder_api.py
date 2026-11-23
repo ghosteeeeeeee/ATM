@@ -281,6 +281,41 @@ def indicators(bars):
                     'adx': last_valid(adx), 'atr': last_valid(atr)}}
 
 
+def chart_trades():
+    """BTC fills with their open/close times for the chart markers
+    (buy/sell icons at the entries + the exit dots). 48h window —
+    covers the 180x15m chart (45h) with margin. Includes open rows."""
+    try:
+        from brain import get_db_connection
+    except Exception:
+        return []
+    out = []
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT id, direction, entry_price, exit_price, open_time, "
+            "close_time, status, pnl_usdt, fees, signal "
+            "FROM trades WHERE token='BTC' "
+            "AND open_time > (now() - interval '48 hours') "
+            "ORDER BY open_time")
+        for r in cur.fetchall():
+            net = _net_of(r[8], r[7])
+            out.append({
+                'id': r[0], 'dir': r[1], 'entry': float(r[2] or 0),
+                'exit': float(r[3] or 0) if r[3] else None,
+                'open_ts': r[4].timestamp() if r[4] else None,
+                'close_ts': r[5].timestamp() if r[5] else None,
+                'status': r[6], 'net': round(net, 4),
+                'reason': r[9],
+            })
+        cur.close()
+        conn.close()
+    except Exception:
+        return out
+    return out
+
+
 def main():
     price, age = live_price()
     _bars = candles()
@@ -291,6 +326,7 @@ def main():
         'candles': _bars,
         'ind': indicators(_bars),
         'rungs': rungs(),
+        'trades': chart_trades(),
         'stats': stats(),
     }
     tmp = OUT + '.tmp'
@@ -299,7 +335,7 @@ def main():
     os.replace(tmp, OUT)
     print(f"[ladder_api] price={price} candles={len(feed['candles'])} "
           f"ind={feed['ind'].get('cur')} rungs={len(feed['rungs'])} "
-          f"stats_n={feed['stats'].get('n')}")
+          f"trades={len(feed['trades'])} stats_n={feed['stats'].get('n')}")
 
 
 if __name__ == '__main__':

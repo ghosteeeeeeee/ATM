@@ -347,6 +347,9 @@ function draw(){
     ctx.restore();
   });
 
+  // trade markers: buy/sell at the entries + the exit dots + connector
+  drawTrades(ctx, P, x, y, c);
+
   // live price line
   if(DATA.price && DATA.price>=ylo && DATA.price<=yhi){
     const yy=y(DATA.price);
@@ -368,6 +371,61 @@ function draw(){
   $('rng-label').textContent = rangeMode==='full'
     ? 'full ladder · '+fmt(ylo,0)+' – '+fmt(yhi,0)
     : 'auto · '+fmt(ylo,0)+' – '+fmt(yhi,0);
+}
+
+/* ── trade markers on the price chart ── */
+function idxForTime(c, ts){
+  let k = -1;
+  for(let i=0;i<c.length;i++){ if(c[i].t <= ts) k=i; else break; }
+  return k;
+}
+function drawTrades(ctx, P, x, y, c){
+  const ts = (DATA.trades||[]);
+  ts.forEach(t=>{
+    const i1 = t.open_ts!=null ? idxForTime(c, t.open_ts) : -1;
+    if(i1<0) return;
+    const isLong = String(t.dir).toUpperCase()==='LONG';
+    const col = isLong ? '#4caf50' : '#ef5350';
+    const px = x(i1), py = y(t.entry);
+    // connector to the exit (subtle, outcome-colored)
+    let px2=null, py2=null;
+    if(t.exit && t.close_ts!=null){
+      const i2 = idxForTime(c, t.close_ts);
+      if(i2>=0){ px2=x(i2); py2=y(t.exit);
+        ctx.save();
+        ctx.globalAlpha=0.28; ctx.strokeStyle = t.net>=0?'#4caf50':'#ef5350';
+        ctx.lineWidth=1; ctx.setLineDash([3,3]);
+        ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px2,py2); ctx.stroke();
+        ctx.restore();
+      }
+    }
+    // entry triangle: BUY below the point (up), SELL above (down)
+    const off = isLong ? 13 : -13;
+    const cy = py + off, s = 5.5;
+    ctx.save();
+    ctx.fillStyle = col; ctx.strokeStyle = '#0a0a0f'; ctx.lineWidth=1;
+    ctx.beginPath();
+    if(isLong){ ctx.moveTo(px, cy-s); ctx.lineTo(px-s, cy+s*0.7); ctx.lineTo(px+s, cy+s*0.7); }
+    else { ctx.moveTo(px, cy+s); ctx.lineTo(px-s, cy-s*0.7); ctx.lineTo(px+s, cy-s*0.7); }
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.font='bold 9px monospace'; ctx.fillStyle=col;
+    ctx.textAlign='center';
+    ctx.fillText(isLong?'B':'S', px, cy + (isLong? -8 : 13));
+    ctx.textAlign='left';
+    // exit dot (hollow, outcome-colored)
+    if(px2!=null){
+      ctx.beginPath(); ctx.arc(px2, py2, 4.2, 0, 7);
+      ctx.strokeStyle = t.net>=0?'#4caf50':'#ef5350'; ctx.lineWidth=1.6;
+      ctx.setLineDash([]); ctx.stroke();
+      if(Math.abs(py2-py)>14){
+        ctx.font='9px monospace'; ctx.fillStyle=t.net>=0?'#4caf50':'#ef5350';
+        ctx.textAlign='center';
+        ctx.fillText((t.net>=0?'+':'')+'$'+Math.abs(t.net).toFixed(2), px2, py2 + (py2<py? -8 : 13));
+        ctx.textAlign='left';
+      }
+    }
+    ctx.restore();
+  });
 }
 
 /* ── indicator chart (RSI/MACD/ADX/ATR, same bars) ── */
@@ -494,9 +552,19 @@ cvEl.addEventListener('mousemove', ev=>{
   ro.style.display='block';
   ro.style.left = Math.min(mx+14, W-190)+'px';
   ro.style.top = Math.max(6, my-52)+'px';
-  ro.textContent = new Date(b.t*1000).toISOString().slice(0,16).replace('T',' ')+'Z\n'
+  let txt = new Date(b.t*1000).toISOString().slice(0,16).replace('T',' ')+'Z\n'
     +'O '+fmt(b.o,1)+'  H '+fmt(b.h,1)+'\nL '+fmt(b.l,1)+'  C '+fmt(b.c,1)
     +'   '+(b.c>=b.o?'+':'')+((b.c/b.o-1)*100).toFixed(2)+'%';
+  // any trade opening/closing in this bar
+  (DATA.trades||[]).forEach(t=>{
+    const bar0=b.t, bar1=b.t+900;
+    const long = String(t.dir).toUpperCase()==='LONG';
+    if(t.open_ts>=bar0 && t.open_ts<bar1)
+      txt += '\n'+(long?'▲ BUY ':'▼ SELL ')+'#'+t.id+' @ '+fmt(t.entry,1);
+    if(t.close_ts && t.close_ts>=bar0 && t.close_ts<bar1)
+      txt += '\n  → exit '+fmt(t.exit,1)+'  '+(t.net>=0?'+':'')+'$'+Math.abs(t.net).toFixed(2);
+  });
+  ro.textContent = txt;
 });
 cvEl.addEventListener('mouseleave', ()=>{ ro.style.display='none'; hoverIdx=null; draw(); drawInd(null); });
 
