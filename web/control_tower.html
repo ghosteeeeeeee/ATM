@@ -207,6 +207,18 @@ function render(d){
     h += `</table>`;
   }
 
+  const A = d.arm_rate;
+  if (A && (A.armed_n !== null || A.unarmed_n !== null)){
+    const cell = (v, pct, sign) => v===null||v===undefined ? '—'
+      : (pct ? v.toFixed(1)+'%' : (v>=0&&sign?'+':'')+'$'+Number(v).toFixed(2));
+    const col = v => (v===null||v===undefined) ? '' : (v>=0 ? 'style="color:var(--green)"' : 'style="color:var(--red)"');
+    h += `<h2>🎯 ARM RATE (${esc(A.window||'7d')}) <span style="color:var(--dim);font-size:10px;font-weight:normal">operational — never a goal</span></h2>
+    <table><tr><th>cohort</th><th>trades</th><th>WR</th><th>net (fill-cap basis)</th></tr>
+    <tr><td>armed (trailing_activated)</td><td>${A.armed_n??'—'}</td><td>${cell(A.armed_wr,true)}</td><td ${col(A.armed_net)}>${cell(A.armed_net,false,true)}</td></tr>
+    <tr><td>unarmed</td><td>${A.unarmed_n??'—'}</td><td>${cell(A.unarmed_wr,true)}</td><td ${col(A.unarmed_net)}>${cell(A.unarmed_net,false,true)}</td></tr>
+    </table>`;
+  }
+
   const P = d.packets||[];
   if (P.length){
     h += `<h2>📨 RECENT PACKETS (kanban)</h2>`;

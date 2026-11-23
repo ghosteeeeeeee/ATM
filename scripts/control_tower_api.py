@@ -285,6 +285,59 @@ def _fill_cap():
     return out
 
 
+def _arm_rate():
+    """Trailing-7d armed/unarmed split of closed trades — CEO ruling
+    20261123T004841Z Part 1 item 3 (BUILD, display-only; label: operational —
+    never a goal).
+
+    Marker = trades.trailing_activated (the flag the MoE/auto_1hr arm-rate
+    reads; verified 2026-11-23 against the known split: armed 51T 94.1% /
+    unarmed 65T 18.5% on 7d). Net = fill_cap basis (JSON fee_total, same
+    SQL expression as _fill_cap — brief numbers +2.50/-3.68 reproduce as
+    +2.49/-3.67 with 1h drift; the task's +3.40/-2.82 are the same rows
+    gross-of-fee). ONE query reusing the fill_cap filter + finally-close.
+    Never raises: any failure degrades fields to null.
+    """
+    out = {'armed_n': None, 'armed_wr': None, 'armed_net': None,
+           'unarmed_n': None, 'unarmed_wr': None, 'unarmed_net': None,
+           'window': '7d'}
+    try:
+        import psycopg2
+        conn = None
+        cur = None
+        try:
+            conn = psycopg2.connect(host='/var/run/postgresql', dbname='brain', user='postgres')
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT trailing_activated,
+                       COUNT(*),
+                       COUNT(*) FILTER (WHERE pnl_usdt > 0),
+                       COALESCE(SUM(pnl_usdt) FILTER (WHERE fees LIKE '{%'), 0)
+                     - COALESCE(SUM(COALESCE((fees::json->>'fee_total')::numeric, 0))
+                                FILTER (WHERE fees LIKE '{%'), 0)
+                FROM trades
+                WHERE status = 'closed'
+                  AND close_time > NOW() - INTERVAL '7 days'
+                GROUP BY 1
+            """)
+            rows = cur.fetchall()
+        finally:
+            try:
+                if cur is not None:
+                    cur.close()
+            finally:
+                if conn is not None:
+                    conn.close()
+        for armed, n, wins, net in rows:
+            k = 'armed' if armed else 'unarmed'
+            out[f'{k}_n'] = int(n)
+            out[f'{k}_wr'] = round(100.0 * int(wins) / int(n), 1) if n else None
+            out[f'{k}_net'] = float(net)
+    except Exception as e:
+        log(f'WARN: arm_rate PG read failed: {e}')
+    return out
+
+
 def main():
     # F1 fix (bug_hunter 20261110, MEDIUM): the RELEASED transition is invisible
     # to decider_run — it respawns every pipeline minute with an empty state set,
@@ -300,6 +353,7 @@ def main():
     except Exception:
         _prev_engaged = None
     fill_cap = _fill_cap()
+    arm_rate = _arm_rate()
     try:
         if _prev_engaged is True and fill_cap.get('engaged') is False:
             _now = datetime.now(timezone.utc)
@@ -315,7 +369,8 @@ def main():
         log('ERROR: registry missing/empty — writing error feed')
         payload = {'generated_at': NOW.isoformat(), 'error': 'registry unreadable',
                    'counts': {}, 'sections': {}, 'trials': [], 'calendar': [],
-                   'done': [], 'packets': [], 'fill_cap': fill_cap}
+                   'done': [], 'packets': [], 'fill_cap': fill_cap,
+                   'arm_rate': arm_rate}
     else:
         entries = [e for e in reg['entries'] if isinstance(e, dict)]
         opens = [e for e in entries if e.get('status') == 'open']
@@ -388,6 +443,7 @@ def main():
             'done': [e.get('id', '?') for e in dones],
             'packets': _recent_packets(),
             'fill_cap': fill_cap,
+            'arm_rate': arm_rate,
         }
 
     tmp = f'{OUTPUT}.{os.getpid()}.tmp'

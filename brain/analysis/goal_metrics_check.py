@@ -37,6 +37,15 @@ STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
 KANBAN = '/root/.hermes/automation/ceo/ceo_kanban.md'
 NS1_LABEL_KEY = 'net $/trade 7d'   # the Tier-H gate that IS NS1 (kanban dedupe key)
 
+# R2 tier write target (CEO ruling 20261123T004841Z item 2: WIRE IT, lazy path).
+# MUST be the file decider_run.py:376 and brain.py:839 actually read:
+# os.path.join(HERMES_DATA, 'vacation_size_reduce.json') = /root/.hermes/data/...
+# (NOT /var/www/hermes/data — writing there would silently no-op the money path).
+sys.path.insert(0, '/root/.hermes/scripts')
+from paths import HERMES_DATA  # noqa: E402
+
+SIZE_REDUCE_FILE = os.path.join(HERMES_DATA, 'vacation_size_reduce.json')
+
 
 def _equity():
     """Current account equity via the EXISTING clearinghouse read
@@ -265,6 +274,117 @@ def _update_state(h_checks, now_iso):
     return consec
 
 
+# ── R2 drawdown-tier write (CEO ruling 20261123T004841Z item 2: WIRE IT, lazy) ─
+def _atomic_json(path, obj):
+    """mkstemp + os.replace in the target dir (same pattern as _save_state)."""
+    tmp = None
+    try:
+        fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path), suffix='.tmp')
+        with os.fdopen(fd, 'w') as f:
+            json.dump(obj, f, indent=1)
+        os.replace(tmp, path)
+    except Exception:
+        if tmp:
+            try:
+                os.unlink(tmp)
+            except Exception:
+                pass
+        raise
+
+
+def _maybe_write_dd_tier(r1_pct, now_iso):
+    """R2 drawdown-tier wiring — CEO ruling 20261123T004841Z item 2 (WIRE IT).
+
+    When R1 (30d max DD % of equity) crosses tier-2 (DD worse than -50% of
+    equity = R1_TARGET_PCT; today -73%), write size_multiplier into the EXISTING
+    size-reduce file decider_run.py:376 / brain.py:839 read — keys the reader
+    expects: `size_reduce` truthy (the gate) + `size_multiplier` (applied when
+    true; file ABSENT = no reduce = 1.0x). Multiplier = DRAWDOWN_TIER_2_MULT
+    read-only from hermes_constants (tier definitions stay in constants; the
+    dead DRAWDOWN_TIER_2_PCT=10% config is a different sizing design and is NOT
+    the R2 boundary — the ruling defines tier-2 as crossing R1's -50% target).
+
+    HONEST CONSTRAINT (verdict 20261123T004841Z): today's effect is mostly
+    floor-eaten — median 7d notional $11.10 = HL_MIN_NOTIONAL_USDT, so 0.25x of
+    any base <= ~$44 lands below the floor and gets raised back (~0% cut on the
+    floored median, -50% on the largest $22.30 base). The tier becomes a real
+    brake only when base sizes exceed ~$44. This is INTENDED: safe to wire
+    BECAUSE the floor binds first.
+
+    Contract:
+      r1_pct None (equity unavailable) -> NO write, NO remove (fail-open: never
+      touch the money file on a missing equity read).
+      Writes only on CHANGE (already-in-force state = no-op, no log line).
+      Recovery restores the exact pre-write file state (snapshot key
+      r2_tier_prev; None = file was absent -> remove it = default 1.0x).
+    Returns the loud log line on change, None otherwise (or on any failure —
+    a bad write must never crash the verifier; WARN goes to stderr).
+    """
+    if r1_pct is None:
+        return None
+    try:
+        cur = None
+        if os.path.exists(SIZE_REDUCE_FILE):
+            with open(SIZE_REDUCE_FILE) as f:
+                cur = json.load(f)
+            if not isinstance(cur, dict):
+                cur = None            # corrupt = unreadable to decider too
+    except Exception:
+        # ponytail: guardrail's writer uses plain open('w') (non-atomic) — a torn
+        # read loses only the prev snapshot, the guard still engages; make
+        # vacation_guardrail atomic if that race ever matters.
+        cur = None                    # unreadable -> treat as absent
+    try:
+        sys.path.insert(0, '/root/.hermes/scripts')
+        from hermes_constants import DRAWDOWN_TIER_2_MULT as mult
+        mult = float(mult)
+    except Exception:
+        mult = 0.25                   # fail-open: the ruled value, never brick
+
+    if r1_pct >= R1_TARGET_PCT:       # recovered above tier-2 -> remove OUR write
+        if not (cur and cur.get('r2_tier')):
+            return None               # nothing of ours in force (idempotent)
+        prev = cur.get('r2_tier_prev')
+        try:
+            if isinstance(prev, dict):
+                _atomic_json(SIZE_REDUCE_FILE, prev)
+            else:
+                os.unlink(SIZE_REDUCE_FILE)
+        except FileNotFoundError:
+            pass
+        except Exception as e:
+            print(f"WARN  R2-TIER restore failed ({e})", file=sys.stderr)
+            return None
+        return f'[R2-TIER] restored (R1 {r1_pct:.1f}% >= {R1_TARGET_PCT:.0f}%)'
+
+    # crossed: tier-2 in force
+    if (cur and cur.get('r2_tier') and cur.get('size_reduce')
+            and isinstance(cur.get('size_multiplier'), (int, float))
+            and not isinstance(cur.get('size_multiplier'), bool)
+            and float(cur['size_multiplier']) == mult):
+        return None                   # already in force — idempotent, no rewrite
+    new = dict(cur) if cur else {}
+    # snapshot what was there BEFORE our first tier write (guardrail's own
+    # marker, release contract, etc.) so recovery restores it byte-for-byte
+    prev = (cur.get('r2_tier_prev') if (cur and cur.get('r2_tier'))
+            else (cur if cur else None))
+    new.update({
+        'size_reduce': True,
+        'size_multiplier': mult,
+        'r2_tier': True,
+        'r2_tier_prev': prev,
+        'reason': f'R2-TIER R1 {r1_pct:.1f}% < {R1_TARGET_PCT:.0f}% of equity',
+        'written_at': now_iso,
+    })
+    try:
+        _atomic_json(SIZE_REDUCE_FILE, new)
+    except Exception as e:
+        print(f"WARN  R2-TIER write failed ({e})", file=sys.stderr)
+        return None
+    return (f'[R2-TIER] size_multiplier={mult:g} written '
+            f'(R1 {r1_pct:.1f}% < {R1_TARGET_PCT:.0f}%)')
+
+
 # ── kanban (verdict 20261122T221140Z §3 alerting rules) ────────────────────────
 def _kanban_lines(r, consec, now_iso):
     """FAIL lines only: NS1, NS2, R1, Tier-H gates failing >=2 consecutive runs,
@@ -330,15 +450,20 @@ def main(argv=None):
 
     r = collect()
     consec = _update_state(r['h_checks'], now_iso)
+    r2_line = _maybe_write_dd_tier(r['r1_dd_pct'], now_iso)   # money-path change only
     klines = _kanban_lines(r, consec, now_iso) if want_kanban else []
-    if want_kanban:
+    if r2_line:
+        klines.append(f"- [{now_iso}] goal-metrics: {r2_line}")
+    if klines:                          # r2 money-path events land even w/o --kanban
         _append_kanban(klines, now_iso)
 
     print("GOAL-704ed65e METRICS", "-" * 50)
     for line in r['lines']:
         print(" ", line)
+    if r2_line:
+        print(" ", r2_line)
     print("RESULT:", "ALL PASS" if r['ok'] else "NOT YET (goal active)")
-    if want_kanban:
+    if want_kanban or r2_line:
         print("KANBAN:", (f"{len(klines)} line(s) -> {KANBAN}" if klines
                           else "no FAIL lines — nothing appended"))
     return 0 if r['ok'] else 1
