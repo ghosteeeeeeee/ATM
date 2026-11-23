@@ -167,6 +167,19 @@ def main():
     if shorts:
         assert abs(shorts[0]['trigger_price'] - 60500) <= 250, shorts[0]
         assert shorts[0]['trigger_price'] >= 59929   # >= the far edge (2%)
+        # F-1 (agent-12 HIGH): the SL travels WITH the trigger — the
+        # shape must be valid (sl > trigger) or the watchdog shape-
+        # skips the arm every cycle (the dark short side)
+        assert shorts[0]['sl'] > shorts[0]['trigger_price'], (
+            "F-1: the spike short's SL must sit above the trigger: "
+            f"sl={shorts[0]['sl']} trig={shorts[0]['trigger_price']}")
+        # F-2 (agent-12 MEDIUM): the note must name the spike (F7)
+        assert 'SPIKE MODE' in shorts[0].get('note', ''), (
+            "F-2: the spike arm's note must name the spike: "
+            f"{shorts[0].get('note', '')[:80]}")
+        if longs:
+            assert longs[0]['sl'] < longs[0]['trigger_price'], (
+                "the long shape: the SL must sit below the trigger")
     if longs:
         assert abs(longs[0]['trigger_price'] - 61750) <= 250, longs[0]
         assert longs[0]['trigger_price'] <= 62375    # <= the far edge (2%)

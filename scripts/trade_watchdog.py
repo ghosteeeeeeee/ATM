@@ -1533,7 +1533,7 @@ def _rip_climax_defer(coin, price):
             _tier = str((json.load(f).get('current') or {})
                         .get('zscore_tier', '') or '')
         if tier_mark and tier_mark in _tier.upper():
-            return True, f"z-tier {_tier} (|z| >= 2) — the spike context"
+            return True, f"z-tier {_tier} (the STRONG tier) — the spike context"
     except Exception:
         pass
     return False, ''

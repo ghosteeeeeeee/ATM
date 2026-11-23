@@ -1047,15 +1047,25 @@ def _ladder_keeper(decision, summary):
                     # the reversal catch; the clamp snaps the round)
                     trig = _band_clamp(price,
                                        price * (1 - _near_pct), 'short')
+                    # F-1 (agent-12 HIGH): the SL must travel WITH the
+                    # trigger — the structure reclaim stays deep below
+                    # the near edge (sl < trigger = the invalid shape
+                    # the watchdog shape-skips EVERY cycle → the short
+                    # side dark in its primary scenario; the shipped
+                    # fixture proved it: trig 60500 / sl 60199). The
+                    # spike short's stop = the reclaim above the NEW
+                    # trigger (the same 60+0.6·ATR15 distance).
+                    _spk_sl = trig + 60 + round(0.60 * atr15)
             if trig and reach_lo <= trig < price:
                 # CEO 2026-11-20 (#17004: price×1.006 lost in 3min):
                 # fresh-air stops sit at MAJOR STRUCTURE — the 1h swing
                 # high + 0.1·ATR1h (the lag's line convention), never an
                 # arbitrary percentage: 'have some conviction to hold
                 # till (major) resistance is broken'.
-                sl = (round(sl1h + 0.60 * atr15) if _src1h
-                      else (round(sh1h + 0.10 * atr1) if fresh_air
-                            else round(sl15 + 0.60 * atr15)))
+                sl = (_spk_sl if _spk else
+                      (round(sl1h + 0.60 * atr15) if _src1h
+                       else (round(sh1h + 0.10 * atr1) if fresh_air
+                             else round(sl15 + 0.60 * atr15))))
                 # ponytail: TP gap fixed at arm time (3·ATR1h THEN, never
                 # moved — F-2 restated doctrine) — if ATR1h later grows
                 # past ~3.5× the gap the disaster floor erodes; top up by
@@ -1066,7 +1076,20 @@ def _ladder_keeper(decision, summary):
                 # the fixed 'sl1h−60' text misattributed sl15-fallback and
                 # fresh-air arms (live proof: trigger58736 labeled
                 # 'sl1h 61320−60'; one note carried two contradictory SLs).
-                if fresh_air:
+                if _spk:
+                    # F-2 (agent-12 MEDIUM): the spike arm's note must
+                    # name the spike and the actual placement (the old
+                    # note claimed "sl1h−60 → band-clamped" — the spike
+                    # override moved it past the clamp; F7: the source
+                    # naming must not lie). _ev rides the same branch.
+                    _src = (f"SPIKE MODE ({_spk}): the near-edge "
+                            f"reversal catch, trigger {trig} "
+                            f"({_near_pct*100:g}% from the price "
+                            f"{price:.0f}), SL {sl} = the reclaim above "
+                            f"the new trigger (60+0.6·ATR15) — "
+                            f"{_spk_why}")
+                    _ev = "SPIKE"
+                elif fresh_air:
                     _fa = (f"price {price:.0f}×0.997"
                            if trig == round(price * 0.997)
                            else f"price {price:.0f}×0.997 → band-clamped {trig}")

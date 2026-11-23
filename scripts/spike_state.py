@@ -29,7 +29,12 @@ from paths import HERMES_DATA
 
 def _continuum_tier():
     try:
-        www = globals().get('WWW_DATA') or '/var/www/hermes/data'
+        try:
+            from paths import WWW_DATA as _www   # F-5: via paths
+        except Exception:
+            _www = '/var/www/hermes/data'
+        # the module global is the test seam; production reads paths
+        www = globals().get('WWW_DATA') or _www
         with open(os.path.join(www, 'continuum_data.json')) as f:
             return str((json.load(f).get('current') or {})
                        .get('zscore_tier', '') or '')
@@ -55,7 +60,7 @@ def spike_state(coin='BTC'):
     tier = _continuum_tier()
     if 'STRONG' in tier.upper():
         return ('up' if 'POS' in tier.upper() else 'down',
-                f"z-tier {tier} (|z| >= 2)")
+                f"z-tier {tier} (the STRONG tier)")
     try:
         db = os.path.join(HERMES_DATA, 'candles.db')
         con = sqlite3.connect(f'file:{db}?mode=ro', uri=True)
