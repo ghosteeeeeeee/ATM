@@ -1,11 +1,11 @@
 {
  "mission": "hourly full-analysis check-ins for 24h (CEO order 2026-11-22)",
  "started_utc": "2026-11-22T23:55Z",
- "done": 7,
+ "done": 13,
  "stop_after": 24,
- "next_due_epoch": 1795420035,
+ "next_due_epoch": 1795442902,
  "note": "each wake: run the full-analysis skill (engines + template), report to CEO, increment done, re-arm a 3600s sleep job; stop re-arming when done >= stop_after or the CEO says stop",
- "protocol": "at each hourly check-in: run the full-analysis AND route any live open decision through ceo-comm (deep, detached 1800s = long timeout)",
+ "protocol": "EVERY check-in runs the FULL full-analysis skill \u2014 the complete \u00a70-\u00a76 Output Template, every section, no compressed/fast version (CEO 2026-11-23: 'there should be no fast version of the skill, we should only ever be using the full full-analysis skill, even in your hourly session timer check-ins'). Sections that must appear every time: \u00a70 positions (with invalidation/confirmation), CHOP CHECK (the corrected ts-ordered flip count), \u00a71 MTF (structure + MTF VOLUME + RSI-STRUCT), \u00a71b structure (all 5 TFs), \u00a71c ADX/ATR lifecycle (all 5 TFs + the trendline), \u00a72 continuum, \u00a73 S/R, \u00a74 contrarian+divergence (RSI-STRUCT break warnings), \u00a75 score (chop-adjusted), \u00a76 verdict (direction with the trust protocol + entry + ENTRY QUALITY \u00a716 + BRACKET DISTANCE \u00a717). auto_analysis.py = one engine among many (its fast path feeds the numbers), never the whole report.",
  "scheduled_briefs": {
   "2026-11-28": "ROUND-anchor shadow review (rounds vs structure-only) \u2014 fire from the check-in on/around that date",
   "2026-11-29": "7-day metric gate + E3 bounce-shadow flip + the FRESH-AIR re-eval + TWO NEW METRICS committed by the fill-quality ruling: (i) entry-leak -> outcome correlation (canonical PnL, per-fill pts \u2014 baseline from agent-7's re-derivation), (ii) exit follow-through saved/premature split with canonical class sums (baseline likewise). If leak-harm or premature-dominance shows post-E1, the relaxation levers become data-backed one-liners."
@@ -24,5 +24,7 @@
   "split_at_60": "SAVED n=10 canonical -$0.153 | PREMATURE n=7 canonical -$0.322 (both negative at every window; the split flips to 8/9 at +120 \u2014 '59% correct' = a +60 snapshot)",
   "flags": "#17014 fee_total = a 10x BUG-099 residue (fee-corrected canonical -$0.294, headline unchanged); #17015 empty fees; probable merge-pairs #17014/17015 + #17026/17027; #17015/#17027 entry price-basis least trustworthy",
   "result_file": "automation/ceo/checkpoints/20261123T032609Z-result-1.md (the 03:53 draft preserved as .superseded-0353Z.md)"
- }
+ },
+ "note_17060": "CORRECTION: #17060 = a MIRROR fill (jup_yolo_mirrored, signal continuum-osc+,jup_yolo_mirrored) \u2014 NOT a ladder rung (my check-in#8 misattribution). Its mfe_exit = correct (the mirror book's home; the gate at position_manager:4811 = the reverted form; is_managed_signal('ai-trader-pending')=True confirms ladder trades stay excluded). The HL backfill corrected the exit to 61,614 (+0.0165).",
+ "backup_note": "The full-analysis SKILL.md = a critical document (CEO 2026-11-23). Backed up: (1) git + canonical GitHub push (off-machine), (2) dated snapshot /root/backups/full-analysis-2026-11-23.md (outside the worktree \u2014 survives a repo accident), (3) DSH-registered at .dsh/skills/full-analysis (symlink to the shared original \u2014 single source of truth). Process rule: every skill write is write-then-verify (wc + content grep) \u2014 the 2026-11-23 truncation incident (open('w') truncates before write) proved why."
 }
