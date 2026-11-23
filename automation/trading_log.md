@@ -32560,3 +32560,60 @@ BY: auto_1hr
 - pump-chain+ 14d n=11 of 20 kill threshold, net -0.55 — revisit if n reaches 20
 - storm packet bar 3/3 + 8th positive awaits CEO sign-off by 2026-11-26
 BY: auto_1hr
+
+## [2026-11-23 15:53] Hourly Analysis
+
+**Storm:** no storm (window-min -1.20% / at-run +0.18%) — both inside gate
+**Trades:** 0 closed last hour | 24h 15 closed (7W 8L)
+**PnL NET:** hour $0.00 | 24h NET $-0.54 (gross -0.36, fees 0.18, payoff 0.68, WR 46.7%) | 7d NET $-1.45 (121T) | 14d NET $-4.02 (231T) | **size-reduce: 0.25x (r2_tier true, R2-TIER R1)**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Kill policy: 0 closes last hour — no trigger; ai-trader-pending 4T 25% net -0.50 24h (CEO all-BTC) -> monitor
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/15 = 6.7% (<40%); tpsl_utils deployed; manual_sl_hit 3T net -0.53 dominant loser, trail_arm_timeout 3T net -0.22 second
+- Boost: none eligible (max n=4, all net negative or below n=5)
+- Arm rate: unarmed 7/15 = 46.7% below 70%, WR 28.6% net -0.48 vs armed 8/8 62.5% net -0.06 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: not 3 consecutive negative hours (09 +0.01, 10 -0.28, 11 0.00, 13 +0.28); regime not NEUTRAL -> no size cut
+- Frequency: 0 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.306% < 0.5% (max 0.639)
+- 2 open: BTC ai-trader-auto LONG 13:58/14:28 (SL 62553)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET -0.54 (fees 0.18 vs gross -0.36), payoff 0.68 — fee-drag + low payoff; 7d -1.45, 14d -4.02
+- unarmed WR 28.6% cohort 46.7% of closes, net -0.48 — stall stack owns fix
+- pump-chain+ 14d n=11 of 20 kill threshold, net -0.55 — revisit if n reaches 20
+- size-reduce now 0.25x r2_tier (file written 15:32) — aggressive cut active
+- storm packet bar 3/3 + 8th positive awaits CEO sign-off by 2026-11-26
+BY: auto_1hr
+
+## [2026-11-23 16:55] Hourly Analysis
+
+**Storm:** no storm (window-min -1.06% / at-run -0.97%) — both inside gate
+**Trades:** 2 closed last hour (0W 2L) | 24h 17 closed (7W 10L)
+**PnL NET:** hour $-0.84 | 24h NET $-1.38 (gross -1.18, fees 0.20, payoff 0.44, WR 41.2%) | 7d NET $-2.29 (123T) | 14d NET $-4.86 (232T) | **size-reduce: 0.25x (r2_tier true, R2-TIER R1)**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Kill policy: 2 closes last hour both ai-trader-auto LONG manual_sl_hit (0% WR but n=2 < 3 threshold; CEO trades -> monitor), 0 open
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/17 = 5.9% (<40%); tpsl_utils deployed; manual_sl_hit 5T net -1.37 dominant loser (all BTC ai-trader CEO trades), trail_arm_timeout 3T net -0.22 second
+- Boost: none eligible (max n=4: ai-trader-pending 4T 25% net -0.50, bb-squeeze+ 4T 25% net -0.22)
+- Arm rate: unarmed 9/17 = 52.9% below 70%, WR 22.2% net -1.32 vs armed 8/8 62.5% net -0.06 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 09 +0.01, 10 -0.28, 11 0.00, 13 +0.28, 16 -0.84 — not 3 consecutive; regime check not NEUTRAL -> no size cut
+- Frequency: 2 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.306% < 0.5% (max 0.639)
+- No constants change -> no signal_versions entry
+
+**Open Questions:**
+- 24h NET -1.38 (fees 0.20 vs gross -1.18), payoff 0.44 — worsened from -0.54; 7d -2.29, 14d -4.86
+- manual_sl_hit 5T net -1.37 = ALL of 24h loss is CEO ai-trader BTC trades
+- unarmed WR 22.2% cohort 52.9% of closes, net -1.32 — stall stack owns fix
+- pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
+- storm packet bar 3/3 + 8th positive awaits CEO sign-off by 2026-11-26
+BY: auto_1hr
