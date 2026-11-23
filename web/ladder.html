@@ -416,13 +416,13 @@ function draw(){
     const yy=y(DATA.price);
     ctx.save();
     ctx.strokeStyle='#4fc3f7'; ctx.lineWidth=1.4; ctx.setLineDash([4,4]);
-    ctx.beginPath(); ctx.moveTo(P.l,yy); ctx.lineTo(dataR,yy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(P.l,yy); ctx.lineTo(W-P.r,yy); ctx.stroke();
     ctx.setLineDash([]);
     const lbl = fmt(DATA.price,1);
     ctx.font='bold 11px monospace';
     const tw=ctx.measureText(lbl).width+10;
-    ctx.fillStyle='#4fc3f7'; ctx.fillRect(dataR+2, yy-8, tw, 16);
-    ctx.fillStyle='#0a0a0f'; ctx.fillText(lbl, dataR+6, yy+4);
+    ctx.fillStyle='#4fc3f7'; ctx.fillRect(W-P.r+2, yy-8, tw, 16);
+    ctx.fillStyle='#0a0a0f'; ctx.fillText(lbl, W-P.r+6, yy+4);
     // glow dot at the last candle
     ctx.fillStyle='#4fc3f7'; ctx.shadowColor='#4fc3f7'; ctx.shadowBlur=10;
     ctx.beginPath(); ctx.arc(x(c.length-1), yy, 3, 0, 7); ctx.fill();
