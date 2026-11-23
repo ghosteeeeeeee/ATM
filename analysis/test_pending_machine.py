@@ -191,10 +191,22 @@ def main():
     COUNT[0] = 2
     setup([mk('a', 57000)])
     assert len(steers(TW.monitor_pending_orders(56900.0), 'a')) == 1, 'same-dir ADD'
-    OPEN[0] = ('1', 'LONG')
+    OPEN[0] = ('1', 'LONG', 0.5)
     setup([mk('a', 57000)])
     assert not steers(TW.monitor_pending_orders(56900.0), 'a'), 'opposite waits'
-    print('5 add-path: ladder --force, dbdown defer, cap defer, ADD, opposite-wait ✓')
+    # F-1 (agent-9): the WINNER gate must be asserted — deleting the
+    # `if _pnl > 0` check entirely must now FAIL this suite.
+    TW._load_orders_state = _file_loader   # undo group4/5's closure leak
+    OPEN[0] = ('1', 'SHORT', -0.80)          # the open trade is LOSING
+    setup([mk('a', 57000)])
+    s = TW.monitor_pending_orders(56900.0)
+    assert not steers(s, 'a'), 'a losing open trade must NOT add'
+    assert 'a' not in json.load(open(os.path.join(_tmp, 'pending_orders_state.json'))), 'the rung must stay armed'
+    OPEN[0] = ('1', 'SHORT', None)           # NULL pnl = unknown → defer
+    setup([mk('a', 57000)])
+    s = TW.monitor_pending_orders(56900.0)
+    assert not steers(s, 'a'), 'an unknown-PnL open trade must NOT add'
+    print('5 add-path: ladder --force, dbdown defer, cap defer, ADD, opposite-wait, WINNER-gate (losing/NULL defer) ✓')
 
     # ── 6. round-anchor arithmetic (the CEO spec) ──────────────────────
     def rs(price, stop, be=0.0):

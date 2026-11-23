@@ -1893,9 +1893,16 @@ def _monitor_pending_orders_impl(btc_price):
                                           password=BRAIN_PASSWORD,
                                           connect_timeout=5)
                     _cur = _c.cursor()
+                    # F-2 (agent-9): LIMIT 1 without ORDER BY sampled a
+                    # nondeterministic leg when stacked same-direction
+                    # rows exist — the gate could see a winning row and
+                    # approve an add to a net-underwater stack. id ASC =
+                    # the LEADING row = the original trade (the CEO's
+                    # 'we are in a trade and it is winning' question).
                     _cur.execute(
                         "SELECT id, direction, pnl_pct FROM trades WHERE "
-                        "token=%s AND status='open' LIMIT 1", (coin,))
+                        "token=%s AND status='open' ORDER BY id ASC "
+                        "LIMIT 1", (coin,))
                     _open = _cur.fetchone()
                     # F-3 (agent-3): MAX_OPEN_POSITIONS exists but nothing
                     # read it on this path — the keeper self-replenishes
