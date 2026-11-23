@@ -173,7 +173,7 @@ def stats():
         # position existed but the pending-only filter hid it. The
         # signal rides along as a chip so the family is visible.
         cur.execute(
-            "SELECT id, token, direction, entry_price, stop_loss, "
+            "SELECT id, token, direction, entry_price, stop_loss, target, "
             "pnl_pct, amount_usdt, signal "
             "FROM trades WHERE status='open' ORDER BY id")
         opens = cur.fetchall()
@@ -193,12 +193,13 @@ def stats():
             'open': [{'id': o[0], 'coin': o[1] or '?', 'dir': o[2],
                       'entry': float(o[3] or 0),
                       'sl': float(o[4] or 0) if o[4] else None,
-                      'pnl_pct': float(o[5] or 0),
+                      'tp': float(o[5] or 0) if o[5] else None,
+                      'pnl_pct': float(o[6] or 0),
                       # psycopg2 returns Decimal for numeric columns —
                       # float() it or the feed dies the moment an open
                       # row exists (it was latent while the list was empty)
-                      'amt': float(o[6] or 0),
-                      'signal': (o[7] or '').split(',')[0]}
+                      'amt': float(o[7] or 0),
+                      'signal': (o[8] or '').split(',')[0]}
                      for o in opens],
             'recent': recs[:25],
         }

@@ -257,7 +257,13 @@ function renderStats(){
   $('windows').innerHTML = `24h <b class="${cls(w[1])}">${usd(w[1])}</b> (n=${w[0]}) &nbsp;·&nbsp; 72h <b class="${cls(w72[1])}">${usd(w72[1])}</b> (n=${w72[0]}) &nbsp;·&nbsp; 7d <b class="${cls(w168[1])}">${usd(w168[1])}</b> (n=${w168[0]})`;
   const opens = s.open||[];
   $('open-list').innerHTML = opens.length? opens.map(o=>
-    `<div style="display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid #14141c"><span>#${o.id} ${o.coin} <span class="tag ${o.dir.toLowerCase()}">${o.dir}</span> @ ${fmt(o.entry,1)} <span style="color:var(--dim);font-size:10px">${o.signal||''}</span></span><span class="${cls(o.pnl_pct)}" style="white-space:nowrap">${o.pnl_pct>0?'+':''}${o.pnl_pct}%</span></div>`).join('')
+    `<div style="padding:4px 0;border-bottom:1px solid #14141c">
+      <div style="display:flex;justify-content:space-between;gap:8px"><span>#${o.id} ${o.coin} <span class="tag ${o.dir.toLowerCase()}">${o.dir}</span> @ ${fmt(o.entry,1)} <span style="color:var(--dim);font-size:10px">${o.signal||''}</span></span><span class="${cls(o.pnl_pct)}" style="white-space:nowrap">${o.pnl_pct>0?'+':''}${o.pnl_pct}%</span></div>
+      <div style="display:flex;justify-content:space-between;gap:8px;margin-top:2px;font-size:11px">
+        <span style="color:var(--red)">SL ${o.sl!=null?fmt(o.sl,1):'—'} <span style="color:var(--dim)">(${o.sl!=null?((o.sl/o.entry-1)*100*(o.dir==='LONG'?1:-1)).toFixed(2):'—'}%)</span></span>
+        <span style="color:var(--green)">TP ${o.tp!=null?fmt(o.tp,1):'—'} <span style="color:var(--dim)">(${o.tp!=null?((o.tp/o.entry-1)*100*(o.dir==='LONG'?1:-1)).toFixed(2):'—'}%)</span></span>
+      </div>
+    </div>`).join('')
     : '<span style="color:var(--dim)">none open</span>';
 }
 
@@ -429,6 +435,30 @@ function draw(){
 
   // trade markers: buy/sell at the entries + the exit dots + connector
   drawTrades(ctx, P, x, y, c);
+
+  // open positions' SL / TP lines (drawn over the rung lines)
+  (DATA.stats && DATA.stats.open || []).forEach(op=>{
+    [['sl', op.sl, '#ef5350', 'SL'], ['tp', op.tp, '#4caf50', 'TP']].forEach(([kind, v, col, lbl])=>{
+      if(v==null || v<ylo || v>yhi) return;
+      const yy = y(v);
+      ctx.save();
+      ctx.strokeStyle = col; ctx.lineWidth = 1.6; ctx.globalAlpha = 0.95;
+      ctx.setLineDash(kind==='sl' ? [10,4] : [4,4]);
+      ctx.beginPath(); ctx.moveTo(P.l, yy); ctx.lineTo(W-P.r, yy); ctx.stroke();
+      ctx.setLineDash([]);
+      const text = lbl+' '+fmt(v,0);
+      ctx.font = 'bold 10px monospace';
+      const tw = ctx.measureText(text).width + 8;
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = 'rgba(18,18,26,.95)';
+      ctx.fillRect(W-P.r+2, yy-7, tw, 14);
+      ctx.strokeStyle = col; ctx.lineWidth = 1;
+      ctx.strokeRect(W-P.r+2.5, yy-6.5, tw-1, 13);
+      ctx.fillStyle = col;
+      ctx.fillText(text, W-P.r+6, yy+3.5);
+      ctx.restore();
+    });
+  });
 
   // hover vertical (synced with the indicator pane — F-6)
   if(hoverIdx!=null && hoverIdx>=0 && hoverIdx<c.length){
