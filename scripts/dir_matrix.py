@@ -552,11 +552,15 @@ def day_labels(anchors):
 
 def resolve_rows(rows, now_ts, lookup):
     """Join realized class into matured call rows. lookup(h, ts) -> (close_in,
-    close_out) or None (outcome bar not closed yet). Pure: no I/O. Returns n resolved."""
+    close_out) or None (outcome bar not closed yet). Pure: no I/O.
+
+    Already-resolved rows are RE-VERIFIED every run (bug_hunter F1): the collector
+    heals candle rows after first insert, so a label joined from a provisional
+    close can change — the healed label is adopted with a CORRECTED log line.
+    Returns (n_newly_resolved, n_corrected)."""
     changed = 0
+    corrected = 0
     for row in rows:
-        if row.get('actual') is not None:
-            continue
         h = row['horizon']
         if int(row['ts']) + HORIZONS[h] * 60 > now_ts:
             continue
@@ -564,11 +568,24 @@ def resolve_rows(rows, now_ts, lookup):
         if closes is None:
             continue
         close_in, close_out = closes
-        row['actual'] = CLASS_NAMES[classify(close_out / close_in - 1, h)]
+        actual = CLASS_NAMES[classify(close_out / close_in - 1, h)]
         probs = {'up': row['p_up'], 'side': row['p_side'], 'down': row['p_down']}
-        row['hit'] = max(probs, key=probs.get) == row['actual']
-        changed += 1
-    return changed
+        hit = max(probs, key=probs.get) == actual
+        if row.get('actual') is None:
+            row['actual'] = actual
+            row['hit'] = hit
+            changed += 1
+        elif row['actual'] != actual:
+            print(f'resolve: CORRECTED {h} ts={int(row["ts"])} '
+                  f'{row["actual"]}/{row.get("hit")} -> {actual}/{hit} '
+                  f'(candle healed after first join)')
+            row['actual'] = actual
+            row['hit'] = hit
+            corrected += 1
+    if corrected:
+        print(f'resolve: {corrected} previously-resolved label(s) corrected '
+              f'against healed candles')
+    return changed, corrected
 
 
 def db_lookup(h, ts_call):
@@ -591,8 +608,8 @@ def do_resolve(now_ts=None):
     if not rows:
         print('resolve: 0 rows in data/dir_matrix_predictions.jsonl (nothing to join)')
         return 0
-    n = resolve_rows(rows, now_ts, db_lookup)
-    if n:
+    n, n_corr = resolve_rows(rows, now_ts, db_lookup)
+    if n or n_corr:
         write_calls(rows)
     by_h = {}
     for r in rows:
@@ -612,7 +629,8 @@ def do_resolve(now_ts=None):
         print(f'resolve {h}: resolved={d["resolved"]}/{d["total"]} '
               f'(joined_now={n}) window={w} {WINDOW_DAYS}d '
               f'ε={EPS_BPS[h]:g}bps hits={d["hits"]}')
-    print(f'resolve: {n} matured call(s) joined (now={iso_z(now_ts)})')
+    print(f'resolve: {n} matured call(s) joined, {n_corr} healed-label '
+          f'correction(s) (now={iso_z(now_ts)})')
     return n
 
 
@@ -1183,17 +1201,27 @@ def selfcheck():
          'actual': 'up', 'hit': True},
     ]
     now = 1000 + 15 * 60 + 1            # 15m matured; 1h/4h not; last already resolved
-    n_res = resolve_rows(rows, now, lookup)
-    chk(n_res == 1, 'resolve joins exactly the matured call')
+    n_res, n_corr = resolve_rows(rows, now, lookup)
+    chk(n_res == 1 and n_corr == 0, 'resolve joins exactly the matured call')
     chk(rows[0]['actual'] == 'up' and rows[0]['hit'] is True,
         '15m outcome +7bps >= 5bps -> actual=up, hit=argmax(p_up)=True')
     chk('actual' not in rows[1] and 'actual' not in rows[2],
         'immature 1h/4h calls untouched')
     chk(rows[4]['actual'] == 'up' and rows[4]['hit'] is True,
-        'already-resolved row untouched')
+        'already-resolved row with stable label re-verified, not duplicated')
+    # bug_hunter F1: a provisional label must be corrected when the collector
+    # heals the candle row underneath it after the first join
+    healed = [dict(r) for r in rows]
+    healed[4]['actual'] = 'down'          # stale provisional label (wrong)
+    healed[4]['hit'] = False
+    n3, c3 = resolve_rows(healed, now, lookup)   # lookup truth: +7bps -> up
+    chk(n3 == 0 and c3 == 1 and healed[4]['actual'] == 'up'
+        and healed[4]['hit'] is True,
+        'F1: healed candle corrects a stale resolved label (1 corrected, 0 new)')
     now2 = 2000 + 60 * 60 + 1
-    n2 = resolve_rows(rows, now2, lookup)
-    chk(n2 == 1 and rows[1]['actual'] == 'down' and rows[1]['hit'] is True,
+    n2, c2 = resolve_rows(rows, now2, lookup)
+    chk(n2 == 1 and c2 == 0 and rows[1]['actual'] == 'down'
+        and rows[1]['hit'] is True,
         '1h outcome -15bps <= -10bps -> down, argmax(p_down)=hit')
 
     # 6) determinism: fixed random_state -> identical fits on identical data
