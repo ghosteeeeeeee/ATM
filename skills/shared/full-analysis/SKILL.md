@@ -1029,6 +1029,38 @@ chase — "bounce imminent").
   the contrarian read in §4) — never a hard block (the hard gates
   stay: E1 confirmation, the level, the precheck, R:R ≥1.0 real).
 
+### 17. The first (closest) bracket: not too close, not too far (CEO, 2026-11-23)
+
+The NEAREST armed rung on each side must sit in a **distance band
+from price — not too close, not too far**:
+
+- **Too close** (< `BRACKET_MIN_NEAR_PCT` = 1.0%): the first poke
+  fires on wick-grade distance (the CEO's example: a short armed
+  0.92% away — "looks too close") — §16's tight-band first-poke class
+  made structural.
+- **Too far** (> `BRACKET_MAX_FAR_PCT` = 2.0%): the rung never fills
+  or fills late (the CEO's example: a long 2.04% away — "looks too
+  far"; his picks: 60,250 / 62,250 ≈ 1.5% / 1.8%).
+
+**Enforcement (the keeper, which both the watcher's cycle and
+auto_trader's run invoke):**
+1. **Derivations clamp into the band** — any newly derived rung
+   (structure, fresh-low, fresh-air, hand-assist) whose trigger lands
+   outside [1%, 2%] is snapped to the nearest 250-round INSIDE the
+   band (all styles, both sides).
+2. **Existing rungs get re-leveled** — the keeper's pre-pass finds the
+   nearest rung per side; if it is out of band, its trigger snaps to
+   the nearest 250-round inside the band and the SL moves by the SAME
+   delta (the reclaim offset is preserved; the TP stays — the R:R is
+   re-checked ≥1.0 planned after the move). In-band rungs (including
+   CEO-dictated levels) are never touched.
+3. Report the closest-bracket distance % in §6 every analysis; out of
+   band at report time = flag it.
+
+This is the placement half of §16: §16 says a tight-band first poke
+lacks conviction; this rule makes the closest bracket require a real
+move (1–2%) to reach it, on both sides, automatically.
+
 ## Analysis Script
 
 **Fast path (2026-10-22):** `python3 scripts/auto_analysis.py` runs the
@@ -1207,6 +1239,8 @@ method + numbers whenever the verdict reviews a series of exits.
   ENTRY QUALITY: [band context: tight-band first-poke vs open range ·
     1m RSI at the level vs direction (suppressed-short / stretched-long
     = LOW-LIKELIHOOD flags per §16)]
+  BRACKET DISTANCE: [closest short X.X% / closest long X.X% — both
+    within [1%,2%] per §17? flag if out of band]
 
 ═══════════════════════════════════════════
 ```
