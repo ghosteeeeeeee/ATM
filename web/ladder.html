@@ -174,6 +174,8 @@ tr.hl td { background:#1c2430; }
 <script>
 let DATA = null, hlRung = null, rangeMode = 'auto';
 const IND_KEYS = ['rsi','macd','adx','atr','cont','z'];
+const RGAP = 70;   // right-edge breathing room: the last tick sits RGAP px off the
+// chart box's right edge (CEO 2026-11-23) — both charts, all series
 let indOn = (()=>{ try{ const s = JSON.parse(localStorage.getItem('ladder_ind_on')||'null');
   const d = {}; IND_KEYS.forEach(k=> d[k] = s && k in s ? !!s[k] : true); return d;
 }catch(e){ const d={}; IND_KEYS.forEach(k=>d[k]=true); return d; } })();
@@ -300,7 +302,8 @@ function draw(){
   const P = {l:8, r:74, t:10, b:22};
   const [ylo,yhi] = yRange();
   const c = DATA.candles;
-  const x = i => P.l + (i+0.5)*(W-P.l-P.r)/c.length;
+  const dataR = W - P.r - RGAP;
+  const x = i => P.l + (i+0.5)*(W-P.l-P.r-RGAP)/c.length;
   const y = v => P.t + (yhi-v)/(yhi-ylo)*(H-P.t-P.b);
 
   // grid
@@ -320,7 +323,7 @@ function draw(){
   ctx.textAlign='left';
 
   // volume histogram in the bottom band (its own scale: the max = 20% of the plot)
-  const bw = Math.max(2, Math.min(14, (W-P.l-P.r)/c.length*0.7));
+  const bw = Math.max(2, Math.min(14, (W-P.l-P.r-RGAP)/c.length*0.7));
   const vmax = Math.max(1, ...c.map(b=>b.v||0));
   const vband = (H-P.t-P.b) * 0.20;
   c.forEach((b,i)=>{
@@ -390,11 +393,11 @@ function draw(){
     const lbl = 'EMA200';
     const tw = ctx.measureText(lbl).width + 8;
     ctx.fillStyle = 'rgba(224,224,224,.14)';
-    ctx.fillRect(W-P.r+2, last[1]-7, tw, 14);
+    ctx.fillRect(dataR+2, last[1]-7, tw, 14);
     ctx.strokeStyle = 'rgba(224,224,224,.6)'; ctx.lineWidth = 1;
-    ctx.strokeRect(W-P.r+2.5, last[1]-6.5, tw-1, 13);
+    ctx.strokeRect(dataR+2.5, last[1]-6.5, tw-1, 13);
     ctx.fillStyle = '#e0e0e0';
-    ctx.fillText(lbl, W-P.r+6, last[1]+3.5);
+    ctx.fillText(lbl, dataR+6, last[1]+3.5);
     ctx.restore();
   }
 
@@ -406,13 +409,13 @@ function draw(){
     const yy=y(DATA.price);
     ctx.save();
     ctx.strokeStyle='#4fc3f7'; ctx.lineWidth=1.4; ctx.setLineDash([4,4]);
-    ctx.beginPath(); ctx.moveTo(P.l,yy); ctx.lineTo(W-P.r,yy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(P.l,yy); ctx.lineTo(dataR,yy); ctx.stroke();
     ctx.setLineDash([]);
     const lbl = fmt(DATA.price,1);
     ctx.font='bold 11px monospace';
     const tw=ctx.measureText(lbl).width+10;
-    ctx.fillStyle='#4fc3f7'; ctx.fillRect(W-P.r+1, yy-8, tw, 16);
-    ctx.fillStyle='#0a0a0f'; ctx.fillText(lbl, W-P.r+6, yy+4);
+    ctx.fillStyle='#4fc3f7'; ctx.fillRect(dataR+2, yy-8, tw, 16);
+    ctx.fillStyle='#0a0a0f'; ctx.fillText(lbl, dataR+6, yy+4);
     // glow dot at the last candle
     ctx.fillStyle='#4fc3f7'; ctx.shadowColor='#4fc3f7'; ctx.shadowBlur=10;
     ctx.beginPath(); ctx.arc(x(c.length-1), yy, 3, 0, 7); ctx.fill();
@@ -502,7 +505,8 @@ function drawInd(hover){
   const P={l:8,r:74,t:10,b:22};
   const c = DATA.candles;
   const [ylo,yhi] = indRange();
-  const x = i => P.l + (i+0.5)*(W-P.l-P.r)/c.length;
+  const dataR = W - P.r - RGAP;
+  const x = i => P.l + (i+0.5)*(W-P.l-P.r-RGAP)/c.length;
   const y = v => P.t + (yhi-v)/(yhi-ylo)*(H-P.t-P.b);
 
   // grid (the same time grid as the main chart)
@@ -591,7 +595,7 @@ indEl.addEventListener('mousemove', ev=>{
   const rct = indEl.getBoundingClientRect();
   const mx = ev.clientX-rct.left;
   const c = DATA.candles, W=indEl.clientWidth, P={l:8,r:74};
-  const i = Math.round((mx-P.l)/((W-P.l-P.r)/c.length)-0.5);
+  const i = Math.round((mx-P.l)/((W-P.l-P.r-RGAP)/c.length)-0.5);
   if(i>=0 && i<c.length){ hoverIdx=i; draw(); drawInd(i); }
 });
 indEl.addEventListener('mouseleave', ()=>{ hoverIdx=null; draw(); drawInd(null); });
@@ -602,7 +606,7 @@ cvEl.addEventListener('mousemove', ev=>{
   const mx = ev.clientX-rct.left, my = ev.clientY-rct.top;
   const c = DATA.candles; const W=cvEl.clientWidth, H=cvEl.clientHeight;
   const P={l:8,r:74,t:10,b:22};
-  const i = Math.round((mx-P.l)/((W-P.l-P.r)/c.length)-0.5);
+  const i = Math.round((mx-P.l)/((W-P.l-P.r-RGAP)/c.length)-0.5);
   if(i<0||i>=c.length){ ro.style.display='none'; return; }
   const b = c[i];
   hoverIdx = i; drawInd(i);
