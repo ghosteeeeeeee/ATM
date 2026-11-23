@@ -991,6 +991,44 @@ Before ANY backtest number is quoted in an analysis, a plan, or a report:
    §7–9 · verdicts `1795152254`, `1795157600`,
    `bug-hunter-retest-fade-harness-2026-11-20`.
 
+### 16. Entry conviction + the 1m-RSI-at-break context (CEO lessons, 2026-11-23)
+
+Two trades taught this (#17058 SHORT and #17059 LONG — both wicked in,
+both stopped): *"we don't need to be that close, we want moves with
+momentum."*
+
+**1. First break of a tight band ≠ conviction.** A ladder level can
+fire on the FIRST poke through a TIGHT resistance/support band — and a
+tight band's edge is exactly where wicks live. We want moves with
+CONVICTION BEHIND THEM. E1's displacement confirmation is necessary
+but not sufficient: also read the BAND CONTEXT at fill — `tight band`
+(first poke through a quiet range = the wick class, prefer waiting for
+the push that comes with momentum already built) vs `open range` (the
+level has room around it = a break can travel). Report the band
+context in §6. The CEO's numbers on the two trades: #17058 filled
+333pts past its trigger on a tight-band poke; #17059 was "the first
+break of a very tight range."
+
+**2. The 1m RSI AT THE ENTRY sets the side's likelihood** (the CEO's
+read, verbatim intent): a SHORT taken with 1m RSI already ~40 = price
+is already quite suppressed → the short is *possible but less likely*
+(the move already happened; the bounce risk dominates). A LONG taken
+with 1m RSI already ~70 = the break entered *stretched* → price could
+go higher, but cooling off and giving the resistance a real momentum
+push a while later is MORE likely (the bounce-off setup beats the
+chase — "bounce imminent").
+
+- SHORT + 1m RSI already < ~40 (suppressed) → **LOW-LIKELIHOOD flag**
+  (fighting a move that already occurred)
+- LONG + 1m RSI already > ~70 (stretched) → **LOW-LIKELIHOOD flag**
+  (the cool-off-then-push setup is the better trade)
+- The strong entries: the 1m RSI with ROOM in the trade's direction
+  (mid-band with the push still ahead) + the band context open + E1
+  displacement.
+- This is an entry-QUALITY flag (informs expectation and sizing, and
+  the contrarian read in §4) — never a hard block (the hard gates
+  stay: E1 confirmation, the level, the precheck, R:R ≥1.0 real).
+
 ## Analysis Script
 
 **Fast path (2026-10-22):** `python3 scripts/auto_analysis.py` runs the
@@ -1166,6 +1204,9 @@ method + numbers whenever the verdict reviews a series of exits.
   DIRECTION: [LONG/SHORT/NONE + who outranks here per §8 trust protocol]
   ENTRY: [the LEVEL + tight structural SL + TP + planned AND real R:R
           (with slip buffer) — or "no trade, level never came"]
+  ENTRY QUALITY: [band context: tight-band first-poke vs open range ·
+    1m RSI at the level vs direction (suppressed-short / stretched-long
+    = LOW-LIKELIHOOD flags per §16)]
 
 ═══════════════════════════════════════════
 ```
