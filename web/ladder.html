@@ -44,6 +44,8 @@ canvas { display:block; width:100%; height:440px; cursor:crosshair; }
 .toolbar { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
 button { background:var(--card2); color:var(--text); border:1px solid var(--border); border-radius:6px;
   padding:4px 10px; font-family:inherit; font-size:11px; cursor:pointer; }
+button.icon { padding:5px 7px; display:inline-flex; align-items:center; }
+button.icon svg { width:15px; height:15px; display:block; }
 button.on { border-color:var(--accent); color:var(--accent); box-shadow:0 0 10px rgba(79,195,247,.25); }
 .stats { display:grid; grid-template-columns: 1fr 1fr; gap:8px; }
 .stat { background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; }
@@ -88,11 +90,11 @@ tr.hl td { background:#1c2430; }
   <div>
   <div class="card glow">
     <div class="toolbar">
-      <button id="btn-auto" class="on">AUTO RANGE</button>
-      <button id="btn-full">FULL LADDER</button>
+      <button id="btn-auto" class="on icon" title="Auto range — the price-centric view (in-range rungs only)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 12l3-3m-3 3l3 3M21 12l3-3m-3 3l3 3"/></svg></button>
+      <button id="btn-full" class="icon" title="Full ladder — stretch the scale to every armed rung"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M12 3l-3 3m3-3l3 3M12 21l-3-3m3 3l3-3"/></svg></button>
       <span style="width:8px"></span>
-      <button id="btn-candles" class="on">CANDLES</button>
-      <button id="btn-line">LINE</button>
+      <button id="btn-candles" class="on icon" title="Candlesticks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v3M7 17v3M7 7h3v10H7zM17 7v10M17 7h-3v10h3z" stroke-width="1.6"/></svg></button>
+      <button id="btn-line" class="icon" title="Close line — the minimal view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 14 21 5"/></svg></button>
       <span class="badge" id="rng-label">—</span>
       <span style="flex:1"></span>
       <span class="legend">
