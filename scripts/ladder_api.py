@@ -316,6 +316,40 @@ def chart_trades():
     return out
 
 
+def continuum_series(bars):
+    """Continuum state_score aligned to the candle bars: for each 15m bar,
+    the last1m continuum tick inside that bar (local continuum_data.json).
+    Returns an array len(bars) (None = no tick in coverage)."""
+    n = len(bars)
+    out = [None] * n
+    cur_val = None
+    try:
+        d = json.load(open('/var/www/hermes/data/continuum_data.json'))
+        hist = d.get('history') or []
+        by_bar = {}
+        for h in hist:
+            ts = h.get('ts')
+            sc = h.get('state_score')
+            if ts is None or sc is None:
+                continue
+            bar_t = ts - (ts % 900)          # the 15m bucket
+            by_bar[bar_t] = float(sc)        # the last tick wins
+        for i, b in enumerate(bars):
+            v = by_bar.get(b['t'])
+            if v is not None:
+                out[i] = round(v, 3)
+        # the current = the newest tick (even if outside the last bar)
+        newest = None
+        for h in hist:
+            if h.get('state_score') is not None:
+                newest = h
+        if newest:
+            cur_val = round(float(newest['state_score']), 3)
+    except Exception:
+        pass
+    return out, cur_val
+
+
 def main():
     price, age = live_price()
     _bars = candles()
@@ -324,11 +358,14 @@ def main():
         'price': price,
         'price_age_s': round(age, 1) if age is not None else None,
         'candles': _bars,
-        'ind': indicators(_bars),
+        'ind': dict(indicators(_bars)),   # extended below with continuum
         'rungs': rungs(),
         'trades': chart_trades(),
         'stats': stats(),
     }
+    _cont, _cont_cur = continuum_series(_bars)
+    feed['ind']['cont'] = _cont
+    feed['ind']['cur']['cont'] = _cont_cur
     tmp = OUT + '.tmp'
     with open(tmp, 'w') as f:
         json.dump(feed, f)

@@ -430,8 +430,8 @@ function drawTrades(ctx, P, x, y, c){
 }
 
 /* ── indicator chart (RSI/MACD/ADX/ATR, same bars) ── */
-const IND_COLORS = { rsi:'#4caf50', macd:'#ef5350', adx:'#fdd835', atr:'#4fc3f7' };
-const IND_NAMES  = { rsi:'RSI', macd:'MACD', adx:'ADX', atr:'ATR' };
+const IND_COLORS = { rsi:'#4caf50', macd:'#ef5350', adx:'#fdd835', atr:'#4fc3f7', cont:'#ff9800' };
+const IND_NAMES  = { rsi:'RSI', macd:'MACD', adx:'ADX', atr:'ATR', cont:'CONTINUUM' };
 let hoverIdx = null;
 
 function indRange(){
@@ -472,7 +472,7 @@ function drawInd(hover){
 
   // the four series, each min-max normalized over the visible window
   const series = DATA.ind;
-  ['rsi','macd','adx','atr'].forEach(k=>{
+  ['rsi','macd','adx','atr','cont'].forEach(k=>{
     const arr = series[k]||[];
     let lo=Infinity, hi=-Infinity, any=false;
     arr.forEach(v=>{ if(v!=null){ lo=Math.min(lo,v); hi=Math.max(hi,v); any=true; } });
@@ -501,7 +501,7 @@ function drawInd(hover){
     // the four values at the hover index
     ctx.font='10px monospace';
     let ty = P.t+12;
-    ['rsi','macd','adx','atr'].forEach(k=>{
+    ['rsi','macd','adx','atr','cont'].forEach(k=>{
       const v = (DATA.ind[k]||[])[hover];
       ctx.fillStyle = IND_COLORS[k];
       ctx.fillText(IND_NAMES[k]+': '+(v==null?'—':v), P.l+6, ty);
@@ -512,7 +512,7 @@ function drawInd(hover){
 
 function renderIndLegend(){
   const cur = (DATA.ind||{}).cur||{};
-  $('ind-legend').innerHTML = ['rsi','macd','adx','atr'].map(k=>{
+  $('ind-legend').innerHTML = ['rsi','macd','adx','atr','cont'].map(k=>{
     const v = cur[k];
     const txt = v==null?'—':(k==='atr'? fmt(v,0) : (k==='macd'? (v>=0?'+':'')+v.toFixed(1) : v.toFixed(1)));
     return `<span class="chip"><span class="swatch" style="background:${IND_COLORS[k]}"></span>`+
