@@ -7,7 +7,7 @@ Emits /var/www/hermes/data/ladder.json:
   rungs[]        armed BTC ladder rungs from pending_orders.json + states
   stats          ai-trader-pending: totals, windows, MFE split, recents
 
-Refresh: hermes-ladder-api.timer (60s); the page polls every 30s.
+Refresh: hermes-ladder-api.timer (15s); the page polls every 30s.
 Stdlib + local DB only (the local-data-first SOP).
 """
 import json
@@ -37,10 +37,13 @@ def candles(n=180):
         f"file:{os.path.join(HERMES_DATA, 'candles.db')}?mode=ro", uri=True)
     try:
         cur = con.cursor()
+        # F-1 belt: even with the seeder fixed, never read a bar whose
+        # window hasn't ended (the forming-bar class).
         cur.execute(
             "SELECT ts, open, high, low, close, volume FROM candles_15m "
-            "WHERE token='BTC' AND is_closed=1 ORDER BY ts DESC LIMIT ?",
-            (n,))
+            "WHERE token='BTC' AND is_closed=1 AND ts < ? "
+            "ORDER BY ts DESC LIMIT ?",
+            (int(time.time() // 900) * 900, n))
         rows = list(reversed(cur.fetchall()))
     finally:
         con.close()
@@ -210,7 +213,10 @@ def indicators(bars):
     adx = [None] * n
     atr = [None] * n
     if n < 32:
-        return {'rsi': rsi, 'macd': macd, 'adx': adx, 'atr': atr}
+        # F-5: the caller reads ind.cur.* — an early return without 'cur'
+        # KeyErrors the feed the moment the candles ever shrink below 32.
+        return {'rsi': rsi, 'macd': macd, 'adx': adx, 'atr': atr,
+                'cur': {'rsi': None, 'macd': None, 'adx': None, 'atr': None}}
     closes = [b['c'] for b in bars]
 
     # RSI(14), Wilder smoothing
@@ -417,13 +423,22 @@ def main():
     # so every displayed bar carries a value (CEO: "the full window").
     _N = 192
     _WARM = 120
-    _full = candles(_N + _WARM)
+    # F-2 (bug-hunter): a candles.db failure used to crash the run and
+    # leave a STALE json being served — emit a degraded-but-valid feed
+    # instead (the page guards empty candles and keeps the rest alive).
+    _feed_err = None
+    try:
+        _full = candles(_N + _WARM)
+    except Exception as _ce:
+        _full = []
+        _feed_err = f'candles:{type(_ce).__name__}'
     _ind_full = indicators(_full)
     _bars = _full[-_N:] if len(_full) >= _N else _full
     _ind = {k: (v[-len(_bars):] if isinstance(v, list) else v)
             for k, v in _ind_full.items()}
     feed = {
         'ts': int(time.time()),
+        'error': _feed_err,
         'price': price,
         'price_age_s': round(age, 1) if age is not None else None,
         'candles': _bars,

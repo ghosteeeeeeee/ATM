@@ -188,14 +188,24 @@ def _store_candles(token: str, interval: str, candles: list):
             conn.execute("PRAGMA busy_timeout=30000")
             conn.execute("PRAGMA journal_mode=WAL")
             c = conn.cursor()
+            # F-1 (bug-hunter 2026-11-23 HIGH): the CURRENT 15m bar must
+            # never be marked is_closed=1 while forming — the old hard
+            # 1s lied on every fetch, the last candle repainted, and
+            # UNGUARDED readers (signal_compactor x7, mtf_macd, hzscore,
+            # accel_300, ema300_breakthrough, ...) computed signal math
+            # off the partial close. Closed = only bars whose open time
+            # is before the current 15m window's start.
+            _now_floor = int(time.time() // 900) * 900
+            _rows = [(r[0], r[1], r[2], r[3], r[4], r[5], r[6],
+                      1 if r[1] < _now_floor else 0) for r in rows]
             c.executemany(f"""
                 INSERT INTO {table} (token, ts, open, high, low, close, volume, is_closed)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(token, ts) DO UPDATE SET
                     open=excluded.open, high=excluded.high, low=excluded.low,
-                    close=excluded.close, volume=excluded.volume, is_closed=1
-                WHERE {table}.volume = 0 OR excluded.volume > 0
-            """, rows)
+                    close=excluded.close, volume=excluded.volume, is_closed=excluded.is_closed
+                    WHERE {table}.volume = 0 OR excluded.volume > 0
+            """, _rows)
             conn.commit()
             return
         except sqlite3.OperationalError as e:

@@ -278,7 +278,7 @@ All dashboards served by nginx on port 54321.
 | Coin Tracker | `/coin_tracker.html` | `coin_tracker_data.json` | 5min |
 | Pump Flow | `/pump_flow.html` | `pump_flow_data.json` | 2min |
 | Control Tower | `/control_tower.html` | `control_tower.json` (control_tower_api.py) | 60s API (page polls 30s) |
-| Ladder | `/ladder.html` | `ladder.json` (ladder_api.py) — live BTC candles + the RSI/MACD/ADX/ATR pane, the armed rung lines, ai-trader-pending stats | 60s API (page polls 30s) |
+| Ladder | `/ladder.html` | `ladder.json` (ladder_api.py) — live BTC candles + the RSI/MACD/ADX/ATR/CONTINUUM/Z-SCORE pane, the armed rung lines, ai-trader-pending stats | 15s API (page polls 30s) |
 
 **File locations:**
 - HTML: `/root/.hermes/web/*.html` → copied to `/var/www/hermes/*.html`

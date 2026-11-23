@@ -67,6 +67,7 @@ tr.hl td { background:#1c2430; }
 .tag.short { color:var(--red); border-color:rgba(239,83,80,.5); }
 .tag.cont { color:var(--purple); border-color:rgba(171,71,188,.5); }
 .tag.retested { color:var(--yellow); border-color:rgba(253,216,53,.5); }
+.tag.trig { color:var(--accent); border-color:rgba(79,195,247,.5); }
 .tag.unfired { color:var(--dim); }
 .mono-r { text-align:right; }
 #readout { position:absolute; pointer-events:none; font-size:11px; color:var(--text); background:rgba(10,10,15,.9);
@@ -266,14 +267,14 @@ function renderRungs(){
   const tb = $('rungs-table').querySelector('tbody');
   tb.innerHTML = rs.map(r=>{
     const dist = p?((r.trig/p-1)*100):null;
-    const stateTag = r.state==='retested'?'retested':r.state==='first_break'?'first_break':r.state==='rejected'?'rejected':'unfired';
+    const stateTag = r.state==='retested'?'retested':r.state==='first_break'?'first_break':r.state==='rejected'?'rejected':r.state==='triggered'?'triggered':'unfired';
     return `<tr data-id="${r.id}" onmouseenter="hl('${r.id}')" onmouseleave="hl(null)">
       <td><span class="tag ${r.dir}">${r.dir[0].toUpperCase()}</span></td>
       <td class="mono-r">${fmt(r.trig,0)}</td>
-      <td class="mono-r ${dist>=0?'pos':'neg'}">${dist>=0?'+':''}${dist.toFixed(2)}%</td>
+      <td class="mono-r ${dist==null?'':(dist>=0?'pos':'neg')}">${dist==null?'—':(dist>=0?'+':'')+dist.toFixed(2)+'%'}</td>
       <td class="mono-r">${fmt(r.sl,0)}</td>
       <td>${r.style==='continuation'?'<span class="tag cont">cont</span>':'<span class="tag unfired">retest</span>'}</td>
-      <td><span class="tag ${stateTag==='retested'?'retested':'unfired'}">${stateTag}</span></td></tr>`;
+      <td><span class="tag ${stateTag==='retested'?'retested':stateTag==='triggered'?'trig':'unfired'}">${stateTag}</span></td></tr>`;
   }).join('');
 }
 function hl(id){ hlRung = id; draw(); }
@@ -429,6 +430,15 @@ function draw(){
   // trade markers: buy/sell at the entries + the exit dots + connector
   drawTrades(ctx, P, x, y, c);
 
+  // hover vertical (synced with the indicator pane — F-6)
+  if(hoverIdx!=null && hoverIdx>=0 && hoverIdx<c.length){
+    const xx=x(hoverIdx);
+    ctx.save();
+    ctx.strokeStyle='rgba(79,195,247,.35)'; ctx.lineWidth=1; ctx.setLineDash([2,3]);
+    ctx.beginPath(); ctx.moveTo(xx,P.t); ctx.lineTo(xx,H-P.b); ctx.stroke();
+    ctx.restore();
+  }
+
   // live price line
   if(DATA.price && DATA.price>=ylo && DATA.price<=yhi){
     const yy=y(DATA.price);
@@ -462,10 +472,13 @@ function drawTrades(ctx, P, x, y, c){
   const ts = (DATA.trades||[]);
   ts.forEach(t=>{
     const i1 = t.open_ts!=null ? idxForTime(c, t.open_ts) : -1;
-    if(i1<0) return;
+    const i2 = (t.exit && t.close_ts!=null) ? idxForTime(c, t.close_ts) : -1;
+    if(i1<0 && i2<0) return;              // entirely outside the window
     const isLong = String(t.dir).toUpperCase()==='LONG';
     const col = isLong ? '#4caf50' : '#ef5350';
-    const px = x(i1), py = y(t.entry);
+    // opened before the window: start the connector at the left edge,
+    // skip the entry triangle (the exit marker still tells the story)
+    const px = i1>=0 ? x(i1) : P.l, py = i1>=0 ? y(t.entry) : y(t.exit);
     // connector to the exit (subtle, outcome-colored)
     let px2=null, py2=null;
     if(t.exit && t.close_ts!=null){

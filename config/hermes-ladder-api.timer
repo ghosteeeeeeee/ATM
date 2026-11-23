@@ -1,5 +1,5 @@
 [Unit]
-Description=Hermes Ladder API Timer — refresh ladder.json every 60s (page polls every 30s)
+Description=Hermes Ladder API Timer — refresh ladder.json every 15s (page polls every 30s)
 
 [Timer]
 OnBootSec=30sec

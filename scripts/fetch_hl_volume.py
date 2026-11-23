@@ -138,10 +138,14 @@ def store_candles(token: str, interval: str, candles: list):
             c.execute(f"SELECT volume FROM {table} WHERE token=? AND ts=?", (token, cd['ts']))
             existing = c.fetchone()
             if existing is None or (existing[0] is not None and existing[0] == 0):
+                # F-1: the column's DEFAULT 1 marked the FORMING bar closed —
+                # set the flag honestly (the same floor rule as the seeder).
+                _nf = int(time.time() // 900) * 900
                 c.execute(
-                    f"INSERT OR REPLACE INTO {table} (token, ts, open, high, low, close, volume) "
-                    f"VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    (token, cd['ts'], cd['open'], cd['high'], cd['low'], cd['close'], cd['volume'])
+                    f"INSERT OR REPLACE INTO {table} (token, ts, open, high, low, close, volume, is_closed) "
+                    f"VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    (token, cd['ts'], cd['open'], cd['high'], cd['low'], cd['close'], cd['volume'],
+                     1 if cd['ts'] < _nf else 0)
                 )
                 stored += 1
 
