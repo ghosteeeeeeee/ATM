@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-22T21:06:39.511707+00:00
-registry: 142 entries (open=35)
+# Shadow disposition report — 2026-11-23T04:49:21.445861+00:00
+registry: 146 entries (open=35)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -124,9 +124,9 @@ registry: 142 entries (open=35)
 - OPEN hl-copy-plus-shadow: deadline=2026-11-30T00:00:00Z | (no parseable source)
 - OPEN hotset-pin-approved-shadow: deadline=2026-11-25T00:00:00Z | (no parseable source)
 - OPEN amplify-pumpchain-normal-short-early: deadline=2026-12-02T00:00:00Z | (no parseable source)
-- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 3696 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 3.3d
+- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 4004 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 3.6d
 - DONE amplify-rider-fade-threshold-walk: ? (?)
-- OPEN amplify-jup-long-blocked-clonehunt: deadline=2026-11-23T00:00:00Z | (no parseable source)
+- DONE amplify-jup-long-blocked-clonehunt: NO SHIP — walk executed 2026-11-23T04:44Z (brain_auditor #291). Bars: (i) n=41 PASS | (ii) walk net +0.13 < +0.50 FAIL | (iii) fk=100% FAIL (every live-winner token-day also in blocked set — token-day unit wrong for multi-fire/day jup; see side-find) | (iv) only CONTINUUM-BLOCK n>=5 net>0 FAIL (need >=2 gates) | (v) split-half H1 +0.27 / H2 -0.13 FAIL. Provenance suspect CONFIRMED: pre-walk would_win 68.3% vs 5m-walk 53.8% same 41 events (gate_shadow would_win inflated +14.5pp vs candle truth). Result: brain/analysis/jup_long_blocked_walk_result.json. Do NOT re-propose without gate_shadow would_win audit + event-level (not token-day) unit. (?)
 - OPEN stop-family-entry-filter-shadow: deadline=2026-11-27T00:00:00Z | (no parseable source)
 - OPEN ai-trader-pending-tag-split: deadline=2026-11-24T00:00:00Z | (no parseable source)
 - OPEN gate-interaction-cross-tab: deadline=2026-11-24T00:00:00Z | (no parseable source)
@@ -143,3 +143,7 @@ registry: 142 entries (open=35)
 - DONE goal-metric-restructure: EXECUTED 2026-11-22 — T APPROVED both items (goal rewrite + philosophy): verifier goal_metrics_check.py restructured to the expectancy set (net $/trade 7d >0, fleet payoff 7d >=1.2, cost % RT <=0.15%; WR = info-only diagnostic, no target); AGENTS.md philosophy line reframed verbatim per CEO 20261122T194418Z (2026-11-22)
 - DONE post822-payoff-regrouping: MASKED EDGE DOES NOT SURVIVE CLEAN DATA (agent-7 run 2026-11-22, fixed anchors + fingerprints): payoff>1.2 group post-8/22 = gross +$3.97 t=+1.00 (ns) fee-net -$0.70 t=-0.18 (vs all-time +2.40); <1.0 loser group t=-4.10 (STRONGER than all-time -1.76) — cut case strengthened, keep case evaporated (2026-11-22)
 - OPEN winner-side-protection-review: deadline=2026-12-06T00:00:00Z | (no parseable source)
+- DONE kpi-framework-formal: EXECUTED 2026-11-22 — APPROVE WITH MODIFICATIONS (verdict 20261122T221140Z) shipped: formal KPI snapshot on goal_progress.json + ceo_dashboard, NS2/R1 gated + --kanban on goal_metrics_check, WR target card killed. Reporting-only: no trading file, no constants. | FOLD RETIRED 2026-11-23 (CEO 20261123T004841Z ruling1, T asked the CEO to rule): old wording retired — limb1 verified MET (-$4.31 since11-04), limb2 broken by construction (references the retired 7-metric verifier). REPLACEMENT LIVE: circuit-breaker NS1 < -0.010 AND NS2 < -$8.00 on 3 consecutive runs -> CEO recommends shadow-only to T (alert-only, no auto-action). Fresh check: NS1 -0.0067 holds, NS2 -10.78 breached -> 1/2 NOT FIRING. (2026-11-22)
+- DONE r2-drawdown-tier-wiring: WIRE-IT (2026-11-23)
+- DONE arm-rate-control-tower: BUILD (2026-11-23)
+- OPEN amplify-rider-extreme-long-cell: deadline=2026-11-30T00:00:00Z | (no parseable source)

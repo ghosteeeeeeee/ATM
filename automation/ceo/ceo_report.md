@@ -1869,3 +1869,9 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 | Never-ran share (7d) | 23.7% (18/76, 4d) | <15% (existing gate) |
 | Never-ran net (7d) | −$1.71 (4d) | ≥ −$0.50 |
 | (c) counterfactual | not collected | tag each continuation fill's 4h trend at arm time; losses clustering in 4h-uptrend arms = ship (c) with data |
+
+## CEO Status — 20261123T033829Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 16T -0.13 43.8% | 7d 118T +0.28 50.8%
+### Findings: disk 89% (>=85% warn, log compression freeing ~0MB); HIGH regime 14d is the bleed pocket (-1.61 over 81T, 45.7%) vs NORMAL +0.79. Regime-specialist read (rotating Q): ai-trader-pending SHORT only earns in NORMAL (+1.00, 27T) and collapses in HIGH (-0.82, 12.5% WR); atr-trend- SHORT ~60% WR in HIGH/NORMAL but negative PnL = R:R not entry; jup SHORT and btc-pump-rider+ LONG are consistent across regimes.
+### Recommendation: HIGH-regime is loss-size not entry quality (60% WR cells negative) — no lever now; disk at 89% needs a real cleanup pass (log compression freeing 0MB).

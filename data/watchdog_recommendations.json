@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-11-22T23:39:44.245453+00:00",
+  "timestamp": "2026-11-23T07:09:48.923541+00:00",
   "steers": [
     {
-      "severity": "urgent",
+      "severity": "warning",
       "category": "health",
-      "title": "Losing streak: 12/20 recent trades lost",
-      "detail": "Win rate 35% over last 20 trades. Total PnL: -0.09 USDT. 11/12 losses never armed (MFE<0.40%) = chop cohort, not wrong-side; arm-rate/stall stack owns the fix. Exits: prearm_lock x5, hard_max_loss x2, atr_sl_hit x2.",
+      "title": "Signal 'ai-trader-pending' losing streak: 3 consecutive losses",
+      "detail": "Net -0.13 USDT over last 20 trades (window losses: -0.48). Consider disabling or tuning this signal.",
       "auto_executable": false,
       "id": "steer-001"
     },
@@ -18,24 +18,20 @@
       "id": "steer-002"
     }
   ],
-  "portfolio_health": "critical",
+  "portfolio_health": "good",
   "regime": {
-    "btc_15m": "LONG_BIAS",
+    "btc_15m": "SHORT_BIAS",
     "btc_4h": "LONG_BIAS",
     "continuum": "ABOVE",
     "volatility": "LOW",
-    "zscore_tier": "STRONG_POS",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "NEGATIVE",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.75,
-    "wyckoff_phase": "MARKUP",
-    "market_phase": "DECLINING",
-    "trend_quality": "STRONG_UP"
+    "linreg_alignment": 0.5,
+    "wyckoff_phase": "UNKNOWN",
+    "market_phase": "CALM",
+    "trend_quality": "UP"
   },
-  "open_count": 1,
-  "deep_analysis": "Data gathered. Writing the merged analysis and AI pick now.\n```\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\nTRADE WATCHDOG \u2014 WARNING\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\nOpen Trades: 1 (1 long, 0 short)\nUnrealized PnL: -0.01 USDT\nRegime: LONG_BIAS (agg flipped SHORT\u2192LONG at 23:30) | Volatility: LOW\nFlip-rate: 26 agg / 28 BTC per 24h \u2014 aggregate at p95 instability\n\n\u2500\u2500 Steers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nRETRACTED \u2014 Exit SPX LONG on bounce 0.2810-0.2812 while SPX SHORT_BIAS conf\u226585 (condition reversed: SPX now NEUTRAL conf 51.3, aggregate flipped LONG_BIAS)\n\ud83d\udfe1 Hold SPX LONG #17054 \u2014 now aligned with flipped tape; SL 0.27913 below 2h low 0.27971 is the hard line; fresh-entry test = keep, not exit\n\ud83d\udd34 Losing streak 12/20 (automated): 11/12 losses never armed = chop cohort\n\ud83d\udfe1 Chop-bleed 7d 89.2% dollar share ($-3.23/$-3.62, 50 losers, 0 NULL; 14d 86.7%; arm today 50% 7/14) \u2014 elevated, under 92 breach\n\ud83d\udfe1 atr-trend- 22T/7d -0.29 at 54.5% WR = payoff problem, auditor candidate (flag True + live traffic)\n\ud83d\udfe2 PICK SOL LONG conf 84 RSI 62.0 precheck PASS (watchlist only \u2014 AI_TRADER_ENABLED=False, will NOT execute)\n\n\u2500\u2500 Deep Analysis \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nThe tape flipped mid-cycle: aggregate SHORT_BIAS 101/127 at 23:00 \u2192 LONG_BIAS at 23:30, BTC 60826\u219261316, continuum ABOVE. SPX regime decayed 91.1 SHORT \u2192 51.3 NEUTRAL and price recovered to entry \u2014 prior exit steer's condition reversed, so it's retracted rather than re-issued. Portfolio \"critical\" is the closed streak, not open risk (n=1, 1/6 slots). Loss pattern unchanged: extreme-RSI entries against the tape lose both ways (BTC SHORT rsi 17.3 \u2192 -0.17); mid-band momentum entries arm the trail and win (jup_yolo 89.5% WR 7d). Chop-bleed 89.2% says the money dies before trail arm \u2014 entry momentum quality owns the fix.\n\n\u2500\u2500 Recommendations \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1. Hold SPX to SL 0.27913; re-test regime next cycle \u2014 re-issue exit fresh only if aggregate flips back SHORT_BIAS with SPX conf\u226585\n2. Route chop-bleed composition (prearm_lock x5) to entry-momentum filters \u2014 auditor owns parameters\n3. Review atr-trend- payoff (54.5% WR, -0.29/7d) \u2014 winners too small vs losers\n\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n```\n\nAnalysis merged into `watchdog_recommendations.json`; AI pick written to `/root/.hermes/data/ai_trader_state.json` (watchlist only).\n",
-  "agent_timestamp": "2026-11-22T23:45:01.738000+00:00",
-  "regime_context": "LONG-BIAS drift tape with p95 churn. At 23:30 (regime_5m): aggregate LONG_BIAS 18 long / 6 short / 103 neutral of 127 scanned \u2014 flipped from SHORT_BIAS 101/127 at 23:00. Watchdog: btc_15m LONG_BIAS, btc_4h LONG_BIAS, continuum ABOVE, zscore STRONG_POS, linreg_alignment 0.75, wyckoff MARKUP, trend_quality STRONG_UP, but volatility LOW, velocity SLOW, acceleration NEGATIVE, volume_regime LOW = drift-up, not impulse. BTC 60826->61316 over the hour, 1m above EMA300 for 97+ consecutive minutes (last cross 22:51). Flip-rate 24h: aggregate 26, BTC 28 \u2014 aggregate at >=26 p95 \"unusually unstable\"; direction states survive ~1h. Source disagreement is real (regime_5m BTC itself NEUTRAL conf 45.6 while aggregate says LONG_BIAS; prior cycle aggregate said SHORT_BIAS). Implication: longs are aligned with the macro tape right now but the tape can flip within one cycle \u2014 condition every direction steer and re-test. Low vol + slow velocity means trail-arm (+0.40% MFE) is hard to reach: entries must catch coin-level momentum (hot-set SOL), not drift entries.",
-  "pattern_alerts": "VERIFIED (PostgreSQL + watchdog.json, run this cycle):\n1. Chop-bleed (DOLLAR share of loss from MFE<0.40%): 7d 89.2% ($-3.23 of $-3.62, 50 losers, 0 NULL mfe), 14d 86.7% (107 losers, 0 NULL), same-day arm rate 50.0% (7/14 closes armed). Baseline 84-86%, breach line 92% \u2014 elevated, no breach; NULL count 0 so no backfill distortion. WINNING side: trail-family momentum entries that reach +0.40% \u2014 jup_yolo_mirrored 19T +1.06 (89.5% WR, LONG 87.5% / SHORT 90.9%), btc-pump-rider+ 13T +0.15 (61.5%). Why we're not on it: 11 of last 12 losses never armed \u2014 we enter mid-chop, not mid-momentum.\n2. Extreme-RSI wrong-side entries, BOTH directions: BTC SHORT #17052 at meta_rsi 17.3 -> -0.17 (winning side = LONG bounce; BTC LONG rsi 53.3 +0.16, rsi 34.1 +0.04). SPX LONG #17054 entered at meta_rsi 21.7 into conf-91.1 SHORT_BIAS \u2014 same anti-pattern; rescued only because the tape flipped long within 1h. Rule: RSI<25 entries against the immediate tape lose in BOTH directions; the edge is mid-band (45-60) momentum with the tape.\n3. atr-trend- payoff decay: 22T/7d, -0.29 net, 54.5% WR \u2014 WR is fine, PAYOFF is not (avg -0.013/trade, 3 consecutive losses in last 20). ATR_TREND_ACCEL_MINUS_ENABLED=True (hermes_constants.py:4723) + live traffic -> real flag, brain-auditor tuning candidate (not dead-signal).\n4. pump-chain+ 0% WR: 7T/7d, -0.23, last close 2026-11-21 18:09, PUMP_FLOW_ENABLED=True -> live with traffic, flag with n=7 small-sample caveat. Prior NEVER_REENABLE note on PUMP_CHAIN_V4 (2026-09-22) is a different flag \u2014 do not conflate.\n5. Exits in last 20: prearm_lock x5 leads \u2014 the trail never arms because entries stall. Exit-side tweaks will not fix this; entry momentum quality owns it (KPI under 92% so no breach action, composition unambiguous).\n6. Dead-signal check: atr-trend- flag True + 22T/7d, pump-chain+ flag True + 7T/7d \u2014 both live, reported normally. No disabled families surfaced this cycle."
+  "open_count": 1
 }

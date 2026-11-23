@@ -1,0 +1,28 @@
+{
+ "mission": "hourly full-analysis check-ins for 24h (CEO order 2026-11-22)",
+ "started_utc": "2026-11-22T23:55Z",
+ "done": 7,
+ "stop_after": 24,
+ "next_due_epoch": 1795420035,
+ "note": "each wake: run the full-analysis skill (engines + template), report to CEO, increment done, re-arm a 3600s sleep job; stop re-arming when done >= stop_after or the CEO says stop",
+ "protocol": "at each hourly check-in: run the full-analysis AND route any live open decision through ceo-comm (deep, detached 1800s = long timeout)",
+ "scheduled_briefs": {
+  "2026-11-28": "ROUND-anchor shadow review (rounds vs structure-only) \u2014 fire from the check-in on/around that date",
+  "2026-11-29": "7-day metric gate + E3 bounce-shadow flip + the FRESH-AIR re-eval + TWO NEW METRICS committed by the fill-quality ruling: (i) entry-leak -> outcome correlation (canonical PnL, per-fill pts \u2014 baseline from agent-7's re-derivation), (ii) exit follow-through saved/premature split with canonical class sums (baseline likewise). If leak-harm or premature-dominance shows post-E1, the relaxation levers become data-backed one-liners."
+ },
+ "briefs_fired": [
+  "2026-11-23_fresh-air-rungs-decision.md (deep launched 00:2x UTC)",
+  "2026-11-23_fresh-air-rungs-decision.md \u2192 RULING: (a) KEEP as-is (deep ok rc=0, 00:35; re-eval at the 11-29 gate; my brief's negative evidence was misattributed \u2014 the true continuation class = n=2, both winners)",
+  "2026-11-23_fill-quality-review.md (deep 20261123T032609Z \u2014 the entries-vs-SLs relaxation decision with the 72h dissection)",
+  "2026-11-23_fill-quality-review.md \u2192 RULING: Option1 RATIFY wait-for-11-29-gate (no changes; deep incomplete rc=124 but decision landed). NOTE: my dissection's nets used the STALE fee-JSON net_pnl (the deep proved it: canonical = pnl_usdt - fee_total \u2248 -$0.47, not +$0.12 \u2014 direction survives, number corrected).",
+  "\u00a717 bracket band SHIPPED (edc9e636): the keeper clamps derivations + re-levels the nearest rung into [1%,2%]; the CEO's dictated levels applied (short 60,250 / long 62,250); skill \u00a717 + template line committed (a291e0ef-era: the \u00a717 commit); bug-hunter agent-8 running"
+ ],
+ "agent_7_pending": null,
+ "canonical_baselines_11_29": {
+  "book_17_fills": "canonical pnl_usdt - fee_total = -$0.475 (stale fee-JSON field would say +$0.22; my brief's +$0.12 = gross excl #17004)",
+  "leak_corr": "Pearson r=+0.183 p=0.483 n=17 (n.s.; the stale-field r=-0.29 narrative REVERSED); >200pt-adverse subset canonical = -$0.40 (7 fills, not 8 \u2014 the 8th was a favorable leak mislabeled)",
+  "split_at_60": "SAVED n=10 canonical -$0.153 | PREMATURE n=7 canonical -$0.322 (both negative at every window; the split flips to 8/9 at +120 \u2014 '59% correct' = a +60 snapshot)",
+  "flags": "#17014 fee_total = a 10x BUG-099 residue (fee-corrected canonical -$0.294, headline unchanged); #17015 empty fees; probable merge-pairs #17014/17015 + #17026/17027; #17015/#17027 entry price-basis least trustworthy",
+  "result_file": "automation/ceo/checkpoints/20261123T032609Z-result-1.md (the 03:53 draft preserved as .superseded-0353Z.md)"
+ }
+}
