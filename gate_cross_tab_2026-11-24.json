@@ -1,0 +1,37 @@
+{
+ "SHORT-REGIME-GATE": {
+  "n": 187,
+  "net": 2.016,
+  "t": 1.36,
+  "h1": 5.221,
+  "h2": -3.205
+ },
+ "SHORT-REGIME-GATE+SHORT-RSI-HARD-FLOOR": {
+  "n": 37,
+  "net": 0.227,
+  "t": 0.52,
+  "h1": 1.457,
+  "h2": -1.23
+ },
+ "SHORT-RSI-HARD-FLOOR": {
+  "n": 551,
+  "net": 7.397,
+  "t": 2.32,
+  "h1": 18.035,
+  "h2": -10.638
+ },
+ "VOL-GATE-BYPASS": {
+  "n": 162,
+  "net": 10.459,
+  "t": 2.59,
+  "h1": 3.0,
+  "h2": 7.458
+ },
+ "SHORT-RSI-HARD-FLOOR+VOL-GATE-BYPASS": {
+  "n": 9,
+  "net": -2.072,
+  "t": -1.44,
+  "h1": -0.003,
+  "h2": -2.069
+ }
+}

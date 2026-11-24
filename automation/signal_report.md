@@ -1,9 +1,9 @@
 # Signal Performance Report
-**Generated:** 2026-11-23 19:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-24 01:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,958 | **WR:** 51.3% | **PnL:** -122.88%
-- **Date range:** 2026-07-29 → 2026-11-23
+- **Total trades (all time):** 3,961 | **WR:** 51.2% | **PnL:** -123.60%
+- **Date range:** 2026-07-29 → 2026-11-24
 
 ---
 
@@ -23,7 +23,7 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| continuation+ | LONG | 2 | 50.0% | -0.21 | ENABLED | Needs more data |
+| bb-squeeze+ | LONG | 3 | 33.3% | -1.05 | ENABLED | Needs more data |
 
 ---
 
@@ -41,7 +41,7 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] continuation+ LONG** — WR=50.0%, PnL=-0.21% over 2 trades. Monitor next cycle.
+1. **[WATCH] bb-squeeze+ LONG** — WR=33.3%, PnL=-1.05% over 3 trades. Monitor next cycle.
 
 ---
 

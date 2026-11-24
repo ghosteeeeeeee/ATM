@@ -12220,5 +12220,35 @@
     "category": "entry sniper",
     "status": "suggested",
     "risk": "low (reporting only)"
+  },
+  {
+    "date": "2026-11-24T04:54:58Z",
+    "idea": "Watchdog paper-flag: net paper=True hedges out of exposure steers",
+    "rationale": "steer-001 said 4 BTC trades over-exposed; 2 are paper=True hedge shadow twins. False urgency.",
+    "expected_impact": "steer precision, zero behavior",
+    "category": "observability",
+    "status": "suggested",
+    "risk": "low",
+    "run": 294
+  },
+  {
+    "date": "2026-11-24T04:54:58Z",
+    "idea": "Auto-ladder same-price double-fire census + one-fill-per-price cooldown (CEO domain)",
+    "rationale": "#17081/#17083 filled 60s apart same trigger 60750/entry 59866.5 (also #17026/#17027 on 11-21); dup-reject prior art keys order-id not price. Measure 30d ladder pairs <=2min, combined vs single PnL, then CEO decides cooldown.",
+    "expected_impact": "removes degenerate double-size entries in fast tape",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "medium (CEO domain)",
+    "run": 294
+  },
+  {
+    "date": "2026-11-24T04:54:58Z",
+    "idea": "shadow_tag_join must evaluate adjudicated bar amendments (tape-split) or suppress BAR MET prints",
+    "rationale": "FLIP1 printed BAR MET today while its formal NO-GO (tape-split sign flip, 11-17) still governs — print can mislead a future reader into flipping.",
+    "expected_impact": "prevents acting on a base-bar print that the amended bar fails",
+    "category": "observability",
+    "status": "suggested",
+    "risk": "low",
+    "run": 294
   }
 ]

@@ -1899,3 +1899,15 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 16T -1.22 37.5% | 7d 119T -0.57 50.4%
 ### Findings: 24h red (37.5% WR) but n=16; 4 control-tower items due ≤24h (first: ai-trader-pending-tag-split 11-24); disk 89% repeated WARN in error_alerts. Proactive Q (23%14=9, regime-specialists): 30d NORMAL 267T 52.8% -0.04 is the only breakeven-big regime — HIGH owns the bleed (189T 50.3% -4.17); specialist cells = bb-squeeze+ NORMAL LONG 64.1% +0.45, jup HIGH SHORT 67.9% +0.29, atr-trend- NORMAL SHORT 68.4% +0.13 — keep alive in NORMAL/HIGH respectively, params already snapshotted by in-flight amplifies.
 ### Recommendation: none (HIGH-regime bleed already owned by open amplify entries; disk at 89% worth a cleanup pass by weekly run)
+
+## CEO Status — 20261123T233830Z
+### Health: pipeline=active (timer-cycled; probe caught idle gap) guardian=active open_pos=0
+### Numbers: 24h 16T -1.09 43.8% | 7d 118T -0.66 50.0%
+### Findings: disk 89% used (repeated health_monitor WARNs); HIGH regime 7d worst cohort 44T 43.2% -0.85 while NORMAL/EXTREME flat-positive. Proactive Q (regime-specialists, 23%14=9): jup_yolo_mirrored+ is the cross-regime winner (7d NORMAL 100%/+0.60, EXTREME 83%/+0.33, HIGH 86%/+0.24); pump-chain+ EXTREME-only 0% -0.23 and atr-trend- EXTREME 43% -0.38 are the negative specialists — HIGH-bleed owner, not a WR-construction artifact.
+### Recommendation: reclaim disk space before it hits 90% (logs/data prune); HIGH-regime bleed goes to weekly deep run.
+
+## CEO Status — 20261124T033831Z
+### Health: pipeline=active guardian=active open_pos=4
+### Numbers: 24h 14T -0.99 42.9% | 7d 117T -0.71 49.6%
+### Findings: New errors Q — disk 90% WARN (repeated 00:54–02:54Z), ai-trader-pending freq UNDER 0.29x baseline, 1 new MOMENTUM block alert; no tracebacks. 4 open positions (flat-to-light). 24h/7d both slightly negative, WR ~43/50% — chop band, no anomaly.
+### Recommendation: Disk at 90% — schedule log/DB retention cleanup before it trips pipeline writes.

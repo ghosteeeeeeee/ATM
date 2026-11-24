@@ -1,9 +1,9 @@
 {
  "mission": "hourly full-analysis check-ins for 24h (CEO order 2026-11-22)",
  "started_utc": "2026-11-22T23:55Z",
- "done": 20,
+ "done": 27,
  "stop_after": 24,
- "next_due_epoch": 1795470295,
+ "next_due_epoch": 1795496884,
  "note": "each wake: run the full-analysis skill (engines + template), report to CEO, increment done, re-arm a 3600s sleep job; stop re-arming when done >= stop_after or the CEO says stop",
  "protocol": "EVERY check-in runs the FULL full-analysis skill \u2014 the complete \u00a70-\u00a76 Output Template, every section, no compressed/fast version (CEO 2026-11-23: 'there should be no fast version of the skill, we should only ever be using the full full-analysis skill, even in your hourly session timer check-ins'). Sections that must appear every time: \u00a70 positions (with invalidation/confirmation), CHOP CHECK (the corrected ts-ordered flip count), \u00a71 MTF (structure + MTF VOLUME + RSI-STRUCT), \u00a71b structure (all 5 TFs), \u00a71c ADX/ATR lifecycle (all 5 TFs + the trendline), \u00a72 continuum, \u00a73 S/R, \u00a74 contrarian+divergence (RSI-STRUCT break warnings), \u00a75 score (chop-adjusted), \u00a76 verdict (direction with the trust protocol + entry + ENTRY QUALITY \u00a716 + BRACKET DISTANCE \u00a717). auto_analysis.py = one engine among many (its fast path feeds the numbers), never the whole report.",
  "scheduled_briefs": {
@@ -29,5 +29,6 @@
  "backup_note": "The full-analysis SKILL.md = a critical document (CEO 2026-11-23). Backed up: (1) git + canonical GitHub push (off-machine), (2) dated snapshot /root/backups/full-analysis-2026-11-23.md (outside the worktree \u2014 survives a repo accident), (3) DSH-registered at .dsh/skills/full-analysis (symlink to the shared original \u2014 single source of truth). Process rule: every skill write is write-then-verify (wc + content grep) \u2014 the 2026-11-23 truncation incident (open('w') truncates before write) proved why.",
  "total": 168,
  "extended_by_ceo": "2026-11-23: 'extend the hourly checkins timer for this session to 7 days' \u2014 the 24-check-in mission extended to 168 (through ~2026-11-30 20:43 UTC). The hourly cadence, the full-template protocol, and the scheduled briefs unchanged; the 11-28 ROUND review + the 11-29 gate + fresh-air re-eval all fall inside the window.",
- "horizon_end_epoch": 1795999495
+ "horizon_end_epoch": 1795999495,
+ "original_24_complete": "2026-11-24 00:51 UTC: the original 24-check-in mission COMPLETE (the CEO's extension to 168 keeps it running \u2014 the cadence, the protocol, and the scheduled briefs unchanged)."
 }

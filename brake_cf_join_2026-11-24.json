@@ -1,0 +1,1786 @@
+[
+ {
+  "token": "FARTCOIN",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 09:07:31",
+  "dir": "LONG",
+  "src": "r2-trend-long3,r2v2-long3",
+  "fwd4h_move": -0.3078
+ },
+ {
+  "token": "STX",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 09:08:01",
+  "dir": "LONG",
+  "src": "bb-squeeze+,ichimoku+",
+  "fwd4h_move": -1.3864
+ },
+ {
+  "token": "RESOLV",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 11:32:20",
+  "dir": "LONG",
+  "src": "atr-trend+",
+  "fwd4h_move": -0.6433
+ },
+ {
+  "token": "JUP",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 11:39:38",
+  "dir": "LONG",
+  "src": "pump-chain+,pump-chain-v6+",
+  "fwd4h_move": -4.6007
+ },
+ {
+  "token": "AVAX",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 11:42:27",
+  "dir": "LONG",
+  "src": "bb-squeeze+",
+  "fwd4h_move": -2.3001
+ },
+ {
+  "token": "HBAR",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 11:48:28",
+  "dir": "LONG",
+  "src": "bb-squeeze+",
+  "fwd4h_move": -2.4195
+ },
+ {
+  "token": "CHIP",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 11:50:44",
+  "dir": "LONG",
+  "src": "pump-chain-v6+",
+  "fwd4h_move": -6.5211
+ },
+ {
+  "token": "ETC",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 11:50:44",
+  "dir": "LONG",
+  "src": "bb-squeeze+",
+  "fwd4h_move": -2.5168
+ },
+ {
+  "token": "USUAL",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 11:52:36",
+  "dir": "LONG",
+  "src": "tl-bounce+3",
+  "fwd4h_move": -2.8355
+ },
+ {
+  "token": "ALGO",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 12:17:06",
+  "dir": "SHORT",
+  "src": "pump-chain-",
+  "fwd4h_move": 1.7857
+ },
+ {
+  "token": "BABY",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 12:40:35",
+  "dir": "SHORT",
+  "src": "volume-buildup-",
+  "fwd4h_move": 1.1737
+ },
+ {
+  "token": "GOAT",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 12:47:05",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": 1.0256
+ },
+ {
+  "token": "BTC",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 14:02:27",
+  "dir": "LONG",
+  "src": "continuum-osc+",
+  "fwd4h_move": -1.833
+ },
+ {
+  "token": "XPL",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 14:05:32",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -2.5952
+ },
+ {
+  "token": "ADA",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 14:13:27",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -1.7375
+ },
+ {
+  "token": "PURR",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 14:48:27",
+  "dir": "LONG",
+  "src": "bb-squeeze+",
+  "fwd4h_move": -6.5857
+ },
+ {
+  "token": "ETH",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 14:52:23",
+  "dir": "LONG",
+  "src": "warrior-sr-confirm+",
+  "fwd4h_move": -1.2258
+ },
+ {
+  "token": "SAGA",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 14:57:12",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": 1.7618
+ },
+ {
+  "token": "BLUR",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 15:07:22",
+  "dir": "LONG",
+  "src": "pump-chain-v6+",
+  "fwd4h_move": 0.4539
+ },
+ {
+  "token": "GRASS",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 15:09:34",
+  "dir": "LONG",
+  "src": "pump-chain-v6+",
+  "fwd4h_move": -5.173
+ },
+ {
+  "token": "TURBO",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 16:49:34",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": 1.0084
+ },
+ {
+  "token": "SUPER",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 16:49:34",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": 0.8197
+ },
+ {
+  "token": "SOL",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 16:57:23",
+  "dir": "LONG",
+  "src": "jup_yolo_mirrored",
+  "fwd4h_move": -0.3276
+ },
+ {
+  "token": "WCT",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 16:57:23",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -1.3081
+ },
+ {
+  "token": "INJ",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 18:45:26",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.8537
+ },
+ {
+  "token": "ONDO",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 18:49:24",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.8008
+ },
+ {
+  "token": "IOTA",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 19:47:16",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -0.3155
+ },
+ {
+  "token": "MNT",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 21:07:48",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -0.1432
+ },
+ {
+  "token": "FIL",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 22:08:32",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": -1.1192
+ },
+ {
+  "token": "IO",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 22:30:27",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": 1.2833
+ },
+ {
+  "token": "NXPC",
+  "day": "2026-11-19",
+  "ts": "2026-11-19 22:44:23",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -1.4074
+ },
+ {
+  "token": "ALT",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 01:14:31",
+  "dir": "LONG",
+  "src": "btc-pump-rider+,rs-s56",
+  "fwd4h_move": -3.0837
+ },
+ {
+  "token": "GRASS",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 01:17:15",
+  "dir": "LONG",
+  "src": "pump-chain+,pump-chain-v6+",
+  "fwd4h_move": -4.656
+ },
+ {
+  "token": "SUPER",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 01:17:15",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": 2.3751
+ },
+ {
+  "token": "FIL",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 01:20:27",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -3.3898
+ },
+ {
+  "token": "RESOLV",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 01:23:25",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -1.7009
+ },
+ {
+  "token": "ALGO",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 01:23:25",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -1.3038
+ },
+ {
+  "token": "ENA",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 02:19:25",
+  "dir": "LONG",
+  "src": "pump-chain-v6+",
+  "fwd4h_move": 1.8591
+ },
+ {
+  "token": "DYDX",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 02:19:25",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": 0.224
+ },
+ {
+  "token": "APE",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 02:45:26",
+  "dir": "LONG",
+  "src": "pump-chain-v6+",
+  "fwd4h_move": 0.0
+ },
+ {
+  "token": "IO",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 03:02:39",
+  "dir": "LONG",
+  "src": "pump-chain+,pump-chain-v6+",
+  "fwd4h_move": 0.9901
+ },
+ {
+  "token": "PUMP",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 03:02:39",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": -0.512
+ },
+ {
+  "token": "NEAR",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 03:02:40",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": 0.2289
+ },
+ {
+  "token": "NXPC",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 03:05:34",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.3012
+ },
+ {
+  "token": "MON",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 03:05:34",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.052
+ },
+ {
+  "token": "USUAL",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 03:08:11",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": 0.4717
+ },
+ {
+  "token": "MET",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 03:27:02",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": 1.4133
+ },
+ {
+  "token": "ME",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 03:27:02",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": -0.2419
+ },
+ {
+  "token": "COMP",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 09:22:16",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": 1.9819
+ },
+ {
+  "token": "BTC",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 09:33:26",
+  "dir": "LONG",
+  "src": "continuum+",
+  "fwd4h_move": -0.4628
+ },
+ {
+  "token": "ETC",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 10:27:03",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": 0.3509
+ },
+ {
+  "token": "ONDO",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 10:32:25",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.5459
+ },
+ {
+  "token": "SYRUP",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 10:33:30",
+  "dir": "LONG",
+  "src": "r2-trend-long4",
+  "fwd4h_move": -4.2254
+ },
+ {
+  "token": "CRV",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 10:34:29",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -2.4071
+ },
+ {
+  "token": "PENGU",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 10:35:30",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -2.9034
+ },
+ {
+  "token": "BLUR",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 10:44:29",
+  "dir": "LONG",
+  "src": "pump-chain+,pump-chain-v6+",
+  "fwd4h_move": 1.7094
+ },
+ {
+  "token": "CFX",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 10:47:11",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -2.8563
+ },
+ {
+  "token": "SOL",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 11:53:27",
+  "dir": "LONG",
+  "src": "jup_yolo_mirrored",
+  "fwd4h_move": -4.5721
+ },
+ {
+  "token": "WLFI",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 12:07:46",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": 0.8909
+ },
+ {
+  "token": "BIGTIME",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 12:22:23",
+  "dir": "SHORT",
+  "src": "volume-buildup-",
+  "fwd4h_move": 5.0114
+ },
+ {
+  "token": "JUP",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 12:32:30",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": -2.8796
+ },
+ {
+  "token": "AERO",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 12:45:27",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": 5.5823
+ },
+ {
+  "token": "ZORA",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 13:17:03",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": 3.187
+ },
+ {
+  "token": "SAGA",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 13:32:26",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": 4.6338
+ },
+ {
+  "token": "KAS",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 13:57:11",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": 3.5447
+ },
+ {
+  "token": "ARB",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 13:57:11",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -3.6441
+ },
+ {
+  "token": "HBAR",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 14:08:33",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -2.9879
+ },
+ {
+  "token": "APT",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 14:08:33",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -8.8966
+ },
+ {
+  "token": "CC",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 14:08:33",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -5.4454
+ },
+ {
+  "token": "CHIP",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 14:09:33",
+  "dir": "LONG",
+  "src": "pump-chain+,pump-chain-v6+",
+  "fwd4h_move": -6.5894
+ },
+ {
+  "token": "ETH",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 14:23:27",
+  "dir": "LONG",
+  "src": "jup_yolo_mirrored",
+  "fwd4h_move": -6.5757
+ },
+ {
+  "token": "ZEN",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 14:52:33",
+  "dir": "SHORT",
+  "src": "volume-buildup-",
+  "fwd4h_move": 4.6871
+ },
+ {
+  "token": "USELESS",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 14:54:28",
+  "dir": "SHORT",
+  "src": "volume-buildup-",
+  "fwd4h_move": 8.2532
+ },
+ {
+  "token": "HYPE",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 16:08:08",
+  "dir": "SHORT",
+  "src": "jup_yolo_mirrored",
+  "fwd4h_move": 1.6761
+ },
+ {
+  "token": "HYPER",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 16:50:38",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": 3.6145
+ },
+ {
+  "token": "ICP",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 17:47:18",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": -1.1976
+ },
+ {
+  "token": "ACE",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 17:52:27",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": -1.7503
+ },
+ {
+  "token": "ENS",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 17:52:27",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -1.4164
+ },
+ {
+  "token": "SUSHI",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 18:04:28",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": -3.4556
+ },
+ {
+  "token": "IMX",
+  "day": "2026-11-20",
+  "ts": "2026-11-20 18:57:19",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -1.7837
+ },
+ {
+  "token": "MNT",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 03:15:31",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": 0.8672
+ },
+ {
+  "token": "BTC",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 03:17:14",
+  "dir": "SHORT",
+  "src": "continuum-trend-",
+  "fwd4h_move": -0.0744
+ },
+ {
+  "token": "NXPC",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 04:27:07",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": -2.0424
+ },
+ {
+  "token": "CHIP",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 04:42:47",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": 1.4578
+ },
+ {
+  "token": "ETC",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 04:47:31",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": 0.3795
+ },
+ {
+  "token": "HBAR",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 04:47:32",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": -0.4666
+ },
+ {
+  "token": "STX",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 04:47:32",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": -0.2991
+ },
+ {
+  "token": "GMT",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 04:52:34",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": 0.1992
+ },
+ {
+  "token": "XPL",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 04:52:34",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": -0.0
+ },
+ {
+  "token": "CASHCAT",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 04:53:09",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": 1.7857
+ },
+ {
+  "token": "JUP",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 04:57:08",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": -2.2962
+ },
+ {
+  "token": "BLUR",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 06:00:47",
+  "dir": "SHORT",
+  "src": "volume-buildup-",
+  "fwd4h_move": -3.4732
+ },
+ {
+  "token": "BABY",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 06:33:26",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": 0.9396
+ },
+ {
+  "token": "HYPER",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 06:37:25",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": -2.7094
+ },
+ {
+  "token": "SOL",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 06:38:01",
+  "dir": "LONG",
+  "src": "jup_yolo_mirrored",
+  "fwd4h_move": 2.1136
+ },
+ {
+  "token": "FARTCOIN",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 06:47:15",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": -1.3734
+ },
+ {
+  "token": "GRASS",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 06:47:15",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": -1.6481
+ },
+ {
+  "token": "ENA",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 06:58:31",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": -0.7361
+ },
+ {
+  "token": "DOT",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 07:04:29",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": 0.6173
+ },
+ {
+  "token": "DOGE",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 07:04:29",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": 0.9513
+ },
+ {
+  "token": "ADA",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 07:07:25",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": 0.2144
+ },
+ {
+  "token": "STABLE",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 07:28:28",
+  "dir": "LONG",
+  "src": "bb-squeeze+",
+  "fwd4h_move": -0.6629
+ },
+ {
+  "token": "AR",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 08:50:29",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": 3.6476
+ },
+ {
+  "token": "MET",
+  "day": "2026-11-21",
+  "ts": "2026-11-21 08:52:28",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": -0.3956
+ },
+ {
+  "token": "KAS",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 02:37:06",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": 0.0239
+ },
+ {
+  "token": "SOL",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 03:55:20",
+  "dir": "SHORT",
+  "src": "jup_yolo_mirrored",
+  "fwd4h_move": 0.4171
+ },
+ {
+  "token": "SAND",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:02:34",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": 0.2826
+ },
+ {
+  "token": "CRV",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:02:34",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -0.4515
+ },
+ {
+  "token": "APT",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:02:34",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": 0.3801
+ },
+ {
+  "token": "ETC",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:07:24",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -0.1842
+ },
+ {
+  "token": "ME",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:08:24",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -0.086
+ },
+ {
+  "token": "LINK",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:08:24",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -0.2336
+ },
+ {
+  "token": "IO",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:08:24",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -2.2634
+ },
+ {
+  "token": "CAKE",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:08:24",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -0.0684
+ },
+ {
+  "token": "ALT",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:08:24",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": 0.4739
+ },
+ {
+  "token": "CFX",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:12:23",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -1.1678
+ },
+ {
+  "token": "HBAR",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:16:58",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": 0.5128
+ },
+ {
+  "token": "ADA",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:16:58",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": 0.6325
+ },
+ {
+  "token": "SYRUP",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:16:58",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -1.0158
+ },
+ {
+  "token": "FOGO",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:22:07",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -2.649
+ },
+ {
+  "token": "DOGE",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:22:07",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": 0.9394
+ },
+ {
+  "token": "ONDO",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:22:07",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": 1.1858
+ },
+ {
+  "token": "ARB",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:32:36",
+  "dir": "SHORT",
+  "src": "pump-chain-",
+  "fwd4h_move": 0.8
+ },
+ {
+  "token": "BABY",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:37:22",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -5.7221
+ },
+ {
+  "token": "ETH",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 04:40:34",
+  "dir": "SHORT",
+  "src": "jup_yolo_mirrored",
+  "fwd4h_move": -1.5544
+ },
+ {
+  "token": "BLUR",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 05:18:27",
+  "dir": "SHORT",
+  "src": "volume-buildup-",
+  "fwd4h_move": 0.9986
+ },
+ {
+  "token": "BCH",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 05:23:26",
+  "dir": "SHORT",
+  "src": "pump-chain-",
+  "fwd4h_move": -1.2301
+ },
+ {
+  "token": "PROVE",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 05:32:15",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -1.6794
+ },
+ {
+  "token": "MNT",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 05:52:29",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -5.7263
+ },
+ {
+  "token": "ALGO",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 05:58:25",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -2.5921
+ },
+ {
+  "token": "PONS",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 06:04:34",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": -6.913
+ },
+ {
+  "token": "USUAL",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 06:17:32",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": -0.5455
+ },
+ {
+  "token": "MET",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 07:15:33",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -2.5055
+ },
+ {
+  "token": "CASHCAT",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 07:28:29",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": 6.966
+ },
+ {
+  "token": "DOT",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 08:07:37",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -2.1638
+ },
+ {
+  "token": "ZRO",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 08:12:53",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -1.3781
+ },
+ {
+  "token": "NEAR",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 08:38:02",
+  "dir": "LONG",
+  "src": "bb-squeeze+",
+  "fwd4h_move": 1.7741
+ },
+ {
+  "token": "COMP",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 08:43:22",
+  "dir": "LONG",
+  "src": "bb-squeeze+",
+  "fwd4h_move": 0.9959
+ },
+ {
+  "token": "RENDER",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 08:47:41",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": 0.0
+ },
+ {
+  "token": "INJ",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 08:53:10",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": 3.0683
+ },
+ {
+  "token": "WCT",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 09:38:33",
+  "dir": "LONG",
+  "src": "atr-trend+",
+  "fwd4h_move": -0.6734
+ },
+ {
+  "token": "CHIP",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 09:45:29",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": 1.0046
+ },
+ {
+  "token": "XPL",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 09:47:23",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.7253
+ },
+ {
+  "token": "LTC",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 09:54:42",
+  "dir": "LONG",
+  "src": "bb-squeeze+",
+  "fwd4h_move": 0.3267
+ },
+ {
+  "token": "VIRTUAL",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 09:55:40",
+  "dir": "LONG",
+  "src": "bb-squeeze+",
+  "fwd4h_move": -0.0527
+ },
+ {
+  "token": "GMT",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 09:55:40",
+  "dir": "LONG",
+  "src": "bb-squeeze+",
+  "fwd4h_move": -1.354
+ },
+ {
+  "token": "NEO",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 09:58:32",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.3945
+ },
+ {
+  "token": "SUPER",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 10:07:58",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -1.3758
+ },
+ {
+  "token": "SAGA",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 10:07:58",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": 0.2304
+ },
+ {
+  "token": "POL",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 10:07:59",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.3036
+ },
+ {
+  "token": "TURBO",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 10:07:59",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.3643
+ },
+ {
+  "token": "RESOLV",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 11:13:08",
+  "dir": "LONG",
+  "src": "atr-trend+",
+  "fwd4h_move": 0.2899
+ },
+ {
+  "token": "SOPH",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 13:57:10",
+  "dir": "LONG",
+  "src": "r2v2-long3",
+  "fwd4h_move": -2.1277
+ },
+ {
+  "token": "BIGTIME",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 14:40:45",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -0.5076
+ },
+ {
+  "token": "GOAT",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 14:52:57",
+  "dir": "LONG",
+  "src": "r2v2-long5",
+  "fwd4h_move": -0.9311
+ },
+ {
+  "token": "PENGU",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 15:00:51",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.9097
+ },
+ {
+  "token": "WLFI",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 15:03:39",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": 1.1468
+ },
+ {
+  "token": "SEI",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 16:29:26",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.3182
+ },
+ {
+  "token": "WLD",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 16:29:26",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": 1.1895
+ },
+ {
+  "token": "LDO",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 16:30:46",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.9263
+ },
+ {
+  "token": "ENA",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 16:33:21",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.3941
+ },
+ {
+  "token": "AIXBT",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 17:22:44",
+  "dir": "SHORT",
+  "src": "pump-chain-",
+  "fwd4h_move": -0.0
+ },
+ {
+  "token": "HYPE",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 17:22:44",
+  "dir": "SHORT",
+  "src": "jup_yolo_mirrored",
+  "fwd4h_move": 0.2383
+ },
+ {
+  "token": "BTC",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 17:50:30",
+  "dir": "LONG",
+  "src": "continuum+",
+  "fwd4h_move": 0.2851
+ },
+ {
+  "token": "MON",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 18:28:33",
+  "dir": "SHORT",
+  "src": "hh-hl-",
+  "fwd4h_move": 3.7176
+ },
+ {
+  "token": "ICP",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 18:49:26",
+  "dir": "LONG",
+  "src": "bb-squeeze+",
+  "fwd4h_move": -1.5113
+ },
+ {
+  "token": "APE",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 21:17:16",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.8253
+ },
+ {
+  "token": "CC",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 21:24:33",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -2.1259
+ },
+ {
+  "token": "ACE",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 22:58:34",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": 5.0074
+ },
+ {
+  "token": "ZEN",
+  "day": "2026-11-22",
+  "ts": "2026-11-22 23:38:02",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -0.7363
+ },
+ {
+  "token": "SPX",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 00:09:09",
+  "dir": "LONG",
+  "src": "continuation+",
+  "fwd4h_move": 0.9365
+ },
+ {
+  "token": "JUP",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 01:37:30",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": -6.1423
+ },
+ {
+  "token": "APT",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 02:07:42",
+  "dir": "SHORT",
+  "src": "pump-chain-",
+  "fwd4h_move": -2.1676
+ },
+ {
+  "token": "IOTA",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 02:19:26",
+  "dir": "SHORT",
+  "src": "pump-chain-",
+  "fwd4h_move": -3.3557
+ },
+ {
+  "token": "SAGA",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 02:28:32",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -3.108
+ },
+ {
+  "token": "ETH",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 02:38:36",
+  "dir": "LONG",
+  "src": "jup_yolo_mirrored",
+  "fwd4h_move": 1.1209
+ },
+ {
+  "token": "CC",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 02:43:06",
+  "dir": "SHORT",
+  "src": "pump-chain-",
+  "fwd4h_move": -3.4676
+ },
+ {
+  "token": "SOL",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 02:53:11",
+  "dir": "LONG",
+  "src": "jup_yolo_mirrored",
+  "fwd4h_move": 2.7972
+ },
+ {
+  "token": "NXPC",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 02:55:33",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -2.2137
+ },
+ {
+  "token": "PROVE",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 03:09:36",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -2.069
+ },
+ {
+  "token": "AVAX",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 03:17:49",
+  "dir": "LONG",
+  "src": "r2-trend-long6,r2v2-long6",
+  "fwd4h_move": 1.1717
+ },
+ {
+  "token": "MNT",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 03:19:38",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -0.8246
+ },
+ {
+  "token": "BLUR",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 03:24:30",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": 4.0576
+ },
+ {
+  "token": "CASHCAT",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 03:33:15",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": -3.8952
+ },
+ {
+  "token": "USELESS",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 03:33:16",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -1.0067
+ },
+ {
+  "token": "PUMP",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 03:35:42",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": 1.2476
+ },
+ {
+  "token": "POL",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 03:39:03",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": 2.3629
+ },
+ {
+  "token": "USUAL",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 03:39:03",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": 2.1314
+ },
+ {
+  "token": "HBAR",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 03:39:55",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": 1.8894
+ },
+ {
+  "token": "SUPER",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 03:39:55",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.524
+ },
+ {
+  "token": "HYPE",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 04:54:03",
+  "dir": "SHORT",
+  "src": "jup_yolo_mirrored",
+  "fwd4h_move": -1.1772
+ },
+ {
+  "token": "AVNT",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 05:05:31",
+  "dir": "SHORT",
+  "src": "r2-trend-short3",
+  "fwd4h_move": -0.3284
+ },
+ {
+  "token": "BTC",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 05:20:32",
+  "dir": "LONG",
+  "src": "continuum-osc+,jup_yolo_mirrored",
+  "fwd4h_move": 0.5924
+ },
+ {
+  "token": "AR",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 05:22:45",
+  "dir": "LONG",
+  "src": "bb-squeeze+,breakout",
+  "fwd4h_move": 0.9829
+ },
+ {
+  "token": "DOGE",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 05:38:33",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.4659
+ },
+ {
+  "token": "WCT",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 05:39:33",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -2.0284
+ },
+ {
+  "token": "SYRUP",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 05:40:36",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -1.4739
+ },
+ {
+  "token": "PENDLE",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 05:40:37",
+  "dir": "LONG",
+  "src": "bb-squeeze+",
+  "fwd4h_move": 1.0622
+ },
+ {
+  "token": "WLFI",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 05:42:46",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": 1.373
+ },
+ {
+  "token": "CRV",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 05:42:46",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.9214
+ },
+ {
+  "token": "ICP",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 05:44:32",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -1.7115
+ },
+ {
+  "token": "GMT",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 05:47:32",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -0.3899
+ },
+ {
+  "token": "ME",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 05:49:36",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": 0.3649
+ },
+ {
+  "token": "BIGTIME",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 06:40:38",
+  "dir": "SHORT",
+  "src": "pump-chain-",
+  "fwd4h_move": 1.4963
+ },
+ {
+  "token": "TRX",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 11:24:31",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": -1.1057
+ },
+ {
+  "token": "ACE",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 11:35:31",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": 6.4865
+ },
+ {
+  "token": "WLD",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 11:40:39",
+  "dir": "LONG",
+  "src": "warrior-sr-confirm+",
+  "fwd4h_move": 4.8719
+ },
+ {
+  "token": "RESOLV",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 13:28:06",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -0.7262
+ },
+ {
+  "token": "KAS",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 13:58:27",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -2.697
+ },
+ {
+  "token": "ETC",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 14:18:29",
+  "dir": "LONG",
+  "src": "warrior-sr-confirm+",
+  "fwd4h_move": -1.3289
+ },
+ {
+  "token": "ENA",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 14:33:27",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": -7.4139
+ },
+ {
+  "token": "ALGO",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 15:27:34",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": -3.2634
+ },
+ {
+  "token": "GRASS",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 15:28:32",
+  "dir": "LONG",
+  "src": "pump-chain+",
+  "fwd4h_move": -4.0064
+ },
+ {
+  "token": "BABY",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 17:52:50",
+  "dir": "LONG",
+  "src": "bb-squeeze+",
+  "fwd4h_move": 5.1852
+ },
+ {
+  "token": "CHIP",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 18:55:39",
+  "dir": "SHORT",
+  "src": "pump-chain-,pump-chain-v6-",
+  "fwd4h_move": 2.2496
+ },
+ {
+  "token": "INJ",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 19:07:42",
+  "dir": "LONG",
+  "src": "warrior-sr-confirm+",
+  "fwd4h_move": -5.8302
+ },
+ {
+  "token": "MON",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 20:14:30",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": 2.1623
+ },
+ {
+  "token": "FOGO",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 21:12:43",
+  "dir": "LONG",
+  "src": "r2v2-long3",
+  "fwd4h_move": 0.0
+ },
+ {
+  "token": "DYDX",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 21:13:30",
+  "dir": "LONG",
+  "src": "r2-trend-long3",
+  "fwd4h_move": 0.7935
+ },
+ {
+  "token": "TURBO",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 22:07:39",
+  "dir": "SHORT",
+  "src": "atr-trend-",
+  "fwd4h_move": -1.7889
+ },
+ {
+  "token": "YGG",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 23:24:43",
+  "dir": "LONG",
+  "src": "btc-pump-rider+",
+  "fwd4h_move": -0.6015
+ },
+ {
+  "token": "XTEN",
+  "day": "2026-11-23",
+  "ts": "2026-11-23 23:43:27",
+  "dir": "LONG",
+  "src": "grind-breakout+",
+  "fwd4h_move": -2.4632
+ },
+ {
+  "token": "USELESS",
+  "day": "2026-11-24",
+  "ts": "2026-11-24 00:12:56",
+  "dir": "SHORT",
+  "src": "linreg-fade-",
+  "fwd4h_move": 0.1952
+ }
+]

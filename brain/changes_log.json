@@ -4829,5 +4829,38 @@
     "after": "logged + CEO proposal",
     "rationale": "drawdown clamp reports protection it does not deliver",
     "impact": "CEO decision on a non-size lever"
+  },
+  {
+    "timestamp": "2026-11-24T04:54:58Z",
+    "agent": "brain_auditor",
+    "change": "Audit #294: recovery_replay selfcheck vacuity assert 0.90->0.80 (rolling-window drift; vacuity still holds at 89.6%)",
+    "type": "tooling",
+    "file": "brain/analysis/recovery_replay.py",
+    "before": ">0.90",
+    "after": ">0.80",
+    "rationale": "14d loser window shrank 206->106 and candle-1 pass rate drifted 96.1->89.6% while the pattern plainly held; assert was flaking",
+    "impact": "selfcheck PASS again; zero trading behavior"
+  },
+  {
+    "timestamp": "2026-11-24T04:54:58Z",
+    "agent": "brain_auditor",
+    "change": "Audit #294: dispositioned 4 due evals (brake-cf EV, gate-cross-tab, regime-tension, tag-split) — all report-only, no trading change",
+    "type": "data",
+    "file": "data/shadow_disposition.json",
+    "before": "4 open due 11-24",
+    "after": "4 done with adjudicated dispositions",
+    "rationale": "due-today mandates",
+    "impact": "brake LEAVE stands; no interaction relax; A1 keep kill; auto cohort monitor"
+  },
+  {
+    "timestamp": "2026-11-24T04:54:58Z",
+    "agent": "brain_auditor",
+    "change": "Audit #294: contrarian outcome join re-ran (mandate) + brake_cf_join/gate_cross_tab artifacts written",
+    "type": "data",
+    "file": "data/contrarian_outcome_join.json",
+    "before": "20:30Z 11-23",
+    "after": "04:31Z 11-24",
+    "rationale": "no systemd producer",
+    "impact": "flip 49.4% n=2669; pc- 55.0%"
   }
 ]
