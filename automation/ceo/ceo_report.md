@@ -1911,3 +1911,9 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 14T -0.99 42.9% | 7d 117T -0.71 49.6%
 ### Findings: New errors Q — disk 90% WARN (repeated 00:54–02:54Z), ai-trader-pending freq UNDER 0.29x baseline, 1 new MOMENTUM block alert; no tracebacks. 4 open positions (flat-to-light). 24h/7d both slightly negative, WR ~43/50% — chop band, no anomaly.
 ### Recommendation: Disk at 90% — schedule log/DB retention cleanup before it trips pipeline writes.
+
+## CEO Status — 20261124T073831Z
+### Health: pipeline=active guardian=active open_pos=3
+### Numbers: 24h 15T -0.72 53.3% | 7d 118T -0.66 50.0%
+### Findings: Rotating Q (24%14=10) regime memory STALE — signal_regime_memory.json updated_at 2026-10-11, 44d old (>7d bar); alerts show routine disk-90% WARN + momentum-block logs, no new errors.
+### Recommendation: Re-run regime-memory update from DB before any regime-dependent gate reads it (stale 44d).

@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-24 01:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-24 07:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,961 | **WR:** 51.2% | **PnL:** -123.60%
+- **Total trades (all time):** 3,963 | **WR:** 51.2% | **PnL:** -124.21%
 - **Date range:** 2026-07-29 → 2026-11-24
 
 ---

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-24T07:10:00.219798+00:00",
+  "timestamp": "2026-11-24T08:40:01.151672+00:00",
   "steers": [
     {
       "severity": "urgent",
@@ -10,28 +10,36 @@
       "id": "steer-001"
     },
     {
+      "severity": "urgent",
+      "category": "health",
+      "title": "Losing streak: 12/20 recent trades lost",
+      "detail": "Win rate 40% over last 20 trades. Total PnL: -1.36 USDT. 10/12 losses never armed (MFE<0.40%) = chop cohort, not wrong-side; arm-rate/stall stack owns the fix. Exits: manual_sl_hit x4, hard_max_loss x3, trail_arm_timeout x3.",
+      "auto_executable": false,
+      "id": "steer-002"
+    },
+    {
       "severity": "warning",
       "category": "cluster",
       "title": "Trade cluster: BTC + BTC",
       "detail": "Both opened within 1 minutes. Correlation risk.",
       "auto_executable": false,
-      "id": "steer-002"
+      "id": "steer-003"
     }
   ],
   "portfolio_health": "critical",
   "regime": {
     "btc_15m": "SHORT_BIAS",
-    "btc_4h": "LONG_BIAS",
+    "btc_4h": "SHORT_BIAS",
     "continuum": "BELOW",
-    "volatility": "LOW",
-    "zscore_tier": "NEUTRAL",
+    "volatility": "NORMAL",
+    "zscore_tier": "STRONG_NEG",
     "velocity_state": "SLOW",
     "acceleration_state": "POSITIVE",
-    "volume_regime": "LOW",
-    "linreg_alignment": 0.0,
+    "volume_regime": "NORMAL",
+    "linreg_alignment": 0.5,
     "wyckoff_phase": "ACCUMULATION",
-    "market_phase": "CALM",
-    "trend_quality": "STRONG_UP"
+    "market_phase": "RECOVERY",
+    "trend_quality": "STRONG_DOWN"
   },
   "open_count": 2
 }
