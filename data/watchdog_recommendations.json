@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-24T08:40:01.151672+00:00",
+  "timestamp": "2026-11-24T11:40:02.513939+00:00",
   "steers": [
     {
       "severity": "urgent",
@@ -10,12 +10,22 @@
       "id": "steer-001"
     },
     {
-      "severity": "urgent",
-      "category": "health",
-      "title": "Losing streak: 12/20 recent trades lost",
-      "detail": "Win rate 40% over last 20 trades. Total PnL: -1.36 USDT. 10/12 losses never armed (MFE<0.40%) = chop cohort, not wrong-side; arm-rate/stall stack owns the fix. Exits: manual_sl_hit x4, hard_max_loss x3, trail_arm_timeout x3.",
-      "auto_executable": false,
+      "severity": "warning",
+      "category": "stale",
+      "title": "BTC open 8h, barely profitable",
+      "detail": "Trade open 8 hours. Only +0.0%. Opportunity cost \u2014 consider freeing capital.",
+      "trade_id": 17083,
+      "auto_executable": true,
       "id": "steer-002"
+    },
+    {
+      "severity": "warning",
+      "category": "stale",
+      "title": "BTC open 8h, barely profitable",
+      "detail": "Trade open 8 hours. Only +0.0%. Opportunity cost \u2014 consider freeing capital.",
+      "trade_id": 17081,
+      "auto_executable": true,
+      "id": "steer-003"
     },
     {
       "severity": "warning",
@@ -23,7 +33,7 @@
       "title": "Trade cluster: BTC + BTC",
       "detail": "Both opened within 1 minutes. Correlation risk.",
       "auto_executable": false,
-      "id": "steer-003"
+      "id": "steer-004"
     }
   ],
   "portfolio_health": "critical",
@@ -31,15 +41,15 @@
     "btc_15m": "SHORT_BIAS",
     "btc_4h": "SHORT_BIAS",
     "continuum": "BELOW",
-    "volatility": "NORMAL",
-    "zscore_tier": "STRONG_NEG",
+    "volatility": "LOW",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "POSITIVE",
-    "volume_regime": "NORMAL",
+    "acceleration_state": "NEGATIVE",
+    "volume_regime": "LOW",
     "linreg_alignment": 0.5,
     "wyckoff_phase": "ACCUMULATION",
-    "market_phase": "RECOVERY",
-    "trend_quality": "STRONG_DOWN"
+    "market_phase": "DECLINING",
+    "trend_quality": "STRONG_UP"
   },
   "open_count": 2
 }

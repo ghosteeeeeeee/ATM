@@ -1917,3 +1917,9 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 15T -0.72 53.3% | 7d 118T -0.66 50.0%
 ### Findings: Rotating Q (24%14=10) regime memory STALE — signal_regime_memory.json updated_at 2026-10-11, 44d old (>7d bar); alerts show routine disk-90% WARN + momentum-block logs, no new errors.
 ### Recommendation: Re-run regime-memory update from DB before any regime-dependent gate reads it (stale 44d).
+
+## CEO Status — 20261124T113831Z
+### Health: pipeline=active (timer oneshot, running 11:39Z) guardian=active open_pos=2
+### Numbers: 24h 12T -0.64 58.3% | 7d 118T -0.90 49.2%
+### Findings: disk 87-90% WARN; bb-squeeze+ freq UNDER (0.00/h vs 0.03 baseline); regime memory STALE — signal_regime_memory.json last write 2026-10-11 (44d, >7d bar)
+### Recommendation: refresh signal_regime_memory.json from DB this week (deep run); watch disk headroom.

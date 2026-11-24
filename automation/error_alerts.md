@@ -5585,3 +5585,23 @@
 
 ## Error Alerts — 2026-11-24 07:54 UTC
 - **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
+
+## Error Alerts — 2026-11-24 08:54 UTC
+- **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
+- **[WARN]** (health_monitor): `logs`: compressed 1 old logs, freed 0.0MB (disk 90%)
+
+## Error Alerts — 2026-11-24 09:54 UTC
+- **[WARN]** (health_monitor): `disk`: disk 87% used (>= 85%)
+
+## Error Alerts — 2026-11-24 10:39 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-11-24 10:54 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-24 11:00 UTC
+- **[WARN]** (freq_deviation_shadow): `bb-squeeze+`: FREQ DEVIATION UNDER source=bb-squeeze+ baseline=0.030/h current=0.000/h ratio=0.00 n_base=10 n_cur=0
+
+## Error Alerts — 2026-11-24 11:39 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: +N.N% from high, +N.N% from low — blocking TOK entries`
