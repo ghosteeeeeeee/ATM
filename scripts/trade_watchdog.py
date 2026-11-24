@@ -989,6 +989,10 @@ def analyze_recent_losses(recent_trades):
     sig_streak_reasons = {}
     _streak_broken = set()
     sig_losses = {}
+    # brain_auditor #295: ladder double-fire (same token+entry_price, ~60s apart)
+    # was reported as "4 consecutive losses" when only 2 unique setups lost.
+    # Streak counts UNIQUE setups; dollar sums still include every fill.
+    _streak_loss_keys = {}
     for t in recent_trades:
         sig = t.get("signal_name", "unknown")
         pnl = t.get("pnl_usdt", 0) or 0
@@ -998,8 +1002,17 @@ def analyze_recent_losses(recent_trades):
         # semantics, kept: the guard note is about the streak as measured.
         if sig not in _streak_broken:
             if pnl < 0:
-                sig_tail_streak[sig] = sig_tail_streak.get(sig, 0) + 1
-                sig_streak_reasons.setdefault(sig, []).append(t.get("exit_reason") or "?")
+                _tok = t.get("token") or t.get("coin")
+                _ep = t.get("entry_price")
+                _key = (_tok, str(_ep)) if _tok is not None and _ep is not None else None
+                _seen = _streak_loss_keys.setdefault(sig, set())
+                if _key is not None and _key in _seen:
+                    pass  # duplicate fill of an already-counted setup
+                else:
+                    if _key is not None:
+                        _seen.add(_key)
+                    sig_tail_streak[sig] = sig_tail_streak.get(sig, 0) + 1
+                    sig_streak_reasons.setdefault(sig, []).append(t.get("exit_reason") or "?")
             else:
                 _streak_broken.add(sig)
     for t in losses:
@@ -3036,9 +3049,13 @@ def _selfcheck_streak_advice():
     # silently degrade to "Something is wrong"
     assert "mfe_pct" in inspect.getsource(collect_recent_closed)
 
-    def _t(sig, pnl, reason, mfe=None):
-        return {"signal_name": sig, "pnl_usdt": pnl, "pnl_pct": pnl, "exit_reason": reason,
-                "amount_usdt": 10.0, "leverage": 5, "mfe_pct": mfe}
+    def _t(sig, pnl, reason, mfe=None, token=None, entry=None):
+        d = {"signal_name": sig, "pnl_usdt": pnl, "pnl_pct": pnl, "exit_reason": reason,
+             "amount_usdt": 10.0, "leverage": 5, "mfe_pct": mfe}
+        if token is not None:
+            d["token"] = token
+            d["entry_price"] = entry
+        return d
 
     # (a) all-prearm streak -> guard note, no disable advice
     prearm = [_t("pump-chain+", -0.01, "prearm_lock") for _ in range(4)]
@@ -3133,7 +3150,31 @@ def _selfcheck_streak_advice():
     assert len(st) == 1, st
     assert "Something is wrong" in st[0]["detail"], st[0]["detail"]
 
-    print("SELFCHECK PASS: interval-merge 5 + streak-advice 9 fixtures (a-i)")
+    # (j) #295: ladder double-fire — 2 unique setups x 2 duplicate fills each
+    #     must count as streak=2 (below the >=3 bar -> NO steer), not 4.
+    #     A regression that drops the dedup must fail here (steer would fire).
+    dup = [_t("ai-trader-auto", -0.04, "manual_sl_hit", token="BTC", entry=59866.5),
+           _t("ai-trader-auto", -0.04, "manual_sl_hit", token="BTC", entry=59866.5),
+           _t("ai-trader-auto", -0.41, "manual_sl_hit", token="BTC", entry=63604.0),
+           _t("ai-trader-auto", -0.41, "manual_sl_hit", token="BTC", entry=63604.0),
+           _t("other-sig", +0.05, "profit-monster-trail")]
+    steers = analyze_recent_losses(dup)
+    sig = [s for s in steers if "ai-trader-auto" in s["title"]]
+    assert len(sig) == 0, f"dup fills must not fire streak>=3: {sig}"
+
+    # (j2) 3 UNIQUE losing setups (one with a duplicate fill) -> streak counts
+    #      the 3 uniques (fires) and reports 3, not 4.
+    dup3 = [_t("ai-trader-auto", -0.04, "manual_sl_hit", token="BTC", entry=59866.5),
+            _t("ai-trader-auto", -0.04, "manual_sl_hit", token="BTC", entry=59866.5),
+            _t("ai-trader-auto", -0.41, "manual_sl_hit", token="BTC", entry=63604.0),
+            _t("ai-trader-auto", -0.10, "manual_sl_hit", token="ETH", entry=3000.0),
+            _t("other-sig", +0.05, "profit-monster-trail")]
+    steers = analyze_recent_losses(dup3)
+    sig = [s for s in steers if "ai-trader-auto" in s["title"]]
+    assert len(sig) == 1, sig
+    assert "3 consecutive losses" in sig[0]["title"], sig[0]["title"]
+
+    print("SELFCHECK PASS: interval-merge 5 + streak-advice 11 fixtures (a-j2)")
 
 
 if __name__ == "__main__":

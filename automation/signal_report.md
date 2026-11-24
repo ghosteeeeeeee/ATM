@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-24 07:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-24 13:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,963 | **WR:** 51.2% | **PnL:** -124.21%
+- **Total trades (all time):** 3,970 | **WR:** 51.2% | **PnL:** -126.28%
 - **Date range:** 2026-07-29 → 2026-11-24
 
 ---
@@ -23,7 +23,9 @@ None found.
 
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
-| bb-squeeze+ | LONG | 3 | 33.3% | -1.05 | ENABLED | Needs more data |
+| btc-pump-rider+ | LONG | 3 | 33.3% | -1.30 | ❓ | Needs more data |
+| atr-trend- | SHORT | 2 | 50.0% | -0.37 | ❓ | Needs more data |
+| jup_yolo_mirrored | LONG | 2 | 50.0% | +0.99 | ❓ | Needs more data |
 
 ---
 
@@ -41,7 +43,9 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] bb-squeeze+ LONG** — WR=33.3%, PnL=-1.05% over 3 trades. Monitor next cycle.
+1. **[WATCH] btc-pump-rider+ LONG** — WR=33.3%, PnL=-1.30% over 3 trades. Monitor next cycle.
+2. **[WATCH] atr-trend- SHORT** — WR=50.0%, PnL=-0.37% over 2 trades. Monitor next cycle.
+3. **[WATCH] jup_yolo_mirrored LONG** — WR=50.0%, PnL=+0.99% over 2 trades. Monitor next cycle.
 
 ---
 
@@ -53,6 +57,7 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-11-24 | 2d4d15b | Logs: hourly analysis 2026-11-24 (no config change, 24h net ... |
 | 2026-11-23 | 5869d43 | scripts: BTC hedge-account experiment — SHADOW MODE (2026-11... |
 | 2026-11-23 | cef296e | MTF spike state: the shared detector + the keeper's near-edg... |
 | 2026-11-23 | bbc6c46 | rip-add standing rules formalized: the RIP-CLIMAX gates (the... |
@@ -62,6 +67,5 @@ None found. Top performers are already enabled.
 | 2026-11-23 | 7423113 | scripts: pump-chain v6 VETO EXECUTED (short-only restore, EX... |
 | 2026-11-22 | 1de08ca | trading: major-break redesign shipped — momentum-confirmatio... |
 | 2026-11-22 | 272ba31 | Daily trading system update (2026-11-22) |
-| 2026-11-21 | 02357b3 | logs: hourly analysis 2026-11-21 03:56 — storm packet cf +2.... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*

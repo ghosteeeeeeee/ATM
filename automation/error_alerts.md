@@ -5605,3 +5605,25 @@
 ## Error Alerts — 2026-11-24 11:39 UTC
 - **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ← mark_signal_executed returned: N (N=failed/already-claimed, N=success)`
 - **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: +N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-11-24 11:54 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-24 12:00 UTC
+- **[WARN]** (freq_deviation_shadow): `btc-pump-rider+`: FREQ DEVIATION OVER source=btc-pump-rider+ baseline=0.060/h current=0.125/h ratio=2.10 n_base=20 n_cur=3
+
+## Error Alerts — 2026-11-24 12:39 UTC
+- **REPEATED** (17x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (11x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-24 12:54 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-24 13:39 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **REPEATED** (12x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (9x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`
