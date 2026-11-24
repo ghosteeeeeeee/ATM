@@ -40,3 +40,5 @@ BY: auto_1hr
 ## TEAM UPDATES
 - [2026-11-20 19:54 UTC] auto_1hr: 🌩️ [STORM-READINESS] window-min -1.91% / at-run +0.09% | blocked 124 (combo_key-stale 28, expired-hotset 27, compaction_stale 22, pump-chain-* 25, short-gates 9, long-rsi-ceiling 7, other 6) | true-starvation 33 RSI>=35 | counterfactual $+0.03 (touch 25/33) | waiver: SHADOW=True ENFORCE=False — cf POSITIVE -> **streak 1/3** (15:56 -$3.29 reset; 2 more positives, deadline 2026-11-26 file truth) | split: blocked SHORTs $+0.64, blocked LONGs $-0.60
 - [2026-11-20 19:54 UTC] auto_1hr: NO CONFIG CHANGE — 2T last hour net +0.04 | 24h 17T 58.8% net +0.10 (payoff 1.10) GREEN | kill none | inversion 0 | boost none eligible | arm-rate unarmed 58.8% (stall stack owns fix, no new gate)
+## TEAM UPDATES
+- [2026-11-24 17:55] auto_1hr: NO CONFIG CHANGE — 0 closes last hour; 24h NET $-0.48 (gross -0.29, fees 0.19, payoff 0.65, WR 47.1%); 7d -2.78, 14d -4.29; size-reduce 0.25x; no storm (window-min -0.65% / at-run +0.53%); unarmed 41.2% WR 0% — stall stack owns fix
