@@ -32841,3 +32841,31 @@ BY: auto_1hr
 - pump-chain+ 14d n=11 of 20 kill threshold (9.1% WR, net -0.55) — revisit if n reaches 20
 - storm bar 0/3, deadline 2026-11-26
 BY: auto_1hr
+
+## [2026-11-24 01:55] Hourly Analysis
+
+**Storm:** no storm — window-min -0.14% / at-run -0.14% (gate: <=-1.5 or |at-run|>=1.5)
+**Trades:** 1 closed last hour (0W 1L) | 24h 14 closed (5W 9L)
+**PnL NET:** hour $-0.12 | 24h NET $-1.38 (gross -1.22, fees 0.16, payoff 0.42, WR 35.7%) | 7d NET $-2.48 (119T) | 14d NET $-4.38 (227T) | **size-reduce: 0.25x (r2_tier true, R2-TIER R1)**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Kill policy: 1 close last hour (IMX atr-trend- SHORT hard_max_loss -0.12) — no 0%-WR 3+ trigger
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/14 = 7.1% (<40%); tpsl_utils deployed; manual_sl_hit 4T net -1.18 dominant (all CEO BTC ai-trader)
+- Boost: none eligible (max n=3 bb-squeeze+ 33.3% net -0.15; jup_yolo_mirrored 2T 100% net +0.27 n<5)
+- Arm rate: unarmed 9/14 = 64.3% below 70%, WR 22.2% net -1.25 vs armed 5/5 60.0% net -0.13 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: not 3 consecutive hourly closes negative; regime NORMAL/HIGH/EXTREME not NEUTRAL, size already 0.25x -> no cut
+- Frequency: 1 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.250% < 0.5% (max 0.638)
+- 2 open: ETC r2v2-long3 LONG 01:34, BABY pump-chain+ LONG 01:47
+
+**Open Questions:**
+- 24h NET -1.38 (fees 0.16 vs gross -1.22), payoff 0.42; 7d -2.48, 14d -4.38
+- manual_sl_hit 4T net -1.18 = dominant 24h loss (CEO BTC ai-trader)
+- unarmed WR 22.2% cohort 64.3% of closes, net -1.25 — stall stack owns fix
+- pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
+- storm bar 0/3, deadline 2026-11-26
+BY: auto_1hr
