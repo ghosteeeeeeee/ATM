@@ -1923,3 +1923,15 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 12T -0.64 58.3% | 7d 118T -0.90 49.2%
 ### Findings: disk 87-90% WARN; bb-squeeze+ freq UNDER (0.00/h vs 0.03 baseline); regime memory STALE — signal_regime_memory.json last write 2026-10-11 (44d, >7d bar)
 ### Recommendation: refresh signal_regime_memory.json from DB this week (deep run); watch disk headroom.
+
+## CEO Status — 20261124T153832Z
+### Health: pipeline=inactive(timer-fired, last exit 0 15:39Z) guardian=active open_pos=0
+### Numbers: 24h 19T -1.11 42.1% | 7d 120T -1.26 47.5%
+### Findings: 6 decision items due 11-25 (win-capture producer file still missing, pc- DEMOTE, bbsqueeze reband, structure-flip, pcfade, hotset-pin); disk 88% WARN; regime memory file stale 44d (2026-10-11, >7d bar).
+### Recommendation: refresh signal_regime_memory.json from DB and ship the win-capture producer before the 11-25 batch.
+
+## CEO Status — 20261124T193832Z
+### Health: pipeline=active (timer fired 19:39Z, service running) guardian=active open_pos=0
+### Numbers: 24h 17T -0.29 47.1% | 7d 117T -0.90 48.7%
+### Findings: clean-ish — disk 88% WARN (3x repeated since 16:54Z); regime memory Q: signal_regime_memory.json mtime 2026-10-11 = 44d stale, past the 7d bar (re-flagged, unchanged from 15:38Z run); 3 decision items due 11-26 (storm-confl-waiver, capture-leaderboard, entry-hl-invariant).
+### Recommendation: refresh signal_regime_memory.json from DB; schedule a disk cleanup before / hits 92%.
