@@ -32869,3 +32869,59 @@ BY: auto_1hr
 - pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
 - storm bar 0/3, deadline 2026-11-26
 BY: auto_1hr
+
+## [2026-11-24 03:00] Hourly Analysis
+
+**Storm:** FIRED (dump gate: window-min <= -1.5) — 🌪️ [STORM-READINESS] window-min -1.77% / at-run -1.68% | blocked 190 in 2h (combo_key-stale 83, expired-hotset 37, confluence single-type 20, compaction_stale_10min 16, vol-gate-override-0.0 9, rr-engine-hard-block 6, pump-chain-rsi-max-long 6, oversold-knife 6, short-rsi-floor-knife/floor 4, short-regime-gate 1, pump-chain-short-high 1, maxxed-vol 1) | true-starvation 24 RSI>=35 (deduped first-fire-per-token; 22 EXPIRED + 2 SKIPPED; 24 walked, 0 missing) | counterfactual $+0.21 (touch 8/24) | waiver SHADOW=True ENFORCE=False — counterfactual POSITIVE -> **streak 1/3** (bar reset to 0/3 by 11-23 17:55 neg packet; 2 more positive storms before 11-26 deadline) — split: blocked LONGs $-1.02 (16, touch 5/16 = gates correctly kept dump LONG losers out) vs blocked SHORTs $+1.23 (8, touch 3/8 = gates suppressed dump SHORT winners = starvation, waiver SHORT scope) — DUMP packet, SHORT-side cf positive = the waiver's intended case, no auto action (CEO NO-CONVERT stands)
+**Trades:** 1 closed last hour (0W 1L) | 24h 14 closed (5W 9L)
+**PnL NET:** hour $-0.13 | 24h NET $-1.40 (gross -1.24, fees 0.16, payoff 0.41, WR 35.7%) | 7d NET $-2.62 (119T) | 14d NET $-4.41 (227T) | **size-reduce: 0.25x (r2_tier true, R2-TIER R1, file truth)**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Kill policy: 1 close last hour (ETC r2v2-long3 LONG hard_max_loss net -0.13) — no 0%-WR 3+ trigger
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/14 = 7.1% (<40%); tpsl_utils deployed; manual_sl_hit 4T net -1.18 dominant (all CEO BTC ai-trader)
+- Boost: none eligible (max n=3 bb-squeeze+ 33.3% net -0.15; jup_yolo_mirrored 2T 100% net +0.27 n<5)
+- Arm rate: unarmed 9/14 = 64.3% below 70%, WR 22.2% net -1.27 vs armed 5/5 60.0% net -0.13 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly 21 -0.01, 23 +0.03, 1 -0.12, 2 -0.13 = 2 consecutive, not 3; regime NORMAL/HIGH/EXTREME not NEUTRAL, size already 0.25x -> no cut
+- Frequency: 1 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.250% < 0.5% (max 0.638)
+- 1 open: BABY pump-chain+ LONG 01:47 SL 0.00853237 TP 0.00873561
+
+**Open Questions:**
+- 24h NET -1.40 (fees 0.16 vs gross -1.24), payoff 0.41; 7d -2.62, 14d -4.41
+- manual_sl_hit 4T net -1.18 = dominant 24h loss (CEO BTC ai-trader)
+- unarmed WR 22.2% cohort 64.3% of closes, net -1.27 — stall stack owns fix
+- pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
+- storm bar 1/3 (positive dump packet), deadline 2026-11-26
+BY: auto_1hr
+
+## [2026-11-24 03:56] Hourly Analysis
+
+**Storm:** FIRED (dump gate: window-min <= -1.5) — 🌪️ [STORM-READINESS] window-min -2.18% / at-run +0.27% | blocked 187 in 2h (combo-key-stale 79, confluence single-type 20, vol-gate-override-0.0 16, compaction_stale_10min 14, short-rsi-floor-knife 13, expired-hotset 13, pump-chain-rsi-max-long 9, rr-engine 7, other 16) | true-starvation 35 RSI>=35 (deduped first-fire-per-token; 34 walked, 1 missing candles) | counterfactual $+0.81 (touch 15/34) | waiver SHADOW=True ENFORCE=False — counterfactual POSITIVE -> **streak 2/3** (03:00 packet positive backfilled to kanban; 1 more positive storm before 11-26 deadline; NO auto-flip — CEO NO-CONVERT stands) — split: blocked LONGs $+0.34 (23, touch 6/23) vs blocked SHORTs $+0.46 (11, touch 9/11 = SHORT-side starvation strong, waiver scope) — DUMP packet, no auto action
+**Trades:** 1 closed last hour (1W 0L) | 24h 14 closed (6W 8L)
+**PnL NET:** hour +$0.04 (BABY pump-chain+ LONG atr_trail_hit) | 24h NET $-1.14 (gross -0.99, fees 0.15, payoff 0.40, WR 42.9%) | 7d NET $-2.39 (117T) | 14d NET $-4.37 (228T) | **size-reduce: 0.25x (r2_tier true, file truth)**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Kill policy: 1 close last hour (BABY WIN) — no 0%-WR 3+ trigger
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/14 = 7.1% (<40%); tpsl_utils deployed; manual_sl_hit 3T net -0.96 dominant (CEO BTC ai-trader)
+- Boost: none eligible (max n=3 bb-squeeze+ 33.3% net -0.15; jup_yolo_mirrored 2T 100% net +0.27 n<5)
+- Arm rate: unarmed 8/14 = 57.1% below 70%, WR 25.0% net -1.05 vs armed 6/6 66.7% net -0.09 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly 21 -0.01, 23 +0.03, 1 -0.12, 2 -0.09 = 2 consecutive, not 3; regime NORMAL/HIGH/EXTREME not NEUTRAL, size already 0.25x -> no cut
+- Frequency: 1 close/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.318% < 0.5% (max 0.660)
+- Open: 4 BTC ai-trader-auto SHORT/hedge pairs (03:24-03:25, CEO engine)
+
+**Open Questions:**
+- 24h NET -1.14 (fees 0.15 vs gross -0.99), payoff 0.40; 7d -2.39, 14d -4.37
+- manual_sl_hit 3T net -0.96 = dominant 24h loss (CEO BTC ai-trader)
+- unarmed WR 25.0% cohort 57.1% of closes, net -1.05 — stall stack owns fix
+- pump-chain+ 14d n=11 of 20 kill threshold — revisit if n reaches 20
+- storm bar 2/3 (03:00 backfilled + this positive), deadline 2026-11-26
+BY: auto_1hr
