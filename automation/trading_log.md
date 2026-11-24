@@ -33158,3 +33158,32 @@ BY: auto_1hr
 - storm bar 2/3 (positive), deadline 2026-11-26
 - at-run +1.45% fresh pump just under 1.5 gate — watch next run
 BY: auto_1hr
+
+## [2026-11-24 12:56] Hourly Analysis
+
+**Storm:** no storm (window-min +0.23% / at-run +0.23%)
+**Trades:** 2 closed last hour (0W 2L) | 24h 16 closed (7W 9L)
+**PnL NET:** hour $-0.20 | 24h NET $-1.08 (gross -0.90, fees 0.18, payoff 0.50, WR 43.8%) | 7d NET $-2.91 (121T) | 14d NET $-4.57 (231T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Kill policy: 2 closes last hour (ICP+LTC btc-pump-rider+ LONG hard_max_loss) — n=2 <3, no 0%-WR trigger; btc-pump-rider+ 14d n=23 WR 56.5% net +0.14 (wins overall, not killable)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/16 = 6.3% (<40%); tpsl_utils deployed; manual_sl_hit 4T net -0.94 + hard_max_loss 4T net -0.45 dominant (CEO BTC + rider losses)
+- Boost: none eligible (max n=3 jup_yolo_mirrored 66.7% net +0.08; n>=5 required)
+- Arm rate: unarmed 10/16 = 62.5% below 70%, WR 10.0% net -1.30 vs armed 6/6 100.0% net +0.22 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: hourly 08 -0.19, 10 +0.02, 11 -0.10, 12 -0.20 — only 2 consecutive; size already 0.25x -> no cut
+- Regime: not NEUTRAL (prior EXTREME/HIGH) -> no size cut
+- Frequency: 2 closes/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.152% < 0.5% (max 0.660)
+- Open: 1 (SUSHI atr-trend- SHORT 11:47)
+
+**Open Questions:**
+- 24h NET -1.08 (fees 0.18 vs gross -0.90), payoff 0.50 at WR 43.8%; 7d -2.91, 14d -4.57
+- manual_sl_hit + hard_max_loss = 8/16 closes, net -1.39 combined (CEO BTC + rider exits)
+- unarmed WR 10.0% cohort 62.5% of closes, net -1.30 — stall stack owns fix
+- storm bar 2/3 (positive), deadline 2026-11-26
+- btc-pump-rider+ closed 0/2 last hour — watch; 14d still profitable so keep alive
+BY: auto_1hr
