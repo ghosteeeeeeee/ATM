@@ -33352,3 +33352,30 @@ BY: auto_1hr
 - unarmed WR 0.0% cohort 41.2% of closes, net -0.74 — stall stack owns fix
 - storm window-min -0.16% / at-run +0.15% (no storm); storm bar 2/3 (positive), deadline 2026-11-26 (shadow_disposition.json)
 BY: auto_1hr
+
+## [2026-11-24 19:57] Hourly Analysis
+
+**Storm:** no storm (window-min -0.59% / at-run -0.31%)
+**Trades:** 0 closed last hour | 24h 17 closed (8W 9L)
+**PnL NET:** hour $0.00 | 24h NET $-0.48 (gross -0.29, fees 0.19, payoff 0.65, WR 47.1%) | 7d NET $-2.56 (117T) | 14d NET $-4.29 (231T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Kill policy: 0 closes last hour — no 0%-WR/3T trigger; atr-trend- and btc-pump-rider+ both n=3 33.3% with wins (not 0%)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/17 = 5.9% (<40%); tpsl_utils deployed; hard_max_loss 4T net -0.45 dominant
+- Boost: none eligible (no n>=5 in 24h)
+- Arm rate: unarmed 7/17 = 41.2% below 70%, WR 0.0% net -0.74 vs armed 10/10 80.0% net +0.26 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 0 (latest close +0.04) — not 3
+- Regime: EXTREME 11T 63.6% / HIGH 6T 16.7% — not NEUTRAL -> no size cut
+- Frequency: 0 closes/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.193% < 0.5% (max 0.744)
+- Open: 0
+
+**Open Questions:**
+- 24h NET -0.48 (fees 0.19 vs gross -0.29), payoff 0.65 at WR 47.1%; 7d -2.56, 14d -4.29
+- unarmed WR 0.0% cohort 41.2% of closes, net -0.74 — stall stack owns fix
+- storm window-min -0.59% / at-run -0.31% (no storm); storm bar 2/3 (positive), deadline 2026-11-26 (shadow_disposition.json)
+BY: auto_1hr
