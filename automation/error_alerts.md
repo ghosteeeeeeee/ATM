@@ -5627,3 +5627,10 @@
 - **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
 - **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`
 - **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`
+
+## Error Alerts — 2026-11-24 13:54 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-24 14:39 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: CASHCAT TOK — signal TOK rolled back (prevents retry loop)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): CASHCAT TOK — TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`

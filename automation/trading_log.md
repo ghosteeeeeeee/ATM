@@ -33215,3 +33215,31 @@ BY: auto_1hr
 - unarmed WR 10.0% cohort 58.8% of closes, net -1.30 — stall stack owns fix
 - storm bar 2/3 (positive), deadline 2026-11-26
 BY: auto_1hr
+
+## [2026-11-24 14:53] Hourly Analysis
+
+**Storm:** no storm (window-min -0.67% / at-run +0.61%)
+**Trades:** 2 closed last hour (0W 2L) | 24h 18 closed (7W 11L)
+**PnL NET:** hour $-0.04 | 24h NET $-1.35 (gross -1.15, fees 0.20, payoff 0.37, WR 38.9%) | 7d NET $-2.96 (121T) | 14d NET $-4.24 (231T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Kill policy: 2 closes last hour (STX atr-trend- SHORT, GMX bb-squeeze+ LONG — both profit-monster-trail exits, net -0.02 each) — n=1 per signal <3, no 0%-WR trigger; ai-trader-auto 4T 0% net -0.94 is 24h CEO BTC manual window, 0 closes last hour
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/18 = 5.6% (<40%); tpsl_utils deployed; manual_sl_hit 4T net -0.94 + hard_max_loss 4T net -0.45 dominant (CEO BTC + rider exits)
+- Boost: none eligible (max n=4 ai-trader-auto 0%; n>=5 required)
+- Arm rate: unarmed 9/18 = 50.0% below 70%, WR 0.0% net -1.58 vs armed 9/9 77.8% net +0.23 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 12 -0.20, 13 +0.05, 14 -0.04 — broken, not 3; size already 0.25x -> no cut
+- Regime: EXTREME 10T 60% / HIGH 7T 14.3% — not NEUTRAL -> no size cut
+- Frequency: 2 closes/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.221% < 0.5% (max 0.744)
+- Open: 1 (RESOLV atr-trend+ LONG 14:33)
+
+**Open Questions:**
+- 24h NET -1.35 (fees 0.20 vs gross -1.15), payoff 0.37 at WR 38.9% — weakest WR/payoff day so far; 7d -2.96, 14d -4.24
+- unarmed WR now 0.0% (was 10.0%), net -1.58 — cohort = 50% of closes; stall stack owns fix
+- manual_sl_hit + hard_max_loss = 8/18 closes, net -1.39 combined (CEO BTC + rider)
+- storm bar 2/3 (positive), deadline 2026-11-26
+BY: auto_1hr
