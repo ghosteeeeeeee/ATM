@@ -1,60 +1,58 @@
-# Current State — brain_auditor #294 2026-11-24 04:56 UTC
-**Last Updated: 2026-11-24 04:56 UTC**
-**Updated by: brain_auditor #294. Prior: #293 2026-11-23 20:55 UTC (preserved in git history).**
+# Current State — brain_auditor #296 2026-11-24 20:45 UTC
+**Last Updated: 2026-11-24 20:45 UTC**
+**Updated by: brain_auditor #296. Prior: #295 2026-11-24 16:55 UTC (preserved in git history).**
 
-## HEADLINE — Four 11-24 evals closed: brake PROTECTIVE (leave stands), no gate-interaction relax, regime-tension reconciled (the -$0.83 was starved-collector), auto split live at n=4 monitor. recovery_replay selfcheck fixed (0.90→0.80). Wrong-side refuted 145th run.
-
-1. **brake-counterfactual DONE:** raw-SKIP join 223 tokdays fwd4h net **-$18.84** @0.106% (halves both negative) + shadow_tag_join BRAKE-FILLCAP 14d 194 tokdays **-$11.28** → blocked candidates would have LOST ~$2-4/day → **DailyFillCap LEAVE ruling stands, brake unchanged.** Tower parity still off (183 vs 94 today, display-only).
-2. **gate-cross-tab DONE:** joint cells all fail (regime+floor n=37 +$0.23 t=0.52; floor+vol n=9; triple 0) → **no interaction-relax candidate, single-gate KEEPs stand.** Side-input: vol-only cell n=162 +$10.46 t=2.59 same-sign halves → other-gate-short-withhold-review (11-27).
-3. **regime-tension RECONCILED:** A1-exempt fresh n=87 **+$4.64** days 6/13 FAIL (11-17's -$0.83 was n=15 starved collector); full withheld n=189 +$1.48 t=1.17 n.s. → **keep A1 ENFORCE=False + regime-gate as-is.**
-4. **tag-split DONE:** ai-trader-auto tag live (ladder fills carry it); auto cohort **n=4 << 30 → NO GATE, MONITOR** (re-read n>=30/12-05); pre-11-23 ladder fills stay pending (no backfill).
-5. **recovery_replay selfcheck FIXED:** failed at 89.6%<0.90 (window drift 206→106 losers) → assert 0.80, PASS, zero behavior.
+## HEADLINE — AMPLIFY emit `amplify-mfe-giveback-armed-lossers-scope` (EARLY n=10, NO-SHIP, due 12-08): the audited 30% MFE giveback covers only jup_yolo; non-CEO non-jup ARMED losers (mfe>=0.40) in loss engines n=10 net −$0.72, cf30 saves +$1.89 → cf_net +$1.17 (units-correct, path 10/10). Book-wide gap-chase floor REJECTED (p=0.55, winner-kill 57%). Floor route CLOSED confirmed (p=0.288 decay). Wrong-side refuted 147th run.
 
 ### 1. FINDINGS THIS RUN
 | Item | Result |
 |---|---|
-| 24h / 7d / 14d / 30d | 13T 46.2% **−0.88** / 117T 49.6% −0.71 / 228T 49.1% −0.95 / 652T 51.8% −5.21 |
-| open trades | **2 REAL BTC SHORT #17081/#17083** (duplicate ladder pair, entry 59866.5, SL 61774 explicit, ~$0.36 each at risk) + **2 PAPER hedges** (#17082/#17084 paper=True) |
-| chop-bleed 7d | never-armed = **75.8%** of gross loss |
-| armed vs unarmed | 7d 65T 81.5% **+2.91** vs 52T 9.6% **−3.62** · 14d 119T 83.2% +6.98 vs 108T 11.1% −7.97 |
-| exit fam 14d | trail 103T 92.2% **+6.51** ‖ chop/stop 124T 12.9% **−7.50** |
-| kill screen | 0 (sub-50% n≥15 net<0 = zero rows) |
+| 24h / 7d / 14d / 30d | 17T 47.1% **−0.29** / 117T 48.7% −0.90 / 231T 48.1% −0.91 / 653T 51.8% −5.32 |
+| open trades | **0** — flat, 0 steers, health good |
+| chop mandate 7d | trail 65T 86.2% **+3.83** ‖ chop_stop 52T 1.9% −4.73 · armed 68T 77.9% +2.72 vs unarmed 49T 8.2% −3.62 |
+| never-armed $ share 7d | 49T (41.9% trades) = **74.4% of gross-loss dollars** (−3.74/−5.03) · arm rate 58.1% (14d 53.7%) |
+| #1 exit bleed 7d | **manual_sl_hit 14T 0% −1.98 = 100% BTC ai-trader (CEO domain)** · hard_max 12T 0% −1.18 · prearm_lock 12T 8.3% −0.13 (enforce window only) |
+| kill screen | 0 (14d sub-50 n≥15 net<0 = empty) |
 
-### 2. AUTOPSY (48h, recovery_replay adverse-first, SELF-CHECK PASS after fix)
-n=16 = 3 never-adverse / 10 recovered / **3 NEVER** (IMX−0.11 + KAS−0.11 atr-trend− chop class · RESOLV −0.01 prearm) → **WRONG-SIDE REFUTED 145th consecutive run** (#61 p=0.116, #84 t=−0.04).
+### 2. AMPLIFY EMIT (this run)
+`amplify-mfe-giveback-armed-lossers-scope` — type (a) counterfactual, **EARLY n=10 label**, deadline **12-08**, NO-SHIP default.
+- 30d armed losers (mfe≥0.40) in atr_sl/hard_max/cut-loser engines: n=13 net −1.09; **non-jup non-CEO n=10 net −0.72**, naive cf30 giveback saves **+1.89 → cf_net +1.17** (pnl_usdt units, no fees ~−0.10), path check **10/10 would have fired**; in-scope jup n=2 also positive.
+- By signal: hl_copy n=3 (+1.00) · continuum-osc- n=2 (+0.35) · pump-chain+ n=3 (+0.32) · r2v2-long18 · pump-chain-.
+- Bars: n≥15 + candle-OOS fk<20% + net-of-fee >+$1.00/30d same-sign 14d/30d + no jup regression + **CEO scope review**.
+- **Untouched:** `not is_ceo_trade` gate (position_manager:4921) + CEO 2026-11-21 ruling (structure-governed NOT mfe-closed). ai-trader variant REJECTED with that prior art.
+- Why-not: all 3 n≥5 net≥+0.30 30d winner cells already covered (atp NORMAL SHORT CEO/amplify-done · bb-squeeze NORMAL LONG reband 12-05 · rider EXTREME LONG 11-30). #295 emitted stale-block same day — non-duplicate lever.
 
-### 3. SHADOW (mandate join re-ran 04:31Z)
-| Source | Status |
-|---|---|
-| contrarian join 04:31Z | overall flip **49.4% n=2669** · pc− **55.0% (71/129)** · rider 49.0% do-NOT · **DEMOTE read due 11-25** |
-| shadow_trader 04:50Z | exit A/B **pm_trail +21,558** vs **hard_max −28,106** = TRAIL-OR-NOTHING |
-| shadow_tag_join 14d | A1-exempt 87 +$4.64 days-fail · BRAKE-FILLCAP 194 −$11.28 · FLIP1 'BAR MET' = base bar only (tape-split NOT in script → formal NO-GO stands, side-find) |
-| floor | CLOSED #291 NO-SHIP — not reopened |
-| oscillator / wyckoff / rr | archived / retired / orphaned = **3/6 answerable + gate_shadow + tag_join** |
+### 3. REJECTED-WITH-DATA (this run)
+- **Book-wide LONG gap≥0.15 chase floor:** 30d blocked n=247 net −4.03 vs kept +0.14 looks like the whole LONG bleed — but **Fisher p=0.55 (30d) / 0.58 (14d) / 0.81 (7d)** and **winner-kill 56.6%** (120/212) ≫ bars; confounded (bb-squeeze+ 56 / jup 54 of blocked); CHASE_GAP_MAX_PCT=2.0 + pump-chain gap blocks already cover extremes. Logged so no run re-proposes.
+- **ai-trader MFE giveback:** CEO 2026-11-21 four-trade-night ruling + `not is_ceo_trade` = standing rejection.
 
-### 4. WATCHDOG STEERS 3/3
-steer-001 '4 BTC over-exposed' = 2 real duplicate-ladder shorts + 2 paper hedges (paper miscount, creative C1) · steer-002 12/20 = self-diagnosis correct (10/12 never-armed chop) · steer-003 atp streak → tag-split closed above.
+### 4. JOINS RE-RAN (mandate + stale-floor)
+| Join | Fresh | Result |
+|---|---|---|
+| contrarian 20:31Z | ✓ | overall flip **50.3% n=2792** (blanket = coin-flip, loses after fees) · pc− **55.2% (71/129) DECAYED** below 58 bar → NO-RE-PROMOTE #295 further vindicated · rider 50.0% do-NOT · pump-chain− het p=0.0054 |
+| floor 20:41Z (was 40h stale) | ✓ | floor_only 49.8% n=2221 vs always 47.2% n=530, **p=0.2875**; trajectory 0.138→0.032→0.044→0.055→0.088→**0.288** = decay continues → **route CLOSED (11-15) CONFIRMED** |
+| shadow_trader 20:32Z | ✓ | 143,153 signals; all top gates avg-negative-EV (46–55% would_win) = gates earning keep; exit A/B **pm_trail +22,075 vs hard_max −28,682** = trail-or-nothing |
+| oscillator / wyckoff / rr | dead | archived / retired / orphaned = **3/6 + tag_join** |
 
-### 5. CREATIVE (this run)
-- **C1:** paper-flag watchdog exposure steers (paper=True counted as exposure).
-- **C2:** auto-ladder same-price double-fire census + one-fill-per-price cooldown — **CEO owed** (#17081/#17083 60s apart same entry; also #17026/#17027; dup-reject prior art keys order-id not price).
-- **C3:** shadow_tag_join must evaluate adjudicated bar amendments or suppress BAR MET prints.
+### 5. AUTOPSY (48h, recovery_replay adverse-first, SELF-CHECK PASS)
+n=19 = 5 never-adverse / 10 recovered / **4 NEVER** (IMX −0.11 atr-trend− · LTC −0.09 rider · BTC ai-trader-auto ×2 −0.04) → **WRONG-SIDE REFUTED 147th consecutive run** (#61 p=0.116, #84 t=−0.04). 14d structural never-recover remains ~19%.
 
-### 6. DUE
-**11-25** WIN-CAPTURE (ship producer — file still missing!) + pc− DEMOTE GO/NO-GO + bbsqueeze reband + structure-flip + pcfade + hotset-pin → **11-26** storm waiver (CEO, bar 2/3) + entry-hl-entry-invariant → 11-27 stop-family + other-gate-withhold (vol-only cell input) + linregfade + pc-weight → 11-28 maker-entry + prearm day-7 etc.
+### 6. PREARM DAY-7 PIN (disposition annotated)
+ENFORCE window is **~2d not 7**: True 11-20 01:26Z → CEO False 11-22 (major-break redesign). Realized prearm_lock exits n=12 (3/7/2 on 11-20/21/22, **0 since = OFF by design, not regression**), avg −0.010 vs same-window hard_max −0.110 / manual_sl −0.098 = **cap worked while live**. 11-28 read must use shadow would-fire counterfactual (ICP #17089 logged 11-24 12:40Z) + the 12-trade realized window.
 
-### 7. CHANGES THIS RUN
-1. `brain/analysis/recovery_replay.py` — selfcheck vacuity assert 0.90→0.80 (tooling, zero behavior).
-2. `data/shadow_disposition.json` — 4 due-today evals → done with adjudicated dispositions (149 total, selfcheck PASS).
-3. `brain/audit_recommendations.json`, `brain/creative_improvements.json` (+3), `brain/changes_log.json` (+3).
-4. `data/contrarian_outcome_join.json` — re-ran 04:31Z (mandate).
-5. Artifacts: `brake_cf_join_2026-11-24.json`, `gate_cross_tab_2026-11-24.json`.
-6. kanban TEAM UPDATES + this CURRENT.md.
+### 7. LAST-RUN VERIFY (#295) — ALL PASS
+reband deadline 12-05 present ✓ · win-capture 12-01 pace ~5 ids/day on track ✓ · struct-flip 12-05 ✓ · pcfade NO-RE-PROMOTE stands (pc− now 55.2%) ✓ · watch-contrarian 12-02 ✓ · hotset 12-01 ✓ · **stale-block premise re-measured intact** (30d stale 207T −3.01 vs fresh 446T −2.31; jup stale +0.13 / bb-squeeze stale +0.18 = blanket reject correct) ✓ · recovery selfcheck PASS ✓ · contrarian mandate ✓ · constants EMPTY ✓ · session lock ABSENT ✓ · CEO_PROTECTED intact ✓ · size-reduce 0.25x file-truth ✓ · 0 Tracebacks ✓ · checkpoint_registry only kill-line 12-03 pending.
 
-### 8. LAST-RUN VERIFY (#293)
-dampen still CEO-pending ✓ · entry-hl-entry-invariant open (11-26) ✓ · **win_capture_shadow.json STILL MISSING (due 11-25)** ✓ · contrarian mandate ✓ · recovery selfcheck FAILED→FIXED ✓ · checkpoint_registry only kill-line 12-03 (0 intraday boxes) ✓ · 0 Tracebacks ✓ · session lock ABSENT ✓ · hermes_constants EMPTY git diff ✓ · CEO_PROTECTED untouched ✓ · size-reduce 0.25x file-truth (inert, floors to $11).
+### 8. CHANGES THIS RUN (all zero-behavior)
+1. `data/shadow_disposition.json` — +`amplify-mfe-giveback-armed-lossers-scope` (151) + prearm-day7 annotation.
+2. `brain/audit_recommendations.json`, `brain/creative_improvements.json` (+3), `brain/changes_log.json` (+5).
+3. `data/contrarian_outcome_join.json` 20:31Z + `data/floor_admit_outcome_join.json` 20:41Z (mandate/stale).
+4. kanban TEAM UPDATES + this CURRENT.md.
+**0 trading-constant changes.** Nothing passed bars: kill screen 0 · gap-chase fails p+fk · MFE scope n=10<15 (EARLY emit only) · PREARM enforce = CEO deliberate OFF · ai-trader = CEO domain.
 
-### 9. READINESS (2026-11-24 04:56 UTC)
-**4 open (2 real shorts + 2 paper).** Regime: btc_15m SHORT_BIAS vs btc_4h LONG_BIAS **DISAGREE = chop** · continuum BELOW · vol LOW · trend STRONG_UP · accel POSITIVE · DailyFillCap **ENGAGED 04:33Z** · auto_trader CHOP/MANAGE_ONLY (long −5 / short 35).
-**HOLD the bracketed BTC shorts (CEO/ai-trader domain, SL explicit). NO fresh counter-trend entries while the two BTC timeframes disagree. NO pipeline fills while the fill cap is engaged. Trail-family first when a side sustains 15–30m WITH volume. Size: the 0.25x DD marker is inert (floors to $11) — the real brake is DailyFillCap, not size.**
-CEO owed: atp RSI<35 dampen · R2 DD non-size lever · entry/hl invariant GO · **ladder double-fire ruling (new)** · storm bar 11-26.
+### 9. READINESS (2026-11-24 20:45 UTC)
+**0 open / 0 steers / portfolio good.** Regime: btc_15m **SHORT_BIAS** = btc_4h **SHORT_BIAS** (aligned) · continuum BELOW · vol LOW · trend STRONG_DOWN · accel POSITIVE · volume LOW.
+**No fresh entries until a side sustains 15–30m WITH volume. Trail-family first. Size 0.25x inert (floors to $11).**
+CEO owed: ladder double-fire (#295 C2) · hotset trial-flip · storm bar 11-26 · MFE-scope review at bar-met (12-08).
+
+**Queue:** 11-25 watch-contrarian final → 11-26 storm-waiver + entry-hl + capture-leaderboard → 11-27 pc-weight/stop-family/other-gate/linregfade → 11-28 prearm-day7 (per annotation) + jup/longbypass/maker/r2v2 batch → 12-01 win-capture n40 + hotset trial-flip + stale-block bar + pcfade re-measure → 12-05 reband limb-v + struct-flip walk → 12-08 MFE-scope bars.

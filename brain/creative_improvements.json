@@ -12250,5 +12250,59 @@
     "status": "suggested",
     "risk": "low",
     "run": 294
+  },
+  {
+    "date": "2026-11-24T16:52:30Z",
+    "idea": "STALE-BLOCK shadow on 5 bleed signals (vb-, hl_copy, atr-trend-, pump-chain-, warrior) — naive +$2.18/30d, winner-kill 9.1%, jup/bb-squeeze excluded (stale-positive)",
+    "rationale": "stale 209T -$3.10 vs fresh -$1.23, halves both negative; partial prior art exists (R2 BLOCK_STALE) but gap on 5 signals",
+    "expected_impact": "+$0.07/day naive, shadow-first",
+    "category": "entry sniper",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-24T16:52:30Z",
+    "idea": "bb-squeeze MODULE-RSI reband 65->70 walk — 146 decided, 74% WR, +$3.38/3.4d, halves same-sign, fk=0; EXTEND to 12-05 for 14d limb",
+    "rationale": "step (iii) pre-registered walk executed; all evaluable limbs pass; instrumentation window too short for limb (v)",
+    "expected_impact": "+$0.99/day if limb (v) passes (upper bound before downstream gates)",
+    "category": "param-widen",
+    "status": "in-flight",
+    "risk": "medium"
+  },
+  {
+    "date": "2026-11-24T16:52:30Z",
+    "idea": "C2 ladder double-fire (CEO owed since #294): #17081/#17083 same entry 60s apart both manual_sl_hit — one-fill-per-price cooldown",
+    "rationale": "duplicate pair doubled BTC short loss; dup-reject prior art keys order-id not price",
+    "expected_impact": "halves duplicate-ladder losses",
+    "category": "execution",
+    "status": "owed-ceo",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-24T20:45:00Z",
+    "idea": "AMPLIFY: amplify-mfe-giveback-armed-lossers-scope — extend audited 30% MFE giveback to non-CEO non-jup armed losers (mfe>=0.40) exiting atr_sl/hard_max/cut-loser",
+    "rationale": "30d non-jup non-CEO armed losers n=10 net -0.72; naive cf30 saves +1.89 -> cf_net +1.17 (pnl_usdt units); path check 10/10 would fire; in-scope jup n=2 also positive. CEO/structure-governed exclusion untouched (position_manager:4921 + 2026-11-21 ruling).",
+    "expected_impact": "+~$1.07/30d net-of-fees if bars met (n>=15, candle-OOS fk<20%, same-sign)",
+    "category": "exit sniper / scope extension",
+    "status": "suggested",
+    "risk": "low-medium"
+  },
+  {
+    "date": "2026-11-24T20:45:00Z",
+    "idea": "REJECTED-WITH-DATA: book-wide LONG gap>=0.15 chase floor",
+    "rationale": "30d blocked bucket net -4.03 LOOKS like the bleed but Fisher p=0.55 (30d)/0.58 (14d)/0.81 (7d) and winner-kill 56.6% >> 20% bar; confounded by bb-squeeze+/jup mix; CHASE_GAP_MAX_PCT=2.0 + pump-chain gap blocks already cover extremes.",
+    "expected_impact": "n/a — would kill 120/212 30d winners",
+    "category": "entry filter",
+    "status": "rejected",
+    "risk": "high"
+  },
+  {
+    "date": "2026-11-24T20:45:00Z",
+    "idea": "Prearm day-7 read reframe: enforce window is ~2d (11-20->11-22 CEO OFF), realized n=12 avg -0.010 vs hard_max -0.110; 0 fires since = OFF by design not regression; 11-28 read must use shadow counterfactual + 12-trade window",
+    "rationale": "Disposition promised 7d of enforce that cannot exist; prevents garbage read.",
+    "expected_impact": "measurement hygiene",
+    "category": "measurement",
+    "status": "applied",
+    "risk": "none"
   }
 ]

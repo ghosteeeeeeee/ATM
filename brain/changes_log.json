@@ -4862,5 +4862,82 @@
     "after": "04:31Z 11-24",
     "rationale": "no systemd producer",
     "impact": "flip 49.4% n=2669; pc- 55.0%"
+  },
+  {
+    "timestamp": "2026-11-24T16:52:30Z",
+    "agent": "brain_auditor",
+    "change": "Audit #295: bbsqueeze reband candle-walk script + 6 due-11-25 dispositions + amplify-stale-block-bleed5 emit (0 trading-constant changes)",
+    "type": "tooling",
+    "file": "brain/analysis/bbsqueeze_reband_walk_2026-11-24.py",
+    "before": "step (ii) only, 2 events counted",
+    "after": "step (iii) walked: n=146 net +$3.38 wr74% halves same-sign fk0; EXTEND limb v to 12-05",
+    "rationale": "pre-registered amplify bar due 11-25",
+    "impact": "no behavior change; decision input for RSI_MAX reband"
+  },
+  {
+    "timestamp": "2026-11-24T16:52:30Z",
+    "agent": "brain_auditor",
+    "change": "shadow_disposition: 6 due-11-25 entries adjudicated (reband EXTEND 12-05, win-capture EXTEND 12-01, struct-flip EXTEND 12-05, pcfade NO-RE-PROMOTE 12-02, contrarian watch EXTEND 12-02, hotset EXTEND 12-01) + new amplify-stale-block-bleed5",
+    "type": "data",
+    "file": "data/shadow_disposition.json",
+    "before": "6 open due 11-25",
+    "after": "all extended/adjudicated with evidence; 150 total entries",
+    "rationale": "mandate disposition deadlines",
+    "impact": "keeps queue honest; no config change"
+  },
+  {
+    "timestamp": "2026-11-24T20:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #296: registered amplify-mfe-giveback-armed-lossers-scope (EARLY n=10, NO-SHIP default, due 12-08) — MFE 30% giveback scope extension to non-CEO non-jup armed losers",
+    "type": "creative",
+    "file": "data/shadow_disposition.json",
+    "before": "150 entries",
+    "after": "151 entries",
+    "rationale": "30d armed losers n=10 net -0.72, cf30 +1.89, path 10/10, in-scope jup positive; bars n>=15+candle-OOS+CEO review",
+    "impact": "zero behavior (registry only)"
+  },
+  {
+    "timestamp": "2026-11-24T20:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #296: annotated prearm-enforce-day7-read — enforce window ~2d (CEO OFF 11-22), realized n=12, 0 fires since = OFF by design; day-7 read must use shadow counterfactual",
+    "type": "data",
+    "file": "data/shadow_disposition.json",
+    "before": "no #296 note",
+    "after": "#296 pre-read note appended",
+    "rationale": "prevents a garbage 11-28 read pretending 7d of enforce exists",
+    "impact": "zero behavior"
+  },
+  {
+    "timestamp": "2026-11-24T20:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #296: contrarian outcome join re-ran (mandate) 20:31Z — overall flip 50.3% n=2792, pc- 55.2% DECAYED, rider 50.0% do-NOT",
+    "type": "data",
+    "file": "data/contrarian_outcome_join.json",
+    "before": "16:31Z #295",
+    "after": "20:31Z #296",
+    "rationale": "stale join poisons flip numbers",
+    "impact": "pc- NO-RE-PROMOTE further vindicated"
+  },
+  {
+    "timestamp": "2026-11-24T20:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #296: floor admit outcome join re-ran (was 40h stale, producer-less) 20:41Z — p=0.2875 confirms route CLOSED",
+    "type": "data",
+    "file": "data/floor_admit_outcome_join.json",
+    "before": "11-23 04:31Z",
+    "after": "11-24 20:41Z",
+    "rationale": "no systemd producer; both joins manual each run",
+    "impact": "floor route stays NO-SHIP, p trajectory decay continues"
+  },
+  {
+    "timestamp": "2026-11-24T20:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #296: 0 trading-constant changes (kill screen 0; gap-chase filter rejected p=0.55/fk 57%; MFE scope n=10<15; PREARM enforce = CEO deliberate OFF; ai-trader = CEO domain)",
+    "type": "config",
+    "file": "scripts/hermes_constants.py",
+    "before": "unchanged (git diff EMPTY)",
+    "after": "unchanged",
+    "rationale": "nothing passed Step-5c bars",
+    "impact": "no behavior change"
   }
 ]

@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-23T15:50:00Z",
+  "updated": "2026-11-24T20:45:00Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -767,10 +767,10 @@
       "id": "watch-contrarian-live",
       "stream": "CONTRARIAN-LIVE pump-chain- fade real-trade watch — PostgreSQL brain trades (pc- LONG opens since started)",
       "kind": "watch",
-      "disposition": "EXTEND 7d to 2026-11-25 — adjudicated 2026-11-17T16:50:00Z (brain_auditor #273): kill gate NOT triggered (38 REAL pc- LONG fills since 10-27, WR 39.5%, gross $0.000); promote gate still unmet on fees (fees json net -$0.209 over 38T, fee_total $0.395 = structurally fee-negative at $11.10 notional). Z-FLIP check remains near-vacuous (BUG-078).",
+      "disposition": "EXTEND 7d to 2026-11-25 — adjudicated 2026-11-17T16:50:00Z (brain_auditor #273): kill gate NOT triggered (38 REAL pc- LONG fills since 10-27, WR 39.5%, gross $0.000); promote gate still unmet on fees (fees json net -$0.209 over 38T, fee_total $0.395 = structurally fee-negative at $11.10 notional). Z-FLIP check remains near-vacuous (BUG-078). | 11-25 deadline read 2026-11-24T16:55:00Z: NOT the 0-trades case — 38 REAL pc- LONG fills since 10-27 (0 new in last 7d), WR 39.5%, gross pnl_usdt 0.000, fee net -0.209 = still structurally fee-negative at $11 notional. Kill gate not triggered; promote gate unmet on fees. Shadow flip-WR decayed to 55.2% (see pcfade). EXTEND 7d to 12-02 paired with pcfade re-measure. Do NOT leave unwatched: if 0 NEW fills by 12-02, recommend CEO disable CONTRARIAN_LIVE_PREFIXES (dormant flag burning nothing but attention).",
       "status": "open",
       "started": "2026-10-27",
-      "deadline": "2026-11-25T00:00:00Z",
+      "deadline": "2026-12-02T00:00:00Z",
       "threshold": "bar: >= 1 REAL fade trade (pc- LONG open since started) + Z-FLIP conversion check at the 11-03 dispo",
       "progress_eval": "contrarian_live",
       "default_action": "report-only: if still 0 real trades at deadline, either extend watch 7d with evidence or disable CONTRARIAN_LIVE_PREFIXES (CEO) — do NOT leave it drifting unwatched",
@@ -1505,12 +1505,12 @@
       "kind": "amplify",
       "status": "open",
       "started": "2026-11-08",
-      "deadline": "2026-11-25T00:00:00Z",
+      "deadline": "2026-12-05T00:00:00Z",
       "threshold": "PARAM-WIDEN counterfactual BB_SQUEEZE_LONG_RSI_MAX 65->70 on validated cell bb-squeeze+|NORMAL|LONG. MANDATORY: use MODULE RSI from signals.value regex rsi= — NEVER entry_rsi_14/enrichment (proven divergent #236: enrichment 58-100 vs module 60-65 on 422/422). Steps: (i) instrument [bb-squeeze] BLOCKED prints to pipeline.log (zero-behavior); (ii) accumulate >=10 blocked events with module RSI 65-70; (iii) 1m-candle walk live exit engine; SHIP only if net pnl_usdt>0 AND 14d/30d same sign AND fk of current 60-65 winners=0 (admit-only) AND n>=10. Units guard pnl_usdt never pnl_pct. If 0 BLOCKED events in 7d after instrumentation, report-only.",
       "default_action": "NO CHANGE (BB_SQUEEZE_LONG_RSI_MAX stays 65)",
       "owner": "brain_auditor",
-      "disposition": "step (i) INSTRUMENTATION NOW SHIPPED — but not by the path this entry assumed. The dead run #284 (00:30) converted both [bb-squeeze] LONG BLOCKED prints to hermes_log.log() in scripts/signals/bollinger_squeeze.py (commit 02357b3a 03:58Z) because raw print never reached pipeline.log (run_all_signals does not capture stdout) — the 'NEVER SHIPPED' note above was a measurement artifact, not a dead code path. Verified 2026-11-21T04:40Z: 38 timestamped '[bb-squeeze] ... BLOCKED' lines in logs/pipeline.log, 0 bare-print-format lines, py_compile PASS, no line-parser breaks (volatility_gate_v2 matches on signal NAME, not the block line). step (ii) ACCUMULATING: 2 events with module RSI 65-70 so far (all other blocks are RSI<60 weakness blocks) vs >=10 needed -> re-registered. Default NO CHANGE (BB_SQUEEZE_LONG_RSI_MAX stays 65).",
-      "evidence": "signals.value rsi in [60,65] on 422/422 bb-squeeze+ LONG since 10-24; entry_rsi_14 ranges 58-100 same rows",
+      "disposition": "step (i) INSTRUMENTATION NOW SHIPPED — but not by the path this entry assumed. The dead run #284 (00:30) converted both [bb-squeeze] LONG BLOCKED prints to hermes_log.log() in scripts/signals/bollinger_squeeze.py (commit 02357b3a 03:58Z) because raw print never reached pipeline.log (run_all_signals does not capture stdout) — the 'NEVER SHIPPED' note above was a measurement artifact, not a dead code path. Verified 2026-11-21T04:40Z: 38 timestamped '[bb-squeeze] ... BLOCKED' lines in logs/pipeline.log, 0 bare-print-format lines, py_compile PASS, no line-parser breaks (volatility_gate_v2 matches on signal NAME, not the block line). step (ii) ACCUMULATING: 2 events with module RSI 65-70 so far (all other blocks are RSI<60 weakness blocks) vs >=10 needed -> re-registered. Default NO CHANGE (BB_SQUEEZE_LONG_RSI_MAX stays 65). | STEP (iii) CANDLE-WALK DONE 2026-11-24T16:55:00Z (brain/analysis/bbsqueeze_reband_walk_2026-11-24.py, selfcheck PASS): 389 raw 65-70 module-RSI BLOCKED lines -> 158 deduped (token/60m) -> 146 decided, 12 no-candles. Result: WR 74.0%, net +$3.38 pnl_usdt (NOTIONAL 11.10, units guard), halves +$1.87/+1.51 SAME-SIGN, fk=0 (admit-only), exits trail 106 / hard_sl 36 / timeout 4. In-window limbs (i)(ii)(iii)(iv) ALL PASS; limb (v) 14d/30d same-sign NOT EVALUABLE (instrumentation span 11-21..11-24 = 3.4d < 14d) -> EXTEND deadline to 2026-12-05 (14d from first event). CAVEATS: (a) walk is upper-bound — RSI block is at signal-gen, downstream gates (confluence/vol/ctx) still filter real fills; (b) simplified exit engine (arm .40/trail .20/SL .85 avg-live/hold 120m), not full ATR stack. Default NO CHANGE (BB_SQUEEZE_LONG_RSI_MAX stays 65) until limb (v) evaluates.",
+      "evidence": "signals.value rsi in [60,65] on 422/422 bb-squeeze+ LONG since 10-24; entry_rsi_14 ranges 58-100 same rows | walk 2026-11-24T16:55:00Z: n=146 net+3.38 wr74.0 halves same-sign fk0 — limb v pending to 12-05",
       "adjudicated_by": " | adjudicated brain_auditor #284b 2026-11-21T04:45:21Z"
     },
     {
@@ -1571,7 +1571,7 @@
       "kind": "shadow",
       "status": "open",
       "started": "2026-11-08",
-      "deadline": "2026-11-25T00:00:00Z",
+      "deadline": "2026-12-01T00:00:00Z",
       "threshold": "MFE_EXIT_GIVEBACK_PCT 0.30→0.20 and/or PM_TRAIL_DISTANCE_PCT 0.002→0.003 SHADOW: prove no ATR-SL race first — constants:1967 says DO NOT WIDEN 'ATR SL beats wider trails'; ship only if capture 0.57→0.70 improves net30 ≥ +$0.10/day with fk<20%",
       "default_action": "no change (winners capture 56.7% of MFE price today)",
       "owner": "CEO",
@@ -1632,7 +1632,8 @@
         "verdict": "COLLECT EXTENDED to 2026-11-25 — directionally positive (7/8, fk 0) but pace 0.87x of bar and n=8. Read bar at 11-25: n>=40 distinct trade_ids AND pace >= +$0.10/day AND fk<20%. Default stays no change; PM_TRAIL_DISTANCE_PCT 0.002->0.003 leg remains CEO_PROTECTED / blocked.",
         "note": "cohort_b (whatif-only = additional captures the 0.30 would miss) is 0 — all measured value comes from cohort_a (earlier exit on trades that 0.30 would also exit). If cohort_b stays 0 through 11-25 the mechanism is 'less giveback on same trades', not 'new captures'."
       },
-      "statused_by": "brain_auditor #287"
+      "statused_by": "brain_auditor #287",
+      "disposition": "11-25 read 2026-11-24T16:55:00Z: PRODUCER LIVE (27 WIN-CAPTURE-SHADOW lines in logs/pipeline.log, first 2026-11-22 21:08Z) but only 10 DISTINCT trade_ids vs bar n>=40 -> NOT MET, EXTEND to 12-01. No json file is expected — read protocol is log-grep + PG join (evidence note stands). Pace ~5 ids/day -> 40 by ~11-30, 12-01 gives margin. Default no change."
     },
     {
       "id": "hml-vol-atr-mult-shadow",
@@ -1673,13 +1674,13 @@
       "kind": "amplify",
       "status": "open",
       "started": "2026-11-09",
-      "deadline": "2026-11-25T00:00:00Z",
+      "deadline": "2026-12-05T00:00:00Z",
       "threshold": "SHIP only if 14d 1m-candle walk on never-armed losers: n>=30 decided AND net delta >= +$2.00 pnl_usdt (UNITS GUARD — never pnl_pct/leverage) AND fk (eventual winners whose path crosses the flip-against before arm) <20% AND armed trades untouched (lock must not fire once trailing_activated=true). Live proof-of-concept: #16838 MFE-CUT logged would-fire at -0.22%/mfe0.09 vs manual_close realized -0.36% price-move; #16818 SOL mfe0.369 still lost.",
       "measurement": "position_manager log [STRUCT-FLIP-SHADOW] at ema300_position change vs open direction; join PG mfe_pct/exit on closed never-armed cohort; pnl_usdt basis only",
       "default_action": "NO SHIP (default) — log-only shadow first, zero behavior",
       "owner": "brain_auditor",
       "notes": "AMPLIFY weekly #244 type (a) exit-side param. NOT a duplicate of amplify-prearm-breakeven-lock (11-14, flat-BE on peak) — this fires on STRUCTURE FLIP while prearm fires on TIME+adverse. NOT mfe-cut-arm-be (stall-cut at T>=45, extended 11-14). Why-not on cells: all 4 n>=10 winner cells in-flight; n>=5 early cells (doji-bottom 5T/80%/+0.20, jup-FLAT-LONG 8T/87.5%/+0.10, warrior-NORMAL 6T) = thin, label only. Contra-vs-aligned entry quality REJECTED-WITH-DATA this run: 14d aligned 265T net -1.58 vs contra 113T net -1.54 = no separation (structure-at-entry does not predict outcome; structure-FLIP-mid-hold is the untested axis).",
-      "disposition": "STEP 1 (log-only probe) WIRED 2026-11-21T13:05Z by brain_auditor #286 — the 'owed next run' item. NEW in scripts/position_manager.py: _btc_ema300_state() (one BTC 1m continuum read per pipeline run, freshness 900s, returns None rather than raising) + _struct_flip_shadow(pos, btc_state), called as the FIRST statement of the per-position loop in check_and_manage_positions(), call site wrapped in try/except so a shadow probe can never take the exit loop down. Detection is STATELESS: continuum_states.ema300_position against entry direction AND last_cross_ts > open_time (= mid-hold flip, contra-entries excluded) — deliberately NOT a module-level dedup set, because position_manager runs as a fresh subprocess every minute (STEPS_EVERY_MIN) and per-process sets reset each run. ZERO BEHAVIOR: one log line '[STRUCT-FLIP-SHADOW] #id ...' with live mfe, armed flag, pnl_pct, signal — no exit, no SL/trail mutation, armed trades untouched by construction. VERIFIED: scripts/test_struct_flip_shadow.py ALL 11 CHECKS PASS (flip logs / contra-entry silent / aligned silent / armed still tagged / no position mutation / junk input silent); py_compile OK; live smoke against the real continuum.db: state ('ABOVE', cross 1795250400, age 3s) -> SHORT-opened-before-cross LOGS, opened-after-cross SILENT, LONG SILENT. STILL OPEN: the measurement itself — >=30 decided never-armed losers, 14d 1m-candle walk, net delta >= +$2.00 pnl_usdt (units guard), fk <20%. Default = NO SHIP unchanged.",
+      "disposition": "STEP 1 (log-only probe) WIRED 2026-11-21T13:05Z by brain_auditor #286 — the 'owed next run' item. NEW in scripts/position_manager.py: _btc_ema300_state() (one BTC 1m continuum read per pipeline run, freshness 900s, returns None rather than raising) + _struct_flip_shadow(pos, btc_state), called as the FIRST statement of the per-position loop in check_and_manage_positions(), call site wrapped in try/except so a shadow probe can never take the exit loop down. Detection is STATELESS: continuum_states.ema300_position against entry direction AND last_cross_ts > open_time (= mid-hold flip, contra-entries excluded) — deliberately NOT a module-level dedup set, because position_manager runs as a fresh subprocess every minute (STEPS_EVERY_MIN) and per-process sets reset each run. ZERO BEHAVIOR: one log line '[STRUCT-FLIP-SHADOW] #id ...' with live mfe, armed flag, pnl_pct, signal — no exit, no SL/trail mutation, armed trades untouched by construction. VERIFIED: scripts/test_struct_flip_shadow.py ALL 11 CHECKS PASS (flip logs / contra-entry silent / aligned silent / armed still tagged / no position mutation / junk input silent); py_compile OK; live smoke against the real continuum.db: state ('ABOVE', cross 1795250400, age 3s) -> SHORT-opened-before-cross LOGS, opened-after-cross SILENT, LONG SILENT. STILL OPEN: the measurement itself — >=30 decided never-armed losers, 14d 1m-candle walk, net delta >= +$2.00 pnl_usdt (units guard), fk <20%. Default = NO SHIP unchanged. | 11-25 read 2026-11-24T16:55:00Z: shadow LIVE and noisy — 646 [STRUCT-FLIP-SHADOW] lines in pipeline.log (probe wired 11-21), still log-only zero-behavior. 14d candle-walk limb (n>=30 never-armed losers + net delta >= +$2.00 + fk<20%) NOT RUN: probe window only 3.4d of flip events, walk needs 14d from 11-21 -> EXTEND to 12-05. Note: lines fire even on armed=1 trades (e.g. #17087 SUSHI) — walk must filter trailing_activated=true out per threshold. Default NO SHIP.",
       "adjudicated_by": " | adjudicated brain_auditor #286 2026-11-21T13:05:00Z",
       "step1_shipped": "2026-11-21T13:05:00Z",
       "updated": "2026-11-21T12:42:11Z"
@@ -1993,7 +1994,7 @@
       "proposal_type": "(a) conditional re-promote counterfactual on a validated shadow cell (tape-scoped, not blanket)",
       "status": "open",
       "started": "2026-11-15",
-      "deadline": "2026-11-25T00:00:00Z",
+      "deadline": "2026-12-02T00:00:00Z",
       "owner": "brain_auditor weekly AMPLIFY + CEO/T sign-off (CONTRARIAN_LIVE is a live flag)",
       "created_by": "brain_auditor #266",
       "evidence": "join RE-RAN 16:31Z mandate: overall 46.1% n=1830 | pc- 66.7% n=102 | rider 44.7% do-NOT | het chi2 p=6e-35 per-signal only | halves computed via cjo.classify re-run 16:45Z. Cit: [calwndar 2026-10-31] fade conversion arc end-to-end, CEO labeled approval-alone null.",
@@ -2005,7 +2006,7 @@
       "prior_art": "session-brain query 'have we tried flipping pump-chain contrarian direction before demote re-promote' -> hits are the demote/flip trail [watch-pc-flip-demote-55 2026-11-13, 'DEMOTE EXECUTED ... bar breached on any-read basis'] = this entry supersedes that metric basis, not a re-proposal of shipped work",
       "status_note": "AMPLIFY weekly emit #266 (satisfies >=1 proposal/run mandate)",
       "caveat": "Per-token heterogeneity is UNTESTABLE at corrected n (pc- now only 2 tokens with n>=10, chi2 null) — pre-fix 'p=0.0001 HETEROGENEOUS' came from contaminated rows. Bar (ii) tape-split (BELOW n=62) is therefore the ONLY scoping test available; do not widen to unscoped pc- fade on this evidence.",
-      "disposition": "NO-RE-PROMOTE at 11-18 read, EXTEND to 2026-11-25 2026-11-17T16:50:00Z (brain_auditor #273): bars (i) PASS — corrected pc- flip-WR 66.7% (68W/34L n=102, z=3.37) >=58, time-halves same-sign older 82.4% n=51 / newer 51.0% n=51 (newer half DECAYING toward 50 vs 63.2% at the 11-15 read — see demote-tripwire creative); (ii) PASS — pc-|BTC-BELOW 77.3% n=66 >=65% n>=50 (AT 40.6% n=32 stays unscoped-blocked); (iii) FAIL — live fade cohort 38T gross $0.000 NET -$0.209 (fees $0.395) still structurally fee-negative; (iv) CEO/T sign-off absent. All four required → shadow stays as-is, CONTRARIAN_LIVE unchanged. Re-read 11-25 or on CEO fade-size/min-expected-move>2x-fee decision, whichever first."
+      "disposition": "NO-RE-PROMOTE at 11-18 read, EXTEND to 2026-11-25 2026-11-17T16:50:00Z (brain_auditor #273): bars (i) PASS — corrected pc- flip-WR 66.7% (68W/34L n=102, z=3.37) >=58, time-halves same-sign older 82.4% n=51 / newer 51.0% n=51 (newer half DECAYING toward 50 vs 63.2% at the 11-15 read — see demote-tripwire creative); (ii) PASS — pc-|BTC-BELOW 77.3% n=66 >=65% n>=50 (AT 40.6% n=32 stays unscoped-blocked); (iii) FAIL — live fade cohort 38T gross $0.000 NET -$0.209 (fees $0.395) still structurally fee-negative; (iv) CEO/T sign-off absent. All four required → shadow stays as-is, CONTRARIAN_LIVE unchanged. Re-read 11-25 or on CEO fade-size/min-expected-move>2x-fee decision, whichever first. | 11-25 read 2026-11-24T16:55:00Z: bar (i) FAILS — join re-ran 16:31Z (mandate): pc- flip-WR now 55.2% (71W/58L n=129) vs required >=58% at the read; decayed from 66.7% n=102 (11-17). chi2 HETEROGENEOUS p=0.0054. Live fade still 38 real pc- LONG fills, WR 39.5%, gross 0.000, fee net -0.209 (fee-negative). NO-RE-PROMOTE this cycle; CONTRARIAN_LIVE stays demoted/off. Re-measure at next join with watch-contrarian-live (both extended to 12-02)."
     },
     {
       "id": "long-rsi-floor30-shadow",
@@ -2040,13 +2041,13 @@
       "kind": "shadow",
       "status": "open",
       "started": "2026-11-16",
-      "deadline": "2026-11-25T00:00:00Z",
+      "deadline": "2026-12-01T00:00:00Z",
       "owner": "CEO",
       "threshold": "baseline fell-out=42/day longs; after pin enable: fell-out longs <10/24h AND long APPROVED→EXECUTED >=8/day (vs 2-3 now) AND no negative side effects on compaction (zero gate changes) — flip HOTSET_PIN_APPROVED=True only at this bar with CEO label",
       "default_action": "stay pinned-off",
       "evidence": "CEO 20261116T153048Z: single highest-quality layer —55 longs died post-approval (42 fell-out+13 EXEC-BLOCK) in24h; zero gates touched by the fix",
       "notes": "pin ships INERT: HOTSET_PIN_APPROVED=False (default) = fell-out UPDATE SQL byte-identical + hotset_final untouched (probe: rotation identical with flag off). HOTSET_PIN_SHADOW=True logs the fell-out cohort (dedup token|direction,site,hour).",
-      "disposition": "EXTEND to 11-25 (CEO 20261118T224556Z) — outcome read REQUIRED before flipping HOTSET_PIN_APPROVED: shadow live (451 WOULD-PIN lines), unique long tokens/day 8/30/13 vs baseline42 fell-out longs/d, approved->executed only 2-3/d; long wing -0.031/trade — do not flip blind"
+      "disposition": "EXTEND to 11-25 (CEO 20261118T224556Z) — outcome read REQUIRED before flipping HOTSET_PIN_APPROVED: shadow live (451 WOULD-PIN lines), unique long tokens/day 8/30/13 vs baseline42 fell-out longs/d, approved->executed only 2-3/d; long wing -0.031/trade — do not flip blind | 11-25 read 2026-11-24T16:55:00Z: mechanism LIVE (229 WOULD-PIN lines today, 23 unique long tokens; ENFORCE=False throughout). Bar is POST-FLIP by construction (fell-out<10/d + approved->executed>=8/d only measurable after HOTSET_PIN_APPROVED=True) — cannot pass while off. Baseline input today: 23 unique fell-out long tokens (vs stated 42/d baseline — regime mix, do not treat as improvement). CEO TRIAL-FLIP decision owed: flip with same-day A/B read, or extend. Default stay pinned-off. EXTEND to 12-01."
     },
     {
       "id": "amplify-pumpchain-normal-short-early",
@@ -2323,7 +2324,8 @@
       "threshold": "At 7 enforce days: (1) fk via full walk (not reach-proxy): share of prearm exits whose NORMAL exit-engine outcome would have been a WINNER <20% (walk baseline 13.9%), n>=15 distinct exits; (2) realized net in pnl_usdt units >= 0 across the enforce cohort; (3) peak-source divergence census: pos-peak vs trades.highest_price vs 1m candle peak for EVERY fire — if >=2 fires have DB-or-candle peak >= PM_TRAIL_ACTIVATE (0.40), ship the GUARD proposal to CEO (skip lock when trades.highest_price >= arm) as a separate review-queue item, not unilateral; (4) 14d same-sign vs walk. Units guard mandatory (#193).",
       "default_action": "keep PREARM_LOCK_ENFORCE=True (CEO GO stands), NO param change; divergence guard needs CEO even if bar (3) trips",
       "not_a_duplicate_of": "amplify-prearm-breakeven-lock (done — first read n=4) / amplify-ugb-bypass-armgap (done — UGB-PT owns bypass atr_sl deaths) / win-side-capture-shadow (post-arm giveback, due 11-25)",
-      "risk": "low — read-only eval; only outcome is a guarded proposal"
+      "risk": "low — read-only eval; only outcome is a guarded proposal",
+      "disposition": " | 2026-11-24T20:45Z (#296 pre-read): ENFORCE WINDOW IS ~2 DAYS NOT 7 — PREARM_LOCK_ENFORCE went True 2026-11-20 01:26Z, CEO set False 2026-11-22 (major-break redesign). Live realized prearm_lock exits: 11-20 n=3 / 11-21 n=7 / 11-22 n=2 / 11-23 n=0 / 11-24 n=0 = n=12 total, avg -0.010 (vs same-window hard_max avg -0.110, manual_sl avg -0.098 = cap worked while live). Day-7 read due 11-28 must therefore lean on the SHADOW would-fire counterfactual (still logging: ICP #17089 11-24 12:40Z) + the 12-trade realized window; a pure '7 days of enforce' read is impossible. Peak-source divergence check unchanged. Do NOT read 0 fires 11-23..11-24 as a regression — enforce is OFF by design."
     },
     {
       "id": "tp-vs-trail-shadow",
@@ -2504,7 +2506,40 @@
       "evidence": "PG 30d: 652 HL rows, 7 diverged (1.07%): 17067 ai-trader-auto 63604 vs 64248 (1.013%), 17027 ai-trader-pending 60182 vs 60724 (0.901%), 17015 56199.5 vs 55762 (-0.778%), 16852 0.018%, 16835 0.296%, 16832 -0.036%, 16421 volume-buildup- -0.459%. Recorded pnl sum -0.60 vs corrected -0.79. 6/7 are ai-trader BTC. Session brain: no prior art found for this defect.",
       "risk": "low (report-only until pinned)",
       "not_a_duplicate_of": "accounting_reconciliation.py section 4c already COUNTS hl_entry_diff_n but does not fix or alert on it"
+    },
+    {
+      "id": "amplify-stale-block-bleed5",
+      "kind": "amplify",
+      "proposal_type": "(a) gate counterfactual — block is_stale=true detect entries on 5 bleeding signals (shadow first)",
+      "status": "open",
+      "started": "2026-11-24",
+      "deadline": "2026-12-01T00:00:00Z",
+      "owner": "brain_auditor #295 weekly AMPLIFY emit",
+      "created_by": "brain_auditor #295",
+      "evidence": "PG 30d with is_stale field: stale 209T net -$3.10 vs fresh 366T -$1.23; stale halves BOTH negative (d1-15 -$2.59 / d16-30 -$0.51). Concentrated on 5 signals (stale n>=8 AND stale_net<0): volume-buildup- 13T -$0.67, hl_copy_trader 9T -$0.60, atr-trend- 24T -$0.48, pump-chain- 15T -$0.34, warrior-sr-confirm+ 9T -$0.09 -> pooled 70T net -$2.18 (31W +$1.21 / 39L -$3.39). BLANKET block REJECTED: jup_yolo stale 66T +$0.13 and bb-squeeze+ stale 31T +$0.18 are net POSITIVE. Winner-kill 31/339 = 9.1% of 30d winners < 20% bar. 14d same-sign -$0.69 (28T), 7d -$0.13 (6T). Prior art: R2_TREND_*_BLOCK_STALE and trend_purity/pump_chain already block stale; gap = rider/atr-trend/bb-squeeze/jup/vb-/hl_copy/warrior record is_stale but do not block. Session brain: no prior art found for a cross-signal stale block on these 5. Cit: [hall of shame 2026-10-11] staleness mechanism killing signals context; [trend align 2026-10-02] stale token universe bug (data-side).",
+      "threshold": "SHADOW first: log [STALE-BLOCK-SHADOW] would-block lines (zero behavior) at detect for the 5 signals when is_stale=true. SHIP only if ALL: (i) >=30 decided would-block events; (ii) joined outcomes net pnl_usdt >0 saved (naive >= +$1.00/14d, units guard); (iii) substitution check — >=70% of would-blocked setups do NOT re-fire fresh within 15m (else block just delays, fk via re-entry unknown); (iv) 7d/14d same-sign; (v) CEO review-queue sign-off (constants change). Default NO CHANGE.",
+      "units_guard": "pnl_usdt only, never leveraged pnl_pct (#193)",
+      "impact_on_winners": "naive block forfeits 31 stale winners (+$1.21) but saves 39 stale losers (-$3.39) = +$2.18/30d; winner-kill 9.1% < 20% bar; jup/bb-squeeze EXCLUDED (stale-positive)",
+      "risk": "low (shadow first; default no change)",
+      "not_a_duplicate_of": "R2_*_BLOCK_STALE (r2-only), trend_purity stale block (that signal only); this targets 5 specific bleed signals proven stale-negative",
+      "measurement": "grep [STALE-BLOCK-SHADOW] from logs/pipeline.log, dedup token|hour, join PG by open_time+token within 15m for substitution, pnl_usdt basis"
+    },
+    {
+      "id": "amplify-mfe-giveback-armed-lossers-scope",
+      "stream": "MFE_EXIT_SIGNALS scope extension: non-CEO non-jup armed losers (mfe>=0.40) exiting via atr_sl/hard_max/cut-loser get 30% giveback",
+      "kind": "amplify",
+      "proposal_type": "(a) param/counterfactual on validated cohort (MFE_EXIT_SIGNALS += non-managed armed signals; units guard: pnl_usdt unleveraged)",
+      "status": "open",
+      "created_at": "2026-11-24T20:45:00Z",
+      "created_by": "brain_auditor #296 AMPLIFY (weekly emit — #295 emitted same-day stale-block-bleed5; this is the second, non-duplicate)",
+      "deadline": "2026-12-08T00:00:00Z",
+      "owner": "brain_auditor #296",
+      "early_label": "EARLY n=10 (bar n>=15) — NO-SHIP default",
+      "evidence": "30d PG: armed losers (mfe>=0.40) in loss engines n=13 net -1.09; non-jup non-CEO n=10 net -0.72, naive cf30 giveback saves +1.89 -> cf_net +1.17 (pnl_usdt units, amount_usdt x price_move, NO fees ~-0.10). Path check 10/10 exits at/below giveback threshold = would have fired. By signal: hl_copy n=3 (+1.00), continuum-osc- n=2 (+0.35), pump-chain+ n=3 (+0.32), r2v2-long18 n=1, pump-chain- n=1. In-scope jup armed losers n=2 net -0.27 cf +0.36 = mechanism works where it already applies. NOT a CEO-trade proposal: position_manager.py:4921 `not is_ceo_trade` + CEO 2026-11-21 ruling (structure-governed ladder/pending NOT mfe-closed) both stay untouched — this is non-managed scope only.",
+      "threshold": "SHIP only if: (i) n>=15 distinct armed losers in scope; (ii) candle-OOS walk on the wider armed population: fk<20% (armed trades touching peak*(1-0.30) that later recover to winner); (iii) cf net > +$1.00/30d pnl_usdt units net-of-fees, same sign at 14d and 30d; (iv) no regression to current jup mfe_exit cohort; (v) CEO review (MFE_EXIT_SIGNALS scope = money path).",
+      "default_action": "NO-SHIP until bars met (n=10 < 15)",
+      "prior_art": "position_manager.py:4906-4924 MFE exit scope = MFE_EXIT_SIGNALS=('jup_yolo',) mirror book; CEO 2026-11-21 four-trade night ledger ruling reverts the 2026-11-20 governed gate for CEO trades; session brain prior-art query 'have we tried extending MFE_EXIT to ai-trader' = no scope-extension item exists for non-CEO signals; win-side-capture/capture-leaderboard are THRESHOLD (0.30->0.20) items inside existing scope, not scope items. NOT a duplicate."
     }
   ],
-  "updated_at": "2026-11-23T20:55:00Z"
+  "updated_at": "2026-11-24T20:45:00Z"
 }
