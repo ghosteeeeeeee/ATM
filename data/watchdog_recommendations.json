@@ -1,93 +1,37 @@
 {
-  "timestamp": "2026-11-24T04:39:59.188022+00:00",
+  "timestamp": "2026-11-24T07:10:00.219798+00:00",
   "steers": [
     {
       "severity": "urgent",
       "category": "cluster",
-      "title": "Over-exposed to BTC: 4 trades",
-      "detail": "4 open trades on BTC. Diversify or reduce.",
+      "title": "Over-exposed to BTC: 2 trades",
+      "detail": "2 open trades on BTC. Diversify or reduce.",
       "auto_executable": false,
       "id": "steer-001"
     },
     {
-      "severity": "urgent",
-      "category": "health",
-      "title": "Losing streak: 12/20 recent trades lost",
-      "detail": "Win rate 40% over last 20 trades. Total PnL: -1.44 USDT. 10/12 losses never armed (MFE<0.40%) = chop cohort, not wrong-side; arm-rate/stall stack owns the fix. Exits: manual_sl_hit x5, trail_arm_timeout x3, hard_max_loss x3.",
+      "severity": "warning",
+      "category": "cluster",
+      "title": "Trade cluster: BTC + BTC",
+      "detail": "Both opened within 1 minutes. Correlation risk.",
       "auto_executable": false,
       "id": "steer-002"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: BTC + BTC",
-      "detail": "Both opened within 0 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-003"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: BTC + BTC",
-      "detail": "Both opened within 1 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-004"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: BTC + BTC",
-      "detail": "Both opened within 1 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-005"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: BTC + BTC",
-      "detail": "Both opened within 1 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-006"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: BTC + BTC",
-      "detail": "Both opened within 1 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-007"
-    },
-    {
-      "severity": "warning",
-      "category": "cluster",
-      "title": "Trade cluster: BTC + BTC",
-      "detail": "Both opened within 0 minutes. Correlation risk.",
-      "auto_executable": false,
-      "id": "steer-008"
-    },
-    {
-      "severity": "warning",
-      "category": "health",
-      "title": "Signal 'ai-trader-pending' losing streak: 3 consecutive losses",
-      "detail": "Net -0.48 USDT over last 20 trades (window losses: -0.48). Consider disabling or tuning this signal.",
-      "auto_executable": false,
-      "id": "steer-009"
     }
   ],
   "portfolio_health": "critical",
   "regime": {
-    "btc_15m": "LONG_BIAS",
+    "btc_15m": "SHORT_BIAS",
     "btc_4h": "LONG_BIAS",
     "continuum": "BELOW",
     "volatility": "LOW",
-    "zscore_tier": "POS",
+    "zscore_tier": "NEUTRAL",
     "velocity_state": "SLOW",
-    "acceleration_state": "FLAT",
+    "acceleration_state": "POSITIVE",
     "volume_regime": "LOW",
-    "linreg_alignment": 0.5,
-    "wyckoff_phase": "UNKNOWN",
-    "market_phase": "DECLINING",
+    "linreg_alignment": 0.0,
+    "wyckoff_phase": "ACCUMULATION",
+    "market_phase": "CALM",
     "trend_quality": "STRONG_UP"
   },
-  "open_count": 4
+  "open_count": 2
 }
