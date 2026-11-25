@@ -2163,7 +2163,12 @@ MULTI_TOUCH_ESCAPE_PCT = 0.5
 # 'jup_yolo_mirrored' and merged variants). Ships enabled per T directive
 # 2026-10-31 ("make a new exit, mfe-exit"); revert = MFE_EXIT_ENABLED False.
 MFE_EXIT_ENABLED = True        # Revert: set False.
-MFE_EXIT_GIVEBACK_PCT = 0.30   # fraction of peak favorable to give back (30%)
+MFE_EXIT_GIVEBACK_PCT = 0.50   # 50% giveback — CEO directive 2026-11-25
+                               # ("make MFE 50%"). The 30% cut the winners
+                               # at the first counter-wiggle: #17098 banked
+                               # 171pts of an 1,854pt move (9% capture) —
+                               # exit at 50% of peak keeps the trend leg.
+                               # Revert: 0.30.
 MFE_EXIT_ARM_PCT = 0.004       # ARMED 0.40% price — SHIPPED after the no-arm
                                # run churned (T: "isn't exactly what we were
                                # looking for"): 5 live closes 19:59-20:58 with
