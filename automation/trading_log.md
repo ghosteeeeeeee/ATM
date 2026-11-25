@@ -33953,3 +33953,32 @@ BY: auto_1hr
 - unarmed WR 50.0% cohort 40.0% of closes, net -0.23 — stall stack owns fix
 - storm window-min -0.46% / at-run -0.16% (no storm, gate not met); storm bar 2/3, deadline 2026-11-26 (shadow_disposition.json)
 BY: auto_1hr
+
+## [2026-11-25 18:55] Hourly Analysis
+
+**Storm:** no storm (window-min -0.17% / at-run +0.44%)
+**Trades:** 0 closed last hour | 24h 14 closed (11W 3L) | 1 open (GMT pump-chain+ LONG, unrealized +0.14, EXTREME)
+**PnL NET:** hour $0.00 | 24h NET $-0.09 (gross 0.06, fees 0.15, payoff 0.32, WR 78.6%) | 7d NET $-2.53 (124T) | 14d NET $-3.25 (230T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — boost already applied 18:02 by auto_1hr: btc-pump-rider+ combo_weight learner 1.06 → 1.3 (signal_versions v2). All criteria met (5T 100% WR net +0.20, 4 tokens: SAND/BABY/HBAR/XPL). Same-hour rule → no second boost. Pipeline restarted 18:54, new weight loaded.
+
+**No Change Needed:**
+- Last hour: 0 closes (1 open: GMT pump-chain+ LONG +0.14 unrealized)
+- Kill policy: no 0%-WR signal n>=3 (0 closes/hr; 24h pump-chain+ n=1). Monitor: pump-chain+ 14d EXTREME 12T WR 25% net -0.50 — not a kill trigger (needs n>=20 across regimes / regime-block path)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/14 = 21.4% (<40%); tpsl_utils deployed; profit-monster-trail 9T net +0.27 dominant
+- Boost: btc-pump-rider+ qualifies but already boosted 18:02 (see above); atr-trend- n=4<5
+- Arm rate: unarmed 5/14 = 35.7% below 70%, WR 40.0% net -0.36 vs armed 9/14 100% net +0.27 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 0 (16:00 -0.16, 17:00 +0.07) — not 3
+- Regime: EXTREME/HIGH/NORMAL not NEUTRAL -> no size cut
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.172% < 0.5% (max 0.499)
+- Open: 1
+
+**Open Questions:**
+- 24h NET -0.09 (fees 0.15 vs gross 0.06), payoff 0.32 at WR 78.6%; 7d -2.53, 14d -3.25
+- unarmed WR 40.0% cohort 35.7% of closes, net -0.36 — stall stack owns fix
+- 18:02 boost run wrote combo_weights+signal_versions but no trading_log/recent_changes line (orphaned; documented here)
+- storm window-min -0.17% / at-run +0.44% (no storm); storm bar 2/3, deadline 2026-11-26 (shadow_disposition.json)
+BY: auto_1hr
