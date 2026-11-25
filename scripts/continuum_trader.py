@@ -672,10 +672,12 @@ class ContinuumTrader:
             # NOTE: exchange MUST be 'Hyperliquid' (capitalized) — guardian filters on this exact string
             cur.execute("""
                 INSERT INTO trades (token, direction, strategy, amount_usdt, entry_price,
+                                   hl_entry_price,
                                    status, exchange, signal, paper, server, confidence, leverage,
                                    open_time, created_at, _signal_metadata)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s)
             """, ('BTC', side, 'continuum', size_btc, entry_price,
+                  entry_price,
                   'open', 'Hyperliquid', 'continuum_engine', True, 'Hermes', conf, 10,
                   json.dumps(meta)))
 

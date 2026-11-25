@@ -1241,17 +1241,15 @@ def reconcile_hype_to_paper(hl_pos, prices):
                 update_fields = []
                 update_values = []
 
-                # Entry price — also always update hl_entry_price so PnL calculations
-                # use the correct HL fill price (not stale hype_cache estimate).
-                # The 0.1% delta check protects against spurious updates; we still
-                # write hl_entry_price every time so close-time corrections stick.
+                # Entry price — always update BOTH entry_price and hl_entry_price
+                # together (entry-hl invariant, audit #297): the old 0.1% gate left
+                # entry_price stale while hl_entry_price moved, so the columns
+                # diverged (5/647 30d, up to 1.01%). Peak re-anchor still runs
+                # only when the value actually changes.
                 entry_delta = 0.0
                 if paper_entry is not None and paper_entry > 0:
                     entry_delta = abs(float(entry_px) - float(paper_entry)) / float(paper_entry)
                 if entry_delta > 0.001:
-                    needs_update = True
-                    update_fields.append("entry_price = %s")
-                    update_values.append(entry_px)
                     log(f'  🔄 {coin} entry: ${paper_entry:.4f} → ${entry_px:.4f}')
                     # Peak re-anchor (same root cause as position_manager._reanchor_seed_peak):
                     # highest/lowest were seeded from creation-time entry_price, so rewriting
@@ -1272,9 +1270,9 @@ def reconcile_hype_to_paper(hl_pos, prices):
                                 log(f'  🔁 {coin} peak re-anchor: {_pk} {_seed} → {_new} (moves with entry)')
                     except Exception as _pk_err:
                         log(f'  ⚠️ {coin} peak re-anchor skipped: {_pk_err}', 'WARN')
-                # Always sync hl_entry_price from HL — this is the authoritative fill price
-                # and is used for PnL. Even if entry_price is unchanged, this may be stale
-                # from a previous position and needs correcting.
+                # Always sync both columns from HL — authoritative fill price.
+                update_fields.append("entry_price = %s")
+                update_values.append(entry_px)
                 update_fields.append("hl_entry_price = %s")
                 update_values.append(entry_px)
 
@@ -1729,16 +1727,17 @@ def _check_and_execute_flip(trade: dict, pnl_pct: float, prices: dict):
                 trail_act_val = float(trail_act) if flip_trailing else None
                 trail_dist_val = float(trail_dist) if flip_trailing else None
                 cur.execute("""
-                    INSERT INTO trades (token, direction, entry_price, leverage,
+                    INSERT INTO trades (token, direction, entry_price, hl_entry_price, leverage,
                         amount_usdt, exchange, status, paper,
                         entry_regime_4h, entry_regime_1h, entry_regime_15m,
                         stop_loss, target, trailing_activation, trailing_distance,
                         flip_armed, flip_variant, flipped_from_trade, created_at)
-                    VALUES (%s, %s, %s, %s, %s, 'Hyperliquid', 'open', FALSE,
+                    VALUES (%s, %s, %s, %s, %s, %s, 'Hyperliquid', 'open', FALSE,
                         %s, %s, %s, %s, %s, %s, %s,
                         FALSE, %s, %s, NOW())
                 """, (
                     token, opposite,
+                    prices.get(token, entry_px),
                     prices.get(token, entry_px),
                     lev, amount, flip_regime_4h, flip_regime_1h, flip_regime_15m,
                     -sl_pct, -tp_pct, trail_act_val, trail_dist_val,

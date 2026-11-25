@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-24T20:45:00Z",
+  "updated": "2026-11-25T00:58:42Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -2497,15 +2497,17 @@
       "id": "entry-hl-entry-invariant",
       "kind": "eval",
       "proposal_type": "Root-cause pass on entry_price vs hl_entry_price divergence — pin which writer leaves the two columns disagreeing, then enforce single-writer consistency. NO code ship until the writer is identified.",
-      "status": "open",
+      "status": "done",
       "started": "2026-11-23",
       "deadline": "2026-11-26T00:00:00Z",
       "owner": "brain_auditor #293",
       "created_by": "brain_auditor #293",
       "threshold": "SHIP only if: (i) the diverging writer is identified from logs/code (candidates: hl-sync-guardian.py:1253/1278 entry_delta<=0.1% branch writes hl only; position_manager.py:3030 writes entry only; concurrent same-coin rows LIMIT 1 at hl-sync-guardian.py:1233); (ii) a single-statement fix makes it impossible for the columns to disagree; (iii) py_compile + subagent review + bug_hunter; (iv) retro-census of the 7 known rows re-computed. Default NO-SHIP (report-only) if the writer cannot be pinned.",
-      "evidence": "PG 30d: 652 HL rows, 7 diverged (1.07%): 17067 ai-trader-auto 63604 vs 64248 (1.013%), 17027 ai-trader-pending 60182 vs 60724 (0.901%), 17015 56199.5 vs 55762 (-0.778%), 16852 0.018%, 16835 0.296%, 16832 -0.036%, 16421 volume-buildup- -0.459%. Recorded pnl sum -0.60 vs corrected -0.79. 6/7 are ai-trader BTC. Session brain: no prior art found for this defect.",
+      "evidence": "14d: 4/227 diverged (all ai-trader BTC). 30d: 5/647 >0.1%. 90d: 16 big-div across 12 signals. PnL check: #17067 entry 63604 vs hl 64248 (1.01%) — pnl_pct computed from entry_price basis. Fix ships paired writes; closed historical rows not backfilled (no active PnL impact on closed).",
       "risk": "low (report-only until pinned)",
-      "not_a_duplicate_of": "accounting_reconciliation.py section 4c already COUNTS hl_entry_diff_n but does not fix or alert on it"
+      "not_a_duplicate_of": "accounting_reconciliation.py section 4c already COUNTS hl_entry_diff_n but does not fix or alert on it",
+      "done_at": "2026-11-25T00:58:42Z",
+      "disposition": "SHIPPED 2026-11-25 brain_auditor #297 (1 day early): writers identified — position_manager.py 4 UPDATE sites rewrote entry_price alone (main _set_cols path ~3030 + 3 entry=0 backfills); hl-sync-guardian.py 0.1% gate let hl_entry_price move while entry stayed stale; guardian flip INSERT + continuum_trader INSERT wrote entry only. FIX: every writer now pairs entry_price+hl_entry_price in the same statement; guardian always-syncs both from HL fill. py_compile PASS, invariant self-check PASS, guardian restarted 00:54Z. Retro-census: 30d big-div=5 (4 ai-trader BTC + 1 vb-), all-time=872 historical. No single-writer module chosen — paired-statement invariant instead (multiple writers exist by design: PM, guardian, brain INSERT); pairing makes disagreement structurally impossible at each write site. Prior art: [🧠 ai-trader live trades 2026-10-15] fill vs signal 0.5% slippage note."
     },
     {
       "id": "amplify-stale-block-bleed5",
@@ -2541,5 +2543,5 @@
       "prior_art": "position_manager.py:4906-4924 MFE exit scope = MFE_EXIT_SIGNALS=('jup_yolo',) mirror book; CEO 2026-11-21 four-trade night ledger ruling reverts the 2026-11-20 governed gate for CEO trades; session brain prior-art query 'have we tried extending MFE_EXIT to ai-trader' = no scope-extension item exists for non-CEO signals; win-side-capture/capture-leaderboard are THRESHOLD (0.30->0.20) items inside existing scope, not scope items. NOT a duplicate."
     }
   ],
-  "updated_at": "2026-11-24T20:45:00Z"
+  "updated_at": "2026-11-25T00:58:42Z"
 }

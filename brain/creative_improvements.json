@@ -12304,5 +12304,23 @@
     "category": "measurement",
     "status": "applied",
     "risk": "none"
+  },
+  {
+    "date": "2026-11-25T00:58:30Z",
+    "idea": "ENTRY-HL SINGLE-WRITER INVARIANT — every UPDATE/INSERT that touches entry_price must write hl_entry_price in the same statement (shipped #297)",
+    "rationale": "5/647 30d rows had entry_price != hl_entry_price (up to 1.01%); all large-divergence rows were ai-trader BTC. Root cause: position_manager rewrote entry_price alone at 4 sites; guardian 0.1% gate let hl move while entry stayed stale; 2 INSERTs wrote entry only. Session prior: [🧠 ai-trader live trades 2026-10-15] \"HL fill recorded at $82,127 vs $81,711 signal price — 0.5% slippage\".",
+    "expected_impact": "eliminates column disagreement going forward; PnL already keyed to fill via hl_entry_price on close paths — prevents future entry-basis drift on open trades",
+    "category": "data integrity",
+    "status": "applied",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-25T00:58:30Z",
+    "idea": "REJECTED: book-wide RSI floor tighten / new entry gates — entry-quality route CLOSED on 3 axes (#96 admission features, #190 detect-time metadata, #192 BTC tape state 0/10). Do not re-propose detect-time entry gates.",
+    "rationale": "kill screen 0 this run; never-armed 94.8% of 7d loss dollars is exit/arm problem not entry-filter problem (armed 87.3% WR +3.00 vs unarmed 15.9% -3.85)",
+    "expected_impact": "n/a — documented so no run re-proposes closed route",
+    "category": "process",
+    "status": "rejected",
+    "risk": "n/a"
   }
 ]

@@ -4939,5 +4939,38 @@
     "after": "unchanged",
     "rationale": "nothing passed Step-5c bars",
     "impact": "no behavior change"
+  },
+  {
+    "timestamp": "2026-11-25T00:58:30Z",
+    "agent": "brain_auditor",
+    "change": "Audit #297: entry-hl single-writer invariant — position_manager (4 UPDATE sites) + hl-sync-guardian (always-sync both cols + flip INSERT) + continuum_trader INSERT now always write entry_price AND hl_entry_price together",
+    "type": "config",
+    "file": "scripts/position_manager.py + scripts/hl-sync-guardian.py + scripts/continuum_trader.py",
+    "before": "entry_price rewritten alone (PM 4 sites); guardian 0.1% gate left entry stale while hl moved; 2 INSERTs wrote entry only",
+    "after": "every entry_price writer pairs hl_entry_price in same statement; guardian always-syncs both from HL fill",
+    "rationale": "entry-hl divergence 5/647 30d (up to 1.01%) — ai-trader BTC cluster; root cause = multi-writer entry_price without hl (disposition entry-hl-entry-invariant due 11-26, shipped early)",
+    "impact": "zero intended behavior change to PnL (hl_entry_price already was fill truth); prevents column disagreement; py_compile PASS, self-check PASS, guardian restarted"
+  },
+  {
+    "timestamp": "2026-11-25T00:58:30Z",
+    "agent": "brain_auditor",
+    "change": "Audit #297: contrarian outcome join re-ran (mandate) 00:31Z — overall flip 50.3% n=2792, pc- 55.2% still DECAYED, rider ~50% do-NOT",
+    "type": "data",
+    "file": "data/contrarian_outcome_join.json",
+    "before": "2026-11-24 20:31Z #296",
+    "after": "2026-11-25 00:31Z #297",
+    "rationale": "stale join poisons flip numbers; no systemd producer",
+    "impact": "pc- NO-RE-PROMOTE stands; CONTRARIAN_LIVE_ENABLED already False since #257 demote"
+  },
+  {
+    "timestamp": "2026-11-25T00:58:30Z",
+    "agent": "brain_auditor",
+    "change": "Audit #297: 0 trading-constant changes (constants_change_review_queue active; kill screen empty; nothing passed Step-5c bars)",
+    "type": "config",
+    "file": "scripts/hermes_constants.py",
+    "before": "unchanged (git diff EMPTY)",
+    "after": "unchanged",
+    "rationale": "nothing cleared significance/OOS/fk bars; no_signal_enable_disable active",
+    "impact": "no behavior change"
   }
 ]

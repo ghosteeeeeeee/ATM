@@ -2914,8 +2914,9 @@ def refresh_current_prices(server: str = SERVER_NAME):
                 if db_cur:
                     try:
                         db_cur.execute("""
-                            UPDATE trades SET entry_price = %s WHERE id = %s AND status = 'open'
-                        """, (cur_price, trade_id))
+                            UPDATE trades SET entry_price = %s, hl_entry_price = %s
+                            WHERE id = %s AND status = 'open'
+                        """, (cur_price, cur_price, trade_id))
                     except Exception:
                         pass
 
@@ -2971,8 +2972,9 @@ def refresh_current_prices(server: str = SERVER_NAME):
                     if db_cur:
                         try:
                             db_cur.execute("""
-                                UPDATE trades SET entry_price = %s WHERE id = %s AND status = 'open'
-                            """, (hl_entry, trade_id))
+                                UPDATE trades SET entry_price = %s, hl_entry_price = %s
+                                WHERE id = %s AND status = 'open'
+                            """, (hl_entry, hl_entry, trade_id))
                         except Exception:
                             pass
 
@@ -3026,9 +3028,11 @@ def refresh_current_prices(server: str = SERVER_NAME):
                         try:
                             # Single statement so entry and seed can never diverge
                             # (a partial apply would leave the phantom peak for good).
+                            # hl_entry_price rides along: entry-hl invariant (audit #297) —
+                            # rewriting entry alone left the columns disagreeing (5/647 30d).
                             _set_cols = ("current_price = %s, pnl_pct = %s, pnl_usdt = %s, "
-                                         "entry_price = %s")
-                            _set_args = [cur_price, pnl_pct, pos['pnl_usdt'], _ep]
+                                         "entry_price = %s, hl_entry_price = %s")
+                            _set_args = [cur_price, pnl_pct, pos['pnl_usdt'], _ep, _ep]
                             if _seed_new:
                                 _set_cols += ", " + _seed_pk + " = %s"
                                 _set_args.append(_seed_new)
@@ -3087,8 +3091,9 @@ def refresh_current_prices(server: str = SERVER_NAME):
                 if db_cur:
                     try:
                         db_cur.execute("""
-                            UPDATE trades SET entry_price = %s WHERE id = %s AND status = 'open'
-                        """, (hl_entry, trade_id))
+                            UPDATE trades SET entry_price = %s, hl_entry_price = %s
+                            WHERE id = %s AND status = 'open'
+                        """, (hl_entry, hl_entry, trade_id))
                     except Exception as e:
                         log(f"  [Position Manager] Failed to fix entry_price for trade {trade_id}: {e}")
 
