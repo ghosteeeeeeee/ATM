@@ -33460,3 +33460,57 @@ BY: auto_1hr
 - unarmed WR 0.0% cohort 41.2% of closes, net -0.74 — stall stack owns fix
 - storm window-min -0.07% / at-run +0.00% (no storm); storm bar 2/3, deadline 2026-11-26 (shadow_disposition.json)
 BY: auto_1hr
+
+## [2026-11-24 23:53] Hourly Analysis
+
+**Storm:** no storm (window-min -0.44% / at-run -0.35%)
+**Trades:** 0 closed last hour | 24h 16 closed (7W 9L)
+**PnL NET:** hour $0.00 | 24h NET $-0.47 (gross -0.29, fees 0.18, payoff 0.74, WR 43.8%) | 7d NET $-2.53 (118T) | 14d NET $-4.21 (229T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Kill policy: 0 closes last hour — no 0%-WR/3T trigger; 24h max n=3 (atr-trend- 33.3% with wins; ai-trader-auto/btc-pump-rider+ 0% but n=2 <3)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/16 = 6.3% (<40%); tpsl_utils deployed; hard_max_loss 4T net -0.45 dominant
+- Boost: none eligible (max n=3, need n>=5)
+- Arm rate: unarmed 7/16 = 43.8% below 70%, WR 0.0% net -0.74 vs armed 9/9 77.8% net +0.27 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 0 (last close 21:00 +0.05) — not 3
+- Regime: EXTREME 9T 55.6% / HIGH 7T 28.6% — not NEUTRAL -> no size cut
+- Frequency: 0 closes/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.223% < 0.5% (max 0.744)
+- Open: 0
+
+**Open Questions:**
+- 24h NET -0.47 (fees 0.18 vs gross -0.29), payoff 0.74 at WR 43.8%; 7d -2.53, 14d -4.21
+- unarmed WR 0.0% cohort 43.8% of closes, net -0.74 — stall stack owns fix
+- storm window-min -0.44% / at-run -0.35% (no storm); storm bar 2/3, deadline 2026-11-26 (shadow_disposition.json)
+BY: auto_1hr
+
+## [2026-11-25 00:53] Hourly Analysis
+
+**Storm:** no storm (window-min -0.86% / at-run -0.32%)
+**Trades:** 0 closed last hour | 24h 16 closed (7W 9L)
+**PnL NET:** hour $0.00 | 24h NET $-0.47 (gross -0.29, fees 0.18, payoff 0.74, WR 43.8%) | 7d NET $-2.53 (118T) | 14d NET $-3.94 (227T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none (no config/constants change)
+
+**No Change Needed:**
+- Kill policy: 0 closes last hour — no 0%-WR/3T trigger; 24h max n=3 atr-trend- 33.3% with wins, not 0%
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 1/16 = 6.3% (<40%); tpsl_utils deployed; hard_max_loss 4T net -0.45 dominant
+- Boost: none eligible (max n=3, need n>=5)
+- Arm rate: unarmed 7/16 = 43.8% below 70%, WR 0.0% net -0.74 vs armed 9/9 77.8% net +0.27 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 0 (latest close 21:18 +0.05) — not 3
+- Regime: EXTREME 9T 55.6% / HIGH 7T 28.6% — not NEUTRAL -> no size cut
+- Frequency: 0 closes/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.223% < 0.5% (max 0.744)
+- Open: 0
+
+**Open Questions:**
+- 24h NET -0.47 (fees 0.18 vs gross -0.29), payoff 0.74 at WR 43.8%; 7d -2.53, 14d -3.94
+- unarmed WR 0.0% cohort 43.8% of closes, net -0.74 — stall stack owns fix
+- storm window-min -0.86% / at-run -0.32% (no storm); storm bar 2/3, deadline 2026-11-26 (shadow_disposition.json)
+BY: auto_1hr
