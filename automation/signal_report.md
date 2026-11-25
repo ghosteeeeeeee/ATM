@@ -1,15 +1,17 @@
 # Signal Performance Report
-**Generated:** 2026-11-25 01:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-25 07:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,974 | **WR:** 51.3% | **PnL:** -125.33%
-- **Date range:** 2026-07-29 → 2026-11-24
+- **Total trades (all time):** 3,978 | **WR:** 51.3% | **PnL:** -125.25%
+- **Date range:** 2026-07-29 → 2026-11-25
 
 ---
 
 ## WINNERS (WR > 55%, PnL > 0)
 
-None found.
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| atr-trend- | SHORT | 3 | 100.0% | +0.94 | 5 | 100.0% | +1.70 | ❓ |
 
 ---
 
@@ -21,7 +23,9 @@ None found.
 
 ## MARGINAL (30-50% WR)
 
-None found.
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| jup_yolo_mirrored | SHORT | 2 | 50.0% | -0.65 | ❓ | Needs more data |
 
 ---
 
@@ -39,6 +43,8 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
+1. **[WATCH] jup_yolo_mirrored SHORT** — WR=50.0%, PnL=-0.65% over 2 trades. Monitor next cycle.
+2. **[KEEP] 1 winning combos** — atr-trend-. LONG side dominant.
 
 ---
 

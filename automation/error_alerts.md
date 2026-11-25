@@ -5749,3 +5749,10 @@
 
 ## Error Alerts — 2026-11-25 06:54 UTC
 - **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-25 07:39 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+NEUTRAL+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-25 07:54 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+- **[WARN]** (health_monitor): `logs`: compressed 1 old logs, freed 0.0MB (disk 88%)
