@@ -33982,3 +33982,31 @@ BY: auto_1hr
 - 18:02 boost run wrote combo_weights+signal_versions but no trading_log/recent_changes line (orphaned; documented here)
 - storm window-min -0.17% / at-run +0.44% (no storm); storm bar 2/3, deadline 2026-11-26 (shadow_disposition.json)
 BY: auto_1hr
+
+## [2026-11-25 19:54] Hourly Analysis
+
+**Storm:** no storm (window-min +0.20% / at-run +0.21%)
+**Trades:** 0 closed last hour | 24h 14 closed (11W 3L) | 1 open (GMT pump-chain+ LONG, unrealized +0.24, EXTREME)
+**PnL NET:** hour $0.00 | 24h NET $-0.09 (gross 0.06, fees 0.15, payoff 0.32, WR 78.6%) | 7d NET $-2.47 (121T) | 14d NET $-3.25 (230T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- Last hour: 0 closes (1 open: GMT pump-chain+ LONG +0.24 unrealized)
+- Kill policy: no 0%-WR signal n>=3 (0 closes/hr). pump-chain+ 14d EXTREME 12T WR 25% net -0.50 — monitor only (all-regime kill needs n>=20; EXTREME-only, no other-regime data)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/14 = 21.4% (<40%); tpsl_utils deployed; profit-monster-trail 9T net +0.27 dominant
+- Boost: btc-pump-rider+ qualifies on raw numbers (5T 100% net +0.20, 4 tokens) but already boosted today 18:02 (combo_weight 1.06→1.3, signal_versions v2) — same-signal concentration, no second boost. atr-trend- n=4<5; jup_yolo_mirrored net -0.04; pump-chain+ net -0.16
+- Arm rate: unarmed 5/14 = 35.7% below 70%, WR 40.0% net -0.36 vs armed 9/14 100% net +0.27 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 0 (16:00 -0.16, 17:00 +0.07) — not 3
+- Regime: HIGH/EXTREME/NORMAL not NEUTRAL -> no size cut
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.172% < 0.5% (max 0.499)
+- Open: 1
+
+**Open Questions:**
+- 24h NET -0.09 (fees 0.15 vs gross 0.06), payoff 0.32 at WR 78.6%; 7d -2.47, 14d -3.25
+- unarmed WR 40.0% cohort 35.7% of closes, net -0.36 — stall stack owns fix
+- storm window-min +0.20% / at-run +0.21% (no storm); storm bar 2/3, deadline 2026-11-26 (shadow_disposition.json)
+BY: auto_1hr
