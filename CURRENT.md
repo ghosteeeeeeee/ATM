@@ -1,50 +1,52 @@
-# Current State — brain_auditor #297 2026-11-25 01:00 UTC
-**Last Updated: 2026-11-25 01:00 UTC**
-**Updated by: brain_auditor #297. Prior: #296 2026-11-24 20:45 UTC (preserved in git history).**
+# Current State — brain_auditor #298 2026-11-25 08:55 UTC
+**Last Updated: 2026-11-25 08:55 UTC**
+**Updated by: brain_auditor #298. Prior: #297 2026-11-25 01:00 UTC (preserved in git history).**
 
-## HEADLINE — entry-hl single-writer invariant SHIPPED EARLY (due 11-26): 5/647 30d rows had entry_price != hl_entry_price (up to 1.01%, 4/5 ai-trader BTC). Writers pinned (PM 4 UPDATE sites + guardian 0.1% gate + 2 INSERTs) and fixed — every writer now pairs both columns in the same statement. Guardian restarted 00:54Z. Wrong-side refuted 148th run. Contrarian join re-ran: pc- 55.2% still DECAYED.
+## HEADLINE — win-capture 11-25 bar FAILED (n=10/40) and storm-waiver pre-read: close at 11-26 as KEEP-shadow. 0 constant changes; wrong-side refuted 149th; entry-hl #297 verify PASS.
 
 ### 1. FINDINGS THIS RUN
 | Item | Result |
 |---|---|
-| 24h / 48h / 7d / 14d / 30d | 16T 43.8% **-0.29** / 31T 41.9% -1.39 / 118T 49.2% -0.85 / 228T 48.2% -0.75 / 649T 51.6% -5.31 |
+| 24h / 48h / 7d / 14d / 30d | 15T 46.7% **-0.30** / 30T 50.0% -1.02 / 118T 49.2% -0.98 / 226T 49.1% -0.49 / 645T 51.8% -5.20 |
 | open trades | **0** — flat, 0 steers, health good |
-| chop mandate 7d | trail 59T 93.2% **+3.77** ‖ chop_stop 28T 3.6% -1.55 · armed 55T 87.3% +3.00 vs unarmed 63T 15.9% -3.85 |
-| never-armed $ share | 7d **94.8%** (50/56) · 14d 97.0% · 30d 95.5% · arm rate 46.6% |
-| #1 exit bleed 7d | **manual_sl_hit 14T 0% -1.98 = 100% ai-trader (CEO domain)** · hard_max 12T 0% -1.18 |
-| kill screen | **0** (sub-50 n≥15 net<0 empty) |
+| chop mandate 7d | trail 42T 95.2% **+2.29** ‖ chop_stop 16T 0% -1.66 · armed 35T 60% +0.27 vs unarmed 83T 44.6% -1.25 |
+| #1 exit bleed | **manual_sl_hit 14T 0% -1.98 = 100% ai-trader (CEO domain)** · 14d 24T -3.07 |
+| kill screen 14d | **EMPTY** (sub-50 n≥15 net<0) |
+| size-reduce | 0.25x r2_tier (file truth) |
 
-### 2. SHIP THIS RUN (bugfix, not constant)
-**entry-hl single-writer invariant** — `position_manager.py` (4 UPDATE sites), `hl-sync-guardian.py` (always-sync both + flip INSERT), `continuum_trader.py` (INSERT). Every `entry_price` writer now writes `hl_entry_price` in the same statement. py_compile PASS, self-check PASS, guardian active. Disposition `entry-hl-entry-invariant` marked **done**.
+### 2. DEADLINE READS (dispositions updated)
+| Entry | Read | Action |
+|---|---|---|
+| win-side-capture / capture-leaderboard | **11-25 bar FAILED** — 10 distinct YES ids vs ≥40; pace 1.56/day, ETA ~12-21 | capture deadline 11-26 → **12-01**; partial-read options pre-registered (n≥20 or widen YES); hard bars untouched |
+| storm-confl-waiver (due 11-26) | **bar incomplete** — 0 STORM-READINESS packets since 11-21; btc-roll -0.1..-0.3 vs -1.5; CEO NO-CONVERT stands | **CLOSE at deadline as KEEP-shadow** unless storm tonight emits streak 3/3 |
+| entry-hl invariant (#297) | **PASS** — 4/4 post-restart opens paired, 0 mismatches | done stands |
 
 ### 3. JOIN + SHADOW
 | Source | Fresh | Result |
 |---|---|---|
-| contrarian 00:31Z | ✓ mandate | overall flip **50.3% n=2792** · pc− **55.2% DECAYED** NO-RE-PROMOTE · rider 50% do-NOT · CONTRARIAN_LIVE already False (#257) |
-| floor 20:41Z (yesterday) | ✓ | p=0.2875 → route **CLOSED** confirmed |
-| shadow_trader 00:32Z | ✓ | 143,849 signals; gates all avg-neg-EV; exit A/B **pm_trail +22,183 vs hard_max −28,864** = trail-or-nothing |
-| oscillator / wyckoff / rr | dead | fossil / retired / orphaned = **3/6** |
+| contrarian 08:31Z | ✓ mandate | overall flip **50.3% n=2792** · pc− **55.4% DECAYED** · rider 50% do-NOT |
+| shadow_trader 08:31Z | ✓ | 143,849 signals; gates avg-neg; exit A/B **pm_trail +22,183 vs hard_max −29,175** |
+| oscillator / wyckoff / rr | dead | fossil / retired / orphaned = **3/6 dead** |
+| floor / storm packets | closed / stale | p=0.2875 CLOSED · 0 packets since 11-21 |
 
-### 4. AUTOPSY (48h, adverse-first, SELF-CHECK PASS)
-n=18 = 5 never-adverse / 9 recovered / **4 NEVER** (IMX · LTC · BTC ai-trader ×2) → **WRONG-SIDE REFUTED 148th** (#61 p=0.116, #84 t=−0.04).
+### 4. AUTOPSY (48h, adverse-first, self-check PASS)
+n=15 = 4 never-adverse / 6 recovered / **5 NEVER** (IMX · HYPE · LTC rider · BTC ai-trader ×2) → **WRONG-SIDE REFUTED 149th** (#61 p=0.116, #84 t=−0.04).
 
-### 5. AMPLIFY
-No NEW cell: all n≥10 net>0 30d winner cells already covered by 17 open amplifies, or CEO-domain (ai-trader-pending NORMAL SHORT +1.00), or sign-flip fail (atr-trend− NORMAL SHORT 14d −0.19). Stated per mandate.
+### 5. AMPLIFY (weekly)
+**No NEW cell.** All 30d n≥10 net>0 cells: ai-trader-pending NORMAL SHORT (CEO) · bb-squeeze+ NORMAL LONG (validated+1.3) · btc-pump-rider+ EXTREME LONG (open 11-30) · jup HIGH SHORT (walk 11-28) · atr-trend− NORMAL SHORT (14d sign-flip fail) · pump-chain− NORMAL LONG (windows incomplete) · jup NORMAL/EXTREME SHORT (thin/covered). Flip-KPI: 0 conversions (bars unmet). In-flight offense serviced: storm pre-read, capture extended, win-side pace noted.
 
-### 6. LAST-RUN VERIFY (#296) — ALL PASS
-mfe-giveback registry ✓ · joins fresh ✓ · prearm annotation ✓ · kill screen still 0 ✓ · constants EMPTY ✓ · session lock absent ✓ · size-reduce 0.25x file-truth ✓ · recovery selfcheck PASS ✓ · 0 new Tracebacks ✓.
+### 6. LAST-RUN VERIFY (#297) — ALL PASS
+entry-hl 4/4 paired ✓ · contrarian join re-ran ✓ · kill screen 0 ✓ · constants EMPTY ✓ · session lock absent ✓ · size-reduce 0.25x ✓ · recovery selfcheck PASS ✓ · 0 new Tracebacks ✓.
 
 ### 7. CHANGES THIS RUN
-1. `scripts/position_manager.py` + `scripts/hl-sync-guardian.py` + `scripts/continuum_trader.py` — entry-hl paired-write invariant (bugfix).
-2. `data/shadow_disposition.json` — entry-hl-entry-invariant → done.
-3. `data/contrarian_outcome_join.json` 00:31Z (mandate).
-4. `brain/audit_recommendations.json`, `brain/creative_improvements.json` (+2), `brain/changes_log.json` (+3).
-5. kanban TEAM UPDATES + this CURRENT.md.
-**0 trading-constant changes.** Kill screen 0; detect-time entry-gate route CLOSED (#96/#190/#192).
+1. `data/shadow_disposition.json` — storm pre-read · capture deadline →12-01 · win-side pace note.
+2. `brain/audit_recommendations.json`, `brain/creative_improvements.json` (+3), `brain/changes_log.json` (+1 meta).
+3. kanban TEAM UPDATES + this CURRENT.md.
+**0 trading-constant changes.** 0 ships. 0 trade actions.
 
-### 8. READINESS (2026-11-25 01:00 UTC)
-**0 open / 0 steers / portfolio good.** Regime: btc_15m **SHORT_BIAS** = btc_4h **SHORT_BIAS** (aligned) · continuum BELOW · vol LOW · trend STRONG_DOWN · accel POSITIVE · volume LOW · wyckoff ACCUMULATION · market_phase RECOVERY · auto_trader CHOP (long −35 / short +15).
-**Both-TF short-aligned but volume LOW + RECOVERY + CHOP scores = NO fresh entries until a side sustains 15–30m WITH volume. Trail-family first. Size 0.25x inert (floors to $11.10).**
-CEO owed: ladder double-fire (#295 C2) · hotset trial-flip · storm bar 11-26 · MFE-scope at bar-met (12-08).
+### 8. READINESS (2026-11-25 08:55 UTC)
+**0 open / 0 steers / portfolio good.** Regime: btc_15m **SHORT_BIAS** = btc_4h **SHORT_BIAS** (aligned) · continuum BELOW · vol LOW · zscore NEG · velocity SLOW · accel NEGATIVE · volume LOW · wyckoff MARKDOWN · market_phase DECLINING · trend_quality UP · linreg_alignment 1.0.
+**Both-TF short-aligned but LOW vol + LOW volume + mixed phase = no fresh entries until a side sustains 15–30m WITH volume. Trail-family first. Size 0.25x inert (floors to $11.10).**
+CEO owed: ladder double-fire (#295 C2) · hotset trial-flip · storm bar 11-26 · **manual_sl_hit ai-trader family review (14d -3.07)** · MFE-scope 12-08.
 
-**Queue:** 11-26 storm-waiver + capture-leaderboard (entry-hl DONE) → 11-27 pc-weight/stop-family/other-gate/linregfade → 11-28 prearm-day7 + jup/longbypass/maker/r2v2 → 11-29 tape-at → 11-30 floor/hl-copy/rider/atp → 12-01 win-capture+hotset+stale+pcfade+prearm-band → 12-02 watch-contrarian final → 12-03 kill-line enforce → 12-05 reband+struct-flip → 12-08 MFE-scope.
+**Queue:** 11-26 storm CLOSE + verify capture extension landed → 11-27 stop-family/other-gate/pc-plus/linregfade → 11-28 jup-walk/cell-tilt/r2v2/longbypass/maker/reentry/prearm → 11-30 rider-cell → 12-01 win-side+capture read → 12-02 contrarian final → 12-03 kill-line enforce → 12-08 MFE-scope.

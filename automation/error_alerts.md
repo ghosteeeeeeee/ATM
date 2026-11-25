@@ -5756,3 +5756,6 @@
 ## Error Alerts — 2026-11-25 07:54 UTC
 - **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
 - **[WARN]** (health_monitor): `logs`: compressed 1 old logs, freed 0.0MB (disk 88%)
+
+## Error Alerts — 2026-11-25 08:39 UTC
+- **REPEATED** (16x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`

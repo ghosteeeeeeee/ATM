@@ -4983,5 +4983,16 @@
     "after": "exact-trigger twins superseded each keeper cycle (nearer/CEO rung kept); selfcheck PASS; dry-run on live config removes 2 of 3x58500 shorts",
     "rationale": "§17 re-level snaps multiple rungs into same 250-bucket → identical triggers → double position on one cross; 2 dup BTC pairs cost ~-0.74 net over 48h (incl. hedge offset)",
     "impact": "Prevents same-level double fills; genuine ladder spacing (>=250 apart) and CEO dictations untouched;0 trading constants changed"
+  },
+  {
+    "timestamp": "2026-11-25T08:55:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #298 dispositions: storm-confl-waiver pre-deadline KEEP-shadow read; amplify-capture-leaderboard deadline 11-26->12-01 (11-25 bar FAILED n=10/40); win-side-capture pace note 1.56/day ETA 12-21",
+    "type": "meta",
+    "file": "data/shadow_disposition.json",
+    "before": "storm open deadline 11-26; capture open deadline 11-26; win-side no pace note",
+    "after": "storm pre-read lodged (close at deadline unless streak 3/3); capture extended to 12-01 with failed-bar math; win-side partial-read options pre-registered",
+    "rationale": "Deadlines arrive without an auditor read otherwise; capture bar cannot be met by 11-26 at measured pace",
+    "impact": "No trading behavior change; measurement deadlines now honest"
   }
 ]

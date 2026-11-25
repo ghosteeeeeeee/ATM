@@ -12322,5 +12322,32 @@
     "category": "process",
     "status": "rejected",
     "risk": "n/a"
+  },
+  {
+    "date": "2026-11-25T08:55:00Z",
+    "idea": "Pre-register win-capture partial-read options BEFORE the 12-01 deadline",
+    "rationale": "Pace 1.56/day makes n=40 unreachable by 12-01 (ETA 12-21). Without a pre-registered fallback the read will either slip silently or get a panic lower-bar. Options: (a) CEO accepts n>=20 with same pace math, (b) widen YES to whatif-only additional-capture lines already in protocol. Bars net30>=$0.10/day and fk<20% stay hard.",
+    "expected_impact": "Avoids deadline-day improvisation on a CEO-owned lever",
+    "category": "measurement hygiene",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-25T08:55:00Z",
+    "idea": "Storm-waiver auto-close protocol at 11-26 deadline",
+    "rationale": "CEO NO-CONVERT already kills the ENFORCE limb; leaving the entry open past deadline invites re-litigation. Close as KEEP-shadow unless a storm tonight emits streak 3/3.",
+    "expected_impact": "One less open disposition; floor-side evidence stays with linregfade entry",
+    "category": "disposition hygiene",
+    "status": "applied",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-25T08:55:00Z",
+    "idea": "manual_sl_hit attribution pin in watchdog output",
+    "rationale": "14d #1 bleed is 100% ai-trader but surfaces only as a raw exit_reason count — CEO sees 'manual_sl_hit -3.07' without the family split. A one-line attribution (signal family + n) in watchdog steers would make the CEO-domain bleed visible without an auditor run.",
+    "expected_impact": "Faster CEO action on the actual #1 bleed line",
+    "category": "observability",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

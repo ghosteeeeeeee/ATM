@@ -1,4 +1,4 @@
-# Shadow disposition report — 2026-11-25T00:58:42.495373+00:00
+# Shadow disposition report — 2026-11-25T08:49:53.728352+00:00
 registry: 151 entries (open=35)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
@@ -31,7 +31,6 @@ registry: 151 entries (open=35)
 - DONE fade-volgate-split-analysis: VALID — exemption candidate cleared (CEO rule met) (2026-10-29)
 - DONE fade-btc-crash-postflip: KEEP PERMANENT — full 24h read 2026-11-06T00:45Z: 9 unique crash=BLOCKED pump-chain- fade lines, coherence NO=5 YES=4 (56% NO) = STILL INCOHERENT; stage=crash-gate n=1 (ANIME WOULD-ALLOW vs live KILL), stage=inversion n=8 split 4/4. Per protocol (count only crash=BLOCKED, pump-chain- fade scope): NOT direction-coherent -> close KEEP pre-flip permanent per pre-registered default. Hoist NOT shipped. (2026-11-06T00:47:12.481255+00:00)
 - OPEN storm-confl-waiver: deadline=2026-11-26T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for storm-confl-waiver
 - OPEN linreg-fade-storm-admission-shadow: deadline=2026-12-01T00:00:00Z | (no parseable source)
 - DONE storm-readiness-packet: DONE 2026-11-12 (audit #250): threshold MET — 6 [STORM-READINESS] packets emitted since 10-30 (10-30, 11-04, 11-05 x2, 11-08, 11-10); mechanism live under auto_1hr. A4 census-attribution caveat VERIFIED CLEAN: 0 "short-regime-gate" mentions across all packets (caveat never materialized). 11-05 no-packet diagnostic RESOLVED (packets did fire 15:21/16:21 that day). Storm-bar accumulation function proven (3/3 MET 11-08, reset 11-10) — bar custody continues under storm-confl-waiver (extended 11-19). (?)
 - DONE signal-zombie-purge: NO CHANGE (default action confirmed) — root cause materially better than the framing: the 'zombies' (decision='EXPIRED' AND executed=1) are already covered by the SECOND tier of a two-tier purge. scripts/archive-signals.py (daily hermes-archive-signals.timer 04:00Z) archives decision IN ('SKIPPED','EXPIRED','EXECUTED','COMPACTED','WAIT','FAILED') older than CUTOFF_HOURS_OTHERS=336h (14d) to /root/.hermes/archive/signals/signals_YYYY-MM.jsonl.gz — decision_reason FULLY PRESERVED — then DELETE+VACUUM. So option (a) retention>=14d AND option (b) archive-preserve are BOTH ALREADY IMPLEMENTED; the compactor's _purge_executed_signals (1h, EXECUTED/FAILED only) and _purge_stale_unexecuted (2h, executed=0 only) are just the fast-path. EVIDENCE: runtime DB min(created_at)=2026-10-25 (16,161 rows, nothing older than ~15d despite ~1000 zombies/day) and archive/signals/{2026-08,2026-09,2026-10,2026-11}.jsonl.gz all present. The ~15.9k 'zombies' are simply the in-retention-window forensic cohort = by design. Forensic history NOT at risk. No purge code change. 3-line ownership comment added to signal_compactor.py so this DECIDE is not re-opened. (2026-11-09T00:45:00Z)
@@ -125,7 +124,7 @@ registry: 151 entries (open=35)
 - OPEN hl-copy-plus-shadow: deadline=2026-11-30T00:00:00Z | (no parseable source)
 - OPEN hotset-pin-approved-shadow: deadline=2026-12-01T00:00:00Z | (no parseable source)
 - OPEN amplify-pumpchain-normal-short-early: deadline=2026-12-02T00:00:00Z | (no parseable source)
-- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 5940 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 5.4d
+- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 6292 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 5.7d
 - DONE amplify-rider-fade-threshold-walk: ? (?)
 - DONE amplify-jup-long-blocked-clonehunt: NO SHIP — walk executed 2026-11-23T04:44Z (brain_auditor #291). Bars: (i) n=41 PASS | (ii) walk net +0.13 < +0.50 FAIL | (iii) fk=100% FAIL (every live-winner token-day also in blocked set — token-day unit wrong for multi-fire/day jup; see side-find) | (iv) only CONTINUUM-BLOCK n>=5 net>0 FAIL (need >=2 gates) | (v) split-half H1 +0.27 / H2 -0.13 FAIL. Provenance suspect CONFIRMED: pre-walk would_win 68.3% vs 5m-walk 53.8% same 41 events (gate_shadow would_win inflated +14.5pp vs candle truth). Result: brain/analysis/jup_long_blocked_walk_result.json. Do NOT re-propose without gate_shadow would_win audit + event-level (not token-day) unit. (?)
 - OPEN stop-family-entry-filter-shadow: deadline=2026-11-27T00:00:00Z | (no parseable source)
@@ -137,8 +136,7 @@ registry: 151 entries (open=35)
 - OPEN amplify-longbypass-dual-basis-reconcile: deadline=2026-11-28T00:00:00Z | (no parseable source)
 - OPEN amplify-maker-entry-fill-walk: deadline=2026-11-28T00:00:00Z | (no parseable source)
 - DONE amplify-ema300-breakthrough-underdeploy: CLOSED SUPERSEDED 2026-11-21 (brain_auditor #286): this entry was appended into _doc instead of entries by #257 (commit 919f4d50), so shadow_disposition.py (:570 reads only reg["entries"]) NEVER surfaced it and its 2026-11-20 deadline silently passed. The same work was properly registered and disposed as "amplify-ema300-underdeploy" (deadline 2026-11-19, CLOSED NO-SHIP 2026-11-18, audit #274: bar (i) counterfactual-walk FAIL). No measurement is owed. Root-cause guard shipped same run: main() now reports dict entries stranded in _doc. (2026-11-21T16:45:00Z)
-- OPEN amplify-capture-leaderboard-giveback: deadline=2026-11-26T00:00:00Z | (no parseable source)
-  -> DECISION DUE within 24h for amplify-capture-leaderboard-giveback
+- OPEN amplify-capture-leaderboard-giveback: deadline=2026-12-01T00:00:00Z | (no parseable source)
 - OPEN prearm-enforce-day7-read: deadline=2026-11-28T00:00:00Z | (no parseable source)
 - DONE tp-vs-trail-shadow: NO SHIP (early close 2026-11-22 — bar evaluated on full 14d population, n=142 deduped >=30; mechanism structural, more data will not change it) (2026-11-22)
 - OPEN prearm-band-lower-candle-oos: deadline=2026-12-01T00:00:00Z | (no parseable source)
