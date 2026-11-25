@@ -12360,5 +12360,15 @@
     "risk": "low",
     "sample": "n=7 double-fire minutes 14d — BELOW ship bar (20+); shadow-collect only until n>=20",
     "verification": "would-block check: 0 of last-7d trail-family winners came from double-fire minutes"
+  },
+  {
+    "date": "2026-11-25T16:45:00Z",
+    "idea": "Re-anchor the exitstack dual-KPI: origin-share leg has healed (7d 73.9% / 14d 76.6% < 92% gate), loss-size leg has not (trailing-30 avg loser -0.1017 vs bar -0.070) — shift remedy focus to loss SIZE (armed-but-giveback 22T -2.20 avg MFE 0.842 14d) under the CEO's new 50% MFE giveback",
+    "rationale": "The never-armed origin problem the whole prearm stack was built for is measurably better (arm rate 41%→58% over 3 weeks). Continuing to push origin-share KPIs now chases a healed wound while avg loss size — the actual reason break-even WR (61.6% at avgL -0.102) exceeds actual WR — stays untouched. CEO fc000481 bumped MFE_EXIT_GIVEBACK_PCT 30%→50% today precisely into this cohort.",
+    "expected_impact": "If giveback-50% shrinks armed-but-lost avg loss from -0.10 toward -0.07, break-even WR drops ~5pp at current avg win +0.062",
+    "category": "exit quality",
+    "status": "suggested",
+    "risk": "low (measurement re-anchor, no param change — the 50% giveback is already CEO-shipped; this only says what to measure it against)",
+    "measurement": "12-01 read (aligned with win-side-capture deadline): (a) trailing-30 avg loser, (b) armed-but-lost n and avg pnl_usdt 14d pre/post 11-25 giveback change, (c) capture ratio. Pre-registered here so the 12-01 batch judges loss-size, not origin-share."
   }
 ]

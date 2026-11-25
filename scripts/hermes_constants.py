@@ -1409,7 +1409,11 @@ REGIME_CONF_MULTIPLIER_ENABLED = True
 # 7d EXTREME: 120T 26.7%WR -$1.99 (worst regime, 54% of all trades).
 # 14d conf<67.6 band (blocked at 0.85x): 76T 19.7%WR -$2.96 | conf>=67.6 (pass): 90T 37.8%WR +$1.79.
 # Net save $2.96/14d. Big winners safe: pump-chain+ EXTREME avg conf 102 → 75.6 at 0.85x.
-# Matches NORMAL penalty symmetry; HIGH already at 0.70 (CEO Oct 10). Revert to 1.15 if 7d EXTREME WR >=45%.
+# Matches NORMAL penalty symmetry. CONDITION REWRITTEN 2026-11-25 (brain_auditor #300, disposition
+# regime-conf-extreme-revert-read): old condition "Revert to 1.15 if 7d EXTREME WR >=45%" FAILED the
+# 30d limb — 7d 51T 56.9% +0.45 and 14d 79T 50.6% +0.32 both positive BUT 30d 172T 51.2% -0.37
+# net-negative. Ship 0.85->1.15 ONLY if 7d AND 14d AND 30d ALL net>0 AND no other regime-mult
+# change in the same run (one-variable rule). Else KEEP 0.85.
 REGIME_CONF_EXTREME_MULT = 0.85   # -15% confidence penalty in EXTREME vol (was +15% boost — stale Sep 24 data)
 REGIME_CONF_NORMAL_MULT  = 0.85   # -15% confidence penalty in NORMAL vol
 REGIME_CONF_HIGH_MULT    = 0.50   # -50% confidence penalty in HIGH vol — REVERTED 2026-11-25 (brain_auditor #299): pre-registered CEO condition fired — 7d HIGH 43T 41.9%WR <45% (net -1.04; 14d 83T 45.8% -1.82; 30d 197T 49.2% -4.56, every n>=8 signal net-negative in HIGH). Was 0.70 (CEO Oct 10). Counterfactual at adj<40: blocks 12/25 losers (-0.90 saved) vs 10/18 winners (+0.56 foregone) = net +$0.34/7d; high-conf jup HIGH SHORT (avg 99) survives, low-conf atr-trend- HIGH (avg 55) mostly blocked. Re-raise to 0.70 if 7d HIGH WR >=50% AND net >0.

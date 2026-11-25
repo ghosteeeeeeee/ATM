@@ -2546,13 +2546,15 @@
     {
       "id": "regime-conf-extreme-revert-read",
       "kind": "eval",
-      "status": "open",
+      "status": "done",
       "created_at": "2026-11-25T12:44:22Z",
       "deadline": "2026-11-26T00:00:00Z",
       "owner": "brain_auditor #299",
       "desc": "EXTREME revert trigger read: REGIME_CONF_EXTREME_MULT comment pre-registers 'Revert to 0.85->1.15 if 7d EXTREME WR >=45%'. 7d EXTREME 49T 55.1% +0.43 (FIRES) BUT 30d EXTREME 173T 50.3% -0.46 net-negative and #299 already shipped HIGH tighten same run — one-variable rule: QUEUE for #300 decision, do not compound.",
       "threshold": "SHIP boost 0.85->1.15 only if: 7d AND 14d EXTREME net>0 AND 30d EXTREME net>0 AND no other regime-mult change in same run. Else KEEP 0.85 and rewrite condition.",
-      "measurement": "PG: volatility_regime='EXTREME' windows 7/14/30d, pnl_usdt"
+      "measurement": "PG: volatility_regime='EXTREME' windows 7/14/30d, pnl_usdt",
+      "disposition": "KEEP 0.85 — ADJUDICATED 2026-11-25T16:45Z (brain_auditor #300, early vs 11-26 deadline). Fresh PG: 7d EXTREME 51T 56.9% +0.45 PASS, 14d 79T 50.6% +0.32 PASS, 30d 172T 51.2% -0.37 FAIL -> threshold limb 3/4 -> NO SHIP. Condition REWRITTEN in hermes_constants.py:1412-1415 (0.85 value unchanged, zero-behavior): ship 1.15 only if 7d AND 14d AND 30d ALL net>0 + no compound regime-mult change same run. Old '7d >=45%' limb alone would have shipped on a 30d-negative base — exactly the drift this read exists to catch.",
+      "read_at": "2026-11-25T16:45:00Z"
     },
     {
       "id": "double-fire-concurrent-cap-shadow",
@@ -2564,6 +2566,18 @@
       "desc": "Per-signal concurrent-open MAX=1 shadow for atr-trend- and btc-pump-rider+ — 14d double-fire census: 7/7 same-minute multi-coin opens net-negative (-$0.79). Existing caps: jup=2, hl_copy=2, pump_flow=4, mtf=2; these two signals have none. Creative improvement #299; session prior-art risk-budget-decision 2026-10-21.",
       "threshold": "Promote to enforce only if shadow n>=20 double-fire events AND blocked cohort would-be net saved >= +$1.00 AND Fisher p<0.05 AND fk <=20% of 14d winners. Units pnl_usdt.",
       "measurement": "shadow-log when a signal opens a 2nd distinct coin while 1st still open; compare would-be pnl vs actual"
+    },
+    {
+      "id": "regime-conf-high-first-read",
+      "kind": "eval",
+      "status": "open",
+      "created_at": "2026-11-25T16:45:00Z",
+      "deadline": "2026-11-29T00:00:00Z",
+      "owner": "brain_auditor #300",
+      "desc": "First read of REGIME_CONF_HIGH_MULT 0.70->0.50 (shipped #299 2026-11-25T12:43Z). 0 HIGH closes in first 4h (post-ship window empty; current vol=LOW so HIGH may not fire for days).",
+      "threshold": "Read when post-ship HIGH closes n>=15 OR at deadline, whichever first: RE-RAISE to 0.70 if 7d post-ship HIGH WR >=50% AND net>0; KEEP 0.50 if WR <45% or net<0; mixed 45-50% = extend 7d. Units pnl_usdt. One-variable rule: EXTREME stayed 0.85 this run so a future HIGH move is legal alone.",
+      "measurement": "PG: volatility_regime='HIGH' AND close_time > TIMESTAMP '2026-11-25 12:43:00', windows rolling 7d on post-ship subset; pnl_usdt",
+      "notes": "Pre-registered in hermes_constants.py:1415 comment (#299). This entry makes the read trackable so it cannot be forgotten while vol sits LOW."
     }
   ],
   "updated_at": "2026-11-25T12:44:22Z"

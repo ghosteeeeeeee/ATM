@@ -5005,5 +5005,16 @@
     "after": "0.50",
     "rationale": "HIGH regime bleeds at all windows (7d -1.04 / 14d -1.82 / 30d -4.56); every n>=8 signal net-negative in HIGH 30d. CEO Oct 10 comment pre-registered: revert to 0.50 if 7d HIGH WR <45%. Trigger verified against live PG before change.",
     "impact": "Counterfactual (adj<40 gate): 7d blocks 12/25 HIGH losers (-0.90 saved) vs 10/18 winners (+0.56 foregone) = net +$0.34/7d. jup HIGH SHORT (conf~99, in-flight walk) survives; low-conf atr-trend- HIGH mostly blocked. Re-raise condition recorded in comment."
+  },
+  {
+    "timestamp": "2026-11-25T16:45:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #300: REGIME_CONF_EXTREME_MULT pre-reg condition rewritten (value 0.85 unchanged, zero-behavior) — 30d EXTREME -0.37 failed the ship bar",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "# Matches NORMAL penalty symmetry; HIGH already at 0.70 (CEO Oct 10). Revert to 1.15 if 7d EXTREME WR >=45%.",
+    "after": "condition requires 7d AND 14d AND 30d ALL net>0 + no compound regime-mult change same run; records #300 adjudication KEEP 0.85",
+    "rationale": "Pre-registered disposition regime-conf-extreme-revert-read default action: ship boost ONLY if 30d also >0 else KEEP + rewrite condition. Old 7d-only limb would ship on a net-negative 30d base.",
+    "impact": "Zero behavior change (comment only). Prevents future runs from shipping a wrong-direction EXTREME confidence boost."
   }
 ]

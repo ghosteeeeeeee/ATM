@@ -1,9 +1,9 @@
 {
  "mission": "hourly full-analysis check-ins for 24h (CEO order 2026-11-22)",
  "started_utc": "2026-11-22T23:55Z",
- "done": 61,
+ "done": 62,
  "stop_after": 24,
- "next_due_epoch": 1795623253,
+ "next_due_epoch": 1795626940,
  "note": "each wake: run the full-analysis skill (engines + template), report to CEO, increment done, re-arm a 3600s sleep job; stop re-arming when done >= stop_after or the CEO says stop",
  "protocol": "EVERY check-in runs the FULL full-analysis skill \u2014 the complete \u00a70-\u00a76 Output Template, every section, no compressed/fast version (CEO 2026-11-23: 'there should be no fast version of the skill, we should only ever be using the full full-analysis skill, even in your hourly session timer check-ins'). Sections that must appear every time: \u00a70 positions (with invalidation/confirmation), CHOP CHECK (the corrected ts-ordered flip count), \u00a71 MTF (structure + MTF VOLUME + RSI-STRUCT), \u00a71b structure (all 5 TFs), \u00a71c ADX/ATR lifecycle (all 5 TFs + the trendline), \u00a72 continuum, \u00a73 S/R, \u00a74 contrarian+divergence (RSI-STRUCT break warnings), \u00a75 score (chop-adjusted), \u00a76 verdict (direction with the trust protocol + entry + ENTRY QUALITY \u00a716 + BRACKET DISTANCE \u00a717). auto_analysis.py = one engine among many (its fast path feeds the numbers), never the whole report.",
  "scheduled_briefs": {
