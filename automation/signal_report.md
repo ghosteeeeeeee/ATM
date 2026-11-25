@@ -1,8 +1,8 @@
 # Signal Performance Report
-**Generated:** 2026-11-24 19:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-25 01:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,973 | **WR:** 51.2% | **PnL:** -125.54%
+- **Total trades (all time):** 3,974 | **WR:** 51.3% | **PnL:** -125.33%
 - **Date range:** 2026-07-29 → 2026-11-24
 
 ---
@@ -21,9 +21,7 @@ None found.
 
 ## MARGINAL (30-50% WR)
 
-| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
-|--------|-----|-------|--------|---------|--------|------|
-| btc-pump-rider+ | LONG | 3 | 33.3% | -1.30 | ❓ | Needs more data |
+None found.
 
 ---
 
@@ -41,7 +39,6 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[WATCH] btc-pump-rider+ LONG** — WR=33.3%, PnL=-1.30% over 3 trades. Monitor next cycle.
 
 ---
 

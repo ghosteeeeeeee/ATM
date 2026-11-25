@@ -4972,5 +4972,16 @@
     "after": "unchanged",
     "rationale": "nothing cleared significance/OOS/fk bars; no_signal_enable_disable active",
     "impact": "no behavior change"
+  },
+  {
+    "timestamp": "2026-11-25T04:52:33Z",
+    "agent": "brain_auditor",
+    "change": "Audit #298: ladder keeper exact-trigger twin sweep — _twin_sweep_ids() removes btc-auto* unfired rungs whose trigger duplicates a nearer-kept/CEO-anchored rung (<1.0 apart); called before §17/appended writes in _ladder_keeper; --selfcheck added. Root cause of #17081/#17083 double-fill (60s apart @60750) and live 58500x3 unfired triple.",
+    "type": "config",
+    "file": "scripts/auto_trader.py",
+    "before": "keeper wrote pending_orders.json directly, no twin dedupe (bypassed _arm_real_leg 0.5xATR dedupe); exact twins both filled",
+    "after": "exact-trigger twins superseded each keeper cycle (nearer/CEO rung kept); selfcheck PASS; dry-run on live config removes 2 of 3x58500 shorts",
+    "rationale": "§17 re-level snaps multiple rungs into same 250-bucket → identical triggers → double position on one cross; 2 dup BTC pairs cost ~-0.74 net over 48h (incl. hedge offset)",
+    "impact": "Prevents same-level double fills; genuine ladder spacing (>=250 apart) and CEO dictations untouched;0 trading constants changed"
   }
 ]

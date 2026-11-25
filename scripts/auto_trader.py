@@ -805,6 +805,46 @@ def _band_clamp(price, trig, direction):
     return t
 
 
+def _twin_sweep_ids(orders, pstate, price):
+    """Exact-trigger twin detection (pure — selfcheckable).
+
+    §17 re-level snaps the nearest rung per side into the same 250-bucket
+    every cycle; with 2+ unfired rungs on one side they converge to the
+    IDENTICAL trigger and both fill on the same cross (live proof
+    2026-11-24: #17081/#17083 opened 60s apart @60750; config also held a
+    58500x3 unfired triple). The keeper writes pending_orders.json
+    directly, bypassing _arm_real_leg's 0.5xATR dedupe, so exact twins
+    were never caught.
+
+    Returns ids to REMOVE: keeper/bracket-owned (btc-auto*) unfired
+    rungs whose trigger duplicates a nearer-kept rung on the same side.
+    CEO dictations (btc-ceo-*) anchor the keep-set (an auto twin of a
+    CEO level is still a double-fill) but are never removed themselves.
+    Distance bar is <1.0 — identical price only; genuine ladder spacing
+    (>=250 apart) is untouched.
+    """
+    rm = set()
+    for side in ('short', 'long'):
+        cand = [o for o in orders
+                if o.get('coin') == 'BTC'
+                and o.get('direction') == side
+                and float(o.get('trigger_price') or 0) > 0
+                and (pstate.get(o.get('id')) or {}).get('status')
+                not in ('fired', 'error')]
+        cand.sort(key=lambda o: (0 if not str(o.get('id') or '')
+                                 .startswith('btc-auto') else 1,
+                                 abs(price - float(o['trigger_price']))))
+        kept_t = []
+        for o in cand:
+            t = float(o['trigger_price'])
+            if any(abs(t - kt) < 1.0 for kt in kept_t):
+                if str(o.get('id') or '').startswith('btc-auto'):
+                    rm.add(o['id'])
+                continue
+            kept_t.append(t)
+    return rm
+
+
 def _ladder_keeper(decision, summary):
     """Rule-13 AUTO-REPLENISH — BOTH SIDES (CEO 2026-11-13: "figure out why
     the next short was not already ready to fire... you better be ready for
@@ -1172,6 +1212,21 @@ def _ladder_keeper(decision, summary):
                              f"dynamic_sl:false. Trend-is-your-friend ride leg.")})
                 appended.append(('ladder_keeper_long', oid, f"long @ {trig} (1h major ceiling {sh1h:.0f}, SL {sl}, TP {tp})"))
 
+        # TWIN SWEEP — exact-trigger duplicates removed before write
+        # (see _twin_sweep_ids docstring; audit #298 root-cause fix).
+        _rm = _twin_sweep_ids(orders, pstate, price)
+        if _rm:
+            for _oid in sorted(_rm):
+                DB.log_event('INFO',
+                             f'ladder_keeper: twin-superseded {_oid} '
+                             f'(exact-trigger twin; nearer rung kept)')
+            orders[:] = [o for o in orders if o.get('id') not in _rm]
+            pcfg['orders'] = orders
+            tmp = p_path + '.tmp'
+            with open(tmp, 'w') as f:
+                json.dump(pcfg, f, indent=1)
+            os.replace(tmp, p_path)
+
         if relevelled:
             pcfg['orders'] = orders
             tmp = p_path + '.tmp'
@@ -1437,5 +1492,38 @@ def run_cycle():
 
 
 if __name__ == '__main__':
+    if '--selfcheck' in sys.argv:
+        # Twin-sweep selfcheck: exact twins collapse to the nearer rung;
+        # CEO orders, fired twins, and genuine ladder spacing survive.
+        _pstate = {'a': {'status': 'armed'}, 'b': {'status': 'retested'},
+                   'c': {'status': 'nope'}, 'f': {'status': 'fired'},
+                   'e': {'status': 'error'}, 'r': {'status': 'rejected'}}
+        _os = [
+            {'id': 'btc-auto-ladder-a', 'coin': 'BTC', 'direction': 'short',
+             'trigger_price': 60750.0},          # auto twin of CEO -> rm
+            {'id': 'btc-auto-ladder-b', 'coin': 'BTC', 'direction': 'short',
+             'trigger_price': 60750.0},          # exact twin -> rm
+            {'id': 'btc-auto-ladder-c', 'coin': 'BTC', 'direction': 'short',
+             'trigger_price': 58500.0},          # spacing 2250 -> keep
+            {'id': 'btc-ceo-short-60750', 'coin': 'BTC', 'direction': 'short',
+             'trigger_price': 60750.0},          # CEO anchor -> never rm
+            {'id': 'btc-auto-ladder-f', 'coin': 'BTC', 'direction': 'short',
+             'trigger_price': 57000.0},          # fired -> not a candidate
+            {'id': 'btc-auto-ladder-r', 'coin': 'BTC', 'direction': 'short',
+             'trigger_price': 58500.0},          # rejected twin of c -> rm
+            {'id': 'btc-auto-ladder-long-x', 'coin': 'BTC', 'direction': 'long',
+             'trigger_price': 63750.0},
+            {'id': 'btc-auto-ladder-long-y', 'coin': 'BTC', 'direction': 'long',
+             'trigger_price': 63750.0},          # long exact twin -> rm
+        ]
+        _rm = _twin_sweep_ids(_os, _pstate, 61000.0)
+        assert _rm == {'btc-auto-ladder-a', 'btc-auto-ladder-b',
+                       'btc-auto-ladder-r',
+                       'btc-auto-ladder-long-y'}, _rm
+        assert 'btc-ceo-short-60750' not in _rm
+        assert 'btc-auto-ladder-f' not in _rm
+        assert 'btc-auto-ladder-c' not in _rm
+        print('twin-sweep selfcheck PASS', sorted(_rm))
+        sys.exit(0)
     s = run_cycle()
     print(json.dumps(s, indent=1, default=str))
