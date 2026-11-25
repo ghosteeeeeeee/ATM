@@ -2542,7 +2542,29 @@
       "threshold": "SHIP only if: (i) n>=15 distinct armed losers in scope; (ii) candle-OOS walk on the wider armed population: fk<20% (armed trades touching peak*(1-0.30) that later recover to winner); (iii) cf net > +$1.00/30d pnl_usdt units net-of-fees, same sign at 14d and 30d; (iv) no regression to current jup mfe_exit cohort; (v) CEO review (MFE_EXIT_SIGNALS scope = money path).",
       "default_action": "NO-SHIP until bars met (n=10 < 15)",
       "prior_art": "position_manager.py:4906-4924 MFE exit scope = MFE_EXIT_SIGNALS=('jup_yolo',) mirror book; CEO 2026-11-21 four-trade night ledger ruling reverts the 2026-11-20 governed gate for CEO trades; session brain prior-art query 'have we tried extending MFE_EXIT to ai-trader' = no scope-extension item exists for non-CEO signals; win-side-capture/capture-leaderboard are THRESHOLD (0.30->0.20) items inside existing scope, not scope items. NOT a duplicate."
+    },
+    {
+      "id": "regime-conf-extreme-revert-read",
+      "kind": "eval",
+      "status": "open",
+      "created_at": "2026-11-25T12:44:22Z",
+      "deadline": "2026-11-26T00:00:00Z",
+      "owner": "brain_auditor #299",
+      "desc": "EXTREME revert trigger read: REGIME_CONF_EXTREME_MULT comment pre-registers 'Revert to 0.85->1.15 if 7d EXTREME WR >=45%'. 7d EXTREME 49T 55.1% +0.43 (FIRES) BUT 30d EXTREME 173T 50.3% -0.46 net-negative and #299 already shipped HIGH tighten same run — one-variable rule: QUEUE for #300 decision, do not compound.",
+      "threshold": "SHIP boost 0.85->1.15 only if: 7d AND 14d EXTREME net>0 AND 30d EXTREME net>0 AND no other regime-mult change in same run. Else KEEP 0.85 and rewrite condition.",
+      "measurement": "PG: volatility_regime='EXTREME' windows 7/14/30d, pnl_usdt"
+    },
+    {
+      "id": "double-fire-concurrent-cap-shadow",
+      "kind": "shadow",
+      "status": "open",
+      "created_at": "2026-11-25T12:44:22Z",
+      "deadline": "2026-12-09T00:00:00Z",
+      "owner": "brain_auditor #299",
+      "desc": "Per-signal concurrent-open MAX=1 shadow for atr-trend- and btc-pump-rider+ — 14d double-fire census: 7/7 same-minute multi-coin opens net-negative (-$0.79). Existing caps: jup=2, hl_copy=2, pump_flow=4, mtf=2; these two signals have none. Creative improvement #299; session prior-art risk-budget-decision 2026-10-21.",
+      "threshold": "Promote to enforce only if shadow n>=20 double-fire events AND blocked cohort would-be net saved >= +$1.00 AND Fisher p<0.05 AND fk <=20% of 14d winners. Units pnl_usdt.",
+      "measurement": "shadow-log when a signal opens a 2nd distinct coin while 1st still open; compare would-be pnl vs actual"
     }
   ],
-  "updated_at": "2026-11-25T08:50:00Z"
+  "updated_at": "2026-11-25T12:44:22Z"
 }

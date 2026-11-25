@@ -1412,7 +1412,7 @@ REGIME_CONF_MULTIPLIER_ENABLED = True
 # Matches NORMAL penalty symmetry; HIGH already at 0.70 (CEO Oct 10). Revert to 1.15 if 7d EXTREME WR >=45%.
 REGIME_CONF_EXTREME_MULT = 0.85   # -15% confidence penalty in EXTREME vol (was +15% boost — stale Sep 24 data)
 REGIME_CONF_NORMAL_MULT  = 0.85   # -15% confidence penalty in NORMAL vol
-REGIME_CONF_HIGH_MULT    = 0.70   # -30% confidence penalty in HIGH vol — CEO Oct 10: Sep 26 "dead zone" (42.9%WR) stale; last 14d HIGH 102T 52.0%WR -$1.51. bb-squeeze+ HIGH 39T 61.5%WR passes at 0.70x (~60% exec). ZORA/ai-trader stays blocked (35%). Revert to 0.50 if 7d HIGH WR <45% or PnL worsens >-$2/7d.
+REGIME_CONF_HIGH_MULT    = 0.50   # -50% confidence penalty in HIGH vol — REVERTED 2026-11-25 (brain_auditor #299): pre-registered CEO condition fired — 7d HIGH 43T 41.9%WR <45% (net -1.04; 14d 83T 45.8% -1.82; 30d 197T 49.2% -4.56, every n>=8 signal net-negative in HIGH). Was 0.70 (CEO Oct 10). Counterfactual at adj<40: blocks 12/25 losers (-0.90 saved) vs 10/18 winners (+0.56 foregone) = net +$0.34/7d; high-conf jup HIGH SHORT (avg 99) survives, low-conf atr-trend- HIGH (avg 55) mostly blocked. Re-raise to 0.70 if 7d HIGH WR >=50% AND net >0.
 REGIME_CONF_FLAT_MULT    = 1.0    # no adjustment for FLAT (too few trades)
 
 # ── Z-Score + Acceleration Alignment (surfing.md quadrants) ───────────────

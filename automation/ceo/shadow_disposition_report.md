@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-25T08:49:53.728352+00:00
-registry: 151 entries (open=35)
+# Shadow disposition report — 2026-11-25T12:44:22.403508+00:00
+registry: 153 entries (open=37)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -124,7 +124,7 @@ registry: 151 entries (open=35)
 - OPEN hl-copy-plus-shadow: deadline=2026-11-30T00:00:00Z | (no parseable source)
 - OPEN hotset-pin-approved-shadow: deadline=2026-12-01T00:00:00Z | (no parseable source)
 - OPEN amplify-pumpchain-normal-short-early: deadline=2026-12-02T00:00:00Z | (no parseable source)
-- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 6292 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 5.7d
+- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 6468 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 5.9d
 - DONE amplify-rider-fade-threshold-walk: ? (?)
 - DONE amplify-jup-long-blocked-clonehunt: NO SHIP — walk executed 2026-11-23T04:44Z (brain_auditor #291). Bars: (i) n=41 PASS | (ii) walk net +0.13 < +0.50 FAIL | (iii) fk=100% FAIL (every live-winner token-day also in blocked set — token-day unit wrong for multi-fire/day jup; see side-find) | (iv) only CONTINUUM-BLOCK n>=5 net>0 FAIL (need >=2 gates) | (v) split-half H1 +0.27 / H2 -0.13 FAIL. Provenance suspect CONFIRMED: pre-walk would_win 68.3% vs 5m-walk 53.8% same 41 events (gate_shadow would_win inflated +14.5pp vs candle truth). Result: brain/analysis/jup_long_blocked_walk_result.json. Do NOT re-propose without gate_shadow would_win audit + event-level (not token-day) unit. (?)
 - OPEN stop-family-entry-filter-shadow: deadline=2026-11-27T00:00:00Z | (no parseable source)
@@ -152,3 +152,6 @@ registry: 151 entries (open=35)
 - DONE entry-hl-entry-invariant: SHIPPED 2026-11-25 brain_auditor #297 (1 day early): writers identified — position_manager.py 4 UPDATE sites rewrote entry_price alone (main _set_cols path ~3030 + 3 entry=0 backfills); hl-sync-guardian.py 0.1% gate let hl_entry_price move while entry stayed stale; guardian flip INSERT + continuum_trader INSERT wrote entry only. FIX: every writer now pairs entry_price+hl_entry_price in the same statement; guardian always-syncs both from HL fill. py_compile PASS, invariant self-check PASS, guardian restarted 00:54Z. Retro-census: 30d big-div=5 (4 ai-trader BTC + 1 vb-), all-time=872 historical. No single-writer module chosen — paired-statement invariant instead (multiple writers exist by design: PM, guardian, brain INSERT); pairing makes disagreement structurally impossible at each write site. Prior art: [🧠 ai-trader live trades 2026-10-15] fill vs signal 0.5% slippage note. (2026-11-25T00:58:42Z)
 - OPEN amplify-stale-block-bleed5: deadline=2026-12-01T00:00:00Z | (no parseable source)
 - OPEN amplify-mfe-giveback-armed-lossers-scope: deadline=2026-12-08T00:00:00Z | (no parseable source)
+- OPEN regime-conf-extreme-revert-read: deadline=2026-11-26T00:00:00Z | (no parseable source)
+  -> DECISION DUE within 24h for regime-conf-extreme-revert-read
+- OPEN double-fire-concurrent-cap-shadow: deadline=2026-12-09T00:00:00Z | (no parseable source)

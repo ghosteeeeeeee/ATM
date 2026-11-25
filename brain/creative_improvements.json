@@ -12349,5 +12349,16 @@
     "category": "observability",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-25T12:44:22Z",
+    "idea": "Per-signal concurrent-open cap (MAX=1) shadow for atr-trend- and btc-pump-rider+ — double-fire minutes are 7/7 net-negative in 14d",
+    "rationale": "14d census: 7 minutes where the same signal opened >=2 distinct coins in the same minute; ALL 7 net negative (total -$0.79, WR 14%). atr-trend- accounts for 4/7 (ALGO+STX -0.20, KAS+ZRO -0.19, IMX+STX -0.11, BLUR+COMP -0.08); btc-pump-rider+ ICP+LTC -0.18 (both hard_max_loss, MFE<0.40, never armed); bb-squeeze+ LDO+PURR -0.13; pump-chain+ CHIP+CRV -0.02. Session prior-art: 'risk-budget decision' 2026-10-21 already flagged 'opened simultaneously. One BTC bounce = double loss' (pump SHORT context). Per-signal concurrent caps EXIST for jup (JUP_YOLO_MAX_OPEN_SHORTS=2), hl_copy (2), pump_flow (4), mtf-regime (2) but NOT for atr-trend- or btc-pump-rider+.",
+    "expected_impact": "Avoid -$0.79/14d double-fire bleed; no effect on single-fire trades (86%+ of opens)",
+    "category": "risk / chop exit",
+    "status": "suggested",
+    "risk": "low",
+    "sample": "n=7 double-fire minutes 14d — BELOW ship bar (20+); shadow-collect only until n>=20",
+    "verification": "would-block check: 0 of last-7d trail-family winners came from double-fire minutes"
   }
 ]

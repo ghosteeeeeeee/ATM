@@ -4994,5 +4994,16 @@
     "after": "storm pre-read lodged (close at deadline unless streak 3/3); capture extended to 12-01 with failed-bar math; win-side partial-read options pre-registered",
     "rationale": "Deadlines arrive without an auditor read otherwise; capture bar cannot be met by 11-26 at measured pace",
     "impact": "No trading behavior change; measurement deadlines now honest"
+  },
+  {
+    "timestamp": "2026-11-25T12:43:47Z",
+    "agent": "brain_auditor",
+    "change": "Audit #299: REGIME_CONF_HIGH_MULT 0.70->0.50 (pre-registered CEO revert condition FIRED: 7d HIGH 43T 41.9%WR <45%)",
+    "type": "config",
+    "file": "hermes_constants.py",
+    "before": "0.70",
+    "after": "0.50",
+    "rationale": "HIGH regime bleeds at all windows (7d -1.04 / 14d -1.82 / 30d -4.56); every n>=8 signal net-negative in HIGH 30d. CEO Oct 10 comment pre-registered: revert to 0.50 if 7d HIGH WR <45%. Trigger verified against live PG before change.",
+    "impact": "Counterfactual (adj<40 gate): 7d blocks 12/25 HIGH losers (-0.90 saved) vs 10/18 winners (+0.56 foregone) = net +$0.34/7d. jup HIGH SHORT (conf~99, in-flight walk) survives; low-conf atr-trend- HIGH mostly blocked. Re-raise condition recorded in comment."
   }
 ]
