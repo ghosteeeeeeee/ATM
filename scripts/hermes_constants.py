@@ -2196,7 +2196,10 @@ MFE_EXIT_SIGNALS = ('jup_yolo',)  # substring scope — mirror book first
 # Ship bar (registry): capture 0.57 -> 0.70, net30 >= +$0.10/day, fk<20%.
 # Registry read/deadline: 2026-11-22. Revert: WIN_CAPTURE_SHADOW = False.
 WIN_CAPTURE_SHADOW = True          # LOG-ONLY shadow switch. Revert: False.
-WIN_CAPTURE_SHADOW_GIVEBACK = 0.20  # ANALYSIS-ONLY what-if giveback — never applied to any live exit.
+WIN_CAPTURE_SHADOW_GIVEBACK = 0.30  # ANALYSIS-ONLY what-if giveback — never applied to any live exit.
+                                    # 2026-11-25: moved 0.20 -> 0.30 to shadow the OLD live value,
+                                    # so the log now compares live 50% (CEO directive) vs the former
+                                    # 30% head-to-head on every future close.
 # ARM-BE-STOP SHADOW — armed-then-breakeven exit collector (brain_auditor 2026-10-18).
 # Verdict PASS 2026-10-17 (brain/verdicts/2026-10-17_arm-breakeven-stop.md):
 # 30d candle OOS, UNIVERSE fk 16.5% net +$5.94; non-EXTREME fk 9.7% net +$3.46;
