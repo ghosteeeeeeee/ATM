@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "brain_auditor #303",
+  "updated": "brain_auditor #305",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -633,15 +633,15 @@
       "id": "reentry-study",
       "stream": "Stop-timing study: 71.5% of stopped losers touch breakeven within 8h (p50 58m) but 61.5% go >=1pp deeper first ($69.76 excursion) — exits fire at local max-adverse, NOT mis-leveled",
       "kind": "eval",
-      "disposition": "DESIGN OWED, re-registered. Prior art found in-repo before building: brain/analysis/reenter_recovery_cf_2026-10-25.py (stop->reclaim counterfactual) + repeat_after_stop_2026-10-26.py — next run must READ/extend these rather than design from scratch (search-before-building). Bars unchanged (re-enter on reclaim-of-BE or +0.25pp structure confirm within 8h; ship shadow-first only if net delta >= +$5/30d on the 291 stopped-loser cohort).",
-      "status": "open",
+      "disposition": "PRIOR-ART RE-RUN 2026-11-26 (audit #305, deadline 11-28): executed brain/analysis/reenter_recovery_cf_2026-10-25.py --days=30 (selfcheck PASS 15 cases) as the disposition mandated (READ/extend, not redesign). VERDICT = REJECTED-WITH-DATA. ALL set n=76 net=-0.456 [FAIL net>0, FAIL both halves, FAIL p=0.41] · RAW-bracket scope n=46 net=+0.552 [passes sign bars] but p_t=0.41 / p_sign=0.88 [FAIL p<0.05] · fillable rate 29.2% of losers (NOT the 71% census premise — limit-at-entry only fills when price trades back through) · LONG net +0.015 / SHORT net -0.471 · exit mix 55.3% timeout. The 8h reclaim-of-BE/+0.25pp variant the stream originally named is a DIFFERENT rule than this 60m AT-entry walk — but prior art shows the edge is thin-to-negative on the standard rule, coupled trial already proved level-widening does not pay (-0.92), and the stream's own upper-bound +$33.29 was hindsight. DISPOSITION = CLOSE NO-CHANGE (default_action honored): no re-entry rule ships; stopped-loser bleed stays owned by the arm-gap stack (PREARM_LOCK_ENFORCE CEO GO pending, prearm-enforce-day7-read due 11-28). Reopen only with a pre-registered 8h-reclaim walk showing net >= +$5/30d AND p<0.05 on both scopes.",
+      "status": "done",
       "started": "2026-10-31",
       "deadline": "2026-11-28T00:00:00Z",
       "evidence": "Exit deep-dive: hold-to-BE upper bound +$33.29 (hindsight; 83 never-recovered give back -$18.63). Coupled trial already proved level-widening does not pay (-$0.92). The unexploited design space = ride/re-entry (stop then re-enter on reclaim), not wider stops.",
       "threshold": "Design + backtest a re-entry rule (re-enter at reclaim-of-BE or +0.25pp structure confirmation within the 8h horizon); counterfactual on the 291 stopped-loser cohort; ship shadow-first only if net delta >= +$5/30d.",
       "default_action": "NO CHANGE until design delivered",
       "owner": "AMPLIFY weekly run / signal-lab",
-      "adjudicated_by": " | adjudicated brain_auditor #284b 2026-11-21T04:45:21Z"
+      "adjudicated_by": " | adjudicated brain_auditor #284b 2026-11-21T04:45:21Z | closed brain_auditor #305 2026-11-26T17:05:00Z (prior-art REJECTED-WITH-DATA)"
     },
     {
       "id": "chase-move-shadow",
@@ -2280,7 +2280,44 @@
       "threshold": "SHIP only if ALL: (i) 3m fill rate >=80% [MET 82.3%]; (ii) missed-cohort net pnl >=0 [MET -0.25 means skipping is net-positive]; (iii) fee save >= +$1.00/14d on pnl_usdt basis, units guard (fees and pnl both USDT, never pnl_pct) [MET +$1.37]; (iv) both 7d halves same-sign positive net_cf [MET +1.09/+0.53]; (v) fk (missed winners) <20% of winners both by count and dollars [MET 18%/17% count, 11.3% dollars — TIGHT]; (vi) ALO retry semantics designed: maker_not_filled writes no DB row (brain.py:1626) so the pipeline must NOT double-fire the same signal — needs a no-retry-or-single-retry rule before ANY enforce; (vii) CEO sign-off = execution/money path change. DEFAULT = NO SHIP, stay Market.",
       "measurement": "Re-run the fill walk at deadline: 14d/30d closed trades x candles_1m min(low)/max(high) vs entry within 180s; report fill%, fee save (sum amount_usdt x 0.0006 for filled), missed cohort net pnl_usdt, fk, both halves. Limit window scope to a CEO-chosen source subset if full-book ALO fill risk is unacceptable (momentum entries where a miss costs more than 0.06% RT).",
       "notes": "Caveat honesty: the fill proxy assumes a post-only order resting AT our recorded (market-filled) entry price; a real ALO would rest at the touch and fill only on a taker hit — fill rate could be lower than 82% if price runs away without revisiting. Proxy is therefore best-estimate, not measured fills. Also: maker fills can be WORSE price-wise only by the spread we already pay. Fee lever session cite: [Build New Linear Regression Signal, 2026-10-29] + [calwndar, 2026-10-31] ('headline net negative is gross of fees; true 30d ~= -9.21'). Cross-ref: fee-net KPI already tracked by auto_1hr (OPEN: 7d fee-drag).",
-      "created_at": "2026-11-21T08:45:00Z"
+      "created_at": "2026-11-21T08:45:00Z",
+      "disposition": "RE-MEASURED 2026-11-26 (audit #305, deadline 11-28): directional post-only proxy (LONG fills iff low<=E, SHORT iff high>=E — economically correct ALO rule; #285's span-proxy gave 82.3% fill / missed-net -0.25). Fresh 14d n=231: 180s fill 79.2% [FAIL bar (i) 80%] · fee_save +1.453 · missed_net +1.190 · NET_cf +0.263/14d [collapsed from +1.62] · fk 25.8% count / 24.1% dollars [FAIL bar (v) <20%] · halves older +0.666 / newer -0.403 [FAIL bar (iv) sign flip]. FULL-BOOK = NO SHIP on this proxy. SHORT-ONLY SCOPING (the entry's own measurement note anticipated a CEO subset): 30d SHORT n=220 fill 93.6% · save +1.705 · missed_net +1.000 · NET_cf +0.705/30d · fk 8.1% count / 13.5% dollars · halves +0.019/+0.686 same-sign POSITIVE — passes (i)(iii)(v)(iv) on the scoped cohort; bar (ii) ambiguous (missed_net>0 = forgoes winners) and bar (vi) retry semantics + (vii) CEO sign-off still open. LONG-only is the problem: fill 59.4% fk 46% halves mixed. DEFAULT = NO SHIP, stay Market. If CEO wants the lever: scope to SHORT entries only, design single-retry rule (MAKER-MISS path already bounded by 10min signal expiry at decider_run.py:6770-6782 — bar (vi) may already be satisfied by that existing ruling), then ship. Session cit: [Build New Linear Regression Signal, 2026-10-29] fee lever + [calwndar, 2026-10-31] net-of-fee correction.",
+      "remeasure_2026_11_26": {
+        "proxy": "directional (LONG low<=E, SHORT high>=E)",
+        "full_book_14d": {
+          "n": 231,
+          "fill_180s_pct": 79.2,
+          "net_cf": 0.263,
+          "fk_count_pct": 25.8,
+          "halves": [
+            0.666,
+            -0.403
+          ],
+          "verdict": "NO SHIP"
+        },
+        "short_only_30d": {
+          "n": 220,
+          "fill_180s_pct": 93.6,
+          "net_cf": 0.705,
+          "fk_count_pct": 8.1,
+          "halves": [
+            0.019,
+            0.686
+          ],
+          "verdict": "PASSES most bars, CEO+retry open"
+        },
+        "long_only_30d": {
+          "n": 416,
+          "fill_180s_pct": 59.4,
+          "net_cf": 0.43,
+          "fk_count_pct": 46.0,
+          "halves": [
+            -0.194,
+            0.623
+          ],
+          "verdict": "FAIL fk+halves"
+        }
+      }
     },
     {
       "id": "amplify-ema300-breakthrough-underdeploy",
@@ -2654,5 +2691,5 @@
       "notes": "Cites [calwndar 2026-10-31] 'LONG in HIGH: 55T, 43.6% WR ... it's regime routing + chop mechanics' (independent earlier measurement, same direction) and [mtf macd 2026-10-02] 'don't blanket disable anything, use the closed trades to see if the signal is in the wrong volatility regime' (method). Reconcile with: regime-conf-high-first-read (SAME 11-29 deadline, must be adjudicated together), prearm-enforce-day7-read (11-28, the arm-side alternative), amplify-stale-block-bleed5 (12-01)."
     }
   ],
-  "updated_at": "2026-11-26T08:54:10Z"
+  "updated_at": "2026-11-26T17:05:03.250732+00:00"
 }

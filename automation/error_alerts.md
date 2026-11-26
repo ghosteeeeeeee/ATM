@@ -5970,3 +5970,22 @@
 
 ## Error Alerts — 2026-11-26 13:55 UTC
 - **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-26 14:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-26 15:40 UTC
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+
+## Error Alerts — 2026-11-26 15:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-26 16:00 UTC
+- **[WARN]** (freq_deviation_shadow): `jup_yolo_mirrored`: FREQ DEVIATION UNDER source=jup_yolo_mirrored baseline=0.104/h current=0.042/h ratio=0.40 n_base=35 n_cur=1
+
+## Error Alerts — 2026-11-26 16:40 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-26 16:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)

@@ -1,229 +1,345 @@
 {
-  "timestamp": "2026-11-26T12:48:50Z",
-  "run": "brain_auditor #304",
-  "session_lock": "ABSENT (/tmp/hermes-session-active.lock not present) — config changes permitted; 0 shipped anyway",
+  "timestamp": "2026-11-26T17:06:28Z",
+  "run": 305,
   "session_brain_stats": {
-    "queries": 11,
-    "hits": 47,
-    "usable_citations": 4,
-    "engine": "SessionBrain.query native kwargs (since_days / chunk_types / topic pushed into sqlite-vec KNI)"
+    "questions_asked": 23,
+    "with_hits": 21,
+    "total_hits": 96,
+    "cited": 21,
+    "citations_used": [
+      [
+        "Build New Linear Regression Signal",
+        "2026-10-29",
+        "entry path hardcodes order_type=Market → taker 0.09% RT; maker 0.03% RT would add +0.06% to every trade"
+      ],
+      [
+        "calwndar",
+        "2026-10-31",
+        "headline net negative is gross of fees — recorded fees $6.05, true 30d ≈ -$9.21"
+      ],
+      [
+        "exit asymmetry",
+        "2026-10-31",
+        "exit lets losses run 2.7x further — the entry is not the problem"
+      ],
+      [
+        "risk-budget decision",
+        "2026-10-21",
+        "regime-based signal blocking pattern (prior art for HIGH block)"
+      ],
+      [
+        "yolo dash",
+        "2026-11-02",
+        "arm 0.40 is the best balanced choice; armed variant beats no-arm once churn counted"
+      ],
+      [
+        "mtf trend signal",
+        "2026-10-01",
+        "don't blanket disable anything, use closed trades to see if signal is in wrong volatility regime"
+      ]
+    ]
   },
   "questions_asked": [
     {
-      "question": "HIGH volatility regime bleed losses",
+      "question": "what did we say about atr-trend- losses and payoff",
       "results_found": 5,
       "cited": true
     },
     {
-      "question": "what did we say about volume-buildup- losses",
-      "results_found": 5,
-      "cited": false
+      "question": "have we tried blocking HIGH regime LONG before",
+      "results_found": 1,
+      "cited": true
     },
     {
-      "question": "have we tried a HIGH regime block or confidence damp",
+      "question": "what did we say about manual_sl_hit ai-trader exits",
       "results_found": 5,
       "cited": true
     },
     {
-      "question": "hl_copy_trader long arm rate losses",
-      "results_found": 3,
-      "cited": false
-    },
-    {
-      "question": "have we tried RSI filter before",
+      "question": "have we tried fee drag payoff filter before",
       "results_found": 5,
       "cited": true
     },
     {
-      "question": "loss size larger than win asymmetric exits",
+      "question": "what did we say about armed vs never-armed gap",
       "results_found": 5,
       "cited": true
     },
     {
-      "question": "pump-chain+ long losing streak",
-      "results_found": 5,
-      "cited": false
-    },
-    {
-      "question": "regime confidence multiplier HIGH",
-      "results_found": 5,
-      "cited": false
-    },
-    {
-      "question": "have we tried blocking LONG trades in HIGH volatility regime (MANDATORY PRIOR-ART for the proposed displacement)",
-      "results_found": 6,
-      "cited": true,
-      "outcome": "NO PRIOR ART FOUND — 6 hits, none is an attempted LONG-in-HIGH block; closest are [mtf macd 2026-10-02 'don't blanket disable anything, use the closed trades to see if the signal is in the wrong volatility regime'] (method, supports regime-scoped analysis) and [regimes 2026-10-12] (vol-gate storm block, a different instrument). Do NOT read as 'tried and rejected'."
-    },
-    {
-      "question": "HIGH regime long losing cell should we block it",
-      "results_found": 6,
-      "cited": false
-    },
-    {
-      "question": "what did we say about regime confidence multiplier HIGH 0.50",
+      "question": "high-long displacement arm gap prearm lock",
       "results_found": 0,
-      "cited": false,
-      "outcome": "no hits in 14d window — the #299 pre-reg lives in the hermes_constants.py:1421 comment only"
+      "cited": false
+    },
+    {
+      "question": "what did we say about pump-chain+ EXTREME",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "regime conf high mult 0.50 results",
+      "results_found": 0,
+      "cited": false
+    },
+    {
+      "question": "fee drag net of fees profitability problem",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "what did we say about atr-trend- hard_max_loss chop",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "have we tried minimum payoff filter before",
+      "results_found": 2,
+      "cited": true
+    },
+    {
+      "question": "ai-trader-pending manual stop losses performance",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "have we tried maker limit entry orders to reduce fees before",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "order type Limit ALO post-only fee savings live",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "minimum edge fee floor trade filter",
+      "results_found": 3,
+      "cited": true
+    },
+    {
+      "question": "jup_yolo_mirrored fees high volume profitability",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "expand maker limit entries beyond linreg-fade all signals fee savings rejected",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "what did we say about maker entry fill rate missed trades",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "what did we say about HIGH regime LONG losses arm gap",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "have we tried blocking atr-trend- signal before",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "maker entry ALO fill walk fee savings results",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "re-entry after stop recovery counterfactual results",
+      "results_found": 5,
+      "cited": true
+    },
+    {
+      "question": "what did we say about fee drag net of fees kill screen",
+      "results_found": 5,
+      "cited": true
     }
   ],
   "trade_summary_24h": {
-    "closed_24h": "24T 70.8% +0.06 (GREEN)",
-    "closed_7d": "126T 54.8% -0.35",
-    "closed_14d": "236T 52.1% +0.13",
-    "closed_30d": "641T 52.9% -4.36",
-    "open_trades": 0,
-    "watchdog": "0 steers, portfolio_health=good, db_healthy=true, mode=autopilot, ts 2026-11-26T12:10:26Z",
-    "weekly_30d": {
-      "10-19": "+1.06",
-      "10-26": "-1.87",
-      "11-02": "-1.54",
-      "11-09": "-1.08",
-      "11-16": "+0.57",
-      "11-23": "-1.33"
+    "n": 21,
+    "wr_pct": 66.7,
+    "gross": 0.01,
+    "fees": 0.22,
+    "net": -0.21,
+    "payoff": 0.51,
+    "windows_net": {
+      "7d": {
+        "n": 126,
+        "wr": 54.8,
+        "gross": -0.35,
+        "fees": 1.75,
+        "net": -2.1,
+        "payoff": 0.71
+      },
+      "14d": {
+        "n": 232,
+        "wr": 51.7,
+        "gross": 0.05,
+        "fees": 3.29,
+        "net": -3.24,
+        "payoff": 0.87
+      },
+      "30d": {
+        "n": 636,
+        "wr": 52.7,
+        "gross": -4.64,
+        "fees": 7.74,
+        "net": -12.38,
+        "payoff": 0.69
+      }
     },
-    "armed_vs_never_14d": "ARMED 101T 91.1% +5.98  vs  NEVER 135T 23.0% -5.85",
-    "armed_vs_never_7d": "ARMED 64T 89.1% +3.36  vs  NEVER 62T 19.4% -3.71",
-    "exit_families_30d": "profit-monster-trail 223T 96.9% +12.77 ‖ atr_sl_hit 95T 0% -10.72 ‖ hard_max_loss 71T 0% -8.27 ‖ manual_sl_hit 32T 0% -3.60 (100% ai-trader, CEO domain)",
-    "exit_families_14d": "profit-monster-trail 82T 95.1% +4.85 ‖ manual_sl_hit 24T 0% -3.07 ‖ atr_sl_hit 27T 0% -2.95 ‖ hard_max_loss 26T 0% -2.77",
-    "rr_asymmetry": "avg win +0.0694 vs avg loss -0.1006 (30d, 1.45x) -> breakeven WR 59.2% vs actual 52.9%; 7d 1.40x; improving from 1.73x at run #239",
-    "regime_30d": "HIGH 201T -4.43 50.2% ‖ NORMAL 241T +0.39 55.2% ‖ EXTREME 175T -0.03 52.0% ‖ FLAT 24T -0.29 58.3%",
-    "regime_14d": "HIGH 90T -1.84 47.8% ‖ NORMAL 57T +1.48 57.9% ‖ EXTREME 89T +0.49 52.8%",
-    "chop_bleed_canonical": "7d 75.4% dollar / 77.4% count (chop_bleed_kpi.py, reproduced) — BELOW the 92% escalation gate; 14d 75.2% dollar"
+    "armed_never_14d": {
+      "armed": {
+        "n": 130,
+        "wr": 82.3,
+        "gross": 7.58,
+        "net": 5.62
+      },
+      "never": {
+        "n": 102,
+        "wr": 12.7,
+        "gross": -7.53,
+        "net": -8.86
+      }
+    },
+    "size_reduce": "0.25x r2_tier (file truth)",
+    "open_trades": 0
   },
   "shadow_analysis": {
-    "contrarian": "JOIN RE-RAN 12:30Z UNCONDITIONALLY (mandate; no systemd producer). overall flip-WR 49.3% (W1476/L1515/SHALLOW7, n=2998) = blanket flip is a coin flip, DO-NOT. per-token: btc-pump-rider+ chi2 p=9.5e-42 HETEROGENEOUS, pump-chain- p=0.0084 HETEROGENEOUS -> per-token only, never blanket. tape-split: rider|AT 59.1% n=215 / rider|BELOW 50.4% n=117 / pc-|BELOW 69.4% n=85 / pc-|AT 29.7% n=37. jsonl classification column still a STATIC 30d label — not read as an outcome.",
-    "trader_report": "shadow_trader --report 12:31Z: EXIT A/B pm_trail +23,161 (n=61,928, 100% WR) vs hard_max -30,211 (0%) vs rr_engine -11,144 = TRAIL-OR-NOTHING unchanged. Every gate still avg-negative-EV (COMBO-STALE 46%/-0.16, CTX-GATE 50%/-0.12, BTC-CRASH 44%/-0.17, SHORT-RSI-HARD-FLOOR 52%/-0.10) = gates correctly withholding.",
-    "hml": "shadow_trader --analyze-hml 12:40Z: PEAK-BUYERS grind-breakout+ 19T giveback +2.845% / return_exhaustion-short 29T +1.315% = giveback class; WRONG-SIDE top is rs-s72 LONG 15T MFE/MAE -0.11 (n small). Largest negative shadow cohort = open-skies+ n=766 17.1% WR -0.383% avg but 0 live closes in 30d -> gates holding the worst source in the book (logged as creative anti-regression receipt).",
-    "floor_admit": "join timestamp 2026-11-24T20:41Z (48h old, not re-run — route CLOSED NO-SHIP #264, fisher p trajectory decaying 0.138->0.032->0.044->0.055->0.088; do not re-propose). floor_only 2221 decided 49.8% vs always_admit 530 47.2%, blocked cohort n=0.",
-    "oscillator": "DEAD — archived 2026-10-27 to data/archive/oscillator_shadow.json.fossil-20261027 (OSCILLATOR_MULT_ENABLED=True has no writer since Oct 1). actual_outcome null on 24,598/24,598.",
-    "wyckoff": "PENDING JOIN — 345 rows, no outcome column, none usable.",
-    "rr_shadow": "ORPHANED — rr_shadow_audit_7d.json has no producer script in repo; not cited.",
-    "jup_trail_atr_arm": "[JUP-SHADOW-TRAIL] governance-gap entry registered #303 (due 12-10); 0/22 ids would-arm at 1.0xATR vs arm_act 0.40%.",
-    "overall": "3 of 6 shadow sources answerable (contrarian + gate/exit A/B + floor-join-on-file); oscillator/wyckoff/rr dead = standing 3/6. Both live joins fresh this run."
+    "contrarian": "join RERUN 16:31Z (mandate): overall flip 49.3% n~2998 = coin-flip DO-NOT blanket; rider chi2 p=9.5e-42 / pc- p=0.0084 HETEROGENEOUS → per-token only; rider|AT 59.1% n=215, pc-|BELOW 69.4% n=85",
+    "oscillator": "fossil archived 2026-10-27 — none",
+    "wyckoff": "pending join — none",
+    "floor_admit": "join 11-24 file — collect, 30d bar was 11-15 (check next disposition run)",
+    "rr_shadow": "orphaned (no producer) — none",
+    "shadow_trader": "--report: pm_trail +23,255 vs hard_max -30,353 vs rr -11,144 = trail-or-nothing; all gates avg-neg (correct). --analyze-hml: open-skies+ 766-780 @ 17.1% worst, 0 live closes = gates holding worst source",
+    "overall": "3/6 answerable; contrarian + shadow_trader + chop_bleed_kpi carried the run"
+  },
+  "chop_bleed_kpi": {
+    "7d_dollar_pct": 75.4,
+    "7d_count_pct": 77.4,
+    "gate_escalate": 92,
+    "status": "NOT tripped"
   },
   "drift_findings": [
     {
-      "item": "hermes_constants.py git diff = FAVORITES_LONG auto-updater only (favorites_updater.py added 'XPL') — not a brain_auditor change, not trading behavior",
-      "severity": "info"
+      "severity": "INFO",
+      "item": "HIGH×LONG still 5/5 ISO weeks negative (10-26 -0.78 … 11-23 -1.00); 30d never-armed 67T 10.4% -5.95 vs armed 50T 88% +2.37 — ARM-GAP confirmed again; LOCKED for 11-29 joint read"
     },
     {
-      "item": "REGIME_CONF_HIGH_MULT post-ship early read: 10 HIGH closes, -0.12, WR 70.0%, arm 90% vs pre-ship 87T -1.93 46.0% arm 52% — n=10, EARLY, NOT claimed as a win; formal read 11-29 as pre-registered",
-      "severity": "info"
+      "severity": "INFO",
+      "item": "REGIME_CONF_HIGH_MULT 0.50 post-ship n=10 (need 15) 70% WR net -0.23 — EARLY, read due 11-29"
     },
     {
-      "item": "size-reduce file truth = 0.25x (r2_tier, written 2026-11-23T15:32Z, 'R2-TIER R1 -77.0% < -50% of equity') — unchanged, reported from file not prose",
-      "severity": "warn"
+      "severity": "MED",
+      "item": "fee coverage only 86.6% (551/636) — 13.4% of 30d closes have no fees JSON, so net KPI slightly understates drag"
     },
     {
-      "item": "PREARM_LOCK_ENFORCE still False (shadow only) while 14d never-armed cohort is -5.85 — the enforce GO remains CEO-owned, in flight as prearm-enforce-day7-read (11-28)",
-      "severity": "warn"
+      "severity": "LOW",
+      "item": "auto_1hr still prints 'storm bar 2/3 deadline 11-26' — storm-confl-waiver already CLOSED at deadline by #301; stale text, entry absent from registry"
     },
     {
-      "item": "stop-family-entry-filter-shadow COLLECTOR-NOT-FOUND still open (flagged #303, deadline 12-01, owner CEO) — bar n>=100 unreachable until someone ships a log-only collector or closes the entry",
-      "severity": "warn"
-    },
-    {
-      "item": "shadow_disposition --selfcheck prints a live BREACH line (trial PnL -4.08 < -2.5, worst HML -9.77% < -6.5) but trial-coupled-cutsloser-sl is status=done since 11-03 — cumulative trial ledger, not a live gate. Cosmetic misread risk; owner main-session.",
-      "severity": "low"
+      "severity": "INFO",
+      "item": "size_mult stamp HELD (all opens since 11-25 carry it, SOL #17117 = 2.0 HoF); tape-state btc_ema300 keys HELD; NULL mfe since #196 fix = 0"
     }
   ],
   "recurring_problems": [
-    "NEVER-ARMED chop cohort is still the whole bleed: 14d 135T 23.0% -5.85 vs armed 101T 91.1% +5.85... (correct: +5.98); 7d 62T 19.4% -3.71 vs 64T 89.1% +3.36. Owned by prearm (11-28) + exitstack, no new gate proposed — #261 proved rsi/gap/momentum do not predict it.",
-    "Loss SIZE is the lever, not entry count: breakeven WR 59.2% vs actual 52.9% at 1.45x RR (improving from 1.73x at #239). Owned by win-side-capture (12-01) + capture-leaderboard (12-01).",
-    "HIGH volatility regime = the single largest bleed bucket 4 consecutive reads (30d -4.43, 14d -1.84, 7d -0.87) — now drilled to HIGH-LONG -3.58 and HIGH atr_sl_hit -4.08."
+    "arm-gap (never-armed owns the bleed): 14d never 102T net -8.86 vs armed 130T net +5.62 — same pattern as HIGH×LONG, atr-trend-, and chop-bleed",
+    "fee drag turns WR-positive signals net-negative (jup 64% WR → net -2.86/30d)",
+    "wrong-side refuted 156th consecutive run (48h recovery: 1 NEVER of 8)"
   ],
   "missing_implementations": [
     {
-      "item": "stop-family-entry-filter-shadow collector (log-only, zero behavior) — 0 grep hits; bar n>=100 unmeasurable",
-      "owner": "CEO",
-      "deadline": "2026-12-01"
+      "item": "maker/ALO entries wired into automated path",
+      "prior_art": "[Build New Linear Regression Signal, 2026-10-29] — 28 days old, still manual-only flag",
+      "status": "SHORT-only scoped PASSES bars; CEO sign-off + retry ruling owed (amplify-maker-entry-fill-walk, deadline 11-28)"
     },
     {
-      "item": "Slippage column BUILD #1 (stop-tighten CFs stay stated-not-realized)",
-      "owner": "main-session",
-      "deadline": "OVERDUE (resurface #N)"
+      "item": "PREARM_LOCK_ENFORCE",
+      "status": "False, CEO GO pending — owns the entire never-armed bleed"
     }
   ],
   "creative_improvements": [
-    "HIGH x LONG as an ARM-GAP cell (armed +2.57 89.6% / never -6.15 11.6%) — measure arm rate before blocking",
-    "Regime-conditional realized-stop KPI (atr_sl_hit price move HIGH -0.913% vs NORMAL -0.690% on identical 1.5% initial SL)",
-    "open-skies+ shadow graveyard (766 rows 17.1% WR, 0 live) pinned as a gates-working receipt"
+    "SCOPE maker entries to SHORT only (fill 93.6% vs LONG 59.4%, fk 8.1%, +$0.70/30d)",
+    "Fee-drag ranking for maker rollout (rank by $ fees burned, not WR)",
+    "Reentry-after-stop CLOSED with data — do not re-propose"
   ],
-  "config_changes_applied": [],
-  "changes_from_last_run": [
+  "config_changes_applied": [
     {
-      "run": "#303",
-      "change": "disposition servicing + NEW jup-trail-atr-arm-shadow registry entry",
-      "verified": "PRESENT in registry (due 12-10), 22/40 ids counted, 0 armed_scd=Y — works"
+      "file": "data/shadow_disposition.json",
+      "change": "reentry-study closed NO-CHANGE (prior-art REJECTED-WITH-DATA)"
     },
     {
-      "run": "#302",
-      "change": "brain/analysis/chop_bleed_kpi.py",
-      "verified": "RAN this run: 7d 75.4% dollar / 77.4% count, reproduced, gate <92% satisfied"
-    },
-    {
-      "run": "#300",
-      "change": "REGIME_CONF_EXTREME_MULT pre-reg comment rewrite (value 0.85 unchanged)",
-      "verified": "value still 0.85, inert"
-    },
-    {
-      "run": "#299",
-      "change": "REGIME_CONF_HIGH_MULT 0.70->0.50",
-      "verified": "live at 0.50; post-ship 10T -0.12 WR 70% arm 90% — n=10 EARLY, formal read 11-29, NOT claimed"
-    },
-    {
-      "run": "#265/#264 etc",
-      "change": "prior verify batch",
-      "verified": "MFE_CUT False · CONTRARIAN_LIVE False · PREARM_LOCK_ENFORCE False (shadow True, thr 0.25) · WINNER_CELL_SIZE_MULT 1.0 · WINNER_CELLS_VALIDATED = 3 members (pc+ absent) · CEO_PROTECTED untouched · 0 Tracebacks in logs/pipeline.log · checkpoint registry 0 intraday pending (watcher active) · recovery_replay --selfcheck rc=0 · shadow_disposition --selfcheck rc=0"
+      "file": "data/shadow_disposition.json",
+      "change": "amplify-maker-entry-fill-walk disposition updated with directional re-measure + SHORT-only scoping"
     }
   ],
-  "losing_trade_autopsy": {
-    "method": "brain/analysis/recovery_replay.py (adverse-first anchor), --selfcheck rc=0; open-anchored replay NOT used (vacuous, measured 198/206)",
-    "window": "48h",
-    "n": 11,
-    "never_adverse": 3,
-    "recovered_after_adverse": 7,
-    "never_traded_back": 1,
-    "never_list": [
-      "#17094 HYPE SHORT jup_yolo_mirrored atr_sl_hit -0.10"
-    ],
-    "verdict": "WRONG-SIDE REFUTED 155th consecutive run (#61 opposite-side p=0.116, #84 fwd-4h t=-0.04)",
-    "pattern": "Dominant mode = GIVEBACK (7/11 traded back through entry) = exit/arming side, matching chop-bleed ownership at ENTRY gates, not direction. 24h losers = 7T -0.89, 6 of 7 LONG, ALL never-armed with mfe<0.40 (BTC 0.195, BABY 0.202, CASHCAT 0.160, SOL 0.213, ETH -0.018, AIXBT -0.050; TURBO 0.366) = the unarmed-chop class, immaterial at -$0.89.",
-    "corrected_14d_reference": "206 losers = 40 never adverse / 137 recovered / 29 never traded back (17.5% structural never-recover cohort) — cited as calibration, not re-derived"
-  },
-  "kill_screen": {
-    "14d_n>=15_sub50": "ai-trader-pending SHORT 27T 40.7% net +0.55 = PAYOFF-POSITIVE, CEO domain, no kill",
-    "30d_n>=15_sub50": "ai-trader LONG 16T 25% -0.26 (CEO) · hl_copy LONG 18T 22.2% -0.33 (covered 11-30) · r2v2-long3 LONG 19T 42.1% -0.81 (covered 11-28) · pump-chain- LONG 31T 38.7% +0.15 (net positive) · pump-chain+ LONG 33T 36.4% -0.20 (100% EXTREME, 7d +0.06 -> same-sign FAIL) · ai-trader SHORT 40T 37.5% +0.24 (CEO)",
-    "three_window_negative_n>=20": "ONLY 2: bb-squeeze+ LONG 7d -0.11 / 14d -0.01 / 30d -0.03 (flat, and a VALIDATED winner cell in NORMAL — do not touch) and atr-trend- SHORT 7d -0.10 / 14d -0.81 / 30d -0.60 fisher p=0.0001 BUT fk14 20.3% > 20% bar AND atr-trend-|EXTREME cell already owns a 12-10 read",
-    "verdict": "0 NEW kill targets passed the Step-5c bars this run"
-  },
-  "amplify": {
-    "due": "formal weekly AMPLIFY due Mon 2026-11-30 (this run = light screen, per #302/#303 precedent)",
-    "winner_cells_30d_n>=10_net>0": [
-      "ai-trader-pending|NORMAL|SHORT 27T +1.00 -> entry amplify-ai-trader-pending-normal-short-btc-cell DONE NO-SHIP 11-21 (replication/token/floor bars FAIL) + re-read 12-05",
-      "btc-pump-rider+|EXTREME|LONG 20T +0.66 -> amplify-rider-extreme-long-cell OPEN due 11-30",
-      "bb-squeeze+|NORMAL|LONG 33T +0.44 -> amplify-bbsqueeze-module-rsi-reband OPEN due 12-05 (+ validated cell)",
-      "jup_yolo_mirrored|HIGH|SHORT 30T +0.24 -> amplify-jup-short-walk OPEN due 11-28",
-      "pump-chain-|NORMAL|LONG 31T +0.15 / atr-trend-|NORMAL|SHORT 19T +0.13 / volume-buildup-|HIGH|SHORT 10T +0.07 / jup NORMAL LONG 44T +0.07 / jup EXTREME SHORT 10T +0.01 -> ALL below the +$1.00 materiality bar",
-      "early n5-9 net>0.3 cells: EMPTY"
-    ],
-    "new_proposals": 0,
-    "why_not": "Every n>=10 30d net>0 cell is either already claimed by an OPEN in-flight entry, already adjudicated (ai-trader cell NO-SHIP 11-21), a validated WINNER_CELL member, or below the +$1.00/30d materiality bar; the only fresh three-window-negative n>=20 cell (atr-trend- SHORT) fails fk (20.3% > 20%) and is owned by atr-trend-minus-extreme-cell-read (12-10). gate_shadow cannot carry a clone-hunt this run: it has NO blocked-signal column (outcome_signal is the follow-on live trade's signal, #260 basis defect), so a signal-scoped blocked-set mine would be reading the wrong basis.",
-    "flip_kpi": "0 shadow->live conversions this week (stated); formal AMPLIFY due 11-30"
-  },
-  "headline": "HIGH x LONG is 101% of the 30d net bleed (-3.58 of -4.36), significant at 7d/14d/30d (p=0.0003 / <0.0001 / <0.0001), 5/5 ISO weeks same-sign, fk 13.0% — but it is an ARM-GAP cell (armed 48T +2.57 89.6% vs never 69T -6.15 11.6%), so the remedy is not obviously a block. 0 trading-constant changes: shipping a second HIGH-side lever 26h after REGIME_CONF_HIGH_MULT 0.50 would destroy the pre-registered 11-29 read of the first. All six ship bars pre-computed and locked in new disposition 'high-long-displacement-read' (due 11-29, joint adjudication, default NO-SHIP).",
-  "next_actions": [
-    "11-27 other-gate-short-withhold-review (owner signal_analyst, default KEEP stands)",
-    "11-28 BATCH: prearm-enforce-day7-read · amplify-jup-short-walk · amplify-r2v2-long3-clonehunt · amplify-longbypass-dual-basis-reconcile · amplify-maker-entry-fill-walk · amplify-cell-conf-tilt-floorproof · reentry-study",
-    "11-29 JOINT READ: regime-conf-high-first-read + high-long-displacement-read — ship at most ONE HIGH-side instrument",
-    "11-30 hl_copy/rider/atp cells + FORMAL WEEKLY AMPLIFY (Flip-KPI must show >=1 conversion)",
-    "12-01 win-side-capture + stop-family collector confirm-or-close + capture-leaderboard",
-    "CEO owed: manual_sl_hit 14d 24T -3.07 = 100% ai-trader (4th consecutive run) · PREARM_LOCK_ENFORCE GO · slippage-column BUILD · stop-family collector decision"
+  "changes_from_last_run": [
+    {
+      "check": "high-long-displacement-read registered (11-29)",
+      "result": "PRESENT in shadow_disposition, status open, bars pre-computed"
+    },
+    {
+      "check": "regime-conf-high-first-read (11-29)",
+      "result": "PRESENT, n=10 post-ship (need 15)"
+    },
+    {
+      "check": "HIGH mult 0.50 live",
+      "result": "CONFIRMED in constants, post-ship 10T 70% net -0.23 EARLY"
+    },
+    {
+      "check": "size_mult stamp",
+      "result": "HELD — all opens since 11-25 carry size_mult"
+    },
+    {
+      "check": "tape-state stamp",
+      "result": "HELED — btc_ema300 keys present"
+    },
+    {
+      "check": "contrarian join mandate",
+      "result": "RERUN 16:31Z this run"
+    },
+    {
+      "check": "chop_bleed_kpi",
+      "result": "RAN — 75.4% 7d, below 92 gate"
+    },
+    {
+      "check": "NULL mfe since fix",
+      "result": "0 rows"
+    }
   ],
-  "side_finds": [
-    "BTC #17116 arm mystery from #303 CLOSED (UNIVERSAL_MAX_HOLD +0.04, peak MFE 0.804%, arm never registered, ATR stop had ratcheted) — arm-side, owned by prearm 11-28",
-    "shadow_disposition selfcheck BREACH line is a done-entry cumulative ledger (low, cosmetic, main-session)",
-    "gate_shadow has no blocked-signal column — blocks any signal-scoped clone-hunt (known #260 basis defect, restated this run)"
-  ]
+  "amplify": {
+    "formal_weekly_due": "2026-11-30 (Mon)",
+    "light_screen": "0 NEW: every n>=10 net>0 30d cell claimed by an OPEN entry or adjudicated (ai-trader-pending|NORMAL|SHORT NO-SHIP 11-21); early n5-9 net>+$0.30 EMPTY; flip-KPI 0 conversions this week (stated). SHORT-only maker scoping logged as creative (subset of existing amplify-maker-entry-fill-walk, not a duplicate entry).",
+    "in_flight_serviced": [
+      "amplify-maker-entry-fill-walk re-measured",
+      "reentry-study closed"
+    ]
+  },
+  "autopsy_48h": {
+    "n": 8,
+    "never_adverse": 1,
+    "recovered": 6,
+    "never": 1,
+    "never_trade": "HYPE #17094 SHORT jup atr_sl -0.10",
+    "verdict": "WRONG-SIDE REFUTED 156th (#61 p=0.116, #84 t=-0.04)"
+  },
+  "deep_dive": {
+    "new_sub50_n15": "0 — atr-trend- 14d 44T 54.5% -0.82 gross/-1.30 net is WR>50 (fee+arm-gap owned by amplify-atrtrend-short-tat-shadow 12-01 + atr-trend-minus-extreme-cell-read 12-10); ai-trader-pending CEO-domain; pump-chain+ n=14<15; bb-squeeze+ n=11<15",
+    "kill_screen": "0 new — 7d/14d only atr-trend- (owned); 30d negatives all WR>50 or fee-dragged or owned"
+  },
+  "next_actions": [
+    "11-27 other-gate-short-withhold-review (owner signal_analyst)",
+    "11-28: prearm-enforce-day7-read + maker-entry deadline (CEO: SHORT-only scope?) + amplify-jup-short-walk + cell-conf-tilt + r2v2-clonehunt + longbypass",
+    "11-29 JOINT READ: regime-conf-high-first-read + high-long-displacement-read (ship at most ONE HIGH-side instrument)",
+    "11-30 rider/atp/hl-copy cells + FORMAL WEEKLY AMPLIFY",
+    "CEO owed: PREARM_LOCK_ENFORCE GO (14d never-armed net -8.86 = the whole bleed) · maker SHORT-only scope · manual_sl_hit 14d -3.37 net 100% ai-trader"
+  ],
+  "readiness": {
+    "regime": "btc_15m SHORT_BIAS vs btc_4h LONG_BIAS CONFLICT · continuum AT · vol LOW · trend STRONG_UP · wyckoff UNKNOWN",
+    "call": "NO fresh discretionary directional entries (bias conflict); trail-family first; size 0.25x; no regime block",
+    "open": 0,
+    "steers": 0,
+    "health": "good"
+  }
 }

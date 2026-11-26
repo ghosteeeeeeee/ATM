@@ -12484,5 +12484,35 @@
     "category": "anti-regression",
     "status": "suggested",
     "risk": "none"
+  },
+  {
+    "date": "2026-11-26T17:05:29Z",
+    "idea": "SCOPE maker/ALO entries to SHORT only — fill asymmetry is the whole edge (93.6% vs 59.4%)",
+    "rationale": "Directional post-only re-measure #305: SHORT 30d n=220 fill 93.6% NET_cf +0.705 fk 8.1% halves same-sign; LONG n=416 fill 59.4% fk 46% halves mixed. Full-book fails bars. Prior art [Build New Linear Regression Signal, 2026-10-29] built the lever; [calwndar, 2026-10-31] corrected net-of-fee. SHORT fills because offers get lifted through entry; LONG misses because bids get pulled.",
+    "expected_impact": "+$0.70/30d fee save net of forgone misses, fk 8% — plus headroom if SHORT share grows",
+    "category": "fee lever",
+    "status": "suggested",
+    "risk": "low (money path still needs CEO; retry semantics largely pre-ruled at decider_run.py:6770)",
+    "refs": [
+      "amplify-maker-entry-fill-walk remeasure_2026_11_26"
+    ]
+  },
+  {
+    "date": "2026-11-26T17:05:29Z",
+    "idea": "Fee-drag ranking for maker rollout priority — rank by $ fees burned, not by WR",
+    "rationale": "30d: fees $7.74 vs gross -$4.64 = net -$12.38 (fee coverage 86.6%). jup_yolo 64% WR gross -0.16 but fees 2.70 = net -2.86; bb-squeeze 57.7% WR gross -0.41 fees 0.56 = net -0.97. These look like kill candidates on gross and are actually fee victims. 65/270 winners had pnl < 2x their fee.",
+    "expected_impact": "prevents mis-kills; targets the $7.74/30d fee bill where it actually sits",
+    "category": "fee lever",
+    "status": "suggested",
+    "risk": "low (analytical lens only, no gate)"
+  },
+  {
+    "date": "2026-11-26T17:05:29Z",
+    "idea": "Reentry-after-stop CLOSED with data — do not re-propose",
+    "rationale": "reenter_recovery_cf 30d re-run: ALL net -0.456 p=0.41 FAIL; RAW scope +0.552 but p=0.41 FAIL; fillable only 29.2% of losers. Receipt stored on reentry-study disposition so the next agent doesn't rediscover it.",
+    "expected_impact": "saves a future run from re-proposing a rejected rule",
+    "category": "receipt",
+    "status": "shipped",
+    "risk": "none"
   }
 ]

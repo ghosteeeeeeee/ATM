@@ -5060,5 +5060,16 @@
     "after": "159 entries, HIGH-LONG bars + HIGH-SHORT split recorded",
     "rationale": "One-variable rule: REGIME_CONF_HIGH_MULT 0.50 landed 2026-11-25T12:43Z with a 11-29 read; shipping a second HIGH-side lever now destroys attribution. Bars pre-computed so the 11-29 run can ship in one step.",
     "impact": "No behavior change; locks a $3.58/30d cell behind a measured gate"
+  },
+  {
+    "timestamp": "2026-11-26T17:05:29Z",
+    "agent": "brain_auditor",
+    "change": "Audit #305: reentry-study CLOSED NO-CHANGE (prior-art reenter_recovery_cf 30d REJECTED-WITH-DATA: ALL net -0.456 p=0.41, RAW +0.552 p=0.41); amplify-maker-entry-fill-walk re-measured directional proxy — full-book NO SHIP (fill 79.2% fk 25.8% halves flip), SHORT-only scoped PASSES most bars (fill 93.6% fk 8.1% +0.705/30d), CEO+retry still open. 0 trading-constant changes.",
+    "type": "config",
+    "file": "data/shadow_disposition.json",
+    "before": "reentry-study open DESIGN OWED; maker-entry open with #285 span-proxy evidence only",
+    "after": "reentry-study done REJECTED-WITH-DATA; maker-entry disposition updated with directional re-measure + SHORT-only scoping",
+    "rationale": "deadline 11-28 servicing; search-before-building honored (ran the prior-art script); bars judged on re-measurement not stale evidence",
+    "impact": "0 trading behavior; prevents a rejected reentry re-proposal and a full-book maker ship on failing bars"
   }
 ]
