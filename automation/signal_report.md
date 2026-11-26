@@ -1,9 +1,9 @@
 # Signal Performance Report
-**Generated:** 2026-11-25 19:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-26 01:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 3,987 | **WR:** 51.3% | **PnL:** -124.94%
-- **Date range:** 2026-07-29 → 2026-11-25
+- **Total trades (all time):** 3,994 | **WR:** 51.4% | **PnL:** -122.04%
+- **Date range:** 2026-07-29 → 2026-11-26
 
 ---
 
@@ -11,7 +11,7 @@
 
 | Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
 |--------|-----|------|-------|--------|-------|--------|---------|--------|
-| btc-pump-rider+ | LONG | 5 | 100.0% | +2.20 | 5 | 100.0% | +2.20 | ❓ |
+| btc-pump-rider+ | LONG | 2 | 100.0% | +1.22 | 7 | 100.0% | +3.41 | ❓ |
 
 ---
 
@@ -23,7 +23,9 @@ None found.
 
 ## MARGINAL (30-50% WR)
 
-None found.
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| pump-chain+ | LONG | 2 | 50.0% | +0.58 | ❓ | Needs more data |
 
 ---
 
@@ -41,7 +43,8 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
-1. **[KEEP] 1 winning combos** — btc-pump-rider+. LONG side dominant.
+1. **[WATCH] pump-chain+ LONG** — WR=50.0%, PnL=+0.58% over 2 trades. Monitor next cycle.
+2. **[KEEP] 1 winning combos** — btc-pump-rider+. LONG side dominant.
 
 ---
 
