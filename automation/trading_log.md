@@ -34592,3 +34592,31 @@ BY: auto_1hr
 - HIGH regime still net -0.18 over 24h (8T) — watch
 - unarmed cohort 52.9% of closes, net -0.14 — stall stack owns fix
 BY: auto_1hr
+
+## [2026-11-26 18:55] Hourly Analysis
+
+**Storm:** no storm (window-min -0.18% / at-run -0.08%)
+**Trades:** 1 closed last hour (1W 0L) | 24h 18 closed (13W 5L) | 4 open (BTC continuum-osc- SHORT, LDO/ADA/ONDO bb-squeeze+ LONG)
+**PnL NET:** hour +$0.05 (SOL jup_yolo_mirrored profit-monster-trail +1.75%) | 24h NET +$0.23 (gross 0.43, fees 0.20, payoff 0.65, WR 72.2%) | 7d NET $-1.69 (126T) | 14d NET $-2.87 (232T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- Last hour: 1 close (SOL jup_yolo_mirrored LONG profit-monster-trail +0.05 net, +1.75%) — second consecutive positive hour (17:00 +0.30, 18:00 +0.05)
+- Kill policy: no 0%-WR signal n>=3 (hour n=1; 24h max n=3 pump-chain+ 66.7% net +0.23)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/18 = 22.2% (<40%); tpsl_utils deployed; profit-monster-trail 8T net +0.20 dominant, atr_sl_hit bucket net -0.57
+- Boost: best atr-trend+ 3T 100% net +0.32 (3T < 5T threshold); pump-chain+ 3T 66.7% (<55%+... WR ok but 3T); btc-pump-rider+ 2T 100% — none meet 5+ trades, skipped
+- Arm rate: unarmed 9/18 = 50.0% <70%, WR 44.4% net -0.14 vs armed 9/18 100% net +0.37 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: none (17:00 +0.30, 18:00 +0.05 both positive); regime EXTREME/HIGH/NORMAL not NEUTRAL -> no cut; already 0.25x
+- Regime: NORMAL 3T net +0.30 / EXTREME 7T net +0.11 / HIGH 8T net -0.18
+- Frequency: 1/hr — under 20
+- Entry quality: 24h winners avg MAE 0.236% < 0.5% (max 0.639 outlier), losers avg |MAE| 0.691%
+
+**Open Questions:**
+- 24h NET +$0.23 (fees 0.20 < gross 0.43), payoff 0.65 at WR 72.2%; 7d $-1.69, 14d $-2.87
+- HIGH regime net -0.18 over 24h (8T) — watch
+- unarmed cohort 50% of closes, net -0.14 — stall stack owns fix
+- 4 open bb-squeeze+/continuum positions — new entries after quiet stretch
+BY: auto_1hr
