@@ -34402,3 +34402,31 @@ BY: auto_1hr
 - unarmed WR 36.4% cohort 45.8% of closes, net -0.71 — stall stack owns fix
 - storm window-min -0.79% / at-run -0.62% (no storm)
 BY: auto_1hr
+
+## [2026-11-26 11:53] Hourly Analysis
+
+**Storm:** no storm (window-min -0.66% / at-run +0.39%)
+**Trades:** 0 closed last hour | 24h 24 closed (17W 7L) | 0 open
+**PnL NET:** hour $0.00 (no closes) | 24h NET '-0.19' (gross 0.06, fees 0.25, payoff 0.44, WR 70.8%) | 7d NET '-2.17' (128T) | 14d NET '-3.21' (237T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 open — quiet
+- Kill policy: no 0%-WR signal n>=3 (max n=2: r2v2-long3 / jup_yolo_mirrored / atr-trend- all 50%)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 6/24 = 25.0% (<40%); tpsl_utils deployed; profit-monster-trail 12T net +0.35 dominant, atr_sl_hit bucket net -0.86
+- Boost: btc-pump-rider+ 7T 100% net +0.29 6 tokens but identical stats to the 11-25 18:02 boost — stale evidence, skipped
+- Arm rate: unarmed 11/24 = 45.8% below 70%, WR 36.4% net '-0.71' vs armed 13/24 100% net '+0.52' — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 3 consecutive negative trading hours (06:00 '-0.17', 09:00 '-0.29', 10:00 '-0.05') but regime EXTREME/HIGH/NORMAL, not NEUTRAL -> no size cut; already at 0.25x
+- Regime: EXTREME 12T / HIGH 10T / NORMAL 2T — not NEUTRAL
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.216% < 0.5% (max 0.639 outlier — watch)
+
+**Open Questions:**
+- 24h NET '-0.19' (fees 0.25 > gross 0.06), payoff 0.44 at WR 70.8%; 7d '-2.17', 14d '-3.21'
+- 3 straight negative trading hours — trend worth watching; size already 0.25x
+- unarmed WR 36.4% cohort 45.8% of closes, net '-0.71' — stall stack owns fix
+- storm window-min -0.66% / at-run +0.39% (no storm)
+BY: auto_1hr
