@@ -1,76 +1,80 @@
-# Current State — brain_auditor #303 2026-11-26 08:58 UTC
-**Last Updated: 2026-11-26 08:58 UTC**
-**Updated by: brain_auditor #303. Prior: #302 2026-11-26 05:00 UTC (preserved in git history).**
+# Current State — brain_auditor #304 2026-11-26 12:51 UTC
+**Last Updated: 2026-11-26 12:51 UTC**
+**Updated by: brain_auditor #304. Prior: #303 2026-11-26 08:58 UTC (preserved in git history).**
 
-## HEADLINE — 3 of the 4 due-11-27 dispositions adjudicated early; one was being judged against the WRONG GATE. 0 trading-constant changes. Watchdog 0 steers / 24h 20T 80.0% +0.38. Wrong-side refuted 154th. 1 governance gap closed (unregistered [JUP-SHADOW-TRAIL] shadow).
+## HEADLINE — HIGH×LONG = 101% of the 30d net bleed, PASSES all six Step-5c bars, and is deliberately LOCKED not shipped: it would have corrupted the pre-registered 11-29 read of REGIME_CONF_HIGH_MULT 0.50. 0 trading-constant changes. Watchdog 0 steers / 24h 24T 70.8% +0.06. Wrong-side refuted 155th.
 
 ### 1. FINDINGS THIS RUN
 | Item | Result |
 |---|---|
-| 24h / 7d / 14d / 30d | 20T 80.0% **+0.38** / 123T 55.3% -0.10 / 238T 52.5% +0.46 / 638T 53.0% -4.08 |
-| weekly | 10-26 -0.99 · 11-02 -1.54 · 11-09 -1.08 · 11-16 +0.57 · 11-23 -1.04 |
-| open trades | **1** — BTC #17116 continuum-osc+ LONG, opened 01:09:43Z, peak **+0.806%**, live +0.63%, 7.8h |
-| exit families 14d | **TRAIL 88T 95.5% +5.36** ‖ CHOP/SL 74T 4.1% -6.34 ‖ manual_sl_hit 24T 0% **-3.07** (100% ai-trader, CEO domain) |
-| exit families 30d | stop-family **198T -22.48** (atr_sl 92 -10.35 · hard_max 71 -8.27 · manual 32 -3.60 · hard_sl 3 -0.26) |
-| chop-bleed (canonical mfe<0.40) | 7d **74.0% dollar / 40.7% count** (script ran, reproduced) · 14d 43.3% -$7.21 · 30d 47.0% -$23.44 — **all <92 gate** |
-| kill screen | **EMPTY** — only sub-50 n>=15 = ai-trader-pending SHORT 29T 37.9% but net **+0.54** |
-| regime 7d / 30d | HIGH 45T 46.7% -1.03 ‖ NORMAL 23T 56.5% -0.17 ‖ EXTREME 55T 61.8% +1.10 — 30d: NORMAL +0.42 / **HIGH 199T -4.51** / EXTREME +0.30 / FLAT -0.29 |
-| bb-squeeze+ HIGH cell | 30d 21T -0.47 47.6% but **14d HIGH +0.06 → same-sign FAILS → not proposed** |
-| size-reduce | 0.25x r2_tier (file truth) |
+| 24h / 7d / 14d / 30d | 24T 70.8% **+0.06** / 126T 54.8% -0.35 / 236T 52.1% +0.13 / 641T 52.9% -4.36 |
+| weekly (ISO) | 10-19 +1.06 · 10-26 -1.87 · 11-02 -1.54 · 11-09 -1.08 · 11-16 +0.57 · 11-23 -1.33 |
+| open trades | **0** — flat, 0 steers, portfolio good, db_healthy |
+| armed vs never | 14d **101T 91.1% +5.98** vs **135T 23.0% -5.85** ‖ 7d 64T 89.1% +3.36 vs 62T 19.4% -3.71 |
+| exit families 30d | pm_trail 223T 96.9% **+12.77** ‖ atr_sl_hit 95T 0% **-10.72** ‖ hard_max 71T 0% -8.27 ‖ manual_sl 32T 0% -3.60 (ai-trader) |
+| exit families 14d | pm_trail 82T 95.1% +4.85 ‖ manual_sl 24T 0% -3.07 (100% ai-trader) ‖ atr_sl 27T 0% -2.95 ‖ hard_max 26T 0% -2.77 |
+| chop-bleed (canonical mfe<0.40) | **7d 75.4% dollar / 77.4% count · 14d 75.2% dollar — all <92 gate** (chop_bleed_kpi.py ran, reproduced) |
+| kill screen | **0 new** — only 2 cells negative at 7/14/30 with n>=20: bb-squeeze+ LONG (flat + validated NORMAL winner cell) and atr-trend- SHORT (fk14 20.3% > 20% bar, owned by 12-10 read) |
+| regime 30d / 14d / 7d | HIGH 201T **-4.43** 50.2% ‖ NORMAL 241T +0.39 ‖ EXTREME 175T -0.03 ‖ FLAT 24T -0.29 — 14d HIGH -1.84, 7d HIGH -0.87 |
+| RR asymmetry | 30d avgW +0.0694 / avgL -0.1006 = **1.45x** → breakeven WR 59.2% vs actual 52.9% (was 1.73x at #239) |
+| size-reduce | **0.25x r2_tier** (file truth, written 11-23T15:32Z, "R2-TIER R1 -77.0%") |
 
-### 2. CONFIG CHANGE — **0 trading-constant changes**
-kill screen EMPTY; nothing passed the Step-5c bars (n>=20, p<0.05, 7/14/30 same-sign, winners untouched). `scripts/hermes_constants.py` diff = the FAVORITES_LONG auto-updater only (favorites_updater.py, not mine). CEO_PROTECTED untouched. **0 ships, 0 trade actions.**
-
-### 3. DISPOSITIONS SERVICED (4 of the 11-27 batch)
-| Entry | Verdict | Why |
+### 2. THE HEADLINE MEASUREMENT — HIGH × LONG
+| Cut | Result | Test |
 |---|---|---|
-| **pc-plus-weight-monitor** | **KEEP 1.4 → done**, successor due 12-10 | 14d traffic exists in ONE regime only (13T EXTREME) → 'BOTH-regimes-negative n>=40' unsatisfiable; cell limb needs EXTREME<=0 **twice**, prior read +0.18 → first non-positive, not a streak |
-| **amplify-linregfade-volgate-admit** | **NO SHIP stands → EXTENDED 12-03** | **ATTRIBUTION WRONG**: top kill is `short-regime-gate` n=128 (signal_compactor:2107), not the vol-gate allowlist; both stack (linreg-fade- in NONE of 4 REGIME_SIGNALS). Bar (i) now MET, bar (ii) still fails (+$0.56<$1.00) |
-| **stop-family-entry-filter-shadow** | **COLLECTOR NOT FOUND → 12-01** | 0 grep hits for its own implementation; no BLOCK-SHADOW tag → n>=100 unreachable. Default NO-SHIP unchanged (must not read as 'measured and failed') |
-| **other-gate-short-withhold-review** | left on deadline | owner signal_analyst; per-gate split is the assigned analysis |
+| 30d | HIGH-LONG **117T -3.58 43.6%** vs nonHIGH-LONG **303T +0.10 53.8%** | Fisher **p<0.0001** |
+| 14d | 42T -1.25 38.1% vs 89T +0.96 55.1% | **p<0.0001** |
+| 7d | 22T -1.09 40.9% vs 56T +0.77 58.9% | **p=0.0003** |
+| weekly | 5/5 ISO weeks negative (10-26 -0.78 / 11-02 -1.17 / 11-09 -0.38 / 11-16 -0.33 / 11-23 -1.00) | same-sign |
+| fk14 | 16 of 123 14d winners = **13.0%** | < 20% bar |
+| save | **+$3.58/30d** | >= +$1.00 |
+| **anatomy** | **ARMED 48T +2.57 89.6% vs NEVER 69T -6.15 11.6%**; 88.9% of loss $ from never-armed mfe<0.40 (56/60 losers) | **ARM-GAP cell, not wrong-side** |
 
-**NEW registry entry `jup-trail-atr-arm-shadow` (due 12-10):** [JUP-SHADOW-TRAIL] had `JUP_YOLO_SHADOW_EVAL_N=40` in constants but **no disposition entry** — same governance gap as jup-atrsl-shadow-parity. Read now: **1775 lines / 22 distinct ids / 0/22 would-arm at 1.0xATR (~1.22%) vs arm_act 0.40%**, fresh 06:03Z. [yolo dash 11-02] already walked "arm 1.0 → LOSSES". The n=40 read must also report 0.40/0.60/0.75xATR from the logged `atr=` column.
+Never-armed LONG loser avg loss by regime: **HIGH -0.1163 > NORMAL -0.0990 > FLAT -0.0967 > EXTREME -0.0892** on an **identical 1.5% initial sl_distance**. Mechanism: **atr_sl_hit realized price move EXTREME -0.959% / HIGH -0.913% / NORMAL -0.690%** → ATR stops widen with vol and the unarmed cohort pays. HIGH atr_sl_hit 33T -4.08 = 38% of the whole atr_sl bleed; jup 33T -4.45 = 41%.
 
-### 4. LAST-RUN VERIFY (#302)
-| Change | Status |
+**WHY NOT SHIPPED:** (1) REGIME_CONF_HIGH_MULT 0.70→0.50 landed 2026-11-25T12:43Z with a pre-registered read due **11-29**; a second HIGH-side lever today strips the LONG leg out of that cohort and makes the read uninterpretable. (2) One-variable rule. (3) The armed half wins 89.6% (+2.57/30d) so the right first instrument may be arm-side (PREARM_LOCK_ENFORCE, CEO GO) not entry-side.
+
+### 3. CONFIG CHANGE — **0 trading-constant changes**
+Kill screen empty; nothing cleared the bars *and* the one-variable rule. `scripts/hermes_constants.py` diff = `favorites_updater.py` FAVORITES_LONG auto-update (+XPL) only, not mine. CEO_PROTECTED untouched. **0 ships, 0 trade actions.**
+
+### 4. SHIPPED (registry only)
+| Action | Detail |
 |---|---|
-| NEW chop_bleed_kpi.py | ✅ **ran this run**, reproduced 74.0% / <92 gate |
-| REGIME_CONF_HIGH_MULT 0.50 (#299) | ✅ live; post-ship HIGH 8T 62.5% -0.20 = **n=8, first read 11-29** |
-| REGIME_CONF_EXTREME_MULT 0.85 (#300) | ✅ intact, 7d EXTREME +1.10 |
-| atr-trend-minus-extreme-cell-read | ✅ open, due 12-10 |
-| monitor hl_copy / pump-chain+ | ⚠️ hl_copy LONG 30d 18T 22.2% -0.33 arm 33.3% — still bad, **covered by hl-copy-plus-shadow 11-30**; pump-chain+ 14d 13T +0.10 below bar |
+| **NEW `high-long-displacement-read`** | due **11-29**, kind eval, all six bars pre-computed in `threshold`, **default NO-SHIP**, explicit joint-adjudication rule with `regime-conf-high-first-read`: exactly ONE HIGH-side instrument ships that day (mult KEEPS → block becomes next single variable; mult REVERTS → block alone or mult alone, never both) |
+| `regime-conf-high-first-read` | direction-split evidence appended: 30d HIGH-SHORT 84T -0.85 59.5% vs HIGH-LONG 117T -3.58; post-ship n=10 = 70% WR / -0.12 / arm 90% vs pre 87T -1.93 / 46% / arm 52% (**EARLY, not claimed**) |
 
-### 5. JOIN + SHADOW
+### 5. AUTOPSY (48h, adverse-first, --selfcheck rc=0)
+n=11 = **3 never-adverse / 7 recovered / 1 NEVER (#17094 HYPE SHORT jup atr_sl -0.10) → WRONG-SIDE REFUTED 155th** (#61 p=0.116, #84 t=-0.04). Dominant mode = **GIVEBACK 7/11** = exit/arming side, matching chop-bleed ownership at ENTRY gates. 24h losers 7T -0.89, 6/7 LONG, **all never-armed mfe<0.40** — immaterial. Open-anchored replay NOT used (vacuous, #85).
+
+### 6. JOIN + SHADOW
 | Source | Fresh | Result |
 |---|---|---|
-| contrarian join | ✓ **08:30Z** (mandate, unconditional) | overall flip **49.4% n=2989** = coin-flip do-NOT blanket; rider chi2 p=9.5e-42, pc- p=0.0054 → per-token only; **pc-|BELOW 70.2% n=84** vs pc-|AT 30.6% n=36 |
-| shadow_trader --report + --analyze-hml | ✓ 08:31Z | pm_trail **+23,087** vs hard_max **-30,083** 0% WR vs rr -11,111 = trail-or-nothing; all gates avg-neg (correct) |
-| chop_bleed_kpi | ✓ | 7d 74.0% dollar / 40.7% count |
-| [JUP-SHADOW-TRAIL] | ✓ counted | 22/40 ids, 0 armed_scd=Y |
-| oscillator / wyckoff / rr | dead | fossil / pending-join / orphaned = **3/6 dead** |
+| contrarian join | ✓ **12:30Z** (mandate, unconditional) | overall flip **49.3% n=2998** = coin-flip DO-NOT blanket; rider chi2 p=9.5e-42 / pc- p=0.0084 HETEROGENEOUS → per-token only; rider\|AT 59.1% n=215, pc-\|BELOW 69.4% n=85 vs pc-\|AT 29.7% n=37 |
+| shadow_trader --report | ✓ 12:31Z | **pm_trail +23,161** vs hard_max **-30,211** vs rr -11,144 = trail-or-nothing; all gates avg-neg (correct) |
+| --analyze-hml | ✓ 12:40Z | biggest negative shadow **open-skies+ 766 @ 17.1% -0.383%** but 0 live closes in 30d = gates holding the worst source |
+| chop_bleed_kpi | ✓ | 7d 75.4% / 14d 75.2% |
+| floor / oscillator / wyckoff / rr | 11-24 file / fossil / pending / orphaned | **3/6 answerable** |
 
-### 6. AUTOPSY (48h, adverse-first, selfcheck PASS)
-n=11 = **2 never-adverse / 5 recovered / 4 NEVER → WRONG-SIDE REFUTED 154th** (#61 p=0.116, #84 t=-0.04). NEVER = HYPE -0.10 · LTC -0.09 · BTC manual_sl ×2 -0.04 — all immaterial ai-trader/chop. Fresh patterns: none.
+### 7. AMPLIFY (light screen; formal weekly due Mon 11-30)
+**0 NEW — saying why:** every n>=10 net>0 30d cell is (a) claimed by an OPEN entry (rider-EXTREME-LONG 11-30 · bb-squeeze-NORMAL-LONG 12-05 · jup-HIGH-SHORT 11-28 · atr-trend-NORMAL-SHORT 12-01), (b) adjudicated NO-SHIP (ai-trader-pending\|NORMAL\|SHORT, 11-21), (c) a validated WINNER_CELLS member, or (d) below +$1.00 materiality (+0.15/+0.13/+0.07/+0.07/+0.01). Early n5-9 net>+$0.30 = **EMPTY**. gate_shadow cannot carry a clone-hunt: **no blocked-signal column** (`outcome_signal` = follow-on trade's signal, #260 basis defect). **Flip-KPI: 0 conversions this week (stated).**
 
-### 7. AMPLIFY (light — same 30d window as #302's full pass hours earlier)
-**0 NEW**, saying why: every n>=10 net>0 30d cell already claimed/in-flight/CEO-domain; the only fresh sub-threshold cell (bb-squeeze+|HIGH|LONG 21T -0.47) fails same-sign at 14d. **Flip-KPI: 0 conversions this week** (pipeline = 11-28 batch); formal AMPLIFY due Mon 11-30.
+### 8. CREATIVE ×3
+1. **HIGH×LONG as an ARM-GAP cell** — decision rule: arm rate 41.0% → nonHIGH 49.2% removes the bleed with zero blocking; block only if the joint 11-29 read says the arm route is unavailable.
+2. **Regime-conditional realized-stop KPI** — atr_sl_hit price move HIGH -0.913% vs NORMAL -0.690% on identical initial SL; the 11-20 scope-widen walk only ever saw the pooled +$0.29.
+3. **open-skies+ graveyard receipt** — 766 shadow rows 17.1% WR, 0 live closes = gates-working evidence, prevents a re-proposal.
 
-### 8. CREATIVE x1 — ARM-REACH LOSER CLASSIFICATION
-Key the existing `LOSERS_MULT=0.3 / LOSERS_SIZE_MULT=0.5` (today token-keyed: AIXBT/KAS) on **30d trail-arm-reach**: candidates hl_copy_trader LONG 33.3% (18T -0.33) and r2v2-long3 LONG 44.4% (18T -0.61) vs winners atr-trend+ 77.8% / jup_yolo SHORT 72.0% / rider 59.3%. Bars: n>=20, 7/14/30 same-sign, fk<20%. **Mandatory dedupe** — hl_copy routes through hl-copy-plus-shadow (11-30), r2v2 through amplify-r2v2-long3-clonehunt (11-28). No prior art found (partial-TP / scale-out queries).
-
-### 9. SIDE-FIND (VERIFY — no action)
-Open **BTC #17116** peaked **+0.806%** but `trailing_activated=False`, `trailing_distance=1.20%`, `profit_monster_trail_state` empty, `stop_loss` still **-0.41% below entry** → ~1.03% peak-giveback exposure on a live +0.63% trade. Confirm whether `atr_managed` ratchets by design or the arm never registered.
+### 9. LAST-RUN VERIFY (#303/#302/#300) — ALL PASS
+jup-trail-atr-arm-shadow in registry (12-10) ✓ · chop_bleed_kpi ran + reproduced ✓ · HIGH 0.50 live (n=10 EARLY) ✓ · EXTREME 0.85 ✓ · MFE_CUT False ✓ · CONTRARIAN_LIVE False ✓ · PREARM_LOCK_ENFORCE False / shadow True thr 0.25 ✓ · WINNER_CELL_SIZE_MULT 1.0 ✓ · WINNER_CELLS_VALIDATED 3 members, pc+ absent ✓ · size-reduce 0.25x ✓ · 0 Tracebacks ✓ · checkpoint watcher active, 0 intraday pending ✓ · recovery + disposition selfcheck rc=0 ✓.
+**SIDE-FIND (LOW, new): `shadow_disposition --selfcheck` now prints `BREACH: trial PnL -4.08 < -2.5; worst HML -9.77% < -6.5` on EVERY run — the underlying entry `trial-coupled-cutsloser-sl` is **status=done since 11-03**, so this is the cumulative-since-2026-10-27 trial ledger, not a live gate. Nobody should read it as a current breach; either gate the live-metrics print on entry status or relabel it (owner: main-session, cosmetic).
+**SIDE-FIND CLOSED:** #303's BTC #17116 — closed 09:10:39Z UNIVERSAL_MAX_HOLD **+0.04**, peak MFE 0.804%, trailing_activated=False, atr_managed=True, stop 60363 vs entry 60608 → arm never registered while the ATR-managed stop ratcheted; +0.76pp giveback on a 0.804% peak = **arm-side, owned by prearm 11-28, no new defect.**
 
 ### 10. SESSION BRAIN
-14 run-derived queries / 46 hits / **4 cited**: [yolo dash 2026-11-02] fixed-0.4% arm vs vol-scaled stop needs 65%+ WR · [exit asymmetry 2026-10-31] losses run 2.7x further than wins · [Build New Linear Regression Signal 2026-10-29] fade NORMAL shadow n=31 **-4.16 WR 35.5% NEGATIVE** · [profit-monster-trail 2026-10-05] PM_TRAIL 0.60→0.40, CEO_PROTECTED. Prior-art query (partial-TP / scale-out) = **no prior art found**.
+11 run-derived queries / 47 hits / **4 cited**. MANDATORY prior-art for the displacement query = **NO PRIOR ART FOUND** (6 hits, none a block attempt). Cites: [calwndar 2026-10-31] "LONG in HIGH: 55T, 43.6% WR … regime routing + chop mechanics" · [exit asymmetry 2026-10-31] "exit lets losses run 2.7x further — the entry is not the problem" · [mtf macd 2026-10-02] "don't blanket disable anything, use the closed trades to see if the signal is in the wrong volatility regime" · [mtf trend signal 2026-10-01] "LONG high+above … n=83 is noise".
 
-### 11. CHANGES THIS RUN
-1. `data/shadow_disposition.json` — 4 entries adjudicated/annotated, +1 `jup-trail-atr-arm-shadow`, +1 `pc-plus-weight-monitor-2` (atomic write).
-2. `brain/audit_recommendations.json` (full), `brain/creative_improvements.json` (+1), `brain/changes_log.json` (+1 meta).
-3. kanban TEAM UPDATES + this CURRENT.md.
-**0 trading-constant value changes. 0 ships to live behavior. 0 trade actions.**
+### 11. READINESS (2026-11-26 12:51 UTC)
+**0 open / 0 steers / portfolio good.** Regime: btc_15m **LONG_BIAS** + btc_4h **LONG_BIAS** AGREE · continuum **ABOVE** · trend_quality **STRONG_UP** · vol NORMAL · zscore NEUTRAL · wyckoff DISTRIBUTION · market CALM · velocity SLOW · acceleration NEGATIVE. Today's 13 opens = **12 LONG + 1 SHORT = aligned with the trend** (correct side of the market). → trail-family first; size **0.25x**; no regime block.
 
 ### QUEUE
-**11-27** other-gate default fires (owner signal_analyst) → **11-28** prearm-day7 + jup-walk + cell-tilt + r2v2-clonehunt + longbypass + maker-fill → **11-29** regime-conf-high-first-read + tape-at → **11-30** rider/atp/hl-copy cells + formal AMPLIFY → **12-01** win-side + stop-family collector confirm → **12-03** linreg-fade cf re-measure → **12-10** jup-trail-atr-arm eval (n=40) + pc-weight-2.
+**11-27** other-gate default fires (owner signal_analyst) → **11-28** prearm-day7 + jup-walk + cell-tilt + r2v2-clonehunt + longbypass + maker-fill + reentry → **11-29 JOINT READ: regime-conf-high-first-read + high-long-displacement-read (ship at most ONE HIGH-side instrument)** → **11-30** rider/atp/hl-copy cells + **FORMAL WEEKLY AMPLIFY** → **12-01** win-side + stop-family collector confirm-or-close → 12-03 linreg-fade → 12-10 jup-trail-atr-arm + pc-weight-2.
 
-**CEO owed:** manual_sl_hit 14d 24T -3.07 = 100% ai-trader (3rd consecutive run) · stop-family shadow collector confirm-or-close · slippage BUILD.
+**CEO owed:** manual_sl_hit 14d 24T -3.07 = 100% ai-trader (**4th consecutive run**) · **PREARM_LOCK_ENFORCE GO** (14d never-armed -5.85 = the whole bleed) · stop-family collector ship-or-close (bar unreachable, owner CEO) · slippage-column BUILD.

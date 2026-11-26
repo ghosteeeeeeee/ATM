@@ -12457,5 +12457,32 @@
       "[yolo dash, 2026-11-02] payoff needs 65%+ WR to break even; we're at 58%",
       "[exit asymmetry, 2026-10-31] exit lets losses run 2.7x further than winners gain"
     ]
+  },
+  {
+    "date": "2026-11-26T12:47:11Z",
+    "idea": "HIGH x LONG is an ARM-GAP cell, not a direction cell — measure the arm rate before the block",
+    "rationale": "30d HIGH-LONG 117T -3.58 splits into ARMED 48T +2.57 89.6% and NEVER 69T -6.15 11.6%. Every other LONG regime shows the same armed/never polarity but a much smaller never-side loss (-0.0892 HIGH vs -0.0892 EXTREME/-0.0990 NORMAL avg per never-armed loser). If arm rate in HIGH-LONG rises from 41.0% toward the nonHIGH-LONG 49.2%, the cell stops bleeding with zero entry-side blocking. Pre-registered disposition 'high-long-displacement-read' carries both instruments.",
+    "expected_impact": "+$3.58/30d if the block ships, OR the same bleed recovered by the arm-side route (prearm enforce) without forfeiting the +2.57 armed cohort",
+    "category": "chop vs trend",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-26T12:47:11Z",
+    "idea": "Regime-conditional realized-stop KPI: atr_sl_hit price-move by volatility_regime",
+    "rationale": "atr_sl_hit realized price move 30d: EXTREME -0.959% / FLAT -0.939% / HIGH -0.913% / NORMAL -0.690% — a 33% wider stop in HIGH with IDENTICAL initial sl_distance 0.015 everywhere. HIGH atr_sl_hit 33T -4.08 = 38% of the whole -10.72 atr_sl bleed. Any future stop-widen/tighten proposal must read this regime split first; the 11-20 scope-widen walk (net +$0.29, FAIL) reported a single pooled number and could not see it.",
+    "expected_impact": "Zero-behavior measurement; prevents a pooled-number stop proposal from shipping a regime-blind cap",
+    "category": "exit quality",
+    "status": "measured, logged in high-long-displacement-read disposition",
+    "risk": "none"
+  },
+  {
+    "date": "2026-11-26T12:47:11Z",
+    "idea": "OPEN-SKIES+ shadow graveyard cross-check (766 shadow rows @ 17.1% WR, -0.383% avg) as a gate-correctness receipt",
+    "rationale": "shadow_trader --analyze-hml lists open-skies+ n=766 avg -0.383% as the largest negative shadow cohort, but PG shows 0 live closes in 30d and 12 all-time (-0.52). The gates are correctly holding the single worst-anticipated source in the book; rather than treating it as dead data, pin it as a standing 'gates working' receipt so nobody re-proposes open-skies+ as an underdeployed signal.",
+    "expected_impact": "Prevents a re-proposal of the book's worst shadow source",
+    "category": "anti-regression",
+    "status": "suggested",
+    "risk": "none"
   }
 ]

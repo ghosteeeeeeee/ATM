@@ -5049,5 +5049,16 @@
     "after": "4 entries adjudicated/extended with fresh evidence, jup-trail-atr-arm-shadow registered",
     "rationale": "Mandate: service due dispositions and never let an unmeasurable bar read as measured-and-failed",
     "impact": "prevents silent deadline drift; restores eval coverage for an unregistered shadow; 0 live-behavior change"
+  },
+  {
+    "timestamp": "2026-11-26T12:47:11Z",
+    "agent": "brain_auditor",
+    "change": "Audit #304: NEW disposition 'high-long-displacement-read' (deadline 11-29, all six Step-5c bars pre-computed, default NO-SHIP, joint-adjudication rule with regime-conf-high-first-read) + direction-split evidence appended to regime-conf-high-first-read. 0 trading-constant changes.",
+    "type": "config",
+    "file": "data/shadow_disposition.json",
+    "before": "158 entries, regime-conf-high-first-read had no direction split",
+    "after": "159 entries, HIGH-LONG bars + HIGH-SHORT split recorded",
+    "rationale": "One-variable rule: REGIME_CONF_HIGH_MULT 0.50 landed 2026-11-25T12:43Z with a 11-29 read; shipping a second HIGH-side lever now destroys attribution. Bars pre-computed so the 11-29 run can ship in one step.",
+    "impact": "No behavior change; locks a $3.58/30d cell behind a measured gate"
   }
 ]
