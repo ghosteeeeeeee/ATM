@@ -34538,3 +34538,30 @@ BY: auto_1hr
 - 5 quiet hours with zero closes — signal pipeline producing no executions; trend unresolved, size already 0.25x
 - unarmed WR 30.0% cohort 45.5% of closes, net $-0.73 — stall stack owns fix
 BY: auto_1hr
+
+## [2026-11-26 16:55] Hourly Analysis
+
+**Storm:** no storm (window-min -0.33% / at-run -0.09%)
+**Trades:** 0 closed last hour | 24h 20 closed (14W 6L) | 0 open
+**PnL NET:** hour $0.00 (no closes) | 24h NET $-0.05 (gross 0.16, fees 0.21, payoff 0.52, WR 70.0%) | 7d NET $-2.10 (126T) | 14d NET $-3.21 (231T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 open — quiet (6th quiet hour in a row, no closes since 10:00)
+- Kill policy: no 0%-WR signal n>=3 (0 closes/hr; 24h worst r2v2-long3 n=2 50%)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 5/20 = 25.0% (<40%); tpsl_utils deployed; profit-monster-trail 10T net +0.35 dominant, atr_sl_hit bucket net -0.70
+- Boost: btc-pump-rider+ 5T 100% net +0.29 5 tokens — stale (no new closes since 11-25 18:02 boost), skipped
+- Arm rate: unarmed 9/20 = 45.0% <70%, WR 33.3% net -0.57 vs armed 11/20 100% net +0.52 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 3 trading hours (06 -0.17, 09 -0.29, 10 -0.05), no closes since 10:00; regime HIGH/EXTREME/NORMAL not NEUTRAL -> no cut; already 0.25x
+- Regime: EXTREME 9T net +0.23 / HIGH 10T net -0.23 / NORMAL 1T net -0.05
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners max MAE 0.639% (outlier), losers avg |MAE| 0.698%, all avg 0.352%
+
+**Open Questions:**
+- 24h NET $-0.05 (fees 0.21 > gross 0.16), payoff 0.52 at WR 70.0%; 7d $-2.10, 14d $-3.21
+- 6 quiet hours with zero closes — signal pipeline producing no executions; trend unresolved, size already 0.25x
+- unarmed WR 33.3% cohort 45.0% of closes, net $-0.57 — stall stack owns fix
+BY: auto_1hr
