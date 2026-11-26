@@ -1,17 +1,15 @@
 # Signal Performance Report
-**Generated:** 2026-11-26 13:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-26 19:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 4,003 | **WR:** 51.4% | **PnL:** -123.46%
+- **Total trades (all time):** 4,008 | **WR:** 51.5% | **PnL:** -119.72%
 - **Date range:** 2026-07-29 → 2026-11-26
 
 ---
 
 ## WINNERS (WR > 55%, PnL > 0)
 
-| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
-|--------|-----|------|-------|--------|-------|--------|---------|--------|
-| btc-pump-rider+ | LONG | — | —% | — | 7 | 100.0% | +3.41 | ❓ |
+None found.
 
 ---
 
@@ -26,9 +24,8 @@ None found.
 | Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
 |--------|-----|-------|--------|---------|--------|------|
 | r2v2-long3 | LONG | 2 | 50.0% | -1.61 | ❓ | Needs more data |
-| atr-trend- | SHORT | 2 | 50.0% | -0.72 | ❓ | Needs more data |
+| jup_yolo_mirrored | LONG | 2 | 50.0% | -0.41 | ❓ | Needs more data |
 | continuum-osc+ | LONG | 2 | 50.0% | -0.01 | ENABLED | Needs more data |
-| pump-chain+ | LONG | 4 | 50.0% | +0.95 | ❓ | Needs more data |
 
 ---
 
@@ -47,10 +44,8 @@ None found. Top performers are already enabled.
 ## RECOMMENDATIONS
 
 1. **[WATCH] r2v2-long3 LONG** — WR=50.0%, PnL=-1.61% over 2 trades. Monitor next cycle.
-2. **[WATCH] atr-trend- SHORT** — WR=50.0%, PnL=-0.72% over 2 trades. Monitor next cycle.
+2. **[WATCH] jup_yolo_mirrored LONG** — WR=50.0%, PnL=-0.41% over 2 trades. Monitor next cycle.
 3. **[WATCH] continuum-osc+ LONG** — WR=50.0%, PnL=-0.01% over 2 trades. Monitor next cycle.
-4. **[WATCH] pump-chain+ LONG** — WR=50.0%, PnL=+0.95% over 4 trades. Monitor next cycle.
-5. **[KEEP] 1 winning combos** — btc-pump-rider+. LONG side dominant.
 
 ---
 

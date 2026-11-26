@@ -34620,3 +34620,30 @@ BY: auto_1hr
 - unarmed cohort 50% of closes, net -0.14 — stall stack owns fix
 - 4 open bb-squeeze+/continuum positions — new entries after quiet stretch
 BY: auto_1hr
+
+## [2026-11-26 19:55] Hourly Analysis
+
+**Storm:** no storm (window-min -0.16% / at-run +0.51%)
+**Trades:** 3 closed last hour (3W 0L) | 24h 21 closed (16W 5L) | 1 open (BTC continuum-osc- SHORT)
+**PnL NET:** hour +$0.04 (ADA/ONDO bb-squeeze+ profit-monster-trail, LDO trail_arm_timeout) | 24h NET +$0.27 (gross 0.50, fees 0.23, payoff 0.56, WR 76.2%) | 7d NET $-1.52 (128T) | 14d NET $-2.83 (235T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- Last hour: 3 closes all wins (ONDO +1.58%, ADA +1.00%, LDO +0.36% raw) — third consecutive positive hour (17:00 +0.30, 18:00 +0.05, 19:00 +0.04); the 3 bb-squeeze+ opens from 17:00 all closed
+- Kill policy: no 0%-WR signal n>=3 (hour n=0 losers; 24h max n=3 atr-trend+ 100% net +0.32 / pump-chain+ 66.7% net +0.23; worst net r2v2-long3 50% n=2 -0.21)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/21 = 19.0% (<40%); tpsl_utils deployed; profit-monster-trail 10T net +0.24 dominant, atr_sl_hit bucket net -0.57
+- Boost: no signal n>=5 in 24h (best atr-trend+ 3T 100% net +0.32 on 2 tokens) — fails 5+ trade threshold, skipped
+- Arm rate: unarmed 9/21 = 42.9% <70%, WR 44.4% net -0.14 vs armed 12/21 100% net +0.41 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: none (17/18/19 all positive); regime HIGH/EXTREME/NORMAL not NEUTRAL -> no cut; already 0.25x
+- Regime: NORMAL 6T net +0.34 / EXTREME 7T net +0.11 / HIGH 8T net -0.18
+- Frequency: 3/hr — under 20
+- Entry quality: 24h winners avg MAE 0.254% < 0.5% (max 0.639 outlier), losers avg |MAE| 0.691%
+
+**Open Questions:**
+- 24h NET +$0.27 (fees 0.23 < gross 0.50), payoff 0.56 at WR 76.2%; 7d $-1.52, 14d $-2.83
+- HIGH regime net -0.18 over 24h (8T) — watch
+- unarmed cohort 42.9% of closes, net -0.14 — stall stack owns fix
+BY: auto_1hr

@@ -2001,3 +2001,10 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 22T +0.02 68.2% | 7d 126T -0.35 54.8%
 ### Findings: disk 89% used (>=85% WARN recurring since 11:55Z, health_monitor only alert; no Tracebacks, no steers, flat portfolio). Rotating Q (regime): 15m scanner 15:30Z = SHORT_BIAS aggregate (104 short / 2 long / 21 neutral of 127) — with-tape shorts only, trail-family first.
 ### Recommendation: schedule disk cleanup/log rotation on the 89% volume before it hits 95%; no trading changes — 24h flat (+0.02) at 68.2% WR is a payoff/size artifact, not a signal.
+
+## CEO Status — 20261126T193836Z
+### Health: pipeline=inactive(timer fired 23s ago, oneshot = normal) guardian=active open_pos=1
+### Numbers: 24h 21T +0.50 76.2% | 7d 128T +0.25 57.0%
+### Findings: disk 89% used (>=85% warn, 3rd alert today); 3 freq-deviation shadows tripped (jup under 0.40x, atr-trend+ 4.20x, bb-squeeze+ 3.00x) — all shadow/advisory.
+### Proactive (row 12 = accumulation): coin_tracker fresh (0.0h) — 94/113 coins in Wyckoff accumulation, 2 markup, 17 none. Top composites: WCT 66.9, ZRO 65.7, IMX 65.0, TRX 64.6, PONS 64.1, SUSHI 63.7. Setup LONGs: WCT/ZRO/PONS/SUSHI/ZEN/SAGA; setup_score leader SUSHI 47.5.
+### Recommendation: clear disk before it hits 90% (log rotation on hl-copy.err/sync-guardian already flagged LOW by auditor).

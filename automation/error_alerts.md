@@ -5989,3 +5989,21 @@
 
 ## Error Alerts — 2026-11-26 16:55 UTC
 - **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-26 17:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-26 18:00 UTC
+- **[WARN]** (freq_deviation_shadow): `atr-trend+`: FREQ DEVIATION OVER source=atr-trend+ baseline=0.030/h current=0.125/h ratio=4.20 n_base=10 n_cur=3
+
+## Error Alerts — 2026-11-26 18:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-26 19:00 UTC
+- **[WARN]** (freq_deviation_shadow): `bb-squeeze+`: FREQ DEVIATION OVER source=bb-squeeze+ baseline=0.042/h current=0.125/h ratio=3.00 n_base=14 n_cur=3
+
+## Error Alerts — 2026-11-26 19:40 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-26 19:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
