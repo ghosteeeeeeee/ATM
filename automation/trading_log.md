@@ -34122,3 +34122,31 @@ BY: auto_1hr
 - unarmed WR 57.1% cohort 43.8% of closes, net -0.15 — stall stack owns fix
 - storm window-min -0.29% / at-run +0.54% (no storm); storm bar 2/3, deadline 2026-11-26 (shadow_disposition.json)
 BY: auto_1hr
+
+## [2026-11-26 00:54] Hourly Analysis
+
+**Storm:** no storm (window-min +0.09% / at-run +0.09%)
+**Trades:** 1 closed last hour (0W 1L) | 24h 17 closed (13W 4L) | 4 open
+**PnL NET:** hour $-0.11 | 24h NET $+0.07 (gross 0.24, fees 0.17, payoff 0.46, WR 76.5%) | 7d NET $-2.18 (124T) | 14d NET $-3.10 (232T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- Last hour: ETH jup-liq+ LONG hard_max_loss -0.10 (net -0.11, pnl_pct -4.62)
+- Kill policy: no 0%-WR signal n>=3 last hour (1 close only). pump-chain+ 14d EXTREME 13T WR 30.8% net -0.30 monitor only (n<20 all-regime)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/17 = 17.6% (<40%); tpsl_utils deployed; profit-monster-trail 9T net +0.33 dominant
+- Boost: btc-pump-rider+ qualifies (6T 100% net +0.29, 5 tokens) but already boosted today 18:02 (v2) — same-signal concentration, no second boost; atr-trend- 4T net -0.09 fails
+- Arm rate: unarmed 8/17 = 47.1% below 70%, WR 50.0% net -0.26 vs armed 9/17 100% net +0.33 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 1 (00:00 -0.11 after 22:00 +0.09) — not 3
+- Regime: EXTREME/HIGH/NORMAL not NEUTRAL -> no size cut
+- Frequency: 1/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.185% < 0.5% (max 0.499)
+- Open: 4
+
+**Open Questions:**
+- 24h NET +0.07 (gross 0.24, fees 0.17), payoff 0.46 at WR 76.5%; 7d -2.18, 14d -3.10
+- unarmed WR 50.0% cohort 47.1% of closes, net -0.26 — stall stack owns fix
+- storm window-min +0.09% / at-run +0.09% (no storm); storm bar 2/3, deadline 2026-11-26 (shadow_disposition.json)
+BY: auto_1hr
