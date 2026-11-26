@@ -34702,3 +34702,30 @@ BY: auto_1hr
 - unarmed cohort 38.1% of closes, net -0.43 — stall stack owns fix
 - 0 open trades
 BY: auto_1hr
+
+## [2026-11-26 22:55] Hourly Analysis
+
+**Storm:** no storm (window-min -0.62% / at-run -0.36%)
+**Trades:** 0 closed last hour | 24h 21 closed (15W 6L) | 3 open (XPL/BABY/STABLE atr-trend+ LONG, opened 22:07-22:42)
+**PnL NET:** hour $0.00 (no closes) | 24h NET $0.00 (gross $0.23, fees $0.23, payoff 0.53, WR 71.4%) | 7d NET $-1.64 (128T) | 14d NET $-2.77 (236T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- Last hour: 0 closes (21:00 was -0.08, single negative hour — not a 3-hour streak); 3 atr-trend+ LONGs opened in the 22:00 hour
+- Kill policy: no 0%-WR signal n>=3 (worst r2v2-long3 50% n=2 net -0.21)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 5/21 = 23.8% (<40%); tpsl_utils deployed; profit-monster-trail 11T net +0.26 dominant, atr_sl_hit bucket net -0.65
+- Boost: no signal n>=5 in 24h (best atr-trend+ 3T 100% net +0.32, bb-squeeze+ 4T 100% net +0.06) — fails 5+ trade threshold, skipped
+- Arm rate: unarmed 8/21 = 38.1% <70%, WR 25.0% net -0.43 vs armed 13/21 100% net +0.43 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: none (17-20 positive, 21:00 -0.08, 22:00 no closes); regime HIGH/EXTREME/NORMAL not NEUTRAL -> no cut; already 0.25x
+- Regime: NORMAL 7T net +0.26 / HIGH 8T net -0.17 / EXTREME 6T net -0.09
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg MAE 0.282% < 0.5% (max 0.639 outlier), losers avg |MAE| 0.676%
+
+**Open Questions:**
+- 24h NET $0.00 exactly (gross 0.23 = fees 0.23), payoff 0.53 at WR 71.4%; 7d $-1.64, 14d $-2.77
+- HIGH net -0.17 / EXTREME net -0.09 over 24h — watch
+- 3 open atr-trend+ LONGs all near-flat/-0.15 — this hour's PnL rides on them
+BY: auto_1hr
