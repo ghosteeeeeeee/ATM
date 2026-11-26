@@ -34348,3 +34348,30 @@ BY: auto_1hr
 - unarmed WR 50.0% cohort 40.0% of closes, net -0.32 — stall stack owns fix
 - storm window-min -0.06% / at-run +0.57% (no storm)
 BY: auto_1hr
+
+## [2026-11-26 09:55] Hourly Analysis
+
+**Storm:** no storm (window-min -0.23% / at-run -0.01%)
+**Trades:** 4 closed last hour (2W 2L) | 24h 23 closed (17W 6L) | 1 open (BTC continuum-osc+ LONG +0.01)
+**PnL NET:** hour $-0.29 (2 atr_sl_hit losses) | 24h NET $-0.14 (gross 0.10, fees 0.24, payoff 0.39, WR 73.9%) | 7d NET $-2.12 (127T) | 14d NET $-3.19 (239T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- Last hour closes: WLFI atr-trend- +0.03net, BTC continuum-osc+ +0.03net, BABY pump-chain+ -0.14net (atr_sl_hit -3.61%), CASHCAT r2v2-long3 -0.21net (atr_sl_hit -5.34%)
+- Kill policy: no 0%-WR signal n>=3 (each signal 1T last hour); 24h 0%-WR are jup-liq+ 1T only, n<3
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 5/23 = 21.7% (<40%); tpsl_utils deployed; profit-monster-trail 12T net +0.35 still dominant, atr_sl_hit worst bucket net -0.81
+- Boost: btc-pump-rider+ qualifies on raw numbers (7T 100% net +0.29, 6 tokens) but no NEW closes since the 2026-11-25 18:02 boost (combo_weight 1.06→1.3, signal_versions v2) — identical stats = stale evidence, stacking same signal = concentration risk; one boost max/hour not the binding constraint, skipped on evidence; atr-trend- net -0.10, r2v2-long3 net -0.21 fail
+- Arm rate: unarmed 10/23 = 43.5% below 70%, WR 40.0% net -0.66 vs armed 13/23 100% net +0.52 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 2 negative trading hours (06:00 -0.17, 09:00 -0.29; 07:00/08:00 no closes) — not 3 consecutive
+- Regime: HIGH/EXTREME not NEUTRAL -> no size cut
+- Frequency: 4/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.216% < 0.5% (max 0.639 outlier — watch)
+
+**Open Questions:**
+- 24h NET turned NEGATIVE -0.14 (gross 0.10 vs fees 0.24 — fees exceed gross); payoff 0.39 at WR 73.9% (wins small, losses big); 7d -2.12, 14d -3.19
+- unarmed WR 40.0% cohort 43.5% of closes, net -0.66 — stall stack owns fix
+- storm window-min -0.23% / at-run -0.01% (no storm)
+BY: auto_1hr
