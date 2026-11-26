@@ -12415,5 +12415,32 @@
     "category": "monitor",
     "status": "suggested",
     "risk": "none"
+  },
+  {
+    "date": "2026-11-26T04:55:00Z",
+    "idea": "SHIPPED: chop_bleed_kpi.py one-file canonical KPI pin (mfe<0.40, NULL reported)",
+    "rationale": "finishes #301 creative #1; trailing_activated overstates 21pt — script makes the official number one command",
+    "expected_impact": "kills #184-class false-math cycles",
+    "category": "data integrity",
+    "status": "shipped",
+    "risk": "none (zero-behavior)"
+  },
+  {
+    "date": "2026-11-26T04:55:00Z",
+    "idea": "PRE-REGISTER: atr-trend- EXTREME cell re-measure at n>=15 or 12-10",
+    "rationale": "30d EXTREME 9T -0.62 arm 22% vs NORMAL 19T +0.13 arm 68%; fk would be 3%; insufficient n today",
+    "expected_impact": "if bar met: +$0.62/30d save at 3% fk",
+    "category": "entry sniper",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-26T04:55:00Z",
+    "idea": "CEO: ai-trader-auto opened BTC SHORT+hedge twice within 60s (17081/17083, 17082/17084) — doubled exposure, both shorts manual_sl_hit",
+    "rationale": "existing double-fire shadow does not cover ai-trader-auto; 5 same-signal double-open pairs in 30d, 2 are ai-trader-auto",
+    "expected_impact": "prevent duplicate exposure",
+    "category": "risk",
+    "status": "escalated-to-CEO",
+    "risk": "low (report-only)"
   }
 ]

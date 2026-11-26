@@ -2593,6 +2593,19 @@
       "revert": "delete entry; no live flag exists yet (TAT is LONG-only today — SHORT path would need new code + CEO GO)",
       "evidence": "14d atr-trend- never-armed = 22T 9.1% WR -1.85 (100% SHORT, 0 LONG never-armed) vs armed 26T 96.2% +1.10. atr-trend- 14d total 48T 56.3% -0.75 = WR>50 but net negative = loss-size, not direction. Existing TAT all LONG-gated (position_manager.py direction=='LONG' for bb-squeeze/pump-chain/bb-bounce blocks). CF 45m on never-armed cohort: 8 fires, losers_saved≈0.64, winners_killed=2 (+0.03) — n=8 << 20 bar, collection-only. median never-armed hold 28m (min5/max111); 14 exits already die before 45m via hard_max/atr_sl/cut-loser. Prior art TAT mechanism: bb-squeeze verdict PASS 2026-10-12 (+$1.48/30d CF), pump-chain 45m extended same day. auto_1hr boosted atr-trend- source weight 1.25→1.4 at 05:55 v2 (24h 80% WR) — entry-side already being amplified; this is exit-side. Session cit: [Build New Linear Regression Signal 2026-10-29] atr-trend exit trial context; [yolo dash 2026-11-02] armed-config verification.",
       "notes": "Why now: kill screen empty, chop-bleed origin-share healed, but atr-trend- remains top-volume net-negative signal whose bleed is 100% never-armed SHORTs. SHORT TAT path does not exist — this disposition collects would-fire lines only; enforce requires new position_manager branch + CEO GO. Do NOT confuse with ATR_TREND_EXIT_TRIAL_ENABLED (False, ride_it mapping) which is a different lever."
+    },
+    {
+      "id": "atr-trend-minus-extreme-cell-read",
+      "kind": "eval",
+      "stream": "atr-trend- | EXTREME vol cell re-measure — 30d 9T -0.62 WR 33.3% arm 22.2% vs NORMAL 19T +0.13 arm 68.4%; would-be block fk 3% (+0.05 winners vs +0.62 saved); n=9 <15 bar today",
+      "status": "open",
+      "started": "2026-11-26",
+      "deadline": "2026-12-10T00:00:00Z",
+      "owner": "brain_auditor #302",
+      "created_by": "brain_auditor #302",
+      "threshold": "n>=15 closed 30d AND net<0 AND fk<20% of atr-trend- winners -> propose EXTREME admission block via review queue; else CLOSE no-change",
+      "evidence": "PG 2026-11-26: EXTREME 9T -0.62 (3 trail wins +0.05 / 6 losses -0.67); HIGH 31T -0.15; NORMAL 19T +0.13. Session brain: no prior atr-trend-EXTREME-specific block proposal found. Existing tat-shadow (12-01) and exit-trial (False) cover exit side — this entry is ADMISSION side only.",
+      "prior_art": "no direct prior art found"
     }
   ],
   "updated_at": "2026-11-26T00:50:00+00:00"

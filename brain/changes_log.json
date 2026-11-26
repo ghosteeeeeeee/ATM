@@ -5027,5 +5027,16 @@
     "after": "status=done, KEEP-shadow, closed_at 2026-11-26T00:50:00Z",
     "rationale": "Pre-registered #298/#300 CLOSE-at-deadline default; storm did not fire tonight so 3/3 unreachable; CEO NO-CONVERT stands",
     "impact": "0 behavior — shadow logging continues under floor-side amplify-linregfade (11-27)"
+  },
+  {
+    "timestamp": "2026-11-26T04:55:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #302: NEW brain/analysis/chop_bleed_kpi.py (canonical mfe<0.40 KPI pin, selfcheck PASS, zero-behavior); pre-registered atr-trend- EXTREME re-measure disposition; 0 trading-constant changes",
+    "type": "creative",
+    "file": "brain/analysis/chop_bleed_kpi.py",
+    "before": "no one-file KPI; trailing_activated overstates by 21pt",
+    "after": "python3 brain/analysis/chop_bleed_kpi.py [days] reproduces official 72.9/74.5/89.2",
+    "rationale": "finish #301 creative #1; prevent #184 false-math recurrence",
+    "impact": "measurement only — no trade behavior change"
   }
 ]
