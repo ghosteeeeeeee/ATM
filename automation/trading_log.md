@@ -34150,3 +34150,31 @@ BY: auto_1hr
 - unarmed WR 50.0% cohort 47.1% of closes, net -0.26 — stall stack owns fix
 - storm window-min +0.09% / at-run +0.09% (no storm); storm bar 2/3, deadline 2026-11-26 (shadow_disposition.json)
 BY: auto_1hr
+
+## [2026-11-26 01:55] Hourly Analysis
+
+**Storm:** no storm (window-min -0.67% / at-run +0.67%)
+**Trades:** 3 closed last hour (3W 0L) | 24h 20 closed (16W 4L) | 3 open
+**PnL NET:** hour $+0.03 | 24h NET $+0.09 (gross 0.29, fees 0.20, payoff 0.40, WR 80.0%) | 7d NET $-1.99 (124T) | 14d NET $-3.08 (235T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- Last hour: STABLE atr-trend+ LONG profit-monster-trail +0.02 (net +0.01); BTC continuum-trend+ +0.02 (net +0.01); CRV btc-pump-rider+ +0.01 (net 0.00) — all trail exits
+- Kill policy: no 0%-WR signal n>=3 last hour (jup-liq+ 1T only); pump-chain+ 14d EXTREME monitor only (n<20 all-regime)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/20 = 15.0% (<40%); tpsl_utils deployed; profit-monster-trail 12T net +0.35 dominant
+- Boost: btc-pump-rider+ qualifies (7T 100% net +0.29, 6 tokens) but already boosted today 18:02 (combo_weight 1.06→1.3, v2) — same-signal concentration, no second boost; atr-trend- 4T net -0.09 fails
+- Arm rate: unarmed 8/20 = 40.0% below 70%, WR 50.0% net -0.26 vs armed 12/20 100% net +0.35 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 0 (00:00 -0.11, 01:00 +0.02) — not 3
+- Regime: EXTREME/HIGH/NORMAL not NEUTRAL -> no size cut
+- Frequency: 3/hr — under 20
+- Entry quality: 24h winners avg |MAE| 0.206% < 0.5% (max 0.632, one outlier — watch)
+- Open: 3
+
+**Open Questions:**
+- 24h NET +0.09 (gross 0.29, fees 0.20), payoff 0.40 at WR 80.0%; 7d -1.99, 14d -3.08
+- unarmed WR 50.0% cohort 40.0% of closes, net -0.26 — stall stack owns fix
+- storm window-min -0.67% / at-run +0.67% (no storm); storm-confl-waiver CLOSED KEEP-SHADOW at deadline 2026-11-26T00:00Z (brain_auditor #301) — bar 2/3 never completed, no longer pending
+BY: auto_1hr
