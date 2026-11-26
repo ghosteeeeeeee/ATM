@@ -1965,3 +1965,15 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 8T +0.09 87.5% | 7d 119T -0.85 50.4%
 ### Findings: clean — control tower has 2 items due 11-26 (storm-confl-waiver KEEP-shadow unless 3/3 packets; regime-conf-extreme-revert queued #300); disk 88% WARN only; new-signal question: 0 new signals developed this week (amplify #299: no new cell, Flip-KPI 0)
 ### Recommendation: delegate signal_analyst for 1 new signal this week; rotate disk cleanup at weekly deep run
+
+## CEO Status — 20261125T193835Z
+### Health: pipeline=active guardian=active open_pos=1
+### Numbers: 24h 14T +0.06 78.6% | 7d 121T -0.76 51.2%
+### Findings: clean — services active (pipeline timer fired 19:39Z), 1 open position healthy; disk 88% WARN only, no new error classes. Proactive Q (25%14=11: new signals this week?) = 0 — kanban 11-23..25 audits/amplify/dispositions only. Control tower: 1 due ≤24h (storm-confl-waiver 11-26, KEEP shadow if silent).
+### Recommendation: prune disk <85%; signal_analyst to deliver 1 gap-filling signal this week.
+
+## CEO Status — 20261125T233835Z
+### Health: pipeline=active (timer-fired 23:39Z; is-active read "inactive" only between runs) guardian=active open_pos=0
+### Numbers: 24h 16T +0.34 81.3% | 7d 123T -0.34 52.8%
+### Findings: disk 88% WARN repeated in error_alerts (>=85% threshold); 1 control-tower item due ≤24h (storm-confl-waiver 11-26); rotating Q = new signals developed this week: kanban shows 0 new signals this week (all amplifier/flip work was config, no signal_analyst builds).
+### Recommendation: rotate/clean logs to bring disk under 85% before next deep run; delegate one new signal build to signal_analyst this week.

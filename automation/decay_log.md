@@ -2453,3 +2453,7 @@
 [2026-11-25 07:43 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
 [2026-11-25 13:43 UTC] === Signal Decay Detector (rapid-response) ===
 [2026-11-25 13:43 UTC] No signals with sufficient trades in 24h window
+[2026-11-25 19:43 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-11-25 19:43 UTC]   🟢 OK: btc-pump-rider+: 5 trades, 100.0% WR, PnL=2.2
+[2026-11-25 19:43 UTC] Done. Rapid-disabled 0 signals.
+[2026-11-25 19:43 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

@@ -12370,5 +12370,50 @@
     "status": "suggested",
     "risk": "low (measurement re-anchor, no param change — the 50% giveback is already CEO-shipped; this only says what to measure it against)",
     "measurement": "12-01 read (aligned with win-side-capture deadline): (a) trailing-30 avg loser, (b) armed-but-lost n and avg pnl_usdt 14d pre/post 11-25 giveback change, (c) capture ratio. Pre-registered here so the 12-01 batch judges loss-size, not origin-share."
+  },
+  {
+    "date": "2026-11-25T21:08:38Z",
+    "idea": "Pre-register atr-trend- SHORT never-armed stall-cut SHADOW (45m, mfe<0.40)",
+    "rationale": "14d atr-trend- never-armed = 22T 9.1% -1.85 (100% SHORT), armed 26T 96.2% +1.10. Existing TAT is LONG-only (bb-squeeze/pump-chain/bb-bounce all gate on direction=='LONG'). CF at 45m: 8 fires, ~0.64 saved on losers, 2 winners +0.03 killed. n=8 < 20 bar → collection-only, NO enforce. Prior art: TAT mechanism proven on bb-squeeze (verdict PASS 2026-10-12) and pump-chain 45m.",
+    "expected_impact": "+0.6/14d if enforce ever clears bars; currently log-only would-fire lines",
+    "category": "exit sniper",
+    "status": "pre-registered",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-25T21:08:38Z",
+    "idea": "Append MFE [0.30,0.40) near-miss census to prearm-enforce-day7-read evidence",
+    "rationale": "30d MFE 0.30-0.40 band = 74T 36.5% -2.83 — exactly PREARM_LOCK domain (thr 0.25, arm 0.40). Strengthens the 11-28 prearm enforce GO case with fresh numbers. Prior art: [yolo dash 2026-11-02] MFE_EXIT_ARM_PCT engages after +0.40%; prearm covers the micro-peak gap below arm.",
+    "expected_impact": "evidence only, zero behavior",
+    "category": "measurement",
+    "status": "pre-registered",
+    "risk": "none"
+  },
+  {
+    "date": "2026-11-25T21:08:38Z",
+    "idea": "REJECTED-WITH-DATA: block SHORT when btc_trend_quality in (UP, STRONG_UP)",
+    "rationale": "TURBO #17102 lost SHORTing into BTC BULL_TREND. Measured: SHORT btc-UP 30d 110T 61.8% -0.77 vs not-UP 77T 55.8% -0.43 — fisher p=0.25 (two-sided ~1.0) NOT significant; both cohorts net-negative (loss-size not direction); coin LONG_BIAS subcohort 62T 59.7% -0.46 same story. Prior art: risk-budget 2026-10-21 trend filter already exists on add_signal path with exemptions. Fails Step-5c significance bar → logged so no run re-derives it.",
+    "expected_impact": "0 (not shipped)",
+    "category": "entry filter",
+    "status": "rejected",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-11-26T00:50:00Z",
+    "idea": "PIN the canonical chop-bleed KPI as a one-file script (mfe<0.40 definition) — the trailing_activated column gives 94.7% vs official 73.7% on the same 7d window (21pt drift); gap = 12 losers -1.27, 8/12 manual_sl_hit (ai-trader path never writes the column)",
+    "rationale": "Two auditors measuring the same KPI with two definitions is the #184 false-math-bug family; #185 dual-measure pin is the prior pattern. Official mfe-based number already matches #300 (73.9/76.6/89.2 vs my 73.7/77.3/89.2) — the column is the liar, not the KPI.",
+    "expected_impact": "0 PnL; prevents a future run 'discovering' a 21pt chop-bleed swing that is pure definition drift",
+    "category": "measurement",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-26T00:50:00Z",
+    "idea": "MONITOR: hl_copy_trader arm-reach 14d 10% (n=10, avg MFE 0.287) and pump-chain+ WR 27.3% (n=11) — both below arm/WR bars but n<15/20 = insufficient data, NO filter proposed",
+    "rationale": "Step-5c minimum sample: signal-level suggestions need n>=20. hl_copy is copy-trader domain; pump-chain+ EXTREME already monitor-only at auto_1hr.",
+    "expected_impact": "0 (monitor only)",
+    "category": "monitor",
+    "status": "suggested",
+    "risk": "none"
   }
 ]

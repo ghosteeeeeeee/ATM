@@ -5839,3 +5839,57 @@
 - **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
 - **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`
 - **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`
+
+## Error Alerts — 2026-11-25 16:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-25 17:39 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — TOK+CONTAGION+MOMENTUM+BTC_LEVEL`
+
+## Error Alerts — 2026-11-25 17:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-25 18:00 UTC
+- **[WARN]** (freq_deviation_shadow): `pump-chain+`: FREQ DEVIATION OVER source=pump-chain+ baseline=0.033/h current=0.083/h ratio=2.55 n_base=11 n_cur=2
+
+## Error Alerts — 2026-11-25 18:39 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+TOK+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-25 18:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-25 19:39 UTC
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-25 19:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-25 20:39 UTC
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BULL+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-25 20:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-25 21:39 UTC
+- **REPEATED** (8x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BULL+TOK, allowing despite TOK filter`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: TOK TOK — signal TOK rolled back (prevents retry loop)`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🏷️ signal N marked TOK (executed=N, no trade opened) — analytics-safe terminal state`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): TOK TOK — TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+TOK+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-25 21:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-25 22:39 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK level: -N.N% from high, +N.N% from low — blocking TOK entries`
+
+## Error Alerts — 2026-11-25 22:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-25 23:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-26 00:39 UTC
+- **NEW** (2x): `Nov N N:N:N python3[TOK]: TS   [TS] [TOK] pending order btc-auto-ladder-long-N: momentum confirm data missing — fill deferred (TOK-safe)`
