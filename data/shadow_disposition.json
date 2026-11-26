@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "brain_auditor #298",
+  "updated": "brain_auditor #303",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -1767,13 +1767,15 @@
       "id": "pc-plus-weight-monitor",
       "stream": "pump-chain+ LONG 1.4 weight — INSUFFICIENT at 11-13 kill-review (n=12<40); cell-scoped re-read",
       "kind": "eval",
-      "status": "open",
+      "status": "done",
       "started": "2026-11-13",
       "deadline": "2026-11-27T00:00:00Z",
       "owner": "brain_auditor",
       "threshold": "14d BOTH-regimes-negative with n>=40 -> kill 1.4 weight; else KEEP with rationale. Cell-scoped: 30d EXTREME net<=0 twice consecutively -> decay boost.",
       "default_action": "KEEP weight (INSUFFICIENT sample)",
-      "evidence": "run #253: 14d n=12 -0.34 EXTREME-only; 30d EXTREME +0.18; fill rate 31T/14d -> 12T/14d."
+      "evidence": "run #253: 14d n=12 -0.34 EXTREME-only; 30d EXTREME +0.18; fill rate 31T/14d -> 12T/14d.",
+      "done_at": "2026-11-26",
+      "disposition": "KEEP weight 1.4 (bar NOT met) — read 2026-11-26T08:30Z brain_auditor #303. Fresh PG: pump-chain+ 14d 13T net +0.10 WR 38.5% (EXTREME only — ONE regime present, so 'BOTH-regimes-negative' is unsatisfiable this window); 30d 34T -0.21 WR 38.2% EXTREME-only, 10/20 tokens. Kill limb needs 14d BOTH-regimes-negative AND n>=40 -> fails on both counts (n=13<40). Cell-scoped decay limb '30d EXTREME net<=0 twice consecutively': prior read #253 = +0.18, this read = -0.21 -> FIRST non-positive read, not twice -> no decay boost. Successor read registered as pc-plus-weight-monitor-2 due 2026-12-10. Session prior art [risk-budget decision 2026-10-21]: pump_chain base 43T 67.4% +0.98 = main signal; pc+ is the boosted sibling. 0 config change."
     },
     {
       "id": "amplify-linregfade-volgate-admit",
@@ -1781,13 +1783,14 @@
       "kind": "amplify",
       "status": "open",
       "started": "2026-11-13",
-      "deadline": "2026-11-27T00:00:00Z",
+      "deadline": "2026-12-03T00:00:00Z",
       "owner": "brain_auditor weekly AMPLIFY run #253",
       "proposal_type": "(c) clone-hunt/type-a: admit a validated signal whose ENTIRE exec path is blocked",
       "evidence": "LINREG_FADE_MINUS_ENABLED=True ('validated 1m Oct-Nov 53.9%') + STANDALONE_BYPASS live 11-05, yet 0 PG fills ever: 63/63 30d EXECs killed by VOL-GATE-v2 allowlist absence (dedup 26; LIT/NEAR/ATOM top). Counterfactual candle-walk run #253: 21/26 walkable, +8h 61.9% WR avg +0.195% med +0.520%, arm/stop sim ≈0.00% net ≈ +$0.56/30d at $11 — positive, n=21, p≈0.08 NOT significant. Session prior art: 'Build New Linear Regression Signal' (0.80) build sessions only; no prior REGIME_SIGNALS admission.",
       "threshold": "ENFORCE admit 'linreg-fade-','linreg_fade_short' to REGIME_SIGNALS['NORMAL'] ONLY IF at read time: (i) killed-EXEC 30d cohort n>=40 AND (ii) +8h counterfactual net >= +$1.00/30d pnl_usdt-basis (derive price-move x amount_usdt, never pnl_pct) AND (iii) 2/3 positive weeks AND (iv) first 5 live fills armed-rate >=50%. Units guard: price-move% x $11 notional, no leverage mixing. Any read below bar -> stay out.",
       "default_action": "NO SHIP — current read fails (i) n=26<40 and (ii) ~+$0.56<$1.00",
-      "notes": "One lever only (fill-funnel disposition). HIGH/EXTREME/FLAT admissions are SEPARATE later questions (EXTREME = storm band, needs its own ATR read). Knife/RSI floors unchanged. Revert: delete the allowlist entries."
+      "notes": "One lever only (fill-funnel disposition). HIGH/EXTREME/FLAT admissions are SEPARATE later questions (EXTREME = storm band, needs its own ATR read). Knife/RSI floors unchanged. Revert: delete the allowlist entries.",
+      "disposition": "NO SHIP stands; EXTENDED 7d for the counterfactual re-measure — read 2026-11-26T08:30Z #303. ATTRIBUTION CORRECTION: fresh 30d signal-fate census (signals_hermes_runtime.signals, signal_type='linreg_fade_short', n=908 since 11-12) shows the top non-stale kill reason is 'blocked@approval: short-regime-gate' n=128 — the SHORT-REGIME-GATE score-kill in signal_compactor:2107 (A4 tombstone), NOT volatility_gate_v2 REGIME_SIGNALS allowlist absence as this entry originally attributed. Both facts are true and STACKED: linreg-fade- is in REGIME_SIGNALS of FLAT/NORMAL/HIGH/EXTREME = NONE (verified via volatility_gate_v2 import) AND it is score-killed by the short-regime gate. Other 30d fates: compaction_stale_10min 619, short-rsi-hard-floor 65, rr-engine-hard-block 41, oversold-knife 31, short-rsi-floor-knife 12. Bar (i) n>=40 is NOW MET (128); bar (ii) still fails on the last measured counterfactual (~+$0.56/30d < +$1.00); bars (iii)/(iv) not re-measured. Session prior art [Build New Linear Regression Signal 2026-10-29]: fade's own shadow NORMAL n=31 total -4.16 WR 35.5% = NEGATIVE, HIGH n=56 -0.25, EXTREME n=139 +30.51 -> a NORMAL-only admission is directionally opposed to that read; EXTREME admission is a SEPARATE later question per the entry's own scope rule. Fresh +8h cf with the corrected kill attribution owed by 12-03. 0 config change."
     },
     {
       "id": "compaction-stale-trend-band-eval",
@@ -2165,12 +2168,13 @@
       "kind": "shadow",
       "status": "open",
       "started": "2026-11-20",
-      "deadline": "2026-11-27T00:00:00Z",
+      "deadline": "2026-12-01T00:00:00Z",
       "owner": "CEO",
       "threshold": "shadow-block entry when direction=LONG AND ((detect-time rsi_exec in [55,70]) OR (gap_pct in [0.5,1.0])) PLUS exec-time re-validation block if |exec_rsi - detect_rsi| > 10. Bar: n_blocked >=100 AND blocked cohort would-be net saved >= +$1.00/14d AND Fisher p<0.05 AND fk <=20% AND both 7d halves same-sign",
       "default_action": "NO-SHIP (bar set deliberately strict: #261 shows rsi/gap/momentum do NOT predict never-armed bleed; jup's rsi>=55 gate already failed Fisher p=0.379)",
       "evidence": "CEO 20261120T002223Z Phase2 sign-mover: cells rsi55-70 n=134 −$2.59, gap0.5-1 n=88 −$2.29, exec-drift median6.1pts 23/86>10",
-      "updated": "2026-11-20T01:11:53Z"
+      "updated": "2026-11-20T01:11:53Z",
+      "disposition": "COLLECTOR NOT FOUND — flagged 2026-11-26 #303. Grep of scripts/ for the implementation this threshold describes (stop_family_entry / STOP-FAMILY-SHADOW / WOULD-BLOCK-SHADOW / the rsi_exec[55,70] and gap_pct[0.5,1.0] block predicate) returned ZERO hits; no log tag with 'BLOCK-SHADOW' exists in logs/pipeline.log. The threshold's evidence cells (rsi55-70 n=134 -$2.59, gap0.5-1 n=88 -$2.29, exec-drift median 6.1pts) are from agent-4's PG analysis, not from a running shadow. => the bar n_blocked>=100 is currently UNREACHABLE because nothing is counting. DEFAULT (NO-SHIP) unchanged and still correct. ACTION OWED by 12-01: owner CEO confirms whether the shadow was ever shipped; if not, either implement log-only collection (zero behavior) or close the entry as never-started. Do NOT let it reach its deadline silently — a bar that cannot be measured must not read as 'measured and failed'."
     },
     {
       "id": "ai-trader-pending-tag-split",
@@ -2223,7 +2227,7 @@
       "id": "other-gate-short-withhold-review",
       "stream": "approval-block SHORTs NOT attributable to floor/regime/vol (rr-engine, pump-chain-short-high, oversold-knife, confluence single-type, rep)",
       "kind": "eval",
-      "disposition": "EVAL",
+      "disposition": "AUDITOR NOTE 2026-11-26 #303: not adjudicated this run — owner is signal_analyst and the per-gate split (token-day dedup fwd4h, n>=30/gate, p<0.05, OOS same-sign) is the assigned analysis, not a quick read. Default (no change, KEEP rulings stand) remains correct and will fire at the 11-27 deadline if the owner has not delivered. Reconcile list unchanged: short-relax0/25 KEEP, regime-gate KEEP, pc-high KEEP.",
       "status": "open",
       "started": "2026-11-20",
       "deadline": "2026-11-27T00:00:00Z",
@@ -2606,7 +2610,32 @@
       "threshold": "n>=15 closed 30d AND net<0 AND fk<20% of atr-trend- winners -> propose EXTREME admission block via review queue; else CLOSE no-change",
       "evidence": "PG 2026-11-26: EXTREME 9T -0.62 (3 trail wins +0.05 / 6 losses -0.67); HIGH 31T -0.15; NORMAL 19T +0.13. Session brain: no prior atr-trend-EXTREME-specific block proposal found. Existing tat-shadow (12-01) and exit-trial (False) cover exit side — this entry is ADMISSION side only.",
       "prior_art": "no direct prior art found"
+    },
+    {
+      "id": "pc-plus-weight-monitor-2",
+      "stream": "pump-chain+ LONG 1.4 weight — recurring regime read (successor to pc-plus-weight-monitor, disposed KEEP 2026-11-26)",
+      "kind": "eval",
+      "status": "open",
+      "started": "2026-11-26",
+      "deadline": "2026-12-10T00:00:00Z",
+      "owner": "brain_auditor",
+      "threshold": "14d BOTH-regimes-negative with n>=40 -> kill 1.4 weight; else KEEP with rationale. Cell-scoped: 30d EXTREME net<=0 twice consecutively -> decay boost.",
+      "default_action": "KEEP weight (INSUFFICIENT sample)",
+      "evidence": "2026-11-26 read: 14d 13T +0.10 / 30d 34T -0.21, EXTREME-only traffic, 20 tokens; 30d EXTREME first non-positive read."
+    },
+    {
+      "id": "jup-trail-atr-arm-shadow",
+      "stream": "[JUP-SHADOW-TRAIL] jup_yolo ATR-scaled trail arm/distance counterfactual (position_manager.py:4468)",
+      "kind": "shadow",
+      "status": "open",
+      "started": "2026-10-31",
+      "deadline": "2026-12-10T00:00:00Z",
+      "owner": "brain_auditor",
+      "threshold": "Eval at JUP_YOLO_SHADOW_EVAL_N=40 DISTINCT trade_ids on [JUP-SHADOW-TRAIL] lines: would-arm rate, and counterfactual exit outcome vs the live fixed 0.40/0.20 trail (UNITS: price-move%, never pnl_pct).",
+      "default_action": "NO CHANGE — PM_TRAIL_ACTIVATE_PCT stays 0.40% (CEO_PROTECTED_FLAGS, 'MUST BE 0.40% — DO NOT CHANGE').",
+      "disposition": "REGISTERED 2026-11-26 #303 (governance gap: the shadow has a pre-registered eval window in hermes_constants.py:4640-4642 but NO registry entry — same class as jup-atrsl-shadow-parity, which was registered retroactively after shipping unregistered). CURRENT READ 22/40 distinct ids, 0/22 would-arm at arm_scd=1.0xATR (~1.22%) vs arm_act 0.40%. Early signal: the configured mult is known-bad — session [yolo dash 2026-11-02] already walked 'arm 1.0 -> LOSSES (-29) because too many trades never engage -> ride to floor (42 floor hits)'. Recommend the 40-trade read ALSO reports arm_scd at 0.40/0.60/0.75xATR from the same logged atr= column (one query, no new collection) so the eval answers 'what arm level is optimal' instead of confirming a rejected value. Lines still fresh (last 2026-11-26 06:03Z).",
+      "evidence": "logs/pipeline.log [JUP-SHADOW-TRAIL]: 1775 lines / 22 distinct ids / 0 armed_scd=Y; arm_scd 1.222% vs arm_act 0.40%."
     }
   ],
-  "updated_at": "2026-11-26T00:50:00+00:00"
+  "updated_at": "2026-11-26T08:54:10Z"
 }

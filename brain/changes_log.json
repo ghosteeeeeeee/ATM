@@ -5038,5 +5038,16 @@
     "after": "python3 brain/analysis/chop_bleed_kpi.py [days] reproduces official 72.9/74.5/89.2",
     "rationale": "finish #301 creative #1; prevent #184 false-math recurrence",
     "impact": "measurement only — no trade behavior change"
+  },
+  {
+    "timestamp": "2026-11-26T08:55:40Z",
+    "agent": "brain_auditor",
+    "change": "Audit #303 disposition servicing: pc-plus-weight-monitor disposed KEEP (bar unsatisfiable, successor registered 12-10); amplify-linregfade-volgate-admit extended to 12-03 with kill-attribution correction (SHORT-REGIME-GATE n=128, not vol-gate allowlist); stop-family-entry-filter-shadow flagged COLLECTOR-NOT-FOUND, deadline 12-01; other-gate review annotated (owner signal_analyst); NEW jup-trail-atr-arm-shadow registry entry (governance gap). 0 trading-constant changes.",
+    "type": "meta",
+    "file": "data/shadow_disposition.json",
+    "before": "4 entries past/near 11-27 deadline, unregistered [JUP-SHADOW-TRAIL] shadow",
+    "after": "4 entries adjudicated/extended with fresh evidence, jup-trail-atr-arm-shadow registered",
+    "rationale": "Mandate: service due dispositions and never let an unmeasurable bar read as measured-and-failed",
+    "impact": "prevents silent deadline drift; restores eval coverage for an unregistered shadow; 0 live-behavior change"
   }
 ]

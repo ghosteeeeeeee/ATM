@@ -12442,5 +12442,20 @@
     "category": "risk",
     "status": "escalated-to-CEO",
     "risk": "low (report-only)"
+  },
+  {
+    "date": "2026-11-26T08:55:40Z",
+    "idea": "Arm-reach loser classification: feed 30d trail-arm-reach (mfe>=0.40 share) into the existing LOSERS_MULT/LOSERS_SIZE_MULT penalty instead of token identity only",
+    "rationale": "30d arm-reach splits sharply: atr-trend+ 77.8% / jup_yolo SHORT 72.0% / btc-pump-rider+ 59.3% (all net-positive) vs hl_copy_trader LONG 33.3% (18T -0.33 22.2% WR) and r2v2-long3 LONG 44.4% (18T -0.61 44.4%). arm-reach is the already-measured proxy for 'never reaches trail' = the chop-entry class the doctrine names, and the lever (LOSERS_MULT=0.3 / LOSERS_SIZE_MULT=0.5) already exists — only the keying is missing.",
+    "expected_impact": "Shrink dollar bleed on the low-arm cohort (about -$0.94/30d across the two candidates) without touching trail-family winners (+5.36/14d).",
+    "category": "entry sniper / sizing",
+    "status": "suggested",
+    "risk": "low",
+    "preconditions": "n>=20 per candidate; 7d/14d/30d same-sign net<0; fk<20% of that signal's winners; dedupe against in-flight entries (hl_copy -> hl-copy-plus-shadow 11-30; r2v2-long3 -> amplify-r2v2-long3-clonehunt 11-28) so no duplicate proposal ships.",
+    "prior_art": "NO prior art found (queries 'partial profit take half position at arm', 'scale out winners partial exit' -> unrelated hits). Token-keyed LOSERS list is the existing sibling.",
+    "citations": [
+      "[yolo dash, 2026-11-02] payoff needs 65%+ WR to break even; we're at 58%",
+      "[exit asymmetry, 2026-10-31] exit lets losses run 2.7x further than winners gain"
+    ]
   }
 ]
