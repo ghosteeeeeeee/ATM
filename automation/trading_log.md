@@ -34510,3 +34510,31 @@ BY: auto_1hr
 - 3 consecutive negative trading hours then 4 quiet hours — trend unresolved; size already 0.25x
 - unarmed WR 36.4% cohort 45.8% of closes, net $-0.71 — stall stack owns fix
 BY: auto_1hr
+
+## [2026-11-26 15:53] Hourly Analysis
+
+**Storm:** no storm (window-min -0.79% / at-run +0.47%)
+**Trades:** 0 closed last hour | 24h 22 closed (15W 7L) | 0 open
+**PnL NET:** hour $0.00 (no closes) | 24h NET $-0.21 (gross 0.02, fees 0.23, payoff 0.48, WR 68.2%) | 7d NET $-2.10 (126T) | 14d NET $-3.33 (233T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- Last hour: 0 closes, 0 open — quiet (5th quiet hour in a row)
+- Kill policy: no 0%-WR signal n>=3 (0 closes/hr; 24h max loss r2v2-long3 n=2 50%)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 6/22 = 27.3% (<40%); tpsl_utils deployed; profit-monster-trail 11T net +0.35 dominant, atr_sl_hit bucket net -0.86
+- Boost: btc-pump-rider+ 6T 100% net +0.29 — stale (no new closes since 11-25 18:02 boost; 7th trade aged out of 24h window), skipped
+- Arm rate: unarmed 10/22 = 45.5% <70%, WR 30.0% net -0.73 vs armed 12/22 100% net +0.52 — stall stack owns fix, NO new gate (surfaced only)
+- Neg streak: 3 negative trading hours (06 -0.17, 09 -0.29, 10 -0.05), 5 quiet hours since; regime EXTREME/HIGH/NORMAL not NEUTRAL -> no cut; already 0.25x
+- Regime: EXTREME 11T net +0.07 / HIGH 10T net -0.23 / NORMAL 1T net -0.05
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg MAE 0.219% < 0.5% (max 0.639 outlier — watch); losers avg |MAE| 0.713%
+- storm-confl-waiver entry absent from shadow_disposition.json (removed per #301) — no action, no storm
+
+**Open Questions:**
+- 24h NET $-0.21 (fees 0.23 > gross 0.02), payoff 0.48 at WR 68.2%; 7d $-2.10, 14d $-3.33
+- 5 quiet hours with zero closes — signal pipeline producing no executions; trend unresolved, size already 0.25x
+- unarmed WR 30.0% cohort 45.5% of closes, net $-0.73 — stall stack owns fix
+BY: auto_1hr
