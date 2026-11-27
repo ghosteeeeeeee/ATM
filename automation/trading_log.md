@@ -35109,3 +35109,28 @@ BY: auto_1hr
 - 0 open trades — flat book entering 13:00
 - unarmed cohort WR 33.3% net -0.35 — stall stack fix still pending
 BY: auto_1hr
+
+## [2026-11-27 13:54] Hourly Analysis
+
+**Storm:** no storm (window-min -0.36% / at-run +0.12%)
+**Trades:** 0 closed last hour | 24h 15 closed (11W 4L) | 0 open (flat book)
+**PnL NET:** hour $0.00 | 24h NET -$0.09 (gross +$0.09, fees $0.18, payoff 0.42, WR 73.3%) | 7d NET -$2.13 (126T) | 14d NET -$3.43 (236T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- Zero closes last hour (12:00 -0.04, 13:00 none) — no negative-hour streak; regime NORMAL 9T +0.22 / HIGH 5T -0.05 / EXTREME 1T -0.27 — not NEUTRAL -> no size cut; already 0.25x
+- Kill policy: no 0%-WR signal n>=3 (24h worst continuum-osc- 1T 0% net -0.08; atr-trend+ 6T 50% net -0.23 over 5 tokens)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/15 = 13.3% (<40%); tpsl_utils deployed; profit-monster-trail 8T net +0.26 dominant, atr_sl_hit bucket net -0.35
+- Boost: no signal passes all 3 gates (bb-squeeze+ 4T 100% net +0.06 fails 5+ trades; jup_yolo_mirrored 2T single-token SOL; atr-trend+ 6T 50% net -0.23 fails net>0.05) — skipped
+- Arm rate: unarmed 6/15 = 40% <70%, WR 33.3% net -0.35 vs armed 9/15 100% net +0.26 — stall stack owns fix, NO new gate (surfaced only)
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg MAE 0.224% < 0.5% (max 0.631), losers 0.798%
+
+**Open Questions:**
+- 24h NET -$0.09 (fees $0.18), payoff 0.42 at WR 73.3%; 7d -$2.13, 14d -$3.43
+- Flat book (0 open) entering 14:00
+- unarmed cohort WR 33.3% net -0.35 — stall stack fix still pending
+BY: auto_1hr
