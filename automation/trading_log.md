@@ -35350,3 +35350,30 @@ BY: auto_1hr
 - 7d -$2.41, 14d -$3.42 — flat/negative, no improvement
 - unarmed cohort net -$0.90 vs armed +$0.18 — stall stack fix still pending
 BY: auto_1hr
+
+## [2026-11-27 22:55] Hourly Analysis
+
+**Storm:** no storm (window-min -0.32% / at-run +0.00%) — both inside ±1.5 gate
+**Trades:** 0 closed last hour (last close 19:31 UTC) | 24h 11 closed (6W 5L) | 2 open (POPCAT LONG 22:12, BABY LONG 22:32, both atr-trend+)
+**PnL NET:** hour $0.00 (no closes) | 24h NET -$0.72 (gross -$0.58, fees $0.14, payoff 0.25, WR 54.5%) | 7d NET -$2.41 (124T) | 14d NET -$3.42 (232T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- 0 closes last hour; 2 fresh atr-trend+ LONGs open (POPCAT, BABY) — monitor only
+- Kill policy: no 0%-WR signal n>=3 (24h worst atr-trend+ 6T 50% net -$0.50; atr-trend- 1T 0% n<3; 14d regime split wins HIGH+NORMAL → keep)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/11 = 18% (<40%); tpsl_utils deployed; profit-monster-trail 5T net +$0.18 dominant, atr_sl_hit bucket -$0.46, hard_max_loss -$0.31
+- Boost: no signal passes all 3 gates (atr-trend+ 6T 50% net -$0.50 fails WR+net; jup_yolo 2T 50% single-token; warrior-sr-confirm+ 1T n<5; continuum-osc+ 1T net $0.00) — skipped
+- Arm rate: unarmed 6/11 = 54.5% <70%, WR 16.7% net -$0.90 vs armed 5/11 100% net +$0.18 — stall stack owns fix, NO new gate (surfaced only)
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg MAE 0.138% < 0.5% (max 0.395), losers 0.712% (max 0.935)
+- Negative-hour streak: today 12 -0.04, 17 -0.33, 19 +0.03 — broken; yesterday 22/23 negative then gap, not 3 consecutive; regime not NEUTRAL → no size cut; already 0.25x
+
+**Open Questions:**
+- 24h NET -$0.72 (fees $0.14), payoff 0.25 at WR 54.5% — payoff still the loss driver
+- 7d -$2.41, 14d -$3.42 — no improvement
+- unarmed cohort net -$0.90 vs armed +$0.18 — stall stack fix still pending
+- 2 open atr-trend+ LONGs into low-volume hours — report PnL next run
+BY: auto_1hr
