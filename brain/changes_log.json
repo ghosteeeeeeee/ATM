@@ -5093,5 +5093,27 @@
     "after": "164 entries",
     "rationale": "30d 80T 42.5% net -2.52 fisher p=0.033, same sign 7/14/30d, kills 15.8% of LONG winners, band completely ungated today (CHASE gates >2.5 only); one-variable + independent-verify + CEO rule = register not ship",
     "impact": "no live behavior change; pre-registered kill candidate with bars"
+  },
+  {
+    "timestamp": "2026-11-27T16:50:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #309: appended evidence_note_309 / evidence_309 to 7 dispositions — NET-OF-FEE cell screen (7/8 winner cells fail the $0.0186 fee bar), type-(b) cell-mult ceiling +$0.085/30d vs maker +$3.5/30d, r2v2 cell decayed to n=1/30d, z[1,2) armed/never decomposition + SEQUENCING_BLOCK_12_04",
+    "type": "meta",
+    "file": "data/shadow_disposition.json",
+    "before": "164 entries, 11-28 amplifies carrying gross-only cell evidence",
+    "after": "164 entries (0 added/0 closed), 7 entries carry #309 evidence; selfcheck PASS",
+    "rationale": "The 11-28 and 12-04 reads would otherwise judge proposals on gross PnL and on a counterfactual that prearm (due 11-28) invalidates",
+    "impact": "decision-validity only; 0 trading-constant changes, 0 trade actions"
+  },
+  {
+    "timestamp": "2026-11-27T16:50:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #309: entry-separator negative result recorded (armed vs never-armed indistinguishable on entry_rsi/z/confidence/momentum/z_tier at 30d) — entry-side filter avenue formally closed, fix is time/exit-side",
+    "type": "creative",
+    "file": "brain/creative_improvements.json",
+    "before": "entry filters re-proposed intermittently across runs",
+    "after": "+3 creative entries (amp re-axis, z-band sequencing, negative-result ledger)",
+    "rationale": "confirms #246; prevents future re-derivation of a rejected avenue",
+    "impact": "none on live config"
   }
 ]

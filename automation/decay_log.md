@@ -2477,3 +2477,7 @@
 [2026-11-27 01:43 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)
 [2026-11-27 07:43 UTC] === Signal Decay Detector (rapid-response) ===
 [2026-11-27 07:43 UTC] No signals with sufficient trades in 24h window
+[2026-11-27 13:43 UTC] === Signal Decay Detector (rapid-response) ===
+[2026-11-27 13:43 UTC]   🟢 OK: atr-trend+: 6 trades, 50.0% WR, PnL=0.49
+[2026-11-27 13:43 UTC] Done. Rapid-disabled 0 signals.
+[2026-11-27 13:43 UTC] Note: Detailed kill logic runs via self_learner.py (daily at 06:00 UTC)

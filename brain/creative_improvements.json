@@ -12604,5 +12604,35 @@
     "category": "telemetry",
     "status": "suggested",
     "risk": "none"
+  },
+  {
+    "date": "2026-11-27T16:50:00Z",
+    "idea": "AMP OFFENSE RE-AXIS: freeze type-(b) winner-cell notional mults and spend the offense budget on the fee axis",
+    "rationale": "Measured net-of-fee (pnl_usdt - fees.fee_total, CEO Phase-0 basis): a 1.25x boost on any validated cell is worth 0.25 x cell_net. Best case btc-pump-rider+|EXTREME|LONG = +$0.085/30d; jup HIGH SHORT = -$0.078/30d (net-negative cell, amplifying LOSES money); bb-squeeze+ NORMAL = -$0.033/30d. Type-(b) would need cell_net >= +$4.00/30d to be worth the +$1.00/30d materiality bar and NO cell reaches +$0.60. Meanwhile the maker lever already on the 11-28 docket measures +$1.62/14d (~+$3.5/30d) = 41x the best cell-mult outcome.",
+    "expected_impact": "Prevents future proposals worth <$0.10/30d from consuming the weekly AMPLIFY slot; concentrates on a lever worth +$3.5/30d (≈31% of the -11.40/30d net bleed)",
+    "category": "offense prioritisation",
+    "status": "suggested (evidence_note_309 appended to 5 dispositions)",
+    "risk": "low — zero code, zero config, changes only how proposals are ranked",
+    "prior_art": "[Build New Linear Regression Signal 2026-10-29] fee lever (cited); net-of-fee cell screen is the #307 fee-admission bar applied at cell level"
+  },
+  {
+    "date": "2026-11-27T16:50:00Z",
+    "idea": "z[1,2) BAND DECOMPOSED — it is a never-armed proxy, so SEQUENCE it behind prearm (11-28) not alongside it",
+    "rationale": "band|mfe>=0.40 63T +3.34 90.5% (behaves like rest-armed 92.5%) vs band|never 70T -6.75 5.7% (rest-never 18.6%). 100% of the band's loss sits in the never-armed class. All-directions band 133T -3.41 vs rest +0.94 p=0.009 (stronger than the LONG-only 0.033); 7/14/30d same sign; winners killed 18.2% (bar <20%). Hold time refutes a stall mechanism (band never-armed exits SOONER, 4153s vs 4716s). An entry-time band kill would also delete 63 armed winners worth +3.34 that prearm (a time instrument) would keep.",
+    "expected_impact": "Makes the 12-04 read valid instead of stale: re-measure the band on a post-prearm baseline before judging it. Short limb recorded same-sign p=0.0546 = NOT significant, scope stays LONG.",
+    "category": "sequencing / decision validity",
+    "status": "suggested (SEQUENCING_BLOCK_12_04 appended to eval-long-z-midband-1-2)",
+    "risk": "low — delays nothing, prevents a wrong-order decision",
+    "prior_art": "no prior art found (query returned 0 hits)"
+  },
+  {
+    "date": "2026-11-27T16:50:00Z",
+    "idea": "ENTRY-SIDE FILTERS ARE STRUCTURALLY CLOSED — record the negative result so no run re-derives it",
+    "rationale": "30d cohort compare, ARMED (n=335) vs NEVER-ARMED-LOSERS (n=235): entry_rsi_14 mean 52.4 vs 51.1 (median 52.3 vs 51.5), signal_z 0.53 vs 0.39, confidence 71.7 vs 71.3, momentum_state proportions rising 38.5% vs 36.6%, z_tier proportions near-identical. RSI buckets 35-45 (armed peak 23.7%) vs 55-65 (never peak 20.9%) = same shape. The ONE exception is the narrow z[1,2) band. Confirms #246 'momentum/z-tier predict ARM not net'.",
+    "expected_impact": "Stops future runs proposing entry-condition filters for the chop bleed (the fix is time/exit-side = prearm)",
+    "category": "negative-result ledger",
+    "status": "recorded",
+    "risk": "none",
+    "prior_art": "[kanban brain_auditor #246, 2026-11-11] 'Entry-filter fisher scan REJECTED (momentum/z-tier predict ARM not net)'; [shadow mode 2026-10-17] 'RR problem itself: exit engines cut winners short and let losers run'"
   }
 ]
