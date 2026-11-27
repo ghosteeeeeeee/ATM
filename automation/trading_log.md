@@ -35188,3 +35188,30 @@ BY: auto_1hr
 - Storm cf +$0.88 positive but waiver entry closed 11-26 (KEEP-SHADOW) — reopen needs fresh CEO label; cf jitter (+0.43 to +0.88 within minutes) is 5m-candle lag on a violent tape, numbers volatile
 - unarmed cohort WR 33.3% net -0.35 — stall stack fix still pending
 BY: auto_1hr
+
+## [2026-11-27 16:53] Hourly Analysis
+
+**Storm:** no storm (window-min +0.35% / at-run +0.35%) — both inside ±1.5 gate
+**Trades:** 0 closed last hour | 24h 15 closed (11W 4L) | 0 open (flat book)
+**PnL NET:** hour $0.00 | 24h NET -$0.09 (gross +$0.09, fees $0.18, payoff 0.42, WR 73.3%) | 7d NET -$1.96 (125T) | 14d NET -$3.22 (233T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- Zero closes last hour (15 none), 0 open — flat book, BTC +0.35% drifting sideways after the dump
+- Kill policy: no 0%-WR signal n>=3 last hour or 24h (worst continuum-osc- 1T 0% net -0.08; atr-trend+ 6T 50% net -0.23 over 5 tokens — mixed, not a kill)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/15 = 13.3% (<40%); tpsl_utils deployed; profit-monster-trail 8T net +0.26 dominant, hard_tp +0.30, atr_sl_hit bucket -0.35
+- Boost: no signal passes all 3 gates (bb-squeeze+ 4T 100% net +0.06 fails 5+ trades; jup_yolo_mirrored 2T 100% single-token SOL; atr-trend+ 6T 50% net -0.23 fails) — skipped
+- Arm rate: unarmed 6/15 = 40% <70%, WR 33.3% net -0.35 vs armed 9/15 100% net +0.26 — stall stack owns fix, NO new gate (surfaced only)
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg MAE 0.224% < 0.5% (max 0.631), losers 0.798% (max 0.935)
+- Negative-hour streak: none (09 +0.03, 10 +0.01, 12 -0.04, 11/13-16 none); regime NORMAL 9T +0.22 / HIGH 5T -0.05 / EXTREME 1T -0.27 — not NEUTRAL -> no size cut; already 0.25x
+
+**Open Questions:**
+- 24h NET -$0.09 (fees $0.18), payoff 0.42 at WR 73.3% — high WR, negative net = payoff problem (losers -0.16 avg vs winners small), not a WR problem
+- 7d -$1.96, 14d -$3.22
+- Flat book 4+ hours; no exposure while tape is quiet — not over-filtering, simply no signals firing
+- unarmed cohort WR 33.3% net -0.35 — stall stack fix still pending
+BY: auto_1hr
