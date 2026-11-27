@@ -35082,3 +35082,30 @@ BY: auto_1hr
 - BTC continuum-osc+ LONG open since 04:33 (~7.4h)
 - unarmed cohort WR 25.0% net -0.23 — stall stack fix still pending
 BY: auto_1hr
+
+## [2026-11-27 12:55] Hourly Analysis
+
+**Storm:** no storm (window-min -0.39% / at-run -0.14%)
+**Trades:** 3 closed last hour (GRASS warrior-sr-confirm+ trail +0.08 net, RUNE atr-trend+ hard_max_loss -0.12, BTC continuum-osc+ MAX_HOLD -0.00 net) | 24h 15 closed (11W 4L) | 0 open (all cleared)
+**PnL NET:** hour -$0.04 | 24h NET -$0.09 (gross +$0.09, fees $0.18, payoff 0.42, WR 73.3%) | 7d NET -$2.13 (126T) | 14d NET -$3.16 (237T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- Regime NORMAL/HIGH/EXTREME not NEUTRAL -> no size cut; already 0.25x
+- Kill policy: no 0%-WR signal n>=3 last hour (each close n=1); 24h worst atr-trend+ 6T 50% net -0.23 — not a kill trigger
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/15 = 13.3% (<40%); tpsl_utils deployed; profit-monster-trail 8T net +0.26 dominant, atr_sl_hit bucket net -0.35
+- Boost: no signal passes all 3 gates (bb-squeeze+ 4T 100% net +0.06 fails 5+ trades; jup_yolo_mirrored 2T single-token; atr-trend+ 6T 50% net -0.23 fails) — skipped
+- Arm rate: unarmed 6/15 = 40% <70%, WR 33.3% net -0.35 vs armed 9/15 100% net +0.26 — stall stack owns fix, NO new gate (surfaced only)
+- Frequency: 3/hr — under 20
+- Entry quality: 24h winners avg MAE 0.224% < 0.5% (max 0.631); losers 0.798%
+- Negative-hour streak: none (09 +0.03, 10 +0.01, 11 none, 12 -0.04)
+- Storm blocked-census not run (gate did not fire)
+
+**Open Questions:**
+- 24h NET -$0.09 (fees $0.18), payoff 0.42 at WR 73.3%; 7d -$2.13, 14d -$3.16
+- 0 open trades — flat book entering 13:00
+- unarmed cohort WR 33.3% net -0.35 — stall stack fix still pending
+BY: auto_1hr
