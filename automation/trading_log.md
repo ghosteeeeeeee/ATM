@@ -35134,3 +35134,30 @@ BY: auto_1hr
 - Flat book (0 open) entering 14:00
 - unarmed cohort WR 33.3% net -0.35 — stall stack fix still pending
 BY: auto_1hr
+
+## [2026-11-27 14:55] Hourly Analysis
+
+**Storm:** FIRED (dump gate: window-min <= -1.5) — 🌪️ [STORM-READINESS] window-min -3.72% / at-run -3.72% | blocked 173 in 2h (combo_key-stale 48, expired-hotset 34, short-rsi-floor-knife 23, compaction_stale_10min 20, confluence single-type 13, short-regime-gate 9, long-rsi-ceiling 6, vol-gate-override-0.0 5, rr-engine 4, oversold-knife 3, pump-chain-rsi-max-long 3, rep-low 2, other 3) | true-starvation 31 RSI>=35 (deduped first-fire-per-token; 31 walked, 0 missing) | counterfactual $-1.95 (touch 19/31) | waiver SHADOW=True ENFORCE=False — counterfactual NEGATIVE -> streak resets (prior streak was closed at deadline 2026-11-26 KEEP-SHADOW per audit #301; bar custody needs fresh CEO label to reopen) — split: blocked LONGs $-4.53 (21, touch 13/21 = gates correctly kept dump LONG losers out) vs blocked SHORTs $+2.69 (10, touch 6/10 = gates suppressed dump SHORT winners = starvation, waiver's intended DUMP-side case) — DUMP packet, SHORT-side cf positive but entry status=done/KEEP-SHADOW, no auto action (CEO NO-CONVERT stands)
+**Trades:** 0 closed last hour | 24h 15 closed (11W 4L) | 0 open (flat book)
+**PnL NET:** hour $0.00 | 24h NET -$0.09 (gross +$0.09, fees $0.18, payoff 0.42, WR 73.3%) | 7d NET -$2.13 (126T) | 14d NET -$3.32 (234T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- Zero closes last hour (12 -0.04, 13 none, 14 none); regime NORMAL 9T +0.22 / HIGH 5T -0.05 / EXTREME 1T -0.27 — not NEUTRAL -> no size cut; already 0.25x
+- Kill policy: no 0%-WR signal n>=3 last hour (each close n=1); 24h worst atr-trend+ 6T 50% net -0.23 — not a kill trigger
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/15 = 13.3% (<40%); tpsl_utils deployed; profit-monster-trail 8T net +0.26 dominant, atr_sl_hit bucket net -0.35
+- Boost: no signal passes all 3 gates (bb-squeeze+ 4T 100% net +0.06 fails 5+ trades; jup_yolo_mirrored 2T single-token; atr-trend+ 6T 50% net -0.23 fails) — skipped
+- Arm rate: unarmed 6/15 = 40% <70%, WR 33.3% net -0.35 vs armed 9/15 100% net +0.26 — stall stack owns fix, NO new gate (surfaced only)
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg MAE 0.224% < 0.5% (max 0.631), losers 0.798%
+- Negative-hour streak: none (09 +0.03, 10 +0.01, 12 -0.04, 13/14 none)
+
+**Open Questions:**
+- 24h NET -$0.09 (fees $0.18), payoff 0.42 at WR 73.3%; 7d -$2.13, 14d -$3.32
+- Flat book (0 open) entering 15:00 during a -3.72% BTC dump — no exposure, no recovery participation either
+- Storm cf -$1.95 (LONGs -4.53 / SHORTs +2.69): gates right on longs, short-side starvation real but waiver entry closed 11-26
+- unarmed cohort WR 33.3% net -0.35 — stall stack fix still pending
+BY: auto_1hr
