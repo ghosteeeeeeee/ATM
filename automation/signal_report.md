@@ -1,15 +1,17 @@
 # Signal Performance Report
-**Generated:** 2026-11-26 19:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-27 01:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
-- **Total trades (all time):** 4,008 | **WR:** 51.5% | **PnL:** -119.72%
+- **Total trades (all time):** 4,013 | **WR:** 51.5% | **PnL:** -121.40%
 - **Date range:** 2026-07-29 → 2026-11-26
 
 ---
 
 ## WINNERS (WR > 55%, PnL > 0)
 
-None found.
+| Signal | Dir | 6h T | 6h WR | 6h PnL | 24h T | 24h WR | 24h PnL | Status |
+|--------|-----|------|-------|--------|-------|--------|---------|--------|
+| atr-trend+ | LONG | 3 | 33.3% | -1.54 | 5 | 60.0% | +1.43 | ❓ |
 
 ---
 
@@ -26,6 +28,7 @@ None found.
 | r2v2-long3 | LONG | 2 | 50.0% | -1.61 | ❓ | Needs more data |
 | jup_yolo_mirrored | LONG | 2 | 50.0% | -0.41 | ❓ | Needs more data |
 | continuum-osc+ | LONG | 2 | 50.0% | -0.01 | ENABLED | Needs more data |
+| pump-chain+ | LONG | 2 | 50.0% | +0.37 | ❓ | Needs more data |
 
 ---
 
@@ -46,6 +49,8 @@ None found. Top performers are already enabled.
 1. **[WATCH] r2v2-long3 LONG** — WR=50.0%, PnL=-1.61% over 2 trades. Monitor next cycle.
 2. **[WATCH] jup_yolo_mirrored LONG** — WR=50.0%, PnL=-0.41% over 2 trades. Monitor next cycle.
 3. **[WATCH] continuum-osc+ LONG** — WR=50.0%, PnL=-0.01% over 2 trades. Monitor next cycle.
+4. **[WATCH] pump-chain+ LONG** — WR=50.0%, PnL=+0.37% over 2 trades. Monitor next cycle.
+5. **[KEEP] 1 winning combos** — atr-trend+. LONG side dominant.
 
 ---
 

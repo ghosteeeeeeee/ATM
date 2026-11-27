@@ -6007,3 +6007,36 @@
 
 ## Error Alerts — 2026-11-26 19:55 UTC
 - **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-26 20:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-26 21:40 UTC
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ⚠️ TOK TOK: BIGTIME TOK — signal TOK rolled back (prevents retry loop)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   ℹ️ hotset failure TOK recorded (exec-policy refusal, no cooldown): BIGTIME TOK — TOK bypass blocked in SHORT_BIAS (LONG_BIAS_BYPASS_SHORT_BIAS_BLOCK_ENABLED)`
+
+## Error Alerts — 2026-11-26 21:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-26 22:40 UTC
+- **REPEATED** (19x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — MOMENTUM`
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+NEUTRAL+AT, allowing despite TOK filter`
+- **REPEATED** (9x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-11-26 22:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-26 23:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-27 00:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-27 01:00 UTC
+- **[WARN]** (freq_deviation_shadow): `btc-pump-rider+`: FREQ DEVIATION UNDER source=btc-pump-rider+ baseline=0.080/h current=0.000/h ratio=0.00 n_base=27 n_cur=0
+
+## Error Alerts — 2026-11-27 01:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-27 02:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)

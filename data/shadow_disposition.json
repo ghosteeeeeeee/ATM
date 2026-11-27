@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "brain_auditor #305",
+  "updated": "2026-11-27T00:47:34Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -2227,15 +2227,17 @@
       "id": "other-gate-short-withhold-review",
       "stream": "approval-block SHORTs NOT attributable to floor/regime/vol (rr-engine, pump-chain-short-high, oversold-knife, confluence single-type, rep)",
       "kind": "eval",
-      "disposition": "AUDITOR NOTE 2026-11-26 #303: not adjudicated this run — owner is signal_analyst and the per-gate split (token-day dedup fwd4h, n>=30/gate, p<0.05, OOS same-sign) is the assigned analysis, not a quick read. Default (no change, KEEP rulings stand) remains correct and will fire at the 11-27 deadline if the owner has not delivered. Reconcile list unchanged: short-relax0/25 KEEP, regime-gate KEEP, pc-high KEEP.",
-      "status": "open",
+      "disposition": "ADJUDICATED 2026-11-27 (audit #306; owner signal_analyst did NOT deliver by deadline, auditor ran the assigned per-gate split). Tool: brain/analysis/gate_relax_bar_2026-11-27.py (--selfcheck PASS 6). Method: gate_shadow PRIMARY fwd_4h (direction-adjusted — verified: same token/minute LONG row = -x, SHORT row = +x), token-day dedup, t-test + population base-rate + 7d-half sign + top-5 token concentration; $ via --notional 13.22 (#305 measured avg). 14d RESULT: RR-ENGINE n=294 +75.04% (+$9.92) p=0.0322 halves +21.51/+53.53 SAME-SIGN 3.61x base-rate = PASS on the written bar | CONFLUENCE-GATE-BLOCK n=263 +72.31% (+$9.56) p=0.0213 same-sign 3.88x = PASS | OVERSOLD-SHORT n=379 -20.54% p=0.606 BELOW population = FAIL (protective, oversold-knife KEEP stands) | PUMP-CHAIN-SHORT-HIGH n=246 p=0.486 = FAIL (pc-high KEEP stands) | PENDING-APPROVE-BLOCK ('rep') n=1 = INSUFFICIENT | reconcile trio all FAIL: SHORT-RSI-HARD-FLOOR n=405 p=0.64, SHORT-REGIME-GATE n=188 p=0.53, VOL-GATE-BYPASS n=204 p=0.11 -> short-relax0/25 KEEP + regime-gate KEEP stand. OUT-OF-SAMPLE KILLS BOTH 14d PASSES: 7d window RR-ENGINE p=0.0661 halves +57.07/-3.53 SIGN-FLIP, CONFLUENCE p=0.1869 -> neither is window-robust. DUAL-BASIS CAVEAT (#284 longbypass class: fwd +0.8665% vs realized 17% WR -$10.09): realized follow-on join (blocked -> PG SHORT fill within 60m) is thin — RR-ENGINE n=81 WR 55.6% net +0.45, CONFLUENCE n=1 = no evidence. CONFLUENCE-GATE-BLOCK is additionally CEO_PROTECTED via CONFLUENCE_REQUIRED. DEFAULT FIRES: NO CHANGE, all KEEP rulings stand. Follow-up rr-engine-short-relax-remeasure registered (due 2026-12-05).",
+      "status": "done",
       "started": "2026-11-20",
       "deadline": "2026-11-27T00:00:00Z",
       "threshold": "Per-gate split of the 'none' cell (n=526 token-days, +$14.48, WR58.2%, p=0.0002, both halves positive, LOO +$13.69): each gate's own bar (token-day dedup fwd4h, n>=30, net>=$1.50/14d, p<0.05, OOS same-sign) before ANY relax; knife/confluence stay protected unless their own bars flip",
       "default_action": "no change — KEEP rulings stand (cross-tab cell is aggregate, not per-gate)",
       "owner": "signal_analyst",
       "evidence": "agent-4 interaction cross-tab 2026-11-20 (fixed window b301abf4): the non-three-gate approval blocks collectively withheld the most profitable shorts of the window — first time this aggregate has been measured; marginals OUT OF SCOPE of gate-interaction-cross-tab, hence this entry",
-      "notes": "reconcile with: short-relax0/25 KEEP, regime-gate KEEP, pc-high KEEP — the cross-tab may be window-specific (14d incl crash legs); OOS + pre-register before proposing anything"
+      "notes": "reconcile with: short-relax0/25 KEEP, regime-gate KEEP, pc-high KEEP — the cross-tab may be window-specific (14d incl crash legs); OOS + pre-register before proposing anything",
+      "disposition_at": "2026-11-27T00:47:34Z",
+      "adjudicated_by": "brain_auditor #306"
     },
     {
       "id": "regime-gate-tension-check",
@@ -2689,7 +2691,51 @@
       "evidence": "30d: HIGH-LONG 117T -3.58 43.6% arm 41.0% vs nonHIGH-LONG 303T +0.10 53.8% arm 49.2%. ARMED high-long 48T +2.57 89.6% vs NEVER 69T -6.15 11.6% = this is a CHOP/ARM-GAP cell, NOT a direction cell. 88.9% of the cell's loss dollars sit in never-armed mfe<0.40 trades (56/60 losers). Never-armed LONG loser avg loss by regime: HIGH -0.1163 > NORMAL -0.0990 > FLAT -0.0967 > EXTREME -0.0892 with IDENTICAL initial sl_distance 0.015 everywhere. Mechanism: atr_sl_hit realized price move HIGH -0.913% vs NORMAL -0.690% (same 1.5% initial) = ATR stops widen with vol and the unarmed cohort pays for it. Same cell's atr_sl_hit slice: HIGH 33T -4.08 (41% of the whole -10.72 atr_sl bleed); by signal jup_yolo_mirrored 33T -4.45 = 41% of the atr_sl bleed.",
       "disposition": "PRE-REGISTERED 2026-11-26 #304. No config change this run: (1) one-variable rule vs REGIME_CONF_HIGH_MULT 0.50 shipped 2026-11-25T12:43Z whose first read is the SAME 11-29 deadline; (2) shipping the block now would deplete the HIGH cohort of its LONG leg and corrupt that pre-registered read; (3) the armed half of this cell wins 89.6% (+2.57/30d) so a hard block forfeits a working trend cohort — the correct first instrument may be arm-side (prearm enforce, in flight) rather than entry-side. Prior art: NO direct hit for a LONG-in-HIGH block (session brain queries 'have we tried blocking LONG trades in HIGH volatility regime' 6 hits, none a block attempt).",
       "notes": "Cites [calwndar 2026-10-31] 'LONG in HIGH: 55T, 43.6% WR ... it's regime routing + chop mechanics' (independent earlier measurement, same direction) and [mtf macd 2026-10-02] 'don't blanket disable anything, use the closed trades to see if the signal is in the wrong volatility regime' (method). Reconcile with: regime-conf-high-first-read (SAME 11-29 deadline, must be adjudicated together), prearm-enforce-day7-read (11-28, the arm-side alternative), amplify-stale-block-bleed5 (12-01)."
+    },
+    {
+      "id": "amplify-feevictim-maker-rescore",
+      "stream": "FEE-VICTIM cells (30d gross>0 AND net<0) re-scored at the maker-entry fee basis — the pre-registered TARGET SET for the maker/ALO rollout",
+      "kind": "amplify",
+      "proposal_type": "(a) param-widen counterfactual on measured cells — widen (confidence/weight, NOT notional: 69.5% floor census) ONLY cells that compute net>0 at maker rate",
+      "status": "open",
+      "created_at": "2026-11-26T21:05:00Z",
+      "owner": "brain_auditor #306 AMPLIFY (weekly-adjacent emit; formal weekly Mon 11-30)",
+      "deadline": "2026-12-15T00:00:00Z",
+      "evidence": "PG 2026-11-26 21:00Z, kill screen n>=20 net<0 => 9 cells, of which 4 are FEE-VICTIM (gross>0, net<0): jup_yolo_mirrored|NORMAL|LONG 45T g+0.14 fee0.76 net-0.62 WR64.4 | jup_yolo_mirrored|HIGH|SHORT 30T g+0.24 fee0.55 net-0.31 WR66.7 | bb-squeeze+|NORMAL|LONG 34T g+0.13 fee0.32 net-0.19 WR67.6 | pump-chain-|NORMAL|LONG 31T g+0.15 fee0.33 net-0.18 WR38.7. Rescored at maker 0.03% RT vs measured taker 0.106% RT (factor 0.283): net_maker = +0.09 / +0.06 / +0.04 / -0.08 => ALL FOUR STAY NEGATIVE, best +$0.09. 30d fee_total = $7.78 on gross -$4.25 (fees = 183% of gross loss); book-wide fee coverage 555/639 = 86.9%. The other 5 kill cells are GROSS-NEGATIVE (jup HIGH LONG 50T g-0.55, bb-squeeze HIGH 22T g-0.44, pump-chain+ EXTREME 32T g-0.23, atr-trend- HIGH 32T g-0.11, jup NORMAL SHORT 24T g-0.06) = maker cannot rescue them.",
+      "threshold": "SHIP any cell only if ALL: (i) maker/ALO path is LIVE for that cell's direction AND fill>=80%; (ii) cell net30 at maker basis >= +$0.25; (iii) n>=20; (iv) 7d/14d/30d same sign; (v) fk of sibling non-victim cells <20% of their winners. UNITS GUARD (#193 landmine): pnl_usdt vs pnl_usdt; fees from trades.fees JSON 'fee_total'; never raw price-move vs stored pnl_pct (leveraged).",
+      "default_action": "NO CHANGE — today's best maker-basis cell is +$0.09 (below the +$0.25 bar), so this entry exists to make the re-run mechanical when amplify-maker-entry-fill-walk (deadline 11-28) lands, not to widen anything now.",
+      "created_by": "brain_auditor #306"
+    },
+    {
+      "id": "be-arm-peak-structural-read",
+      "stream": "BE_ARM_PEAK_PCT 0.40% -> 2.5% (structural legs) — day-7/day-14 read; NO registered read existed for a change shipped 2026-11-22",
+      "kind": "eval",
+      "status": "open",
+      "created_at": "2026-11-26T21:05:00Z",
+      "started": "2026-11-22",
+      "owner": "brain_auditor #306 (gap-fill: registry had zero entries mentioning BE_ARM_PEAK_PCT)",
+      "deadline": "2026-11-29T00:00:00Z",
+      "evidence": "Ship: commit 1de08caf 2026-11-22 23:45Z 'major-break redesign ... structure-only exits (CEO ruling 20261122T220223Z)'; auto_trader.py:92 _be_armed now needs peak >= BE_ARM_PEAK_PCT (0.025), code comment states REVERT = 0.004. MECHANISM (verified 2026-11-26): ALL 83 armed pending orders carry dynamic_sl:False, so manual_exit_manager.update_trail:197 early-returns and the mxm BE-lock+tiered trail is OFF on every structural leg (CEO-directed per live order note 'CEO 2026-11-12: mxm giveback-trail stands down for these structural legs' — NOT a bug); auto_trader._lag_stop (30-min) is the sole stop authority and its BE-cap is the ONLY profit-lock left. MEASURED: ai-trader 30d peak buckets => <0.40: 26 LOSS -2.21 / 2 WIN +0.06 | 0.40-2.5 (the BE gap): 18 LOSS -1.90 + 16 WIN +2.17 (gross +0.27, net -0.41) | >=2.5: 3 WIN +1.08. CF bracket if BE armed at 0.40 on the gap cohort ONLY: save 14/18 losers that crossed entry = +$1.70 ; cost 7/16 winners that dipped past entry (mae>0.10) = -$1.05 => NET ~ +$0.65/30d, peak-before-dip ordering NOT verified. POST-SHIP (open_time > 2026-11-22 23:45, 4 days): gap cohort n=6 = 4 LOSS -0.90 (all crossed entry, avg mae 1.49) + 2 WIN +0.16 (avg mae 0.02, would SURVIVE a 0.40 BE) => CF ~ +$0.75.",
+      "threshold": "READ at day-7 (2026-11-29) and day-14 (2026-12-06). TRIGGER a revert review (BE_ARM_PEAK_PCT 0.025 -> 0.004, the code's own registered REVERT path) only if ALL: (i) gap-cohort n>=20 decided; (ii) CF net >= +$1.50 pnl_usdt (units guard, no fees in the CF, fees reported separately); (iii) 7d/14d same sign; (iv) fk<20% of gap-cohort winners (winners killed by the 0.40 BE). MONITOR-ONLY until n>=20 — today n=6 post-ship / n=34 all-window, both below the 20-trade bar.",
+      "default_action": "NO CHANGE — monitor. Reverting a CEO 4-day-old ruling on n=6 would repeat the small-n pattern this prompt bans.",
+      "created_by": "brain_auditor #306"
+    },
+    {
+      "id": "rr-engine-short-relax-remeasure",
+      "kind": "eval",
+      "status": "open",
+      "stream": "RR-ENGINE SHORT-leg relax candidate (found by the #306 other-gate per-gate split)",
+      "created_at": "2026-11-27T00:47:34Z",
+      "deadline": "2026-12-05T00:00:00Z",
+      "owner": "brain_auditor #306",
+      "desc": "First read of gate_relax_bar_2026-11-27.py on RR-ENGINE SHORT: 14d PASS on all four written bars (+$9.92, p=0.032, halves same-sign, 3.61x base-rate) but 7d FAIL (p=0.066, halves sign-flip) = NOT window-robust. This entry exists so the finding is not dropped and so no future run ships it off a single window.",
+      "threshold": "SHIP a scoped RR-ENGINE SHORT relax proposal only if ALL: (i) TWO reads >=3 days apart both PASS the four written bars (n>=30, net>=$1.50/14d, p<0.05, halves same-sign) on the PRIMARY fwd_4h basis; (ii) gate mean > population mean of blocked SHORTs in the same window (base-rate limb added #306 — a bear drift makes every gate pass against zero); (iii) realized follow-on join (blocked -> PG fill within 60m) n>=30 and net>0 — the #284 dual-basis landmine; (iv) top-5 token concentration <70% of net (14d read = 60%, JUP/PONS/ARB/DYDX/RESOLV); (v) fk: relaxing must not be estimated to lose on the admitted cohort (units guard pnl_usdt, never pnl_pct). Default NO CHANGE.",
+      "default_action": "NO CHANGE — RR-ENGINE stays live; collect to the 12-05 read",
+      "not_a_duplicate_of": "other-gate-short-withhold-review (done #306, delivered this analysis) / short-relax0/25 KEEP / regime-gate KEEP / pc-high KEEP / CONFLUENCE-GATE-BLOCK — the latter also passes 14d but is CEO_PROTECTED via CONFLUENCE_REQUIRED and has realized n=1, so it is a CEO packet item only, never an auditor proposal",
+      "evidence": "gate_relax_bar_2026-11-27.py 14d: RR-ENGINE 294 tokdays +75.04% +$9.92 p=0.0322 halves +21.51/+53.53, mean 0.2552% vs population 0.0691% (3.61x), 83 tokens top5 60%. 7d: n=157 +53.53% p=0.0661 halves +57.07/-3.53 = FAIL. Realized join n=81 WR 55.6% net +0.45.",
+      "risk": "low while NO CHANGE; medium if shipped on the 14d window alone (single-window pattern class)"
     }
   ],
-  "updated_at": "2026-11-26T17:05:03.250732+00:00"
+  "updated_at": "2026-11-26T17:05:03.250732+00:00",
+  "updated_by": "brain_auditor #306"
 }

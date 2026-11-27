@@ -12514,5 +12514,32 @@
     "category": "receipt",
     "status": "shipped",
     "risk": "none"
+  },
+  {
+    "date": "2026-11-27T00:51:42Z",
+    "idea": "Base-rate-relative gate-relax bar (shipped inside brain/analysis/gate_relax_bar_2026-11-27.py)",
+    "rationale": "14d population mean fwd for blocked SHORTs = +0.069%, 7d = -0.076%. Against zero, RR-ENGINE (+0.255) and CONFLUENCE-GATE-BLOCK (+0.275) pass p<0.05 on both windows; judged against the population they still beat it 3.6-3.9x, but OVERSOLD-SHORT flips sign between windows. Without a population limb any drift window certifies every gate for relaxation.",
+    "expected_impact": "prevents false gate relaxations; reclassified 2 of 8 gates this run",
+    "category": "measurement",
+    "status": "shipped",
+    "risk": "none (advisory output, no live gate reads it)"
+  },
+  {
+    "date": "2026-11-27T00:51:42Z",
+    "idea": "Pre-registered impact read for CEO's 2026-11-22 structure-only change (PREARM OFF + BE_ARM_PEAK 2.5%), due 12-06",
+    "rationale": "POST 5d never-armed 29T 20.7% -2.70 (-0.54/day, -0.093/trade) vs PRE 9d 76T 10.5% -5.20 (-0.58/day, -0.068/trade): share flat 41% vs 45%, per-trade loss WORSE, arm% series-best 58.6%, book flipped +1.34 -> -1.30. n=29 = measurement, not a claim.",
+    "expected_impact": "gives the CEO an impact number for a money-path ruling instead of vibes",
+    "category": "change-tracking",
+    "status": "suggested",
+    "risk": "none"
+  },
+  {
+    "date": "2026-11-27T00:51:42Z",
+    "idea": "bb-squeeze+ NORMAL decay-kill at the 12-05 reband read (close the notional/conf-tilt amplify family if 14d net <= 0)",
+    "rationale": "WINNER_CELLS_VALIDATED member decayed to +0.13/30d, 0.00/14d, -0.04/7d while FIVE open amplify entries cite it; the family's justification should not outlive its cell.",
+    "expected_impact": "frees 2-3 weekly AMPLIFY slots from dead proposals",
+    "category": "governance",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
