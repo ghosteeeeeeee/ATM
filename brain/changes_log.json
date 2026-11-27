@@ -5115,5 +5115,27 @@
     "after": "+3 creative entries (amp re-axis, z-band sequencing, negative-result ledger)",
     "rationale": "confirms #246; prevents future re-derivation of a rejected avenue",
     "impact": "none on live config"
+  },
+  {
+    "timestamp": "2026-11-27T20:55:00Z",
+    "agent": "brain_auditor",
+    "type": "meta",
+    "change": "Audit #310: CLOSED disposition prearm-enforce-day7-read as MOOT-ENFORCE-OFF (ENFORCE False since 11-22 commit 1de08caf; enforce window 11-20..11-22, final n=12 frozen, bars 1/2 fail, bar 3 trips 5/12) + NEW disposition peak-source-divergence-neverarmed (deadline 12-04, default NO CHANGE)",
+    "file": "data/shadow_disposition.json",
+    "before": "open, due 2026-11-28",
+    "after": "done (moot) + successor entry peak-source-divergence-neverarmed open",
+    "rationale": "The flag was turned off 5 days before the deadline by the CEO major-break redesign; a 7-enforce-day read is unreachable and would keep re-burning the queue slot. The one live finding (peak-source divergence: 44/293 = 15.0% of the never-armed cohort reached +0.40% on 1m closes) needed an owner.",
+    "impact": "0 trading behavior; queue honesty + preserved data-integrity finding"
+  },
+  {
+    "timestamp": "2026-11-27T20:55:00Z",
+    "agent": "brain_auditor",
+    "type": "creative",
+    "change": "Audit #310: NEW brain/analysis/prearm_day7_read_2026-11-27.py (--selfcheck PASS) — 12 enforce fires x 1m candles: peak-source census + fk reach-proxy + realized net",
+    "file": "brain/analysis/prearm_day7_read_2026-11-27.py",
+    "before": "(none)",
+    "after": "new analysis script, zero trading behavior",
+    "rationale": "Day-7 read owed 11-28; produced 11-27 and surfaced the three-source peak disagreement inside #17023.",
+    "impact": "Feeds disposition close + successor entry; no code path touched"
   }
 ]

@@ -3,12 +3,12 @@
   "jup share rolling-50": 0,
   "HML 7d count": 0,
   "HML 7d net-of-fees": 0,
-  "net 24h (fees in)": 6,
-  "net 72h (fees in)": 27,
-  "fill ratio 48h LONG": 8,
-  "net $/trade 7d": 40,
-  "fleet payoff 14d": 40,
+  "net 24h (fees in)": 7,
+  "net 72h (fees in)": 28,
+  "fill ratio 48h LONG": 9,
+  "net $/trade 7d": 41,
+  "fleet payoff 14d": 41,
   "cost % notional RT 14d": 0
  },
- "updated_at": "2026-11-27T19:38:39+00:00"
+ "updated_at": "2026-11-27T23:38:39+00:00"
 }

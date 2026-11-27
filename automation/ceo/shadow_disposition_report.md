@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-27T16:54:11.768480+00:00
-registry: 164 entries (open=43)
+# Shadow disposition report — 2026-11-27T20:59:02.435062+00:00
+registry: 165 entries (open=43)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -124,7 +124,7 @@ registry: 164 entries (open=43)
 - OPEN hl-copy-plus-shadow: deadline=2026-11-30T00:00:00Z | (no parseable source)
 - OPEN hotset-pin-approved-shadow: deadline=2026-12-01T00:00:00Z | (no parseable source)
 - OPEN amplify-pumpchain-normal-short-early: deadline=2026-12-02T00:00:00Z | (no parseable source)
-- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 8756 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 8.1d
+- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 8932 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 8.3d
 - DONE amplify-rider-fade-threshold-walk: ? (?)
 - DONE amplify-jup-long-blocked-clonehunt: NO SHIP — walk executed 2026-11-23T04:44Z (brain_auditor #291). Bars: (i) n=41 PASS | (ii) walk net +0.13 < +0.50 FAIL | (iii) fk=100% FAIL (every live-winner token-day also in blocked set — token-day unit wrong for multi-fire/day jup; see side-find) | (iv) only CONTINUUM-BLOCK n>=5 net>0 FAIL (need >=2 gates) | (v) split-half H1 +0.27 / H2 -0.13 FAIL. Provenance suspect CONFIRMED: pre-walk would_win 68.3% vs 5m-walk 53.8% same 41 events (gate_shadow would_win inflated +14.5pp vs candle truth). Result: brain/analysis/jup_long_blocked_walk_result.json. Do NOT re-propose without gate_shadow would_win audit + event-level (not token-day) unit. (?)
 - OPEN stop-family-entry-filter-shadow: deadline=2026-12-01T00:00:00Z | (no parseable source)
@@ -137,7 +137,7 @@ registry: 164 entries (open=43)
 - OPEN amplify-maker-entry-fill-walk: deadline=2026-11-28T00:00:00Z | (no parseable source)
 - DONE amplify-ema300-breakthrough-underdeploy: CLOSED SUPERSEDED 2026-11-21 (brain_auditor #286): this entry was appended into _doc instead of entries by #257 (commit 919f4d50), so shadow_disposition.py (:570 reads only reg["entries"]) NEVER surfaced it and its 2026-11-20 deadline silently passed. The same work was properly registered and disposed as "amplify-ema300-underdeploy" (deadline 2026-11-19, CLOSED NO-SHIP 2026-11-18, audit #274: bar (i) counterfactual-walk FAIL). No measurement is owed. Root-cause guard shipped same run: main() now reports dict entries stranded in _doc. (2026-11-21T16:45:00Z)
 - OPEN amplify-capture-leaderboard-giveback: deadline=2026-12-01T00:00:00Z | (no parseable source)
-- OPEN prearm-enforce-day7-read: deadline=2026-11-28T00:00:00Z | (no parseable source)
+- DONE prearm-enforce-day7-read: CLOSED MOOT-ENFORCE-OFF (brain_auditor #310 2026-11-27). ENFORCE went False 2026-11-22 (commit 1de08caf, CEO major-break redesign: prearm's [0.25,0.40) domain handed to structure stops) = the enforce window was 2026-11-20 01:26Z -> 2026-11-22, so a 'day-7 read' is unreachable. FINAL cohort n=12 FROZEN. Read: brain/analysis/prearm_day7_read_2026-11-27.py --selfcheck PASS. bar1 n>=15 NOT MET (n=12) AND fk reach-proxy 7/12 = 58.3% vs the 13.9% walk baseline = FAIL (reach != winner-fk, labeled); bar2 realized net -0.13 pnl_usdt (avg -0.0108) FAIL; bar3 TRIPS (>=2): 5 of 12 fires had 1m-CLOSE favorable peak >= PM_TRAIL_ACTIVATE 0.40 during the hold (17023 BLUR +0.693 / 17029 BLUR +0.642 / 17033 APT +0.427 / 17037 BLUR +0.630 / 17045 RESOLV +0.485), DB mfe_pct >=0.40 on only 2 of them and trades.highest_price on 0 (17023: highest_price +0.396% vs mfe_price +0.580% vs 1m close +0.693% = THREE disagreeing sources inside one row); bar4 14d same-sign MOOT. Guard proposal (skip lock when DB-or-candle peak >= arm) is therefore owed on any future re-GO but is moot while ENFORCE=False — successor entry owns it: peak-source-divergence-neverarmed. (?)
 - DONE tp-vs-trail-shadow: NO SHIP (early close 2026-11-22 — bar evaluated on full 14d population, n=142 deduped >=30; mechanism structural, more data will not change it) (2026-11-22)
 - OPEN prearm-band-lower-candle-oos: deadline=2026-12-01T00:00:00Z | (no parseable source)
 - DONE goal-metric-restructure: EXECUTED 2026-11-22 — T APPROVED both items (goal rewrite + philosophy): verifier goal_metrics_check.py restructured to the expectancy set (net $/trade 7d >0, fleet payoff 7d >=1.2, cost % RT <=0.15%; WR = info-only diagnostic, no target); AGENTS.md philosophy line reframed verbatim per CEO 20261122T194418Z (2026-11-22)
@@ -165,3 +165,4 @@ registry: 164 entries (open=43)
 - OPEN rr-engine-short-relax-remeasure: deadline=2026-12-05T00:00:00Z | (no parseable source)
 - OPEN amplify-grindbreakout-short-knife-exempt: deadline=2026-12-11T00:00:00Z | (no parseable source)
 - OPEN eval-long-z-midband-1-2: deadline=2026-12-04T00:00:00Z | (no parseable source)
+- OPEN peak-source-divergence-neverarmed: deadline=2026-12-04T00:00:00Z | (no parseable source)

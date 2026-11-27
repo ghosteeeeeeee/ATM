@@ -6146,3 +6146,22 @@
 
 ## Error Alerts — 2026-11-27 19:55 UTC
 - **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
+
+## Error Alerts — 2026-11-27 20:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
+
+## Error Alerts — 2026-11-27 21:00 UTC
+- **[WARN]** (freq_deviation_shadow): `bb-squeeze+`: FREQ DEVIATION UNDER source=bb-squeeze+ baseline=0.045/h current=0.000/h ratio=0.00 n_base=15 n_cur=0
+
+## Error Alerts — 2026-11-27 21:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 87% used (>= 85%)
+
+## Error Alerts — 2026-11-27 22:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 87% used (>= 85%)
+
+## Error Alerts — 2026-11-27 23:40 UTC
+- **NEW** (2x): `Nov N N:N:N python3[TOK]: TS   [brain.py] ❌ mirror_open TOK for TOK: Insufficient margin to place order. asset=N`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: ess=False, size=None, total_sz=None, notional_usdt=None, entry_price=None`
+
+## Error Alerts — 2026-11-27 23:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 87% used (>= 85%)

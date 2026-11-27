@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-27T00:47:34Z",
+  "updated": "2026-11-27T20:55:00+00:00",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -2386,7 +2386,7 @@
       "id": "prearm-enforce-day7-read",
       "stream": "PREARM_LOCK_ENFORCE day-7 read + peak-source divergence check (re-measure promised inside done disposition amplify-prearm-breakeven-lock)",
       "kind": "eval",
-      "status": "open",
+      "status": "done",
       "started": "2026-11-22",
       "deadline": "2026-11-28T00:00:00Z",
       "owner": "brain_auditor #288 (registry ship — deadline was only recorded inside a done disposition, would have been dropped)",
@@ -2395,7 +2395,8 @@
       "default_action": "keep PREARM_LOCK_ENFORCE=True (CEO GO stands), NO param change; divergence guard needs CEO even if bar (3) trips",
       "not_a_duplicate_of": "amplify-prearm-breakeven-lock (done — first read n=4) / amplify-ugb-bypass-armgap (done — UGB-PT owns bypass atr_sl deaths) / win-side-capture-shadow (post-arm giveback, due 11-25)",
       "risk": "low — read-only eval; only outcome is a guarded proposal",
-      "disposition": " | 2026-11-24T20:45Z (#296 pre-read): ENFORCE WINDOW IS ~2 DAYS NOT 7 — PREARM_LOCK_ENFORCE went True 2026-11-20 01:26Z, CEO set False 2026-11-22 (major-break redesign). Live realized prearm_lock exits: 11-20 n=3 / 11-21 n=7 / 11-22 n=2 / 11-23 n=0 / 11-24 n=0 = n=12 total, avg -0.010 (vs same-window hard_max avg -0.110, manual_sl avg -0.098 = cap worked while live). Day-7 read due 11-28 must therefore lean on the SHADOW would-fire counterfactual (still logging: ICP #17089 11-24 12:40Z) + the 12-trade realized window; a pure '7 days of enforce' read is impossible. Peak-source divergence check unchanged. Do NOT read 0 fires 11-23..11-24 as a regression — enforce is OFF by design."
+      "disposition": "CLOSED MOOT-ENFORCE-OFF (brain_auditor #310 2026-11-27). ENFORCE went False 2026-11-22 (commit 1de08caf, CEO major-break redesign: prearm's [0.25,0.40) domain handed to structure stops) = the enforce window was 2026-11-20 01:26Z -> 2026-11-22, so a 'day-7 read' is unreachable. FINAL cohort n=12 FROZEN. Read: brain/analysis/prearm_day7_read_2026-11-27.py --selfcheck PASS. bar1 n>=15 NOT MET (n=12) AND fk reach-proxy 7/12 = 58.3% vs the 13.9% walk baseline = FAIL (reach != winner-fk, labeled); bar2 realized net -0.13 pnl_usdt (avg -0.0108) FAIL; bar3 TRIPS (>=2): 5 of 12 fires had 1m-CLOSE favorable peak >= PM_TRAIL_ACTIVATE 0.40 during the hold (17023 BLUR +0.693 / 17029 BLUR +0.642 / 17033 APT +0.427 / 17037 BLUR +0.630 / 17045 RESOLV +0.485), DB mfe_pct >=0.40 on only 2 of them and trades.highest_price on 0 (17023: highest_price +0.396% vs mfe_price +0.580% vs 1m close +0.693% = THREE disagreeing sources inside one row); bar4 14d same-sign MOOT. Guard proposal (skip lock when DB-or-candle peak >= arm) is therefore owed on any future re-GO but is moot while ENFORCE=False — successor entry owns it: peak-source-divergence-neverarmed.",
+      "closed_at": "2026-11-27T20:55:00Z"
     },
     {
       "id": "tp-vs-trail-shadow",
@@ -2854,8 +2855,24 @@
         "units_guard": "pnl_usdt vs pnl_usdt; fees = trades.fees JSON fee_total (CEO Phase-0 net = pnl_usdt - fee_total).",
         "reproduce": "SELECT ... GROUP BY band in/out, cohort armed(COALESCE(mfe_pct,0)>=0.40) vs never; fisher_exact on WR 2x2; windows 7/14/30d."
       }
+    },
+    {
+      "id": "peak-source-divergence-neverarmed",
+      "stream": "Peak-source disagreement (trades.mfe_pct / trades.highest_price vs candles_1m 1m close) — never-armed label + prearm guard",
+      "kind": "eval",
+      "status": "open",
+      "created_at": "2026-11-27T20:55:00Z",
+      "deadline": "2026-12-04T00:00:00Z",
+      "owner": "brain_auditor #310",
+      "proposal_type": "(a) measurement + CEO guard decision — NO code ships from this entry",
+      "evidence": "brain/analysis/prearm_day7_read_2026-11-27.py (--selfcheck PASS). 30d closed n=616 with 1m candles: 44 trades (15.0% of the 293 DB-labeled never-armed cohort, mfe_pct<0.40) did in fact reach +0.40% favorable on 1m CLOSE during their hold (combined pnl -1.53); reverse direction 30 trades (DB>=0.40 but 1m close <0.40) => the two sources disagree BOTH ways (44 vs 30), so it is source jitter, not a one-sided bias. 7d n=124: 1m-close >=0.40 = 81 (65%) vs DB mfe >=0.40 = 75 (60.5%); mean peak candle 0.813% vs DB 0.664% (1.22x). Extreme case #17023 BLUR: trades.highest_price +0.396% (0.004pp BELOW the 0.40 arm line) vs trades.mfe_price/mfe_pct +0.580% vs 1m close +0.693% vs 1m high +0.834% — three disagreeing sources inside one row, and which one the arm check reads decides arming. Feed sanity (so this is not a venue artifact): candles_1m close vs trades.exit_price at the exit minute mean |diff| = 0.110% over 12 spot checks — the candle series is the same market within ~0.11%, while the observed peak gaps run to 0.44-0.79pp. CONSEQUENCE: (i) the prearm lock's armed-guard can fire on trades the market already took to arm level (5/12 fires); (ii) the never-armed cohort — which the chop-bleed KPI and #309's z[1,2) decomposition both rest on — carries ~15% label noise. PRIOR ART (do not re-derive): [yolo dash 2026-11-02] 'guardian.py:1885 writes current_price without peaks; observed 0.17% disagreement (3x the MFE threshold) and highest_price < current_price on 16629 — pre-existing dual-writer'; [ugb_pt exit 2026-10-31] 'MFE/MAE columns are all zeros — not being recorded; compute from highest_price/lowest_price'. Both 25-28 days old; this entry is the COHORT QUANTIFICATION of that known dual-writer class, not a new discovery.",
+      "threshold": "Report at 12-04: (1) reproduce 44/293 and 30-reverse on a fresh 30d window (same query, same n>=600); (2) if either direction moves >30%, treat the prior number as unstable and re-baseline the never-armed cohort label; (3) re-measure #309's z[1,2) decomposition using a CANDLE-based arm label — report whether fisher p=0.0091 survives; (4) the prearm GUARD (skip lock when DB-or-candle peak >= PM_TRAIL_ACTIVATE) is drafted HERE for CEO only if ENFORCE is re-GO'd. Units: pct of price, never pnl_pct; pnl in pnl_usdt.",
+      "default_action": "NO CHANGE — measurement only. Do not touch the trail arm path, trades.mfe_pct writer, or PREARM_* constants (ENFORCE is already False by CEO ruling; money-path changes need CEO).",
+      "risk": "low (analysis only); the risk being managed is a WRONG conclusion: 15% label noise does NOT by itself refute the never-armed loss cohort (the 44 trades total -1.53, i.e. they are losing too) — it bounds how sharp the label can be.",
+      "measurement": "brain/analysis/prearm_day7_read_2026-11-27.py extended, or a copy with --since-days N; PG trades x data/candles.db 1m close.",
+      "not_a_duplicate_of": "prearm-enforce-day7-read (CLOSED this run, MOOT-ENFORCE-OFF) · amplify-prearm-breakeven-lock (done) · eval-long-z-midband-1-2 (different cohort, LONG z-band) · prearm-band-lower-candle-oos (12-01, band parameter not source)"
     }
   ],
-  "updated_at": "2026-11-27T16:45:00+00:00",
-  "updated_by": "brain_auditor #309"
+  "updated_at": "2026-11-27T20:55:00+00:00",
+  "updated_by": "brain_auditor #310"
 }

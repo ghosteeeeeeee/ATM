@@ -12634,5 +12634,35 @@
     "status": "recorded",
     "risk": "none",
     "prior_art": "[kanban brain_auditor #246, 2026-11-11] 'Entry-filter fisher scan REJECTED (momentum/z-tier predict ARM not net)'; [shadow mode 2026-10-17] 'RR problem itself: exit engines cut winners short and let losers run'"
+  },
+  {
+    "date": "2026-11-27T20:55:00Z",
+    "idea": "CLOSE the prearm day-7 read as MOOT and hand the peak-divergence to a successor entry (the flag went False 5 days before the deadline)",
+    "rationale": "PREARM_LOCK_ENFORCE was set False 2026-11-22 (commit 1de08caf, CEO major-break redesign: prearm's [0.25,0.40) domain handed to structure stops) while disposition prearm-enforce-day7-read was still scheduled for 11-28. The enforce window was 11-20 01:26Z to 11-22 = final cohort n=12 frozen, so bar (1) n>=15 is unreachable and bar (4) 14d same-sign is vacuous. Running the read anyway gave the final numbers: net -0.13 FAIL, reach-proxy 7/12=58.3% vs 13.9% walk baseline FAIL, bar (3) TRIPS at 5/12 fires.",
+    "expected_impact": "Stops a future run burning a full slot re-deriving an unreachable day-7 read, and preserves the one live finding (peak-source divergence) instead of letting it die with the closed entry.",
+    "category": "queue hygiene",
+    "status": "shipped",
+    "risk": "none",
+    "prior_art": "none found for the day-7 read itself; disposition prearm-enforce-day7-read (own prior)"
+  },
+  {
+    "date": "2026-11-27T20:55:00Z",
+    "idea": "NEVER-ARMED IS A THREE-SOURCE LABEL — quantify the noise before any arm-based decision (44/293 = 15.0% of the cohort reached +0.40% on 1m closes)",
+    "rationale": "30d n=616: trades.mfe_pct says 293 never-armed, but 1m-CLOSE peak says 44 of those DID reach +0.40% (pnl -1.53) while 30 go the other way (DB>=0.40, close<0.40). Both directions disagree = source jitter, not bias. Extreme row #17023 BLUR carries THREE disagreeing peaks in one row: highest_price +0.396% (0.004pp under the arm line), mfe_price +0.580%, 1m close +0.693%, 1m high +0.834%. Feed sanity: candles_1m close vs exit_price mean |diff| 0.110% (n=12) so the candle series is the same market, while peak gaps run 0.44-0.79pp. Consequence: the chop-bleed KPI and #309's z[1,2) fisher p=0.0091 both read a label that is ~15% noisy.",
+    "expected_impact": "Bounds the sharpness of every arm-based conclusion (15% label noise) and pre-registers the re-measure on a candle label at 12-04 so a later run cannot 'discover' the noise and over-claim a refutation.",
+    "category": "data integrity / negative-result ledger",
+    "status": "recorded",
+    "risk": "low — explicitly NOT claimed as a refutation (the 44 mislabeled trades lost -1.53 too)",
+    "prior_art": "[yolo dash 2026-11-02] guardian.py:1885 writes current_price without peaks, 0.17% disagreement, highest_price<current_price — dual-writer; [ugb_pt exit 2026-10-31] MFE/MAE columns all zeros"
+  },
+  {
+    "date": "2026-11-27T20:55:00Z",
+    "idea": "EVERY n>=20 30d CELL FAILS THE FEE-ADMISSION BAR — publish net/trade per cell as the standing screen (best cell is -0.0022/trade)",
+    "rationale": "Extended #309's '7 of 8 gross-positive cells fail after fees' to the complement: across ALL 30d cells with n>=20 the best net/trade is btc-pump-rider+|LONG -0.0022 and the worst is atr-trend-|SHORT -0.0225; gross/trade on the whole book is -0.0066 vs fee/trade 0.01247 (fees 188% of the gross loss, 30d gross -4.13 / fees 7.78 / net -11.91). 7 cells at WR>=55% are still net-negative because avg_loss is 1.4-2.0x avg_win (jup LONG: breakeven needs 66.7%, actual 62.8%).",
+    "expected_impact": "No behavior change — gives the 11-30 formal weekly AMPLIFY a pre-computed screen so it cannot propose a cell that cannot pay its own freight.",
+    "category": "fee axis / offense-budget routing",
+    "status": "recorded",
+    "risk": "none",
+    "prior_art": "[Build New Linear Regression Signal 2026-10-29] entry path hardcodes order_type=Market -> taker 0.09% RT, maker would add +0.06% (29d old, still unimplemented in pipeline)"
   }
 ]
