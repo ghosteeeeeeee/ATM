@@ -35215,3 +35215,31 @@ BY: auto_1hr
 - Flat book 4+ hours; no exposure while tape is quiet — not over-filtering, simply no signals firing
 - unarmed cohort WR 33.3% net -0.35 — stall stack fix still pending
 BY: auto_1hr
+
+## [2026-11-27 17:54] Hourly Analysis
+
+**Storm:** no storm (window-min -1.23% / at-run -0.88%) — both inside ±1.5 gate
+**Trades:** 1 closed last hour (0W 1L) | 24h 15 closed (10W 5L) | 1 open (MERL atr-trend- SHORT 17:47)
+**PnL NET:** hour -$0.19 (gross -$0.17) | 24h NET -$0.58 (gross -$0.39, fees $0.19, payoff 0.25, WR 66.7%) | 7d NET -$2.15 (126T) | 14d NET -$3.35 (232T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- 1 close last hour: SOL jup_yolo_mirrored LONG atr_sl_hit -$0.19 net (MAE 0.722%, held 32min) — single trade, no pattern
+- Kill policy: no 0%-WR signal n>=3 (last hour n=1; 24h worst atr-trend+ 5T 40% net -0.53 — 40% WR not 0%, no regime block trigger)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/15 = 20% (<40%); tpsl_utils deployed; profit-monster-trail 8T net +0.26 dominant, atr_sl_hit bucket net -0.54
+- Boost: no signal passes all 3 gates (bb-squeeze+ 4T 100% net +0.06 fails 5+ trades; warrior-sr-confirm+ 1T; jup_yolo 3T net -0.11) — skipped
+- Arm rate: unarmed 6/15 = 40% <70%, WR 16.7% net -0.84 vs armed 9/15 100% net +0.26 — stall stack owns fix, NO new gate (surfaced only)
+- Frequency: 1/hr — under 20
+- Entry quality: 24h winners avg MAE 0.234% < 0.5% (max 0.631), losers 0.783% (max 0.935)
+- Negative-hour streak: none (10 +0.01, 12 -0.04, 17 -0.19, gaps in between); regime NORMAL 8T -0.08 / HIGH 6T -0.23 / EXTREME 1T -0.27 — not NEUTRAL -> no size cut; already 0.25x
+
+**Open Questions:**
+- 24h NET -$0.58 (fees $0.19), payoff 0.25 at WR 66.7% — payoff is the loss driver (winners avg +0.05 vs losers avg -0.16), not WR
+- 7d -$2.15, 14d -$3.35 (worsening from -$3.22/-$3.35 range)
+- atr-trend+ 5T 40% net -$0.53 is worst 24h signal — watch for 0% regime cluster; no kill criteria met
+- unarmed cohort WR 16.7% net -$0.84 — stall stack fix still pending
+- window-min -1.23% approaching dump gate — recheck next run
+BY: auto_1hr
