@@ -35270,3 +35270,30 @@ BY: auto_1hr
 - unarmed cohort WR 14.3% net -$0.98 — stall stack fix still pending
 - HIGH regime 7T net -$0.37 is the worst 24h regime bucket — watch, no auto action (regime not NEUTRAL)
 BY: auto_1hr
+
+## [2026-11-27 19:54] Hourly Analysis
+
+**Storm:** no storm (window-min -0.02% / at-run -0.02%) — both inside ±1.5 gate
+**Trades:** 1 closed last hour (1W 0L) | 24h 13 closed (7W 6L) | 0 open (flat)
+**PnL NET:** hour +$0.03 (gross +$0.04) | 24h NET -$0.78 (gross -$0.62, fees $0.16, payoff 0.27, WR 53.8%) | 7d NET -$2.41 (124T) | 14d NET -$3.32 (233T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- 1 close last hour: USUAL atr-trend+ LONG profit-monster-trail +$0.03 net (+1.03%, armed, EXTREME regime)
+- Kill policy: no 0%-WR signal n>=3 (last hour n=1; 24h atr-trend+ 6T 50% net -$0.50 is worst but 50% WR ≠ 0%, no regime-block trigger)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/13 = 23% (<40%); tpsl_utils deployed; profit-monster-trail 6T net +$0.20 dominant, atr_sl_hit bucket net -$0.54
+- Boost: no signal passes all 3 gates (atr-trend+ 6T 50% fails WR+net; jup_yolo_mirrored 2T net -$0.16; all others n<=1) — skipped
+- Arm rate: unarmed 7/13 = 53.8% <70%, WR 14.3% net -$0.98 vs armed 6/13 100% net +$0.20 — stall stack owns fix, NO new gate (surfaced only)
+- Frequency: 1/hr — under 20
+- Entry quality: 24h winners avg MAE 0.180% < 0.5% (max 0.430), losers 0.693% (max 0.935)
+- Negative-hour streak: 3 consecutive negative hours 11-26 21/22/23 (-0.08/-0.27/-0.16) but regime HIGH/NORMAL/EXTREME not NEUTRAL → no size cut; already 0.25x; current hour positive
+
+**Open Questions:**
+- 24h NET -$0.78 (fees $0.16), payoff 0.27 at WR 53.8% — payoff remains the loss driver (winners avg ~+0.05, losers ~-0.16)
+- 7d -$2.41, 14d -$3.32 — steady, no improvement
+- unarmed cohort net -$0.98 vs armed +$0.20 — stall stack fix still pending
+- HIGH regime 7T net -$0.37 still worst 24h bucket — watch, no auto action
+BY: auto_1hr
