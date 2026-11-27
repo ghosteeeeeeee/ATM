@@ -35243,3 +35243,30 @@ BY: auto_1hr
 - unarmed cohort WR 16.7% net -$0.84 — stall stack fix still pending
 - window-min -1.23% approaching dump gate — recheck next run
 BY: auto_1hr
+
+## [2026-11-27 18:54] Hourly Analysis
+
+**Storm:** no storm (window-min -0.80% / at-run +0.36%) — both inside ±1.5 gate
+**Trades:** 1 closed last hour (0W 1L) | 24h 15 closed (9W 6L) | 0 open (flat)
+**PnL NET:** hour -$0.14 (gross -$0.13) | 24h NET -$0.77 (gross -$0.59, fees $0.18, payoff 0.23, WR 60.0%) | 7d NET -$2.40 (125T) | 14d NET -$3.35 (232T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- 1 close last hour: MERL atr-trend- SHORT stale_exit -$0.14 net (-3.46%); prior hour SOL jup_yolo atr_sl_hit -$0.17 — flat book now
+- Kill policy: no 0%-WR signal n>=3 (24h worst atr-trend+ 5T 40% net -0.53; atr-trend- 1T / continuum-osc- 1T only)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/15 = 20% (<40%); tpsl_utils deployed; profit-monster-trail 7T net +0.21 dominant, atr_sl_hit bucket net -0.54
+- Boost: no signal passes all 3 gates (bb-squeeze+ 4T 100% net +0.06 fails 5+ trades; warrior-sr-confirm+ 1T; atr-trend+ 5T 40% fails) — skipped
+- Arm rate: unarmed 7/15 = 46.7% <70%, WR 14.3% net -$0.98 vs armed 8/15 100% net +$0.21 — stall stack owns fix, NO new gate (surfaced only)
+- Frequency: 1/hr — under 20
+- Entry quality: 24h winners avg MAE 0.232% < 0.5% (max 0.631), losers 0.693% (max 0.935)
+- Negative-hour streak: hours with closes 12 -0.04, 17 -0.33 — not 3 consecutive; regime NORMAL 7T -0.13 / HIGH 7T -0.37 / EXTREME 1T -0.27 — not NEUTRAL -> no size cut; already 0.25x
+
+**Open Questions:**
+- 24h NET -$0.77 (fees $0.18), payoff 0.23 at WR 60.0% — payoff is the loss driver (atr_sl_hit -0.54 + hard_max_loss -0.31), not WR
+- 7d -$2.40, 14d -$3.35 — 7d worsening from -$2.15
+- unarmed cohort WR 14.3% net -$0.98 — stall stack fix still pending
+- HIGH regime 7T net -$0.37 is the worst 24h regime bucket — watch, no auto action (regime not NEUTRAL)
+BY: auto_1hr
