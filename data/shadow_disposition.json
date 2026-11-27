@@ -2734,8 +2734,47 @@
       "not_a_duplicate_of": "other-gate-short-withhold-review (done #306, delivered this analysis) / short-relax0/25 KEEP / regime-gate KEEP / pc-high KEEP / CONFLUENCE-GATE-BLOCK — the latter also passes 14d but is CEO_PROTECTED via CONFLUENCE_REQUIRED and has realized n=1, so it is a CEO packet item only, never an auditor proposal",
       "evidence": "gate_relax_bar_2026-11-27.py 14d: RR-ENGINE 294 tokdays +75.04% +$9.92 p=0.0322 halves +21.51/+53.53, mean 0.2552% vs population 0.0691% (3.61x), 83 tokens top5 60%. 7d: n=157 +53.53% p=0.0661 halves +57.07/-3.53 = FAIL. Realized join n=81 WR 55.6% net +0.45.",
       "risk": "low while NO CHANGE; medium if shipped on the 14d window alone (single-window pattern class)"
+    },
+    {
+      "id": "amplify-grindbreakout-short-knife-exempt",
+      "kind": "amplify",
+      "type": "param-widen counterfactual (signal-scoped gate exemption)",
+      "status": "open",
+      "deadline": "2026-12-11T00:00:00Z",
+      "created_by": "brain_auditor #307",
+      "created_at": "2026-11-27T04:50:00+00:00",
+      "default": "NO-SHIP",
+      "proposal": "Source-scoped waiver of the EXEC-TIME RSI knife floor (OVERSOLD_SHORT_RSI_MAX=35) for source 'grind-breakout-' SHORT only. SINGLE VARIABLE - hard-floor (45) and mid-band death band (45-55) changes are explicitly OUT OF SCOPE this entry. Precedent for per-source floor: SHORT_RSI_HARD_FLOOR_JUP_YOLO=35 (CEO Option D 2026-10-30).",
+      "evidence": {
+        "shadow_30d": "n=28 closed, WR 96.4%, avg +1.325, sum +37.1 (brain/shadow_trades.db, source='grind-breakout-')",
+        "population_base_rate": "POP SHORT 30d n=56280 WR 55.6% avg -0.085; POP SHORT rsi_14<35 n=6349 WR 42.4% avg -0.115 -> signal is 11.0x avg / +52.5pt WR vs population",
+        "blocked_breakdown": "knife<35 n=14 (RSI 29.4-34.7) | hard_floor<45 n=5 (37.2-44.5) | death_band 45-55 n=3 | blocked@approval n=3 | BTC-CRASH n=1 | CONVERTED n=2 (both won)",
+        "blocked_cohort": "25/25 winners, binomial p=1.19e-07; knife cell 14/14 p=3.05e-05",
+        "token_holdout": "top-5 tokens 75.9% of n; excluding top-2 (MET,JUP) still WR 94.4% n=18"
+      },
+      "bars": {
+        "i_n_ge_20": "MET (28)",
+        "ii_halves_same_sign": "MET (first 15d 100% n=14 / second 15d 92.9% n=14)",
+        "iii_population_base_rate_limb": "MET (>=3x avg AND >=+20pt WR required; actual 11.0x and +52.5pt)",
+        "iv_binomial_p_lt_0_05": "MET (1.19e-07)",
+        "v_token_concentration_lt_70pct": "FAIL raw (75.9%) but PASS holdout (excl top-2 = 94.4%, n=18) -> waiver recorded, must be re-checked at the 12-11 read",
+        "vi_realized_join_n_ge_30": "FAIL-IMPOSSIBLE (only 1 live grind-breakout- close in 30d) -> SUBSTITUTE BAR: staged shadow re-read n>=35 all-positive before ANY ship",
+        "vii_single_variable": "MET (exec knife floor only)",
+        "viii_collision": "MET (signal-scoped, 0 effect on other 46 sources)"
+      },
+      "blocking_requirements": [
+        "INDEPENDENT VERIFICATION (own-conclusions agent) - mandatory; my counterfactual is not sufficient",
+        "CEO sign-off: this edits the exec-time last-line-of-defense gate added 2026-10-31 after the CASHCAT oversold-short loss [cit: calwndar 2026-10-31] and the BANANA lesson",
+        "14d staged shadow re-read hitting the substitute bar (vi)"
+      ],
+      "kill_conditions": [
+        "14d re-read flips sign (any negative week)",
+        "token concentration worsens (excl top-2 drops below 80% WR)",
+        "population SHORT base rate rises above 70% WR (gate becomes the non-binding constraint)"
+      ],
+      "notes": "Formal weekly AMPLIFY due Mon 11-30; this is the week's Flip-KPI candidate. Not shipped this run: 0 trading-constant changes, session lock absent, hermes_constants EMPTY git diff, CEO_PROTECTED 16/16 untouched."
     }
   ],
-  "updated_at": "2026-11-26T17:05:03.250732+00:00",
-  "updated_by": "brain_auditor #306"
+  "updated_at": "2026-11-27T04:50:00+00:00",
+  "updated_by": "brain_auditor #307"
 }

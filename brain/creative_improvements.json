@@ -12541,5 +12541,32 @@
     "category": "governance",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-27T04:50:00Z",
+    "idea": "SOURCE-SCOPED EXEC RSI KNIFE-FLOOR WAIVER FOR grind-breakout- SHORT (AMPLIFY pre-registered, default NO-SHIP, due 12-11)",
+    "rationale": "grind-breakout- SHORT is the best source in the shadow book: 30d n=28, 96.4% WR, avg +1.325 vs population SHORT 55.6%/-0.085 (11.0x avg, +52.5pt WR). 25/29 fires were BLOCKED - exec knife floor<35 = 14 (RSI 29.4-34.7), hard floor<45 = 5 (37.2-44.5), mid-band death band = 3, blocked@approval = 3, BTC-CRASH = 1; only 2 converted (both won). Blocked cohort 25/25 winners, binomial p=1.19e-07; halves 100%/92.9%; token holdout excl MET+JUP still 94.4%. Gates are correct at population level (POP SHORT rsi<35 n=6349 WR 42.4% avg -0.115) - this signal is the exception. Per-source floor precedent exists (SHORT_RSI_HARD_FLOOR_JUP_YOLO=35, CEO Option D 2026-10-30).",
+    "expected_impact": "frees the largest recoverable cell (14/29 = 48% of blocked fires); ~+18pp counterfactual shadow PnL per 30d window at the observed avg. NOT a realized-fill claim.",
+    "category": "entry sniper / gate exemption",
+    "status": "suggested",
+    "risk": "medium-high"
+  },
+  {
+    "date": "2026-11-27T04:50:00Z",
+    "idea": "FEE-ADMISSION BAR on every future proposal: gross-per-trade must exceed 1.5x the trailing-30d avg fee",
+    "rationale": "30d gross +3.62 / fees 7.79 / net -4.17 = fees are 215% of gross (was 168% at #306). avg gross/trade +0.0057 < avg fee 0.0122, so the book's per-trade gross edge sits below its per-trade cost. Same shape as #306's population base-rate limb, applied to cost instead of tape.",
+    "expected_impact": "prevents fee-negative registrations; ~0 behavior change today (all 8 current n>=10 30d winner cells already net>0)",
+    "category": "governance",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-27T04:50:00Z",
+    "idea": "WIRE OR DROP signal_history.trade_id (0 of 9731 rows populated in 7d)",
+    "rationale": "dead column makes signal->trade attribution impossible; an auditor can mis-read 'signals that never traded' as a conversion gap when the column is simply never written (I hit this exact trap mid-run before checking the base rate).",
+    "expected_impact": "telemetry only; removes a class of false findings",
+    "category": "telemetry",
+    "status": "suggested",
+    "risk": "low"
   }
 ]
