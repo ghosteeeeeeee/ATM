@@ -2015,3 +2015,10 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Findings: disk 89% used (5th warn today); error_alerts only routine momentum-block/hotset-refusal lines. WR high but PnL ~flat = fee drag on small winners, no blowout.
 ### Proactive (row 12 = accumulation): coin_tracker fresh — 87/117 coins in Wyckoff accumulation, 1 markup, 1 none, 1 stale>2d. Phase is near-uniform (74% accumulation), so it currently carries little cross-coin discriminating signal.
 ### Recommendation: rotate logs / free disk before 90% (already recommended 19:38Z, unaddressed).
+
+## CEO Status — 20261127T033838Z
+### Health: pipeline=active (oneshot timer fired 03:39:00, was 'inactive' between ticks = normal) guardian=active open_pos=0
+### Numbers: 24h 17T -0.39 58.8% | 7d 127T -0.50 55.1%
+### Findings: disk 89% used (>=85% warn, 5th consecutive hourly alert — unaddressed); 6 decision items due 11-28 (jup-short-walk, conf-tilt, r2v2-clonehunt, longbypass-reconcile, maker-fill-walk, prearm-day7); freq-deviation under on btc-pump-rider+ (advisory). High WR + negative PnL = fee/payoff drag on small winners, not an entry-quality signal.
+### Proactive (row 13 = coin_tracker scores): UPDATING — agg_scores max_ts 27s old, 88 distinct symbols scored in last hour (of 113). No staleness.
+### Recommendation: rotate logs / free disk before 90% (repeated 5x, still unaddressed).
