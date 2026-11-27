@@ -12568,5 +12568,41 @@
     "category": "telemetry",
     "status": "suggested",
     "risk": "low"
+  },
+  {
+    "date": "2026-11-27T13:00:00Z",
+    "idea": "LONG z-midband kill: block LONG when 1.0 <= z_score < 2.0 (mirror of the existing LONG_MIDBAND_RSI 60-70 doctrine)",
+    "rationale": "30d 80T 42.5% net -$2.52 vs non-band LONG 56.1% (fisher p=0.033); 14d -$0.95 (p=0.051) and 7d -$0.74 (p=0.087) SAME SIGN; reach+0.40% only 46.3%; loser exits 31/46 = atr_sl_hit+hard_max_loss (chop signature); 6 different signals, survives excluding EXTREME (39T -$1.19 vs baseline 234T -$1.03); kills only 15.8% of LONG winners (bar <20%); CHASE_ZSCORE_MAX=2.5 and SIGNAL_FILTER_Z_MIN=-1.5 leave [1,2) completely ungated today",
+    "expected_impact": "+~$2.52/30d (32% of the 30d fee load) and removes the band's 46.3% arm rate",
+    "category": "entry sniper",
+    "status": "suggested (disposition eval-long-z-midband-1-2, default NO-SHIP)",
+    "risk": "low — direction-scoped, below the existing >2.5 chase block"
+  },
+  {
+    "date": "2026-11-27T13:00:00Z",
+    "idea": "FEE-FLOOR ADMISSION AT SOURCE LEVEL — TESTED AND REJECTED-WITH-DATA",
+    "rationale": "hypothesis: skip sources whose 30d avg gross/trade < avg fee/trade. MEASURED: ALL 8 sources with n>=20 fail (jup_yolo -0.0002 vs 0.0145, atr-trend- -0.0100 vs 0.0105, btc-pump-rider +0.0122 vs 0.0145 ...). The 8 = 471T, gross -1.15, fee 6.08, net -7.23. Blocking them all would kill 265 winners worth +$18.21. No source-level fee floor exists to exploit — logged so it is never re-proposed.",
+    "expected_impact": "none — rejected",
+    "category": "cost",
+    "status": "rejected-with-data",
+    "risk": "n/a"
+  },
+  {
+    "date": "2026-11-27T13:00:00Z",
+    "idea": "SCOPE THE AI-TRADER PRECHECK'S OVERSOLD-SHORT WARNING TO THE MEASURED BAND",
+    "rationale": "ai-trader-pending SHORT 30d by entry RSI: <20 6T +0.18 50% | 20-30 18T -1.70 22.2% | 30-40 11T +0.44 45.5% | >=40 5T +1.32 60% — only the 20-30 band loses, and it is NON-MONOTONE with n=18. MFE in-band 0.347 = never went anywhere. Fisher vs the rest of the cohort is not significant at n=18.",
+    "expected_impact": "unknown — insufficient data, MONITOR ONLY (need >=20T and monotone shape)",
+    "category": "entry sniper",
+    "status": "monitor",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-27T13:00:00Z",
+    "idea": "ORPHAN CLEANUP: data/gate_shadow.db is 0 bytes",
+    "rationale": "real collector is brain/gate_shadow.db (28MB, fresh 0.8h); the data/ file was created 11-20 by a path-resolution bug and will make any source inventory that globs data/ report an empty gate-shadow source",
+    "expected_impact": "telemetry hygiene",
+    "category": "telemetry",
+    "status": "suggested",
+    "risk": "none"
   }
 ]

@@ -1,5 +1,5 @@
-# Shadow disposition report — 2026-11-27T04:52:35.901054+00:00
-registry: 163 entries (open=42)
+# Shadow disposition report — 2026-11-27T12:56:11.041917+00:00
+registry: 164 entries (open=43)
 
 - DONE flip-contrarian-pc: FLIP (2026-10-27)
 - DONE trial-coupled-cutsloser-sl: REVERT-UPHELD — trial cost -$0.92 vs old params; closed 8 days early (2026-10-31)
@@ -124,7 +124,7 @@ registry: 163 entries (open=42)
 - OPEN hl-copy-plus-shadow: deadline=2026-11-30T00:00:00Z | (no parseable source)
 - OPEN hotset-pin-approved-shadow: deadline=2026-12-01T00:00:00Z | (no parseable source)
 - OPEN amplify-pumpchain-normal-short-early: deadline=2026-12-02T00:00:00Z | (no parseable source)
-- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 8228 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 7.6d
+- OPEN kill-line-shadow-enforce: deadline=2026-12-03T00:00:00Z | data/kill_line_shadow.jsonl: 8580 rows, 0.0d | brain/kill_line_registry.json: 636 rows, 7.9d
 - DONE amplify-rider-fade-threshold-walk: ? (?)
 - DONE amplify-jup-long-blocked-clonehunt: NO SHIP — walk executed 2026-11-23T04:44Z (brain_auditor #291). Bars: (i) n=41 PASS | (ii) walk net +0.13 < +0.50 FAIL | (iii) fk=100% FAIL (every live-winner token-day also in blocked set — token-day unit wrong for multi-fire/day jup; see side-find) | (iv) only CONTINUUM-BLOCK n>=5 net>0 FAIL (need >=2 gates) | (v) split-half H1 +0.27 / H2 -0.13 FAIL. Provenance suspect CONFIRMED: pre-walk would_win 68.3% vs 5m-walk 53.8% same 41 events (gate_shadow would_win inflated +14.5pp vs candle truth). Result: brain/analysis/jup_long_blocked_walk_result.json. Do NOT re-propose without gate_shadow would_win audit + event-level (not token-day) unit. (?)
 - OPEN stop-family-entry-filter-shadow: deadline=2026-12-01T00:00:00Z | (no parseable source)
@@ -164,3 +164,4 @@ registry: 163 entries (open=42)
 - OPEN be-arm-peak-structural-read: deadline=2026-11-29T00:00:00Z | (no parseable source)
 - OPEN rr-engine-short-relax-remeasure: deadline=2026-12-05T00:00:00Z | (no parseable source)
 - OPEN amplify-grindbreakout-short-knife-exempt: deadline=2026-12-11T00:00:00Z | (no parseable source)
+- OPEN eval-long-z-midband-1-2: deadline=2026-12-04T00:00:00Z | (no parseable source)

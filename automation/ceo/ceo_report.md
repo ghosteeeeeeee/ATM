@@ -2022,3 +2022,15 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Findings: disk 89% used (>=85% warn, 5th consecutive hourly alert — unaddressed); 6 decision items due 11-28 (jup-short-walk, conf-tilt, r2v2-clonehunt, longbypass-reconcile, maker-fill-walk, prearm-day7); freq-deviation under on btc-pump-rider+ (advisory). High WR + negative PnL = fee/payoff drag on small winners, not an entry-quality signal.
 ### Proactive (row 13 = coin_tracker scores): UPDATING — agg_scores max_ts 27s old, 88 distinct symbols scored in last hour (of 113). No staleness.
 ### Recommendation: rotate logs / free disk before 90% (repeated 5x, still unaddressed).
+
+## CEO Status — 20261127T073838Z
+### Health: pipeline=active (timer fired 07:39Z, oneshot exits between ticks = normal) guardian=active open_pos=1
+### Numbers: 24h 15T -0.26 60.0% | 7d 124T -0.58 54.8%
+### Findings: clean — worst 7d cell ai-trader-auto 4T 0% -0.90 (CEO domain, n=4 monitor); disk 90% WARN repeating since 03:55Z; 6 decision items due ≤11-28 (jup-walk, conf-tilt, r2v2, longbypass, maker-entry, prearm-day7); rotating Q "coin tracker signals this week" = 0 (empty set)
+### Recommendation: one line — rotate logs/disk before the 90% warn becomes a write failure; 11-28 batch belongs to the weekly deep run.
+
+## CEO Status — 20261127T113839Z
+### Health: pipeline=active (timer-fires each min) guardian=active open_pos=1
+### Numbers: 24h 12T +0.10 75.0% | 7d 123T -0.40 56.1%
+### Findings: disk 89-90% used (>=85% warn repeated hourly since 07:55Z); pump-chain+ freq deviation 0.000/h vs 0.039 baseline; rotating Q (27%14=row13: coin_tracker scores updating = YES, agg_scores max ts 0.5min old, 113 symbols)
+### Recommendation: prune logs to drop disk below 85% before it trips health critical.

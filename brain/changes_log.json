@@ -5082,5 +5082,16 @@
     "after": "status=done with the full per-gate split (RR-ENGINE + CONFLUENCE pass 14d written bars but FAIL 7d OOS; oversold/pc-high/floor/regime/vol all FAIL = every KEEP stands); follow-up registered; script committed",
     "rationale": "owner did not deliver by deadline; default action fired only after the assigned analysis was actually run, so the KEEP ruling rests on measurement",
     "impact": "0 trading behavior; two 14d gate passes documented and explicitly downgraded to COLLECT (window-robustness fail + thin realized join + CONFLUENCE CEO-protected)"
+  },
+  {
+    "timestamp": "2026-11-27T13:00:00Z",
+    "agent": "brain_auditor",
+    "change": "Audit #308: registered disposition 'eval-long-z-midband-1-2' (LONG z_score [1,2) kill, deadline 2026-12-04, default NO-SHIP) — 0 trading-constant changes",
+    "type": "meta",
+    "file": "data/shadow_disposition.json",
+    "before": "163 entries",
+    "after": "164 entries",
+    "rationale": "30d 80T 42.5% net -2.52 fisher p=0.033, same sign 7/14/30d, kills 15.8% of LONG winners, band completely ungated today (CHASE gates >2.5 only); one-variable + independent-verify + CEO rule = register not ship",
+    "impact": "no live behavior change; pre-registered kill candidate with bars"
   }
 ]

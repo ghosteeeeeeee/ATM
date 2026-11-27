@@ -2773,8 +2773,49 @@
         "population SHORT base rate rises above 70% WR (gate becomes the non-binding constraint)"
       ],
       "notes": "Formal weekly AMPLIFY due Mon 11-30; this is the week's Flip-KPI candidate. Not shipped this run: 0 trading-constant changes, session lock absent, hermes_constants EMPTY git diff, CEO_PROTECTED 16/16 untouched."
+    },
+    {
+      "id": "eval-long-z-midband-1-2",
+      "stream": "LONG z_score in [1.0,2.0) — the un-gated mid-chase band: 30d 80T 42.5%WR net -$2.52 vs non-band LONG 56.1%",
+      "kind": "eval",
+      "status": "open",
+      "deadline": "2026-12-04T00:00:00Z",
+      "created_by": "brain_auditor #308",
+      "created_at": "2026-11-27T12:55:00+00:00",
+      "proposal": "Single-variable KILL: block LONG entry when 1.0 <= z_score < 2.0 (a z-midband, mirror of the existing LONG_MIDBAND_RSI 60-70 doctrine at hermes_constants.py:1358). CHASE_ZSCORE_MAX=2.5 only gates z>2.5 and SIGNAL_FILTER_Z_MIN=-1.5 only gates z<-1.5 (both with speed/other conjuncts) — band [1,2) is completely ungated today. NO code/constant change this run: enforce=False would leave the band observable in PG exactly as it is now, so shipping a no-op shadow gate adds nothing (ponytail rung 1). This entry is the change.",
+      "evidence": {
+        "30d": "80T 34W/46L WR 42.5% net -$2.52; non-band LONG 312W/175L WR 56.1%; fisher p=0.03303; reach+0.40% 46.3%",
+        "14d": "27T 10W/17L WR 37.0% net -$0.95 vs rest 59.0%; p=0.05128 (same sign)",
+        "7d": "15T 6W/9L WR 40.0% net -$0.74 vs rest 65.1%; p=0.08674 (same sign)",
+        "regime_split_30d": "EXTREME 41T -1.33 39.0% (z<1 EXTREME baseline 61T +1.23 62.3%) | HIGH 24T -0.93 41.7% | NORMAL 15T -0.26 53.3%; band EXCLUDING EXTREME still 39T -$1.19 46.2% vs non-band non-EXTREME 234T -$1.03 55.1%",
+        "signal_mix": "6 sources, not one: r2v2-long3 17T -0.88 · jup_yolo_mirrored 20T -0.87 · pump-chain+ 16T -0.71 · warrior-sr-confirm+ 8T -0.27 · bb-squeeze+ 18T -0.23 · btc-pump-rider+ 8T +0.10 (only positive)",
+        "exit_mix": "losers = atr_sl_hit 16 (-2.11) + hard_max_loss 15 (-1.68) = 31/46 loser exits = chop/no-momentum signature",
+        "winners_killed": "30d 34/215 LONG winners = 15.8% (bar <20%); 14d 13.3%; 7d 11.5%",
+        "net_effect_if_blocked": "+2.52/30d (vs 30d fee load 7.78 = 32% of fee)",
+        "units_guard": "pnl_usdt vs pnl_usdt; fees from trades.fees JSON fee_total (#193 landmine)"
+      },
+      "bars": {
+        "i_n_ge_20": "MET (80)",
+        "ii_p_lt_0_05": "MET 30d p=0.033; 14d p=0.051 MARGINAL; 7d p=0.087 MARGINAL — three same-sign windows required, met",
+        "iii_oos_consistent": "MET (sign identical 7d/14d/30d, magnitude grows with n)",
+        "iv_winners_lt_20pct": "MET (15.8%)",
+        "v_not_already_shipped": "MET — grep hermes_constants: only CHASE_ZSCORE_MAX=2.5 (>2.5) and SIGNAL_FILTER_Z_MIN=-1.5 exist; no LONG z-midband. Session-brain prior-art query returned NO z-midband proposal (hits were RSI/SHORT-CONTINUUM only)",
+        "vi_no_collision": "MET — band sits BELOW the existing >2.5 chase block; signal-scoped to direction=LONG only, 0 SHORT effect",
+        "vii_confounder_regime": "PARTIAL — effect concentrated in EXTREME/HIGH but survives excluding EXTREME (see evidence)",
+        "viii_independent_verification": "PENDING — own-conclusions must re-derive from PG before ANY enforce",
+        "ix_ceo_signoff": "REQUIRED — this is a live entry block"
+      },
+      "default_action": "NO CHANGE this run — monitor. Ship only after (a) own-conclusions independent re-derivation, (b) re-read at deadline showing all three windows still same-sign, (c) CEO sign-off.",
+      "kill_conditions": [
+        "any window flips sign at the 12-04 re-read",
+        "winners-killed rises above 20%",
+        "band net goes positive",
+        "z_score null-rate rises (30d null rate 81/631=12.8% — band only measurable on non-null)"
+      ],
+      "not_a_duplicate_of": "eval-midband-long-4564 (meta_rsi 45-64, DONE/NO-CHANGE — different feature: RSI not z) | CHASE_FILTER (z>2.5 only) | HIGH-long-displacement-read (regime read, due 11-29)",
+      "notes": "Formal weekly AMPLIFY due Mon 11-30. This run: 0 trading-constant changes, session lock ABSENT, hermes_constants.py EMPTY git diff, CEO_PROTECTED untouched. Registering the disposition IS the change."
     }
   ],
-  "updated_at": "2026-11-27T04:50:00+00:00",
-  "updated_by": "brain_auditor #307"
+  "updated_at": "2026-11-27T12:56:10.975603+00:00",
+  "updated_by": "brain_auditor #308"
 }

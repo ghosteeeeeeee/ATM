@@ -81,6 +81,7 @@ def main():
                                  and '.opencode/node_modules/.bin/' not in l
                                  and 'lsp/' not in l
                                  and not l.startswith('./skills/shared/')  # MANDATED shared skill symlinks (AGENTS.md)
+                                 and not l.startswith('./.dsh/skills/')  # DSH shared skill symlinks (same mandate, added 2026-11-23)
                                  and l != './scripts/hl_sync_guardian.py')  # underscore alias -> hl-sync-guardian.py
     if symlinks_clean.strip():
         print(f"[!] SYMLINKS FOUND:{chr(10)}{symlinks_clean}")
