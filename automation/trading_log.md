@@ -35297,3 +35297,30 @@ BY: auto_1hr
 - unarmed cohort net -$0.98 vs armed +$0.20 — stall stack fix still pending
 - HIGH regime 7T net -$0.37 still worst 24h bucket — watch, no auto action
 BY: auto_1hr
+
+## [2026-11-27 20:55] Hourly Analysis
+
+**Storm:** no storm (window-min -0.44% / at-run -0.18%) — both inside ±1.5 gate
+**Trades:** 0 closed last hour | 24h 12 closed (6W 6L) | 0 open (flat)
+**PnL NET:** hour $0.00 (no closes) | 24h NET -$0.80 (gross -$0.65, fees $0.15, payoff 0.28, WR 50.0%) | 7d NET -$2.41 (124T) | 14d NET -$3.32 (233T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- 0 closes last hour, flat book
+- Kill policy: no 0%-WR signal n>=3 (24h worst atr-trend+ 6T 50% net -0.50; 14d regime split EXTREME 7T 42.9% -0.29 / HIGH 5T 80% -0.13 / NORMAL 2T 50% +0.18 — wins in HIGH+NORMAL, not a kill; no regime-block trigger)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/12 = 25% (<40%); tpsl_utils deployed; profit-monster-trail 5T net +0.18 dominant, atr_sl_hit bucket net -0.54, hard_max_loss -0.31
+- Boost: no signal passes all 3 gates (warrior-sr-confirm+ 1T +0.08 n<5; continuum-osc+ 1T net 0; atr-trend+ 6T 50% net -0.50 fails WR+net) — skipped
+- Arm rate: unarmed 7/12 = 58.3% <70%, WR 14.3% net -$0.98 vs armed 5/12 100% net +$0.18 — stall stack owns fix, NO new gate (surfaced only)
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg MAE 0.138% < 0.5% (max 0.395), losers 0.693% (max 0.935)
+- Negative-hour streak: closes in 09 +0.03, 10 +0.01, 12 -0.04, 17 -0.33, 19 +0.03 — not 3 consecutive; regime EXTREME/HIGH/NORMAL not NEUTRAL → no size cut; already 0.25x
+
+**Open Questions:**
+- 24h NET -$0.80 (fees $0.15), payoff 0.28 at WR 50.0% — payoff still the loss driver (atr_sl_hit -0.54 + hard_max_loss -0.31)
+- 7d -$2.41, 14d -$3.32 — flat vs yesterday, no improvement
+- unarmed cohort net -$0.98 vs armed +$0.18 — stall stack fix still pending
+- HIGH regime 6T net -0.39 worst 24h bucket; atr-trend+ EXTREME 14d 42.9% — watch, no auto action
+BY: auto_1hr

@@ -6125,3 +6125,24 @@
 
 ## Error Alerts — 2026-11-27 16:55 UTC
 - **[WARN]** (health_monitor): `disk`: disk 89% used (>= 85%)
+
+## Error Alerts — 2026-11-27 17:40 UTC
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+- **REPEATED** (5x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+NEUTRAL+TOK, allowing despite TOK filter`
+- **REPEATED** (7x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-11-27 17:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
+
+## Error Alerts — 2026-11-27 18:40 UTC
+- **REPEATED** (19x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   [brain.py] ❌ TOK rc=N: stderr_tail=[TOK-TOK] info_rate: waited N.1s total, retrying (throttled: N line/60s)`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   TS   → TOK: ne, total_sz=None, notional_usdt=None, entry_price=None`
+- **NEW** (1x): `Nov N N:N:N python3[TOK]: TS   [brain.py] ❌ mirror_open TOK for TOK: Cannot increase position when open interest is at cap. asset=N | [TOK-TOK] info_rate: waited N.1s total, retrying (throttled: N lin`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-27 18:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
+
+## Error Alerts — 2026-11-27 19:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 90% used (>= 85%)
