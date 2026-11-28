@@ -35403,3 +35403,29 @@ BY: auto_1hr
 - unarmed cohort net -$0.45 vs armed +$0.19 — stall stack fix still pending
 - 3 open LONGs into new hour — report PnL next run
 BY: auto_1hr
+
+## [2026-11-28 00:55] Hourly Analysis
+
+**Storm:** no storm (window-min +0.00% / at-run +0.06%) — both inside ±1.5 gate
+**Trades:** 4 closed last hour (BIGTIME pump-chain+ hard_tp +0.26 net, BABY atr-trend+ trail +0.07, SOL jup_yolo_mirrored trail +0.04, YGG atr-trend+ atr_sl_hit -0.10) | 24h 13 closed (9W 4L) | 1 open (LDO atr-trend- SHORT 00:50)
+**PnL NET:** hour +$0.28 | 24h NET +$0.02 (gross +$0.17, fees $0.15, payoff 0.60, WR 69.2%) | 7d NET -$2.11 (128T) | 14d NET -$2.99 (236T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- Kill policy: no 0%-WR signal n>=3 (worst atr-trend- 1T 0% n<3; jup_yolo_mirrored 3T 66.7% net -$0.11 single-token; atr-trend+ 6T 66.7% net -$0.07 6 tokens)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 2/13 = 15.4% (<40%); tpsl_utils deployed; profit-monster-trail 7T net +$0.30 dominant, atr_sl_hit bucket -$0.28, hard_max_loss -$0.12, stale_exit -$0.14
+- Boost: no signal passes all 3 gates (atr-trend+ 6T 66.7% fails net -$0.07; jup_yolo_mirrored 3T fails n>=5 + single-token; rest n=1) — skipped
+- Arm rate: unarmed 6/13 = 46.2% <70%, WR 33.3% net -$0.29 vs armed 7/13 100% net +$0.30 — stall stack owns fix, NO new gate (surfaced only)
+- Frequency: 4/hr — under 20
+- Entry quality: 24h winners avg MAE 0.216% < 0.5% (max 0.518), losers 0.699% (max 1.006)
+- Negative-hour streak: 17 -0.33, 19 +0.03, 23 +0.11, 00 +0.21 — no 3 consecutive negative → no size action (already 0.25x)
+
+**Open Questions:**
+- 24h NET turned POSITIVE +$0.02 (fees $0.15), payoff 0.60 at WR 69.2% — payoff still <1.0, best 24h in days
+- 7d -$2.11, 14d -$2.99 — improving slowly from -$2.41/-$3.42
+- unarmed cohort net -$0.29 vs armed +$0.30 — stall stack fix still pending
+- 1 open LDO SHORT — report PnL next run
+BY: auto_1hr
