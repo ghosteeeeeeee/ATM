@@ -6223,3 +6223,30 @@
 
 ## Error Alerts — 2026-11-28 10:55 UTC
 - **[WARN]** (health_monitor): `disk`: disk 87% used (>= 85%)
+
+## Error Alerts — 2026-11-28 11:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 87% used (>= 85%)
+
+## Error Alerts — 2026-11-28 12:40 UTC
+- **REPEATED** (8x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says TOK+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum +N.N% — blocking TOK entries`
+- **REPEATED** (3x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING — BTC_LEVEL`
+
+## Error Alerts — 2026-11-28 12:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-28 13:40 UTC
+- **REPEATED** (13x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-28 13:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-28 14:40 UTC
+- **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] IO TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+- **REPEATED** (6x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says DECLINING+LEAN_BEAR+AT, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-28 14:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
+
+## Error Alerts — 2026-11-28 15:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)

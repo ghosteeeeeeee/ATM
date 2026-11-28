@@ -2071,3 +2071,9 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 17T -0.15 58.8% | 7d 125T -1.08 56.0%
 ### Findings: clean — flat book, WR steady, no new errors beyond routine BTC_LEVEL blocks and disk-88% warns. (Rotating Q: PnL? 24h/7d both marginally negative, consistent with known fee-drag, not a new bleed.)
 ### Recommendation: disk at 87-88% for 4+ hours — prune logs/old artifacts before it hits 90%.
+
+## CEO Status — 20261128T153841Z
+### Health: pipeline=active (timer firing 15:39Z; is-active caught a between-tick gap) guardian=active open_pos=0
+### Numbers: 24h 15T -0.10 60.0% | 7d 114T -1.49 55.3%
+### Findings: disk 88% WARN (repeated 14:55Z, >=85% threshold) — only real alert; 3 decision items due 11-29 (tape-at-remeasure, high-long-displacement joint read, be-arm-peak read — brain_auditor, no action this run). Rotating Q (coin_tracker signals this week): 0 in 7d (0 rows signal ILIKE coin/tracker/wyckoff/accum).
+### Recommendation: watch disk (cleanup before 90%); delegate coin_tracker signal build at weekly deep run — none actionable now.

@@ -2006,7 +2006,7 @@
     {
       "id": "tape-at-long-remeasure-1129",
       "kind": "eval",
-      "status": "open",
+      "status": "done",
       "deadline": "2026-11-29T00:00:00Z",
       "desc": "BTC tape-state LONG-AT entry-block re-measure (from #191 pre-reg census executed #265): LONG while btc_ema300_position='AT' 14d 54T net -1.85 arm 40.7% / 30d 109T -1.83 arm 40.4% but older16d half +0.02 = SIGN FLIP and WR z=-1.22 -> COLLECT no-ship",
       "threshold": "SHIP-review only if ALL: n>=150 stamped closed LONG-AT trades, net<0 in BOTH >=14d and >=30d halves (same-sign), two-prop z>=1.96 vs LONG non-AT, fk<20% of 30d LONG winners. Else close as noise. Units: pnl_usdt.",
@@ -2015,7 +2015,21 @@
       "created_by": "brain_auditor #265",
       "evidence": "#191 tape stamp n=233/14d coverage 87.6%; arm split AT/BELOW 41.6% vs ABOVE 60.0% z=-2.26 IS significant — profit translation is the open question",
       "not_a_duplicate_of": "LONG_NEUTRAL_BLOCK already gates AT/Below in NEUTRAL regimes; this is the non-NEUTRAL residual cohort",
-      "risk": "low"
+      "risk": "low",
+      "done_at": "2026-11-28T16:45:01Z",
+      "updated": "2026-11-28T16:45:01Z",
+      "disposition": "CLOSED AS NOISE (early read #314, due 11-29): ship-review bar n>=150 FAILS — stamped LONG-AT closed trades: 14d n=24, 30d n=128 (both <150). net<0 holds (14d -0.68 / 30d -3.55) and arm% depressed (45.8/41.4) but without n the threshold's 'Else close as noise' branch fires. LONG_NEUTRAL_BLOCK already gates AT/Below in NEUTRAL regimes; this residual non-NEUTRAL cohort is too thin to instrument. Prior art: disposition cited [method] two-prop z / #191 tape stamp — no new session-brain hit needed for a no-ship. Re-open only if stamped n reaches >=150 with net<0 same-sign AND z>=1.96.",
+      "adjudicated_by": " | NOISE brain_auditor #314 2026-11-28T16:45Z",
+      "read_314": {
+        "n_14d": 24,
+        "n_30d": 128,
+        "n_bar": "FAIL (<150)",
+        "net_14d": -0.68,
+        "net_30d": -3.55,
+        "rule": "close as noise",
+        "read_at": "2026-11-28T16:45:01Z",
+        "read_by": "brain_auditor #314"
+      }
     },
     {
       "id": "amplify-pcfade-windowfix-repromote-review",
@@ -2567,7 +2581,17 @@
         "type_b_ceiling": "1.25x value = 0.25 x 0.34 = +$0.085/30d, far below the +$1.00/30d materiality bar used in prior winner-cell adjudications -> type-(b) is structurally inert for this cell regardless of sign.",
         "units_guard": "pnl_usdt vs pnl_usdt; fees = trades.fees JSON fee_total."
       },
-      "evidence_note_313": "PRE-READ 2026-11-28 #313 (deadline 11-30): all bars PASSING now — 7d 11T 100% +0.62 / 14d 19T 78.9% +0.79 / 30d 20T 75% +0.66 gross, net-of-fee +0.41; 15 distinct tokens (bar iii); sibling EXTREME SHORT n=0 (bar v); armed 15/20 (75%); weekly -0.04 / +0.39 / +0.31 (first week slightly negative, next two positive). Only remaining risk: the 7d window has ~2 days to flip before the read. Cell-add is inert while WINNER_CELL_SIZE_MULT=1.0; mult re-raise stays CEO-gated. Units pnl_usdt."
+      "evidence_note_313": "PRE-READ 2026-11-28 #313 (deadline 11-30): all bars PASSING now — 7d 11T 100% +0.62 / 14d 19T 78.9% +0.79 / 30d 20T 75% +0.66 gross, net-of-fee +0.41; 15 distinct tokens (bar iii); sibling EXTREME SHORT n=0 (bar v); armed 15/20 (75%); weekly -0.04 / +0.39 / +0.31 (first week slightly negative, next two positive). Only remaining risk: the 7d window has ~2 days to flip before the read. Cell-add is inert while WINNER_CELL_SIZE_MULT=1.0; mult re-raise stays CEO-gated. Units pnl_usdt.",
+      "evidence_note_314": {
+        "at": "2026-11-28T16:45:19Z",
+        "by": "brain_auditor #314",
+        "legs": "7d 7T 100% net +0.22 (arm 71%) | 14d 19T 78.9% +0.55 | 30d 20T 75% +0.41 net (gross +0.66)",
+        "weekly": "w11-09 -0.09 (4T) -> w11-16 +0.28 (9T) -> w11-23 +0.22 (7T) — two consecutive positive weeks",
+        "status": "all bars still PASSING; cell-add inert while WINNER_CELL_SIZE_MULT=1.0; mult re-raise CEO-gated",
+        "risk": "7d window can still flip before 11-30 read; fee-admission 30d $0.0170/trade vs bar $0.0186 (evidence_note_309 mixed)",
+        "units": "pnl_usdt"
+      },
+      "updated": "2026-11-28T16:45:19Z"
     },
     {
       "id": "amplify-vbo-short-killreview",
@@ -2596,7 +2620,16 @@
       "evidence": "PG 2026-11-23 30d cells n>=10 net>0 ranked: ai-trader-pending NORMAL SHORT 27T +1.00 WR44.4 (UNOWNED) | bb-squeeze+ NORMAL LONG 39T +0.45 (owned 11-25) | rider EXTREME LONG 13T +0.35 (owned 11-30) | jup HIGH SHORT 28T +0.29 (owned 11-28) | pump-chain- NORMAL LONG 31T +0.15 (contrarian 11-25) | atr-trend- NORMAL SHORT 19T +0.13 | jup NORMAL LONG 44T +0.07 (below materiality). Band decomposition 30d atp SHORT: RSI<35 29T -1.21 34.5% / 35-45 7T +0.13 / 45-55 3T +0.60 / >=55 1T +0.72. Cit: [ai-trader watchdog recs 2026-10-06] manual BTC drag; [signal analyst 2026-10-24] CEO disable-automated keep-manual.",
       "risk": "low while HOLD; medium if shipped before the dampen decision (could double down on the same signal)",
       "not_a_duplicate_of": "the atp SHORT RSI<35 half-size dampen (brain_auditor #292, CEO-pending) — complementary lever, deliberately sequenced behind it",
-      "evidence_note_313": "PRE-READ 2026-11-28 #313 (deadline 11-30): bar (ii) 7d/14d/30d same-sign is now FAILING on the 7d leg — 7d 3T net -0.22 (33.3% WR) vs 14d 9T +0.94 / 30d 27T +1.00. Weekly decay: +1.36 (w11-09, 22T) -> -0.16 (w11-16, 4T) -> -0.20 (w11-23, 1T); ~all of the 30d gross sits in the w11-09 cohort. Net-of-fee 30d still +0.66 (fee 0.34). CEO RSI<35 dampen still unratified; 30d knife band RSI<35 = 20T -0.32 (from entry). DEFAULT at 11-30 read: HOLD/NO-SHIP on same-sign failure unless 7d recovers positive before the read; do not add to WINNER_CELLS_VALIDATED on a decaying cell. Units pnl_usdt."
+      "evidence_note_313": "PRE-READ 2026-11-28 #313 (deadline 11-30): bar (ii) 7d/14d/30d same-sign is now FAILING on the 7d leg — 7d 3T net -0.22 (33.3% WR) vs 14d 9T +0.94 / 30d 27T +1.00. Weekly decay: +1.36 (w11-09, 22T) -> -0.16 (w11-16, 4T) -> -0.20 (w11-23, 1T); ~all of the 30d gross sits in the w11-09 cohort. Net-of-fee 30d still +0.66 (fee 0.34). CEO RSI<35 dampen still unratified; 30d knife band RSI<35 = 20T -0.32 (from entry). DEFAULT at 11-30 read: HOLD/NO-SHIP on same-sign failure unless 7d recovers positive before the read; do not add to WINNER_CELLS_VALIDATED on a decaying cell. Units pnl_usdt.",
+      "evidence_note_314": {
+        "at": "2026-11-28T16:45:19Z",
+        "by": "brain_auditor #314",
+        "legs": "7d 3T net -0.26 (33.3% WR, arm 33%) FAIL same-sign | 14d 6T +0.29 | 30d 27T +0.66 gross +1.00",
+        "weekly": "w11-09 +1.09 (22T) -> w11-16 -0.21 (4T) -> w11-23 -0.21 (1T) — decay continues",
+        "default": "HOLD/NO-SHIP at 11-30 unless 7d recovers positive; CEO RSI<35 dampen still unratified (one-variable)",
+        "units": "pnl_usdt net-of-fee 0.01247"
+      },
+      "updated": "2026-11-28T16:45:19Z"
     },
     {
       "id": "entry-hl-entry-invariant",
@@ -2751,7 +2784,7 @@
     {
       "id": "high-long-displacement-read",
       "kind": "eval",
-      "status": "open",
+      "status": "done",
       "created_at": "2026-11-26T12:45:00Z",
       "deadline": "2026-11-29T00:00:00Z",
       "owner": "brain_auditor #304",
@@ -2760,7 +2793,7 @@
       "default_action": "NO-SHIP until the 11-29 joint read. DO NOT ship alongside a REGIME_CONF_HIGH_MULT change in the same run — two HIGH-side levers at once destroys attribution for the 11-29 mult read (its rule: KEEP 0.50 if post-ship HIGH WR<45% OR net<0). At the joint read: if the mult KEEPS 0.50, the block becomes the next single variable and may ship that run; if the mult REVERTS to 0.70, ship the block alone (net one change) only if the block's six bars still hold; if the mult re-raises AND the block's bars hold, ship block first and re-measure the mult after.",
       "measurement": "PG: volatility_regime='HIGH' AND direction='LONG' vs (volatility_regime<>'HIGH' AND direction='LONG'), windows rolling 7/14/30d on close_time, pnl_usdt; Fisher exact 2x2 on win/loss; fk = blocked-14d-winners / all-14d-winners.",
       "evidence": "30d: HIGH-LONG 117T -3.58 43.6% arm 41.0% vs nonHIGH-LONG 303T +0.10 53.8% arm 49.2%. ARMED high-long 48T +2.57 89.6% vs NEVER 69T -6.15 11.6% = this is a CHOP/ARM-GAP cell, NOT a direction cell. 88.9% of the cell's loss dollars sit in never-armed mfe<0.40 trades (56/60 losers). Never-armed LONG loser avg loss by regime: HIGH -0.1163 > NORMAL -0.0990 > FLAT -0.0967 > EXTREME -0.0892 with IDENTICAL initial sl_distance 0.015 everywhere. Mechanism: atr_sl_hit realized price move HIGH -0.913% vs NORMAL -0.690% (same 1.5% initial) = ATR stops widen with vol and the unarmed cohort pays for it. Same cell's atr_sl_hit slice: HIGH 33T -4.08 (41% of the whole -10.72 atr_sl bleed); by signal jup_yolo_mirrored 33T -4.45 = 41% of the atr_sl bleed.",
-      "disposition": "PRE-REGISTERED 2026-11-26 #304. No config change this run: (1) one-variable rule vs REGIME_CONF_HIGH_MULT 0.50 shipped 2026-11-25T12:43Z whose first read is the SAME 11-29 deadline; (2) shipping the block now would deplete the HIGH cohort of its LONG leg and corrupt that pre-registered read; (3) the armed half of this cell wins 89.6% (+2.57/30d) so a hard block forfeits a working trend cohort — the correct first instrument may be arm-side (prearm enforce, in flight) rather than entry-side. Prior art: NO direct hit for a LONG-in-HIGH block (session brain queries 'have we tried blocking LONG trades in HIGH volatility regime' 6 hits, none a block attempt).",
+      "disposition": "NO-SHIP (early read #314, due 11-29): bar (c) Fisher FAILS on independent re-measure — 7d p=0.1682 / 14d p=0.0817 / 30d p=0.1957 (none <0.05), reproducing #311 pre_read (0.177/0.079/0.108). Bar (a) n PASS (29/50/124), bar (b) net same-sign PASS (-1.79/-2.30/-5.06), bar (d) weekly 5/5 negative PASS, bar (f) save +$5.06/30d PASS — but threshold requires ALL six on re-measure; Fisher fail alone = NO-SHIP. Partner regime-conf-high-first-read already DONE #311 (KEEP 0.50, post-ship n=20 net -0.39). One-HIGH-instrument rule: mult stays 0.50; block does not ship. Prior art: [calwndar 2026-10-31] 'LONG in HIGH = regime routing + chop mechanics' (same direction, independent); [mtf macd 2026-10-02] don't blanket disable — armed HIGH-LONG cohort still wins. Re-open only with a method disclosure from #304 that reproduces Fisher p<0.05 on the same cohorts.",
       "notes": "Cites [calwndar 2026-10-31] 'LONG in HIGH: 55T, 43.6% WR ... it's regime routing + chop mechanics' (independent earlier measurement, same direction) and [mtf macd 2026-10-02] 'don't blanket disable anything, use the closed trades to see if the signal is in the wrong volatility regime' (method). Reconcile with: regime-conf-high-first-read (SAME 11-29 deadline, must be adjudicated together), prearm-enforce-day7-read (11-28, the arm-side alternative), amplify-stale-block-bleed5 (12-01).",
       "pre_read_311": {
         "at": "2026-11-28T00:55:00Z",
@@ -2775,7 +2808,21 @@
         },
         "pre_read_verdict": "On the recorded SHIP BAR (\"all six MUST still hold on re-measure\") bar (c) FAILS on every reproduction I can run -> default at the 11-29 joint read = NO-SHIP unless #304 discloses a method that reproduces p<0.05. Arm-side read unchanged: 30d HIGH-LONG armed 53T +2.85 (90.6%) vs never 71T -6.39 (11.3%) = still a chop/arm-gap cell, not a direction cell."
       },
-      "updated": "2026-11-28T00:55:00Z"
+      "updated": "2026-11-28T16:45:01Z",
+      "done_at": "2026-11-28T16:45:01Z",
+      "adjudicated_by": " | NO-SHIP brain_auditor #314 2026-11-28T16:45Z",
+      "read_314": {
+        "bars_remeasured": {
+          "a_n": "PASS 29/50/124",
+          "b_net_same_sign": "PASS -1.79/-2.30/-5.06",
+          "c_fisher": "FAIL p=0.168/0.082/0.196",
+          "d_weekly": "PASS 5/5 negative",
+          "f_save": "PASS +5.06/30d"
+        },
+        "rule": "NO-SHIP (any bar fails)",
+        "read_at": "2026-11-28T16:45:01Z",
+        "read_by": "brain_auditor #314"
+      }
     },
     {
       "id": "amplify-feevictim-maker-rescore",
@@ -2799,11 +2846,23 @@
       "created_at": "2026-11-26T21:05:00Z",
       "started": "2026-11-22",
       "owner": "brain_auditor #306 (gap-fill: registry had zero entries mentioning BE_ARM_PEAK_PCT)",
-      "deadline": "2026-11-29T00:00:00Z",
+      "deadline": "2026-12-06T00:00:00Z",
       "evidence": "Ship: commit 1de08caf 2026-11-22 23:45Z 'major-break redesign ... structure-only exits (CEO ruling 20261122T220223Z)'; auto_trader.py:92 _be_armed now needs peak >= BE_ARM_PEAK_PCT (0.025), code comment states REVERT = 0.004. MECHANISM (verified 2026-11-26): ALL 83 armed pending orders carry dynamic_sl:False, so manual_exit_manager.update_trail:197 early-returns and the mxm BE-lock+tiered trail is OFF on every structural leg (CEO-directed per live order note 'CEO 2026-11-12: mxm giveback-trail stands down for these structural legs' — NOT a bug); auto_trader._lag_stop (30-min) is the sole stop authority and its BE-cap is the ONLY profit-lock left. MEASURED: ai-trader 30d peak buckets => <0.40: 26 LOSS -2.21 / 2 WIN +0.06 | 0.40-2.5 (the BE gap): 18 LOSS -1.90 + 16 WIN +2.17 (gross +0.27, net -0.41) | >=2.5: 3 WIN +1.08. CF bracket if BE armed at 0.40 on the gap cohort ONLY: save 14/18 losers that crossed entry = +$1.70 ; cost 7/16 winners that dipped past entry (mae>0.10) = -$1.05 => NET ~ +$0.65/30d, peak-before-dip ordering NOT verified. POST-SHIP (open_time > 2026-11-22 23:45, 4 days): gap cohort n=6 = 4 LOSS -0.90 (all crossed entry, avg mae 1.49) + 2 WIN +0.16 (avg mae 0.02, would SURVIVE a 0.40 BE) => CF ~ +$0.75.",
       "threshold": "READ at day-7 (2026-11-29) and day-14 (2026-12-06). TRIGGER a revert review (BE_ARM_PEAK_PCT 0.025 -> 0.004, the code's own registered REVERT path) only if ALL: (i) gap-cohort n>=20 decided; (ii) CF net >= +$1.50 pnl_usdt (units guard, no fees in the CF, fees reported separately); (iii) 7d/14d same sign; (iv) fk<20% of gap-cohort winners (winners killed by the 0.40 BE). MONITOR-ONLY until n>=20 — today n=6 post-ship / n=34 all-window, both below the 20-trade bar.",
       "default_action": "NO CHANGE — monitor. Reverting a CEO 4-day-old ruling on n=6 would repeat the small-n pattern this prompt bans.",
-      "created_by": "brain_auditor #306"
+      "created_by": "brain_auditor #306",
+      "due": "2026-12-06T00:00:00Z",
+      "updated": "2026-11-28T16:45:01Z",
+      "day7_read_314": {
+        "read_at": "2026-11-28T16:45:01Z",
+        "read_by": "brain_auditor #314",
+        "post_ship_n": 8,
+        "post_ship_wr": 25.0,
+        "post_ship_net": -1.15,
+        "bar_i_n_ge_20": "FAIL (8<20) -> MONITOR-ONLY, no revert review",
+        "verdict": "NO CHANGE — extend to day-14 (2026-12-06). n=8 < 20 gap-cohort bar; reverting a CEO 6-day-old ruling on n=8 repeats the small-n pattern."
+      },
+      "notes": " | #314 day-7 early read 2026-11-28T16:45:01Z: n=8<20 -> MONITOR, deadline moved to day-14 12-06."
     },
     {
       "id": "rr-engine-short-relax-remeasure",

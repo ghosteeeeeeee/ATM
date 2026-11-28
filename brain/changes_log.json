@@ -5261,5 +5261,49 @@
     "after": "1328 ideas",
     "rationale": "offense mirror of the T=20m pre-arm cut — lean the trades that confirm, not just cut the ones that stall",
     "impact": "0 trading behavior; CF walk queued for next run"
+  },
+  {
+    "timestamp": "2026-11-28T16:46:15Z",
+    "agent": "brain_auditor",
+    "change": "Audit #314: dispositioned high-long-displacement-read NO-SHIP (Fisher bar c fails re-measure p=0.168/0.082/0.196)",
+    "type": "meta",
+    "file": "data/shadow_disposition.json",
+    "before": "open due 11-29",
+    "after": "done NO-SHIP",
+    "rationale": "Pre-registered bar (c) does not reproduce; partner regime-conf already KEEP 0.50; one-HIGH-instrument rule",
+    "impact": "Clears 11-29 queue; no config change; HIGH mult stays 0.50"
+  },
+  {
+    "timestamp": "2026-11-28T16:46:15Z",
+    "agent": "brain_auditor",
+    "change": "Audit #314: dispositioned tape-at-long-remeasure-1129 CLOSED AS NOISE (n 14d=24/30d=128 <150 bar)",
+    "type": "meta",
+    "file": "data/shadow_disposition.json",
+    "before": "open due 11-29",
+    "after": "done NOISE",
+    "rationale": "Ship-review n>=150 fails; threshold else-branch = close as noise",
+    "impact": "No entry block shipped; residual AT cohort too thin"
+  },
+  {
+    "timestamp": "2026-11-28T16:46:15Z",
+    "agent": "brain_auditor",
+    "change": "Audit #314: be-arm-peak day-7 early read MONITOR (post-ship n=8<20), deadline extended to day-14 2026-12-06",
+    "type": "meta",
+    "file": "data/shadow_disposition.json",
+    "before": "open due 11-29 day-7",
+    "after": "open due 12-06 day-14",
+    "rationale": "Gap-cohort bar n>=20 unmet; no revert of CEO 11-22 ruling on n=8",
+    "impact": "Day-14 read preserved; no BE_ARM_PEAK_PCT change"
+  },
+  {
+    "timestamp": "2026-11-28T16:46:15Z",
+    "agent": "brain_auditor",
+    "change": "Audit #314: evidence_note_314 appended to amplify-atp-short-normal-cell (7d still -0.26 FAIL) + amplify-rider-extreme-long-cell (bars still PASSING)",
+    "type": "data",
+    "file": "data/shadow_disposition.json",
+    "before": "evidence_note_313 only",
+    "after": "evidence_note_313 + evidence_note_314",
+    "rationale": "Fresh legs before 11-30 reads; atp default HOLD/NO-SHIP, rider cell-add still inert at mult 1.0",
+    "impact": "Zero trading behavior; decision inputs current"
   }
 ]

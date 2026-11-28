@@ -1,5 +1,5 @@
 # Signal Performance Report
-**Generated:** 2026-11-28 07:43 UTC | **Period:** Last 6h + 24h
+**Generated:** 2026-11-28 13:43 UTC | **Period:** Last 6h + 24h
 
 ## Overall Stats
 - **Total trades (all time):** 4,032 | **WR:** 51.5% | **PnL:** -121.83%
@@ -21,7 +21,9 @@ None found.
 
 ## MARGINAL (30-50% WR)
 
-None found.
+| Signal | Dir | 24h T | 24h WR | 24h PnL | Status | Note |
+|--------|-----|-------|--------|---------|--------|------|
+| jup_yolo_mirrored | LONG | 2 | 50.0% | -0.52 | ❓ | Needs more data |
 
 ---
 
@@ -39,6 +41,7 @@ None found. Top performers are already enabled.
 
 ## RECOMMENDATIONS
 
+1. **[WATCH] jup_yolo_mirrored LONG** — WR=50.0%, PnL=-0.52% over 2 trades. Monitor next cycle.
 
 ---
 
@@ -50,6 +53,7 @@ None found. Top performers are already enabled.
 
 | Date | Commit | Change |
 |------|--------|--------|
+| 2026-11-28 | 7f66530 | auto_1hr: hourly analysis log 2026-11-28 — no config change |
 | 2026-11-27 | a3b5049 | Daily trading system update (2026-11-27) |
 | 2026-11-26 | c2fe568 | brain_auditor #304: HIGH-LONG bleed cell pre-registered (11-... |
 | 2026-11-25 | 190d4db | Audit #300: EXTREME revert adjudicated KEEP 0.85 (30d limb f... |
@@ -59,6 +63,5 @@ None found. Top performers are already enabled.
 | 2026-11-24 | 2d4d15b | Logs: hourly analysis 2026-11-24 (no config change, 24h net ... |
 | 2026-11-23 | 5869d43 | scripts: BTC hedge-account experiment — SHADOW MODE (2026-11... |
 | 2026-11-23 | cef296e | MTF spike state: the shared detector + the keeper's near-edg... |
-| 2026-11-23 | bbc6c46 | rip-add standing rules formalized: the RIP-CLIMAX gates (the... |
 
 *Changes to `scripts/hermes_constants.py`. Use `git show <commit>` for details.*
