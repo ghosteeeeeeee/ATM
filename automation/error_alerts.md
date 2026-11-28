@@ -6217,3 +6217,9 @@
 
 ## Error Alerts — 2026-11-28 09:40 UTC
 - **REPEATED** (8x): `Nov N N:N:N python3[TOK]: TS   TS   ✅ [TOK-TOK-OVERRIDE] TOK TOK — continuum says RECOVERY+LEAN_BEAR+TOK, allowing despite TOK filter`
+
+## Error Alerts — 2026-11-28 09:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 87% used (>= 85%)
+
+## Error Alerts — 2026-11-28 10:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 87% used (>= 85%)
