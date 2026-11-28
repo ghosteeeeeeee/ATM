@@ -5137,5 +5137,93 @@
     "after": "new analysis script, zero trading behavior",
     "rationale": "Day-7 read owed 11-28; produced 11-27 and surfaced the three-source peak disagreement inside #17023.",
     "impact": "Feeds disposition close + successor entry; no code path touched"
+  },
+  {
+    "timestamp": "2026-11-28T00:55:00Z",
+    "agent": "brain_auditor",
+    "type": "meta",
+    "change": "Audit #311: 6 disposition services — regime-conf-high-first-read READ-FIRED EARLY (n=20>=15) -> KEEP 0.50 (net -0.39); amplify-cell-conf-tilt-floorproof CLOSED NO-CHANGE (3/4 cells fail bar ii); amplify-r2v2-long3-clonehunt CLOSED (cell 30d n=0); amplify-maker-entry-fill-walk CLOSED full-book NO-SHIP; amplify-longbypass-dual-basis-reconcile step-1 SAME-SIGN (fwd +1.14%/74% pos; realized n=15 +1.05) extended 12-05; amplify-jup-short-walk EXTENDED 12-05 (walk producer orphaned)",
+    "file": "data/shadow_disposition.json",
+    "before": "43 open",
+    "after": "40 open + 1 new = 41",
+    "rationale": "deadline 11-28 batch + pre-registered HIGH-mult read trigger",
+    "impact": "0 trading-constant changes"
+  },
+  {
+    "timestamp": "2026-11-28T00:55:00Z",
+    "agent": "brain_auditor",
+    "type": "data",
+    "change": "Audit #311 AMPLIFY weekly emit: NEW entry amplify-maker-entry-short-only-pilot (fee axis, shadow-first ALO on SHORT only; LONG-only measured loser 59.4% fill / fk 46%) — full-book variant closed same run",
+    "file": "data/shadow_disposition.json",
+    "before": "n/a",
+    "after": "deadline 2026-12-12, default NO SHIP",
+    "rationale": "fees = 212% of 30d gross loss; SHORT scope passes 4 of 7 bars",
+    "impact": "candidate +$0.70-3.50/30d, zero behavior until CEO sign-off"
+  },
+  {
+    "timestamp": "2026-11-28T00:55:00Z",
+    "agent": "brain_auditor",
+    "type": "creative",
+    "change": "Audit #311: NEW brain/analysis/longbypass_reconcile_2026-11-28.py (--selfcheck PASS) — two-base reconcile on the SAME cohort (gate_shadow fwd_4h vs PG realized first-trade-24h), the step-1 measurement the disposition owed since 11-21",
+    "file": "brain/analysis/longbypass_reconcile_2026-11-28.py",
+    "before": "divergence unresolved since 11-17",
+    "after": "SAME-SIGN positive at 30d and 7d; step-2 walk still owed",
+    "rationale": "close the basis gap with a runnable tool instead of a third extension",
+    "impact": "0 trading behavior"
+  },
+  {
+    "timestamp": "2026-11-28T01:18:00Z",
+    "agent": "brain_auditor",
+    "type": "bugfix",
+    "change": "Audit #311 bug_hunter SHIP-WITH-FIXES -> all 3 findings fixed in brain/analysis/longbypass_reconcile_2026-11-28.py: (1) MED double-count — overlapping 24h token-day windows claimed the same PG trade twice (live: ZRO #16920) -> seen-set, 30d realized net +1.05 -> +0.79, WR 73.3% -> 66.7%; (2) MED selfcheck reimplemented dedup instead of calling it -> shared dedup_blocked() now used by both; (3) LOW NULL pnl_usdt float() crash -> skip. Round-2 bug_hunter VERDICT SHIP, no new bugs.",
+    "file": "brain/analysis/longbypass_reconcile_2026-11-28.py",
+    "before": "net +1.05 (inflated)",
+    "after": "net +0.79",
+    "rationale": "double-counted realized trade would have overstated the gate-relax case",
+    "impact": "base B still same-sign positive; disposition + CURRENT + kanban updated to corrected figures"
+  },
+  {
+    "timestamp": "2026-11-28T05:02:22Z",
+    "agent": "brain_auditor",
+    "change": "Audit #312 BUGFIX: raw_signals.json zscore index row[9] (macd_hist) -> row[7] (z_score) + index-mapping comment",
+    "type": "bugfix",
+    "file": "scripts/signal_compactor.py",
+    "before": "zscore = row[9] if len(row) > 9 else None  # macd_hist",
+    "after": "zscore = row[7] if len(row) > 7 else None  # z_score",
+    "rationale": "SELECT order is 6=z_score_tier 7=z_score 8=rsi_14 9=macd_hist; live values -1.26e-06/0.00238038 proved macd_hist was being rendered by signals.html as a z-score. rsi=row[8] was already correct.",
+    "impact": "Dashboard-only, ZERO trading behavior. py_compile PASS."
+  },
+  {
+    "timestamp": "2026-11-28T05:02:22Z",
+    "agent": "brain_auditor",
+    "change": "Audit #312 DEAD-CODE REMOVAL + doc: decider_run.py:4230 TOKEN-LEVEL REGIME CHECK (z_score_tier) branches deleted (31 lines) and replaced with a documented INERT notice",
+    "type": "creative",
+    "file": "scripts/decider_run.py",
+    "before": "31 lines of unreachable penalty branches (rising/falling comparisons + numeric-vs-string guard)",
+    "rationale": "Proven never-executed: (1) hotset.json never carries z_score_tier (4 compactor writer sites checked) so _z_tier always empty; (2) latent vocab mismatch vs signal_schema.py:475 {extreme_high,high,neutral,low,extreme_low} (13,403 rows, 0 rising/falling); (3) latent _momentum type mismatch (numeric momentum_score vs phase strings). 0 [Z-SCORE] lines in pipeline.log + all rotated archives.",
+    "after": "Documented INERT notice with the measured evidence + re-measure pointer (disposition zscore-long-gate-deadcode, 12-05). DID NOT rewire/enable — the would-block cell fails the p<0.05 bar (30d p=0.073).",
+    "impact": "ZERO trading behavior (block never ran). py_compile PASS; hermes_constants EMPTY diff; CEO_PROTECTED intact."
+  },
+  {
+    "timestamp": "2026-11-28T05:02:22Z",
+    "agent": "brain_auditor",
+    "change": "Audit #312: registered disposition zscore-long-gate-deadcode (eval, due 2026-12-05, default NO CHANGE) + refreshed contrarian/floor/shadow_trader joins",
+    "type": "data",
+    "file": "data/shadow_disposition.json",
+    "before": "no entry",
+    "after": "entry with 4-limb re-measure bar (n>=60 both windows, Fisher p<0.05, fk<=20%, 6/6 weeks same-sign); else DELETE the dead block outright",
+    "rationale": "records the negative battery so it is not re-derived; only entry-time cell near the bar was z=high x LONG (p=0.073)",
+    "impact": "no trading behavior; forensics only"
+  },
+  {
+    "timestamp": "2026-11-28T05:09:12Z",
+    "agent": "brain_auditor",
+    "change": "Audit #312: disposition eval-long-z-midband-1-2 evidence RESTATED (bar ii FAIL-ON-REMEASURE: p 0.0336 -> 0.13694 in 16.5h; corrected the impossible \"312W/175L\" rest-cell typo) + zscore-long-gate-deadcode re-scoped to non-duplicate",
+    "type": "data",
+    "file": "data/shadow_disposition.json",
+    "before": "bar ii: 'MET 30d p=0.033'; rest cell recorded as 312W/175L (n=487 > the entire 30d LONG cohort of 413)",
+    "after": "bar ii: FAIL-ON-REMEASURE with the reproduced p, the corrected 187W/146L rest cell, and a two-anchor requirement",
+    "rationale": "the only limb that made the block look shippable does not reproduce a day later; a non-reproducible p must be corrected before the 12-04 read",
+    "impact": "no trading behavior; blocks a non-significant ship"
   }
 ]

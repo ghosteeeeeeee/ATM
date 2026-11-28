@@ -2790,7 +2790,11 @@ def run_compaction(dry=False, verbose=False, purge_executed=False):
             raw_signals = []
             for row in rows[:100]:
                 token, direction, stype, conf, source, created = row[0], row[1], row[2], row[3], row[4], row[5]
-                zscore = row[9] if len(row) > 9 else None
+                # row[] indices follow the SELECT above: 6=z_score_tier 7=z_score
+                # 8=rsi_14 9=macd_hist. Was row[9] (macd_hist) until 2026-11-28 —
+                # signals.html renders this as a z-score, so the column showed
+                # macd_hist magnitudes (e.g. -1.26e-06 -> "-0.000"). Dashboard-only.
+                zscore = row[7] if len(row) > 7 else None
                 rsi = row[8] if len(row) > 8 else None
                 price_val = None
                 _pc = None

@@ -12664,5 +12664,59 @@
     "status": "recorded",
     "risk": "none",
     "prior_art": "[Build New Linear Regression Signal 2026-10-29] entry path hardcodes order_type=Market -> taker 0.09% RT, maker would add +0.06% (29d old, still unimplemented in pipeline)"
+  },
+  {
+    "date": "2026-11-28T00:55:00Z",
+    "idea": "SHORT-only maker/ALO shadow pilot (fee axis, the only offense axis with order-of-magnitude headroom)",
+    "rationale": "fees 7.81 = 212% of the 30d gross loss; type-(b) cell mults cap at +$0.085/30d; SHORT cohort alone measures 93.6% fill / +$0.705 net-cf / fk 8.1% / same-sign halves while LONG fails",
+    "expected_impact": "+~$0.70-3.50/30d if shadow confirms, 0 risk before CEO sign-off",
+    "category": "fee axis",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-28T00:55:00Z",
+    "idea": "Register every analysis producer-less artifact as a disposition precondition (orphan audit)",
+    "rationale": "3rd producer-less artifact found (jup_long_blocked_walk, rr_shadow_audit_7d, contrarian_outcome_join); each one silently blocks or poisons a downstream read",
+    "expected_impact": "prevents the class where a due walk cannot be run",
+    "category": "process",
+    "status": "suggested",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-28T05:02:22Z",
+    "idea": "Entry-feature significance battery — measure EVERY stamped entry-time feature against the house bar before proposing any entry filter, and bank the negative result",
+    "rationale": "630 stamped 30d trades x 5 feature families: z_score_tier x dir (best p=0.073), wave_phase x dir (0.348), momentum_state x dir (0.763), coin_regime x dir (0.374 + 7d/14d sign flip), btc_trend_quality anti-vs-match (n.s.). ZERO clear p<0.05. Corroborates #261 and [gold star trades 2026-10-08] which proposed wave-phase 51d ago with no significance test.",
+    "expected_impact": "stops the 5-entry-filter re-derivation loop; redirects to exit/loss-size/fee axes already owned by the registered stack",
+    "category": "process",
+    "status": "measured",
+    "risk": "none"
+  },
+  {
+    "date": "2026-11-28T05:02:22Z",
+    "idea": "zscore-long-gate-deadcode monitor — z_score_tier='high' x LONG, the only entry-time cell that came close",
+    "rationale": "30d n=80 WR43.8% net -2.15 (=58% of book loss), 5/5 weeks negative, fk14 9.2%, spread over 17 signals; but p=0.073/30d and 0.231/14d, regime-concentrated sub-cell.",
+    "expected_impact": "IF it clears all four limbs at 12-05: up to -$2.15/30d. Probability LOW.",
+    "category": "entry sniper",
+    "status": "registered zscore-long-gate-deadcode due 2026-12-05",
+    "risk": "low"
+  },
+  {
+    "date": "2026-11-28T05:02:22Z",
+    "idea": "Ship the dead-gate audit as a permanent INERT notice instead of leaving working-looking code",
+    "rationale": "decider_run.py:4230 read as a live 20pt penalty but had 3 independent defects and 0 log lines ever; anyone auditing z-protection would waste a run re-deriving it",
+    "expected_impact": "saves future audit runs; records the measured p=0.073 so nobody 'just fixes' it into a non-significant ship",
+    "category": "documentation / false-security removal",
+    "status": "SHIPPED",
+    "risk": "none"
+  },
+  {
+    "date": "2026-11-28T05:09:12Z",
+    "idea": "P-STABILITY LIMB — any bar that reads 'fisher p<0.05' must be reported at TWO anchors >=24h apart before a block can ship",
+    "rationale": "eval-long-z-midband-1-2 recorded p=0.03364 at 2026-11-27 12:31Z; the identical definition re-measured 16.5h later gives p=0.13694 with n unchanged (80/333). One day of rolling-window drift moved the cell 4x above the bar. The house rules already ban 14d patterns that reverse at 7d — this is the same failure at hourly granularity, and it is invisible because every disposition currently reports a single p.",
+    "expected_impact": "prevents shipping a block whose significance exists only in one window; cheap (same query, one extra anchor)",
+    "category": "process / significance hygiene",
+    "status": "SHIPPED as restated bar (ii) on eval-long-z-midband-1-2 + limb (a) on zscore-long-gate-deadcode",
+    "risk": "none"
   }
 ]

@@ -4227,37 +4227,25 @@ def _run_hot_set():
                 if effective_neutral > 0:
                     log(f'  🌐 [NEUTRAL] {token} {direction}: -{neutral_penalty}pt → -{neutral_escalation}pt survival = {effective_neutral}net (conf {hot_sig["confidence"]:.0f}%→{confidence:.0f}%)')
 
-            # ── TOKEN-LEVEL REGIME CHECK (z_score_tier) ──────────────────
-            # z_direction = 'rising' = local bottom → LONG ideal, SHORT penalized
-            # z_direction = 'falling' = local top → SHORT ideal, LONG penalized
-            # Neutral zone → let market regime decide (no penalty here)
-            _z_tier = (hot_sig.get('z_score_tier') or '').lower()
-            _z = hot_sig.get('z_score', 0.0)
-            if _z_tier and _z is not None:
-                if _z_tier == 'rising' and direction == 'LONG':
-                    pass  # ideal — no penalty
-                elif _z_tier == 'falling' and direction == 'SHORT':
-                    pass  # ideal — no penalty
-                elif _z_tier == 'neutral':
-                    pass  # neutral zone — let market regime handle it
-                elif _z_tier == 'rising' and direction == 'SHORT':
-                    # Price at local bottom but SHORT direction — PENALIZE
-                    # Graceful de-escalation: penalty is applied, signal fades naturally
-                    if _momentum not in ('bottoming', 'neutral'):
-                        extra_penalty = 20
-                        escalation = min(_survival_rounds * 2, 10)
-                        effective_extra = max(extra_penalty - escalation, 0)
-                        confidence -= effective_extra
-                        log(f'  📍 [Z-SCORE] {token} {direction}: {extra_penalty}pt z-penalty → -{escalation}pt survival bonus = {effective_extra}net (conf now {confidence:.0f}%, tier={_z_tier}, momentum={_momentum})')
-                elif _z_tier == 'falling' and direction == 'LONG':
-                    # Price at local top but LONG direction — PENALIZE
-                    # Graceful de-escalation: penalty is applied, signal fades naturally
-                    if _momentum != 'bottoming':
-                        extra_penalty = 20
-                        escalation = min(_survival_rounds * 2, 10)
-                        effective_extra = max(extra_penalty - escalation, 0)
-                        confidence -= effective_extra
-                        log(f'  📍 [Z-SCORE] {token} {direction}: {extra_penalty}pt z-penalty → -{escalation}pt survival bonus = {effective_extra}net (conf now {confidence:.0f}%, tier={_z_tier}, momentum={_momentum})')
+            # ── TOKEN-LEVEL REGIME CHECK (z_score_tier) — INERT, do not trust it ──
+            # DESIGN: local bottom -> LONG ideal / SHORT -20pt; local top -> SHORT
+            # ideal / LONG -20pt (graceful de-escalation over survival rounds).
+            # INERT SINCE INCEPTION — verified 2026-11-28 (brain_auditor #312), 3 defects:
+            #   (1) KEY ABSENT: hot_sig is flat hotset.json; signal_compactor writes
+            #       z_score at 4 sites and NEVER z_score_tier -> _z_tier always ''.
+            #   (2) VOCAB (latent): the producer that does write z_score_tier
+            #       (signal_schema.py:475) emits {extreme_high,high,neutral,low,
+            #       extreme_low} — signals table 13,403 rows, 0 'rising'/'falling';
+            #       those two are momentum_cache.z_direction, a different field.
+            #   (3) GUARD (latent): _momentum is momentum_score (numeric, :4071), so
+            #       `_momentum in ('bottoming','neutral')` could never be True.
+            # EVIDENCE: 0 `[Z-SCORE]` lines in logs/pipeline.log + all rotated archives.
+            # DO NOT "just fix" it: the cell this gate would block (z_score_tier='high'
+            # x LONG, PG 30d) is n=80 / -2.15 / fisher p=0.073 = FAILS the p<0.05 bar
+            # (14d p=0.231; fk14 9.2%; 5/5 weeks negative). Enabling a non-significant
+            # cell is the failure mode this repo bans. Re-measure: disposition
+            # zscore-long-gate-deadcode (due 2026-12-05). z IS guarded elsewhere:
+            # Z-FLIP :5642, CHASE_ZSCORE_MAX :6478, ACCEL-V3/V4 :5813/:5945.
 
             # ── SINGLE-SOURCE hzscore FILTER ────────────────────────────────────
             # hzscore is combo-only, never solo. Must have pct-hermes (or vel-hermes)

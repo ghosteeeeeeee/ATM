@@ -7,7 +7,7 @@
     "zero_events 14d or join_rate below floor -> auto-KILL ticket. status: open | done.",
     "Revert paths are per-entry; constants reverts ride data/vacation_mode.json rules.unclog_waiver scope."
   ],
-  "updated": "2026-11-27T20:55:00+00:00",
+  "updated": "2026-11-28T01:15:00Z",
   "entries": [
     {
       "id": "flip-contrarian-pc",
@@ -601,7 +601,7 @@
       "kind": "amplify",
       "status": "open",
       "created": "2026-10-31T12:45:00Z",
-      "deadline": "2026-11-28T00:00:00Z",
+      "deadline": "2026-12-05T00:00:00Z",
       "owner": "brain_auditor weekly AMPLIFY run",
       "proposal_type": "(c) clone-hunt: mine BLOCKED setups against the winner profile + counterfactual-walk candles",
       "evidence": "The copy stream emits BOTH sides (jup_yolo_monitor.py:572-578 parses side long/short; watchdog P2 claim 'we mirror only the long leg' is FALSE). signals_hermes_runtime: jup_yolo_short 194 rows vs jup_yolo_long 222 rows (both born 10-30) but trades in PG = 1 SHORT / 39 LONG in 30d. Fate of shorts: compaction_stale 91 (47%), combo stale 23, short-rsi-hard-floor 26 (floor 35 verified WIRED for jup — compactor:4360 + logs print '< 35' for HYPER/purrs vs '< 45' for IMX/APT), oversold-knife 16, rep-low 15, rr-engine 8, hot-set 5; SOL SHORT_BLACKLIST 1081 log hits. Meanwhile 24h SHORT tape is 9T 77.8% WR.",
@@ -612,12 +612,13 @@
       "notes": "clone-hunt on bb-squeeze+ blocked singles measured this run and KILLED: 329 deduped blocked rows 51.7% WR -32.45pp (NORMAL 34T 41.2% -3.06pp, HIGH 134T 49.3% -14.66pp) = gates correctly reject; do not re-propose.",
       "disposition": "EXTEND (guard honored — no walk reported without OOS days; signal born 10-30, >=7 OOS days now exist so the walk IS runnable next run). Live-cell context 2026-11-21T04:40Z: jup SHORT 30d 61T 63.9% net +0.24 (was 47T -0.08 at the 11-14 read, 1T on 10-31) — conversion is climbing on its own, which RAISES the fk bar for any exemption (more live winners to kill). Walk plan unchanged: first-fire-per-token blocked set, live exit engine, pnl_usdt units guard, n>=20 decided AND net>0 AND 7d/14d/30d same-sign AND fk<20% of jup SHORT winners. Default NO SHIP.",
       "evidence_note_280": "brain_auditor #280 2026-11-20T01:05Z: CORRECTED token-day dedup (substr key) gate_shadow 30d jup SHORT blocked = 76.6% would-win n=47 (top gates: SHORT-MIDBAND 87.5 n=8, EXEC-RSI-HARD-FLOOR 81.8 n=11, CONTINUUM-BULL/OVERSOLD 80.0 n=45, EXEC-BLOCK 77.8 n=36) avg would_pnl +0.023 — supports the 11-21 walk; note #276 provenance dispute (gate_shadow vs shadow_trader) applies; candle-walk + fk + units bars unchanged.",
-      "adjudicated_by": " | adjudicated brain_auditor #284b 2026-11-21T04:45:21Z",
+      "adjudicated_by": " | adjudicated brain_auditor #284b 2026-11-21T04:45:21Z | EXTEND brain_auditor #311 2026-11-28T00:55Z",
       "evidence_note_309": {
         "net_of_fee_screen_30d": "jup_yolo_mirrored|HIGH|SHORT 30d 30T gross +0.24 fees 0.55 NET -0.31 = -0.0102/trade = NEGATIVE after fees (fee bar $0.0186 = 1.5x 30d avg fee $0.0124). jup|NORMAL|LONG 46T gross +0.19 fees 0.78 NET -0.59. Both jup 'winner cells' are gross-only artifacts.",
         "type_b_warning": "A 1.25x notional boost on this cell is worth 0.25 x (-0.31) = -$0.078/30d = LOSES money. Do not propose type-(b) on this cell.",
         "reproduce": "SUM(pnl_usdt) - SUM(json fees.fee_total) GROUP BY signal,volatility_regime,direction 30d."
-      }
+      },
+      "disposition_311": "EXTENDED at 11-28 deadline. The guard it deferred on ('walk runnable after ~2026-11-13') has been satisfied for 15 days, but the WALK ITSELF was not run this run: the producer of brain/analysis/jup_long_blocked_walk_result.json (2026-11-23, the only prior jup blocked-set walk, LONG side) is ORPHANED - no script in the repo writes it (grep brain/ scripts/ analysis/ = 0 hits), same defect class as rr_shadow_audit_7d.json. Re-building the exit-engine walk inline without its producer would be exactly the unverifiable-numbers pattern this prompt bans. Fresh inputs for the 12-05 walk: gate_shadow jup SHORT blocked 30d = 76.6% would-win n=47 (token-day dedup, #280); live jup SHORT conversion still climbing; bars unchanged (n>=20 decided AND net>0 AND 7/14/30 same-sign AND fk<20% of jup SHORT winners). Default NO SHIP stands."
     },
     {
       "id": "atrtrail-clip-12",
@@ -1480,7 +1481,7 @@
       "id": "amplify-cell-conf-tilt-floorproof",
       "stream": "Winner-cell OFFENSE via confidence tilt instead of notional (floor census 2026-11-07)",
       "kind": "amplify",
-      "status": "open",
+      "status": "done",
       "started": "2026-11-07",
       "deadline": "2026-11-28T00:00:00Z",
       "threshold": "SHADOW ONLY first. Deliverable bar measured against the POST-REVERT baseline (set net14 computed with WINNER_CELL_SIZE_MULT=1.0 on the day this ships to shadow): (i) set net14 > baseline + $0.40; (ii) NO individual cell net14 < 0; (iii) cell-set fill count >= baseline fill count; (iv) 14d same-sign vs 7d. Units = pnl_usdt, never pnl_pct (#193 landmine).",
@@ -1489,11 +1490,20 @@
       "evidence": "FLOOR CENSUS is the whole rationale: 276/397 = 69.5% of 14d closes sit at amount_usdt <= 11.5 (HL_MIN_NOTIONAL floor), so a notional multiplier is floored away on ~7 in 10 trades — measured proof this run: 46 WINNER-CELL-SIZE tag events (all x1.25) -> 30 matched trades -> 14d pnl -0.07 -> uplift over 1.0x = -0.01 vs a +$1.00 bar. Size is structurally the wrong axis at this account balance; confidence/weight tilts change WHETHER a cell clears the confidence gate (fill-mix) rather than HOW BIG it is, and are floor-proof. Precedent mechanism: REGIME_CONF_MULTIPLIER_ENABLED already does regime->confidence multipliers.",
       "notes": "WHY-NOT (mandate: a proposal must state what it is NOT): this is deliberately NOT a new size value, NOT a signal enable/disable, NOT time-based (banned), NOT a blanket +X to all cells. In-flight offense items NOT duplicated: winner-cell-size-125 (11-10), amplify-bbsqueeze-warrior-uninert (11-10), amplify-vb-high-short-clonehunt (11-13), amplify-bbsqueeze-chop-exempt (11-13), amplify-bbsqueeze-neutral-exempt (11-14), amplify-prearm-breakeven-lock (11-14), amplify-jup-short-high-cell (11-19). Measurement vehicle = analysis/winner_cell_set_kpi.py + the existing cell-set SQL.",
       "cell_health_20261107": "CELL-MEMBERSHIP RE-VALIDATION REQUIRED BEFORE SHADOW-SHIP (audit #235): of the 4 cells the tilt would amplify, only bb-squeeze+|NORMAL is positive on all windows (7d +0.19 / 14d +0.52 / 30d +0.76). pump-chain+|EXTREME has DECAYED OUT: 7d -0.42 (n=3) / 14d -0.22 (n=30) / 30d -0.14 (n=68) — it was +0.61 at the #234 read 3.5h earlier and crossed negative purely by window roll-off (Oct-8 IMX +0.48 / GRASS +0.17 / BABY +0.10 aged out of the 30d window between 17:05Z and 20:40Z). volume-buildup-|HIGH 14d -0.07 (30d +0.42). r2v2-long3|NORMAL n=4 in 14d (thin). Bar (ii) 'no cell net14 < 0' would already FAIL today on 2 of 4 cells. Precondition: re-run analysis/winner_cell_set_kpi.py at shadow-ship and drop any cell with net14<0 from the tilt set rather than shipping a tilt that amplifies a dead cell. Reproduce: python3 analysis/winner_cell_set_kpi.py",
-      "adjudicated_by": " | cell-health check brain_auditor #235 2026-11-07T21:05Z | adjudicated brain_auditor #284b 2026-11-21T04:45:21Z",
-      "disposition": "CELL RE-VALIDATION (own precondition) FAILS 2026-11-21T04:40Z -> NO CHANGE stands. Fresh PG: bb-squeeze+|NORMAL|LONG 7d +0.04 / 14d +0.04 / 30d +0.66 OK (but n=1/7d — traffic dried up after the weight/hotset changes); volume-buildup-|HIGH|SHORT 14d +0.07 n=1 (30d +0.49) OK-thin; r2v2-long3|NORMAL|LONG 14d n=0 (30d 4T +0.16) FAILS n>=5; pump-chain+|EXTREME|LONG 14d -0.16 / 30d -0.44 FAILS bar (ii) 'no cell net14<0'. 2 of 4 cells fail; shipping a confidence tilt would amplify a dead cell. Re-register only if all 4 cells clear bar (ii).",
+      "adjudicated_by": " | cell-health check brain_auditor #235 2026-11-07T21:05Z | adjudicated brain_auditor #284b 2026-11-21T04:45:21Z | CLOSE brain_auditor #311 2026-11-28T00:55Z",
+      "disposition": "CLOSED NO-CHANGE at deadline 2026-11-28. Own precondition (bar ii: no cell net14<0, all 4 cells clearing) FAILS on 3 of 4 -> shipping a confidence tilt would amplify a dead cell. Fresh PG 30d (gross / net-of-fee at 0.01247): bb-squeeze+|NORMAL|LONG 24T -0.04 / -0.34 (DECAYED to gross-negative, was +0.66/+0.76 in Oct) | volume-buildup-|HIGH|SHORT 7T +0.32/+0.23 (n<10) | r2v2-long3|NORMAL|LONG 30d n=0 (cell no longer fires) | pump-chain+|EXTREME|LONG 29T +0.11 / -0.25. The confidence-axis lever is kept ALIVE only as a reopen trigger: re-open if and when all 4 cells clear bar (ii) on a fresh read. Not a rejection of the mechanism (it remains the floor-proof replacement for the size axis, which is structurally inert at 69.5% HL_MIN floor) - it is a rejection of TODAY'S cell set. Reopen: any weekly AMPLIFY run may re-register if winner_cell_set_kpi.py clears bar (ii).",
       "evidence_note_309": {
         "net_of_fee_screen_30d": "AMP SCREEN #309: only 1 of 8 n>=10 net>0 30d cells is NET-of-fee positive AND above the $0.0186 fee bar (ai-trader-pending|NORMAL|SHORT, already adjudicated NO-SHIP). The other 7 are NET-OF-FEE NEGATIVE. Any proposal in this entry that amplifies a cell must be judged on NET (pnl_usdt - fees.fee_total), not gross.",
         "reproduce": "SELECT signal,volatility_regime,direction,COUNT(*),SUM(pnl_usdt),SUM(json fees.fee_total) FROM trades WHERE status='closed' AND close_time>NOW()-INTERVAL '30 days' GROUP BY 1,2,3 HAVING COUNT(*)>=10 AND SUM(pnl_usdt)>0"
+      },
+      "done_at": "2026-11-28T00:55:00Z",
+      "close_note_311": {
+        "cells_30d": {
+          "bb-squeeze+|NORMAL|LONG": "24T gross -0.04 net -0.34",
+          "volume-buildup-|HIGH|SHORT": "7T gross +0.32 net +0.23 (n<10)",
+          "r2v2-long3|NORMAL|LONG": "0T",
+          "pump-chain+|EXTREME|LONG": "29T gross +0.11 net -0.25"
+        }
       }
     },
     {
@@ -1909,7 +1919,7 @@
       "stream": "r2v2-long3 NORMAL LONG winner-cell offense coverage (validated member with ZERO open amplify entry)",
       "kind": "amplify",
       "proposal_type": "(c) clone-hunt: mine gate_shadow blocked-LONG cohorts on tokens that later filled r2v2 + counterfactual-walk candles",
-      "status": "open",
+      "status": "done",
       "created_at": "2026-11-14T08:44:51Z",
       "deadline": "2026-11-28T00:00:00Z",
       "owner": "brain_auditor #260 AMPLIFY (weekly emit)",
@@ -1920,13 +1930,14 @@
       "measurement": "brain/gate_shadow.db PRIMARY basis (fwd_4h, tok_n) + PG r2v2-long3 NORMAL|LONG cell; dedupe gate|token|direction|UTC-day (short-relax-shadow-study convention)",
       "not_a_duplicate_of": "amplify-ema300-underdeploy (different signal) / amplify-grind-breakout-* (different signal) / winner-cell-size-125 (notional axis, adjudicated FAIL) / amplify-cell-conf-tilt-floorproof (confidence axis, 4 named cells not incl. r2v2)",
       "notes": "AMPLIFY weekly emit #260. Why-not stated up front: no OTHER cell cleared the bar — all other n>=10 positive cells are already in-flight (bb-squeeze+ x5, volume-buildup- x2, atr-trend- x3, jup x7, pc+ / pc- / warrior / tat / prearm / grind / ema300 / linregfade / xmirror / ugb / structure-flip) and every costliest short-side gate on the fwd basis (SHORT-BB-DEAD-ZONE +0.357, SLOPE-FILTER +0.334, SHORT-RSI-CEILING +0.292, EXEC-RSI-HARD-FLOOR +0.287, SHORT-REGIME-GATE +0.190; all 7d/30d same-sign, tok_n>=56) is already closed by short-relax-shadow-study (0/25 gates cleared 5 bars, 'price of poor base rates' accepted 10-31) or has an open exempt shadow. Flip-KPI: 0 shadow->live conversions this run (stated).",
-      "disposition": "RE-MEASURED 2026-11-21T04:40Z: every 7d/14d follow-on cohort still tok_n << 50 (LONG-NEUTRAL 7d 0 traffic, CONTINUUM-BLOCK flips sign 7d) and the live cell is 14d n=0 / 30d 4T — bar (i) unreachable this week. NO SHIP stands (coverage entry). Re-register.",
-      "adjudicated_by": " | adjudicated brain_auditor #284b 2026-11-21T04:45:21Z",
+      "disposition": "CLOSED at deadline 2026-11-28 - COVERAGE ENTRY OBSOLETE, not a NO-SHIP on the clone-hunt logic. Fresh PG: r2v2-long3|NORMAL|LONG 30d n=0 (and 7d/14d n=0) - the validated cell does not fire inside any live window, so there is nothing to amplify and no blocked-LONG cohort to mine against it. The coverage gap this entry was opened to close (zero amplify entries for one of the 3 WINNER_CELLS_VALIDATED members) is now moot: the member is a non-firing cell. Re-open ONLY if the cell returns to n>=5/30d with net>0. No walk run this run (would have had nothing to join).",
+      "adjudicated_by": " | adjudicated brain_auditor #284b 2026-11-21T04:45:21Z | CLOSE brain_auditor #311 2026-11-28T00:55Z",
       "evidence_note_309": {
         "cell_decay_update": "COVERAGE BASIS STALE: this entry cites 'validated cell NORMAL|LONG 30d 5T +0.19 80% WR' (measured 2026-11-14). Fresh 30d: r2v2-long3|NORMAL|LONG n=1 (+0.11, 100%); 60d n=6 +0.78 with last close 2026-10-11 -> the cell barely fires inside any live window. 30d r2v2-long3 by cell: EXTREME|LONG 15T -0.78 40% (the bulk of the family's -0.87), HIGH|LONG 2T -0.20, NORMAL|LONG 1T +0.11.",
         "implication": "clone-hunt has almost no live cell left to defend; bar (i) tok_n>=50 is unreachable via a cell firing 1x/30d. Recommend the 11-28 read CLOSE this as 'coverage gap closed by measurement: cell dormant' rather than extend. NET-of-fee also fails: 60d net +0.58 gross before fees.",
         "units_guard": "pnl_usdt vs pnl_usdt; fees = trades.fees JSON fee_total."
-      }
+      },
+      "done_at": "2026-11-28T00:55:00Z"
     },
     {
       "id": "amplify-pcv6-extreme-short-cell",
@@ -2276,7 +2287,7 @@
       "proposal_type": "(a) measurement reconcile BEFORE any param proposal — no trade change in this entry",
       "status": "open",
       "created": "2026-11-21T04:45:21Z",
-      "deadline": "2026-11-28T00:00:00Z",
+      "deadline": "2026-12-05T00:00:00Z",
       "owner": "brain_auditor #284 AMPLIFY (weekly-adjacent emit; formal weekly = 11-23)",
       "evidence": "gate_shadow PRIMARY fwd_4h, token-day dedup 30d: LONG-BYPASS-SHORT-BIAS-BLOCK 63 tok-days / 110 ev avg +0.8665% pos 68.2% (7d 41 tok-days +1.0228% SAME-SIGN and STRENGTHENING) = top blocked-would-win cell at tok_n>=50. BUT the adjudicated opposite: long-bypass-regime-shadow (done 2026-11-17) measured the joinable blocked cohort 14d n=53 WR 17.0% net -$10.09 -> 'gate SAVING ~$10/14d, no revert'. Also #231 measured LONG x entry_regime_4h=SHORT_BIAS 110T 58.2% arm 60.0% vs other 164T 49.4% arm 45.7% (arm-rate p=0.026) before catching a signal-mix confounder inside jup. Same adverse-selection gap class #237 documented for the fade cohort: shadow fwd says blocked-would-win, realized follow-on says losers.",
       "threshold": "Reconcile FIRST: (1) run both bases on the SAME cohort and SAME window (fwd_4h PRIMARY vs the 11-17 joinable realized cohort) and report the divergence; (2) if PRIMARY survives on the realized book (blocked-trade counterfactual walk with live exit engine, pnl_usdt units guard), then a scoped exempt proposal may be drafted with bars: n>=50 tok-days maintained AND 7d/14d/30d same-sign AND walk net >= +$1.00/30d AND fk<20% of live LONG winners; (3) if the two bases reconcile to 'gate saves money', CLOSE and record as never-re-open. Default: NO CHANGE — the gate stays live (it is the 'do not fight the trend' rule and the watchdog's P2 wrong-side pattern is on the counter-trend LONG side today).",
@@ -2287,21 +2298,35 @@
       "evidence_note_309": {
         "net_of_fee_screen_30d": "AMP SCREEN #309: only 1 of 8 n>=10 net>0 30d cells is NET-of-fee positive AND above the $0.0186 fee bar (ai-trader-pending|NORMAL|SHORT, already adjudicated NO-SHIP). The other 7 are NET-OF-FEE NEGATIVE. Any proposal in this entry that amplifies a cell must be judged on NET (pnl_usdt - fees.fee_total), not gross.",
         "reproduce": "SELECT signal,volatility_regime,direction,COUNT(*),SUM(pnl_usdt),SUM(json fees.fee_total) FROM trades WHERE status='closed' AND close_time>NOW()-INTERVAL '30 days' GROUP BY 1,2,3 HAVING COUNT(*)>=10 AND SUM(pnl_usdt)>0"
-      }
+      },
+      "reconcile_311": {
+        "at": "2026-11-28T00:55:00Z",
+        "tool": "brain/analysis/longbypass_reconcile_2026-11-28.py --selfcheck PASS | bug_hunter VERDICT SHIP (round 2, 3 findings fixed: double-count seen-set, shared dedup in selfcheck, NULL-pnl guard)",
+        "method": "BOTH bases on the SAME cohort: gate_shadow dedup=gate|token|dir|UTC-day; BASE A = fwd_4h PRIMARY; BASE B = first live LONG on the same token opening inside 24h of the block -> PG pnl_usdt.",
+        "base_a_30d": "tok_n=52 n=96 avg_fwd +1.1373% pos 71/96 = 74.0%",
+        "base_b_30d": "n=15 net +0.79 pnl_usdt WR 66.7% (winners +1.01 / losers -0.22) — AFTER bug_hunter round-1 fix (seen-set; the pre-fix +1.05 double counted ZRO trade 16920 across two token-day windows)",
+        "base_a_7d": "tok_n=26 n=33 avg_fwd +1.2547% pos 22/33 = 66.7%",
+        "base_b_7d": "n=7 net +0.09 WR 71.4%",
+        "divergence": "SAME-SIGN POSITIVE at both 30d and 7d - step (1) of the threshold is SATISFIED. The 2026-11-17 opposite read (n=53 WR 17.0% net -10.09) used a looser/different join and does NOT reproduce on the same-cohort, first-trade-per-block, 24h-lookahead convention (n=15/+0.79 here). The two bases do NOT reconcile to \"gate saves money\".",
+        "residual_risk": "BASE B n=15 (only 15 of 52 blocked token-days produced a follow-on LONG at all) and those trades are OTHER-path fills, not the blocked setup itself. Step (2) - counterfactual walk of the blocked set with the live exit engine, units guard - is still REQUIRED before any scoped exempt draft.",
+        "next": "EXTENDED to 12-05 for step (2) walk. Bars unchanged: tok-days>=50 (HAVE 52) AND 7/14/30 same-sign (HAVE 30d/7d) AND walk net >= +$1.00/30d AND fk<20% of live LONG winners. Default remains NO CHANGE - this is a CEO SHIP-LIVE trend gate (\"do not fight the trend\") and the watchdog still names counter-trend LONGs as the wrong-side class."
+      },
+      "adjudicated_by": " | step-1 reconcile brain_auditor #311 2026-11-28T00:55Z",
+      "updated": "2026-11-28T01:15:00Z"
     },
     {
       "id": "amplify-maker-entry-fill-walk",
       "kind": "amplify",
       "amplify_type": "fee-axis (NOT a winner-cell, NOT size): maker/ALO entry path counterfactual",
       "deadline": "2026-11-28T00:00:00Z",
-      "status": "open",
+      "status": "done",
       "created_by": "brain_auditor #285",
       "evidence": "HEADLINE #285: fees are now 158% of gross (7d gross +1.13 vs fees 1.787 = net -0.66; 30d gross -6.82 vs fees 7.164 = net -13.98; PG fee_total from trades.fees JSON). Pipeline entries are TAKER: decider_run.execute_trade -> brain.py add default order_type='Market' (brain.py:414/1626); hyperliquid_exchange.place_order ALREADY supports order_type='Limit' + tif='Alo' (hyperliquid_exchange.py:1099-1238) and brain.py CLI has --order-type Limit (brain.py:1625) = the maker lever was built as a MANUAL flag and never wired into the automated path. Session prior art [Build New Linear Regression Signal, 2026-10-29] 'entry path hardcodes order_type=Market -> taker 0.09% RT ... maker 0.03% RT would add +0.06% to every trade' -> 23 days old, still unimplemented in pipeline. FILL-WALK (brain_auditor #285, 14d n=209 closed, candles_1m proxy: post-only at recorded entry fills iff price revisits entry within window): fill 1m 74.2% / 3m 82.3% / 5m 86.6%; filled 172 notional $2287.61 fee_paid $2.677; missed 37 net pnl -0.25 (winners +0.95 / losers -1.20) = skipping them HELPS; maker save est 0.06% RT x notional = +$1.37/14d; NET COUNTERFACTUAL +$1.62/14d (~+$3.5/30d). Halves same-sign: older +$1.09 (fill 83%, fk 9/52=17%) / newer +$0.53 (fill 82%, fk 9/50=18%). fk by dollars = 0.95/8.39 = 11.3% of 14d gross wins.",
       "threshold": "SHIP only if ALL: (i) 3m fill rate >=80% [MET 82.3%]; (ii) missed-cohort net pnl >=0 [MET -0.25 means skipping is net-positive]; (iii) fee save >= +$1.00/14d on pnl_usdt basis, units guard (fees and pnl both USDT, never pnl_pct) [MET +$1.37]; (iv) both 7d halves same-sign positive net_cf [MET +1.09/+0.53]; (v) fk (missed winners) <20% of winners both by count and dollars [MET 18%/17% count, 11.3% dollars — TIGHT]; (vi) ALO retry semantics designed: maker_not_filled writes no DB row (brain.py:1626) so the pipeline must NOT double-fire the same signal — needs a no-retry-or-single-retry rule before ANY enforce; (vii) CEO sign-off = execution/money path change. DEFAULT = NO SHIP, stay Market.",
       "measurement": "Re-run the fill walk at deadline: 14d/30d closed trades x candles_1m min(low)/max(high) vs entry within 180s; report fill%, fee save (sum amount_usdt x 0.0006 for filled), missed cohort net pnl_usdt, fk, both halves. Limit window scope to a CEO-chosen source subset if full-book ALO fill risk is unacceptable (momentum entries where a miss costs more than 0.06% RT).",
       "notes": "Caveat honesty: the fill proxy assumes a post-only order resting AT our recorded (market-filled) entry price; a real ALO would rest at the touch and fill only on a taker hit — fill rate could be lower than 82% if price runs away without revisiting. Proxy is therefore best-estimate, not measured fills. Also: maker fills can be WORSE price-wise only by the spread we already pay. Fee lever session cite: [Build New Linear Regression Signal, 2026-10-29] + [calwndar, 2026-10-31] ('headline net negative is gross of fees; true 30d ~= -9.21'). Cross-ref: fee-net KPI already tracked by auto_1hr (OPEN: 7d fee-drag).",
       "created_at": "2026-11-21T08:45:00Z",
-      "disposition": "RE-MEASURED 2026-11-26 (audit #305, deadline 11-28): directional post-only proxy (LONG fills iff low<=E, SHORT iff high>=E — economically correct ALO rule; #285's span-proxy gave 82.3% fill / missed-net -0.25). Fresh 14d n=231: 180s fill 79.2% [FAIL bar (i) 80%] · fee_save +1.453 · missed_net +1.190 · NET_cf +0.263/14d [collapsed from +1.62] · fk 25.8% count / 24.1% dollars [FAIL bar (v) <20%] · halves older +0.666 / newer -0.403 [FAIL bar (iv) sign flip]. FULL-BOOK = NO SHIP on this proxy. SHORT-ONLY SCOPING (the entry's own measurement note anticipated a CEO subset): 30d SHORT n=220 fill 93.6% · save +1.705 · missed_net +1.000 · NET_cf +0.705/30d · fk 8.1% count / 13.5% dollars · halves +0.019/+0.686 same-sign POSITIVE — passes (i)(iii)(v)(iv) on the scoped cohort; bar (ii) ambiguous (missed_net>0 = forgoes winners) and bar (vi) retry semantics + (vii) CEO sign-off still open. LONG-only is the problem: fill 59.4% fk 46% halves mixed. DEFAULT = NO SHIP, stay Market. If CEO wants the lever: scope to SHORT entries only, design single-retry rule (MAKER-MISS path already bounded by 10min signal expiry at decider_run.py:6770-6782 — bar (vi) may already be satisfied by that existing ruling), then ship. Session cit: [Build New Linear Regression Signal, 2026-10-29] fee lever + [calwndar, 2026-10-31] net-of-fee correction.",
+      "disposition": "RE-MEASURED 2026-11-26 (audit #305, deadline 11-28): directional post-only proxy (LONG fills iff low<=E, SHORT iff high>=E — economically correct ALO rule; #285's span-proxy gave 82.3% fill / missed-net -0.25). Fresh 14d n=231: 180s fill 79.2% [FAIL bar (i) 80%] · fee_save +1.453 · missed_net +1.190 · NET_cf +0.263/14d [collapsed from +1.62] · fk 25.8% count / 24.1% dollars [FAIL bar (v) <20%] · halves older +0.666 / newer -0.403 [FAIL bar (iv) sign flip]. FULL-BOOK = NO SHIP on this proxy. SHORT-ONLY SCOPING (the entry's own measurement note anticipated a CEO subset): 30d SHORT n=220 fill 93.6% · save +1.705 · missed_net +1.000 · NET_cf +0.705/30d · fk 8.1% count / 13.5% dollars · halves +0.019/+0.686 same-sign POSITIVE — passes (i)(iii)(v)(iv) on the scoped cohort; bar (ii) ambiguous (missed_net>0 = forgoes winners) and bar (vi) retry semantics + (vii) CEO sign-off still open. LONG-only is the problem: fill 59.4% fk 46% halves mixed. DEFAULT = NO SHIP, stay Market. If CEO wants the lever: scope to SHORT entries only, design single-retry rule (MAKER-MISS path already bounded by 10min signal expiry at decider_run.py:6770-6782 — bar (vi) may already be satisfied by that existing ruling), then ship. Session cit: [Build New Linear Regression Signal, 2026-10-29] fee lever + [calwndar, 2026-10-31] net-of-fee correction. || #311 DEADLINE READ 2026-11-28: FULL-BOOK = NO SHIP CONFIRMED (3 of 7 bars fail on the directional proxy: fill 79.2%<80%, fk 25.8%>20%, halves sign-flip). Entry CLOSED - do not re-open the full-book variant. The SHORT-only scope is spun out to a NEW entry 'amplify-maker-entry-short-only-pilot' (shadow-first, CEO money-path sign-off pending) so the passing scoped cohort is not lost with it.",
       "remeasure_2026_11_26": {
         "proxy": "directional (LONG low<=E, SHORT high>=E)",
         "full_book_14d": {
@@ -2343,7 +2368,9 @@
         "book_context_30d": "book net -11.40 (gross -3.63, fees 7.77); fee/trade 0.0124; maker would recover roughly $4.7-5.4/30d at current volume if the measured fill-rate walk holds (entry's own figure +$3.5/30d is the conservative one to quote).",
         "prior_art": "[Build New Linear Regression Signal, 2026-10-29] 'entry path hardcodes order_type=Market -> taker 0.09% RT ... maker 0.03% RT would add +0.06% to every trade' = 29d old, still unwired in the automated path.",
         "units_guard": "pnl_usdt vs pnl_usdt; fees = trades.fees JSON fee_total."
-      }
+      },
+      "done_at": "2026-11-28T00:55:00Z",
+      "adjudicated_by": " | CLOSE brain_auditor #311 2026-11-28T00:55Z"
     },
     {
       "id": "amplify-ema300-breakthrough-underdeploy",
@@ -2645,7 +2672,7 @@
     {
       "id": "regime-conf-high-first-read",
       "kind": "eval",
-      "status": "open",
+      "status": "done",
       "created_at": "2026-11-25T16:45:00Z",
       "deadline": "2026-11-29T00:00:00Z",
       "owner": "brain_auditor #300",
@@ -2654,7 +2681,19 @@
       "measurement": "PG: volatility_regime='HIGH' AND close_time > TIMESTAMP '2026-11-25 12:43:00', windows rolling 7d on post-ship subset; pnl_usdt",
       "notes": "Pre-registered in hermes_constants.py:1415 comment (#299). This entry makes the read trackable so it cannot be forgotten while vol sits LOW. | #304: post-ship n=10 available; HIGH-LONG displacement bars all PASS on 30d but block SHIPS-NO until joint read.",
       "evidence": "AUDIT #304 (2026-11-26 12:45Z) DIRECTION SPLIT ADDED — the HIGH cohort is not homogeneous: 30d HIGH-LONG 117T -3.58 43.6% arm 41.0% vs HIGH-SHORT 84T -0.85 59.5% arm 50.0%. Post-mult ship (open_time>=2026-11-25 12:43Z): 10 HIGH closes, -0.12, WR 70.0%, arm 90% vs pre-ship 14d 87T -1.93 46.0% arm 52% (n=10, EARLY, not claimed). Judge must read this TOGETHER with the new entry 'high-long-displacement-read' (same 11-29 deadline) and ship at most ONE HIGH-side instrument. Original note: ",
-      "updated": "2026-11-26T12:45:00Z"
+      "updated": "2026-11-26T12:45:00Z",
+      "done_at": "2026-11-28T00:55:00Z",
+      "disposition": "READ FIRED EARLY per its own rule ('n>=15 OR at deadline, whichever first'): post-ship HIGH closes (open_time>=2026-11-25 12:43Z) n=20 >= 15. Result: net -0.39 pnl_usdt, WR 65.0%, armed 11/20. RULE VERDICT = KEEP 0.50 (the rule: RE-RAISE to 0.70 only if WR>=50% AND net>0; KEEP if WR<45% OR net<0 -> net<0 fires KEEP). One-variable rule honored: REGIME_CONF_EXTREME_MULT untouched at 0.85, no HIGH-side lever shipped this run. JOIN: high-long-displacement-read (same 11-29 deadline) now unblocks as the sole remaining HIGH-side candidate.",
+      "read_311": {
+        "post_ship_n": 20,
+        "post_ship_net": -0.39,
+        "post_ship_wr": 65.0,
+        "post_ship_armed": "11/20",
+        "rule": "KEEP 0.50 (net<0)",
+        "read_at": "2026-11-28T00:55:00Z",
+        "read_by": "brain_auditor #311"
+      },
+      "adjudicated_by": " | READ brain_auditor #311 2026-11-28T00:55Z"
     },
     {
       "id": "amplify-atrtrend-short-tat-shadow",
@@ -2720,7 +2759,21 @@
       "measurement": "PG: volatility_regime='HIGH' AND direction='LONG' vs (volatility_regime<>'HIGH' AND direction='LONG'), windows rolling 7/14/30d on close_time, pnl_usdt; Fisher exact 2x2 on win/loss; fk = blocked-14d-winners / all-14d-winners.",
       "evidence": "30d: HIGH-LONG 117T -3.58 43.6% arm 41.0% vs nonHIGH-LONG 303T +0.10 53.8% arm 49.2%. ARMED high-long 48T +2.57 89.6% vs NEVER 69T -6.15 11.6% = this is a CHOP/ARM-GAP cell, NOT a direction cell. 88.9% of the cell's loss dollars sit in never-armed mfe<0.40 trades (56/60 losers). Never-armed LONG loser avg loss by regime: HIGH -0.1163 > NORMAL -0.0990 > FLAT -0.0967 > EXTREME -0.0892 with IDENTICAL initial sl_distance 0.015 everywhere. Mechanism: atr_sl_hit realized price move HIGH -0.913% vs NORMAL -0.690% (same 1.5% initial) = ATR stops widen with vol and the unarmed cohort pays for it. Same cell's atr_sl_hit slice: HIGH 33T -4.08 (41% of the whole -10.72 atr_sl bleed); by signal jup_yolo_mirrored 33T -4.45 = 41% of the atr_sl bleed.",
       "disposition": "PRE-REGISTERED 2026-11-26 #304. No config change this run: (1) one-variable rule vs REGIME_CONF_HIGH_MULT 0.50 shipped 2026-11-25T12:43Z whose first read is the SAME 11-29 deadline; (2) shipping the block now would deplete the HIGH cohort of its LONG leg and corrupt that pre-registered read; (3) the armed half of this cell wins 89.6% (+2.57/30d) so a hard block forfeits a working trend cohort — the correct first instrument may be arm-side (prearm enforce, in flight) rather than entry-side. Prior art: NO direct hit for a LONG-in-HIGH block (session brain queries 'have we tried blocking LONG trades in HIGH volatility regime' 6 hits, none a block attempt).",
-      "notes": "Cites [calwndar 2026-10-31] 'LONG in HIGH: 55T, 43.6% WR ... it's regime routing + chop mechanics' (independent earlier measurement, same direction) and [mtf macd 2026-10-02] 'don't blanket disable anything, use the closed trades to see if the signal is in the wrong volatility regime' (method). Reconcile with: regime-conf-high-first-read (SAME 11-29 deadline, must be adjudicated together), prearm-enforce-day7-read (11-28, the arm-side alternative), amplify-stale-block-bleed5 (12-01)."
+      "notes": "Cites [calwndar 2026-10-31] 'LONG in HIGH: 55T, 43.6% WR ... it's regime routing + chop mechanics' (independent earlier measurement, same direction) and [mtf macd 2026-10-02] 'don't blanket disable anything, use the closed trades to see if the signal is in the wrong volatility regime' (method). Reconcile with: regime-conf-high-first-read (SAME 11-29 deadline, must be adjudicated together), prearm-enforce-day7-read (11-28, the arm-side alternative), amplify-stale-block-bleed5 (12-01).",
+      "pre_read_311": {
+        "at": "2026-11-28T00:55:00Z",
+        "by": "brain_auditor #311",
+        "bars_remeasured": {
+          "a_n_ge_20": "PASS 7d 29 / 14d 49 / 30d 124",
+          "b_net_neg_same_sign": "PASS -1.20 / -1.58 / -3.54",
+          "c_fisher_vs_nonHIGH_LONG": "**FAIL -> DOES NOT REPRODUCE**: p=0.177 (7d) / 0.079 (14d) / 0.108 (30d), none <0.05. Best alternative variant (HIGH-LONG vs all-other LONG) 30d p=0.056. #304 recorded p=0.0003/<0.0001/<0.0001 - NOT reproducible on fisher(win/loss) or two-prop z with the same cohorts (two-prop z 30d = 0.061). Method disclosure needed from #304 or the bar fails on re-measure per this entry own rule.",
+          "d_weekly_same_sign": "PASS 5/5 (-0.78, -1.17, -0.38, -0.33, -1.14)",
+          "e_fk14": "PASS 21/127 = 16.5% <= 20%",
+          "f_30d_save": "PASS +$3.54 >= +$1.00"
+        },
+        "pre_read_verdict": "On the recorded SHIP BAR (\"all six MUST still hold on re-measure\") bar (c) FAILS on every reproduction I can run -> default at the 11-29 joint read = NO-SHIP unless #304 discloses a method that reproduces p<0.05. Arm-side read unchanged: 30d HIGH-LONG armed 53T +2.85 (90.6%) vs never 71T -6.39 (11.3%) = still a chop/arm-gap cell, not a direction cell."
+      },
+      "updated": "2026-11-28T00:55:00Z"
     },
     {
       "id": "amplify-feevictim-maker-rescore",
@@ -2822,11 +2875,12 @@
         "exit_mix": "losers = atr_sl_hit 16 (-2.11) + hard_max_loss 15 (-1.68) = 31/46 loser exits = chop/no-momentum signature",
         "winners_killed": "30d 34/215 LONG winners = 15.8% (bar <20%); 14d 13.3%; 7d 11.5%",
         "net_effect_if_blocked": "+2.52/30d (vs 30d fee load 7.78 = 32% of fee)",
-        "units_guard": "pnl_usdt vs pnl_usdt; fees from trades.fees JSON fee_total (#193 landmine)"
+        "units_guard": "pnl_usdt vs pnl_usdt; fees from trades.fees JSON fee_total (#193 landmine)",
+        "reproduce_2026-11-28T0500Z": "REPRODUCTION (brain_auditor #312): the recorded p=0.03303 IS reproducible for the 2026-11-27 12:31Z window — fisher(34,46 | 187,146) = 0.03364 and 187/333 = 56.2% = the stated 56.1%. CORRECTION: the 'non-band LONG 312W/175L' string in bar ii is a TYPO (312+175=487 and 312/487=64.1% contradict the same line's own 56.1%, and 487 exceeds the entire 30d LONG cohort of 413) — the real rest cell was 187W/146L n=333. RE-MEASURE 2026-11-28 05:00Z (same definition, rolling window): band 80T 35W/45L net -2.15 (43.8%) | rest-LONG 333T 177W/156L net -1.05 (53.2%) | fisher p=0.13694. Band n unchanged at 80 and rest n unchanged at 333, but p moved 0.0336 -> 0.1369 = 4x ABOVE the bar in 16.5h of window drift. 14d p=0.2934, 7d p=0.4212 (both restated). Alternate anchors (signal_z_score in [1,2) vs metadata tier='high'; close_time vs open_time) give 30d p=0.0788 / 0.13694 / 0.0662 (excl. already-gated z<-1.5 & z>2.5) — NONE < 0.05 today. CONCLUSION: bar (ii) does NOT hold on re-measure; the cell is marginal and window-sensitive. Bar (ii) status = FAIL-ON-REMEASURE pending the 12-04 read."
       },
       "bars": {
         "i_n_ge_20": "MET (80)",
-        "ii_p_lt_0_05": "MET 30d p=0.033; 14d p=0.051 MARGINAL; 7d p=0.087 MARGINAL — three same-sign windows required, met",
+        "ii_p_lt_0_05": "RESTATED 2026-11-28 #312: was 'MET 30d p=0.033'. Re-measured 05:00Z same day -> p=0.13694 (band 35W/45L vs rest 177W/156L, both n unchanged). p moved 4x the bar in 16.5h of rolling-window drift. => FAIL-ON-REMEASURE. Do not ship on the 11-27 number.",
         "iii_oos_consistent": "MET (sign identical 7d/14d/30d, magnitude grows with n)",
         "iv_winners_lt_20pct": "MET (15.8%)",
         "v_not_already_shipped": "MET — grep hermes_constants: only CHASE_ZSCORE_MAX=2.5 (>2.5) and SIGNAL_FILTER_Z_MIN=-1.5 exist; no LONG z-midband. Session-brain prior-art query returned NO z-midband proposal (hits were RSI/SHORT-CONTINUUM only)",
@@ -2854,7 +2908,8 @@
         "SEQUENCING_BLOCK_12_04": "prearm-enforce-day7-read is due 2026-11-28 and attacks the SAME never-armed cohort with a TIME instrument that does NOT kill the band's 63 armed trades (+3.34). If prearm lands first, RE-MEASURE this band on a post-prearm baseline before the 12-04 read; otherwise 12-04 judges a stale counterfactual. Order: 11-28 prearm -> re-measure -> 12-04 z-band.",
         "units_guard": "pnl_usdt vs pnl_usdt; fees = trades.fees JSON fee_total (CEO Phase-0 net = pnl_usdt - fee_total).",
         "reproduce": "SELECT ... GROUP BY band in/out, cohort armed(COALESCE(mfe_pct,0)>=0.40) vs never; fisher_exact on WR 2x2; windows 7/14/30d."
-      }
+      },
+      "updated": "2026-11-28T05:10:00Z"
     },
     {
       "id": "peak-source-divergence-neverarmed",
@@ -2871,8 +2926,47 @@
       "risk": "low (analysis only); the risk being managed is a WRONG conclusion: 15% label noise does NOT by itself refute the never-armed loss cohort (the 44 trades total -1.53, i.e. they are losing too) — it bounds how sharp the label can be.",
       "measurement": "brain/analysis/prearm_day7_read_2026-11-27.py extended, or a copy with --since-days N; PG trades x data/candles.db 1m close.",
       "not_a_duplicate_of": "prearm-enforce-day7-read (CLOSED this run, MOOT-ENFORCE-OFF) · amplify-prearm-breakeven-lock (done) · eval-long-z-midband-1-2 (different cohort, LONG z-band) · prearm-band-lower-candle-oos (12-01, band parameter not source)"
+    },
+    {
+      "id": "amplify-maker-entry-short-only-pilot",
+      "kind": "amplify",
+      "amplify_type": "fee-axis (a) counterfactual -> shadow-first pilot; NOT a winner-cell, NOT a size change, NOT time-based",
+      "status": "open",
+      "created_at": "2026-11-28T00:55:00Z",
+      "created_by": "brain_auditor #311 weekly AMPLIFY emit",
+      "deadline": "2026-12-12T00:00:00Z",
+      "default": "NO SHIP - shadow logging only until CEO signs the money path",
+      "proposal": "Wire hyperliquid_exchange order_type=Limit + tif=Alo (already supported, hyperliquid_exchange.py:1099-1238) for SHORT entries ONLY, behind a SHADOW leg that logs would-fill ALO outcomes with zero behavior first. LONG-only cohort is explicitly OUT OF SCOPE (fill 59.4% / fk 46% / mixed halves = measured loser).",
+      "why_now": "Amplify-maker-entry-fill-walk closed at its 11-28 deadline: full-book FAILS (fill 79.2%<80, fk 25.8%>20, halves flip) but the SHORT-only scope passes 4 of the 7 bars and the deadline would have thrown it away.",
+      "evidence": {
+        "short_only_30d": "n=220, directional post-only fill@180s 93.6%, fee_save +1.705, missed_net +1.000, NET_cf +0.705/30d pnl_usdt, fk 8.1% count / 13.5% dollars, halves +0.019/+0.686 SAME-SIGN POSITIVE",
+        "why_it_matters_30d": "book net -11.40 = gross -3.63 + fees 7.77 -> fees are 188% of the gross loss; fee/trade 0.0124. Every type-(b) winner-cell 1.25x is worth <= +$0.085/30d (#309 measured) vs this fee axis ~+$0.70-3.50/30d = the offense books biggest single lever by an order of magnitude.",
+        "prior_art": "[Build New Linear Regression Signal, 2026-10-29] \"entry path hardcodes order_type=Market -> taker 0.09% RT ... maker 0.03% RT would add +0.06% to every trade\" - 30d old, still unwired in the automated path."
+      },
+      "threshold": "SHIP (enforce) only if ALL: (i) shadow leg >=30 decided SHORT ALO would-fills with 3m fill >=80%; (ii) fee save >= +$1.00/14d pnl_usdt, units guard (never pnl_pct, #193); (iii) fk (missed winners) <20% of SHORT winners by count AND dollars; (iv) 7d/14d same-sign; (v) single-retry / no-double-fire rule designed against maker_not_filled writing no DB row (brain.py:1626) - decider_run.py:6770-6782 10min signal expiry may already satisfy this, must be shown not assumed; (vi) CEO sign-off (execution/money path).",
+      "measurement": "shadow log line [MAKER-ALO-SHADOW] on SHORT entries only: entry price, 1m low/high within 180s, would-fill y/n, fee delta (0.0009 -> 0.0003 RT on amount_usdt). Join weekly to PG by open_time+token.",
+      "not_a_duplicate_of": "amplify-maker-entry-fill-walk (CLOSED 11-28 full-book NO SHIP; this entry is the scoped child that entry itself anticipated) / amplify-feevictim-maker-rescore (re-SCORES cells at maker basis, no wiring) / winner-cell-size-125 + conf-tilt (sizing axes, both closed)",
+      "risk": "low (shadow first, zero behavior until CEO sign-off); medium only at enforce (missed momentum fills)",
+      "session_citations": "[Build New Linear Regression Signal, 2026-10-29] fee lever; [calwndar, 2026-10-31] \"headline net negative is gross of fees; true 30d ~= -9.21\""
+    },
+    {
+      "id": "zscore-long-gate-deadcode",
+      "kind": "eval",
+      "status": "open",
+      "created_at": "2026-11-28T05:05:00Z",
+      "deadline": "2026-12-05T00:00:00Z",
+      "owner": "brain_auditor #312",
+      "stream": "decider_run.py:4230 TOKEN-LEVEL REGIME CHECK (z_score_tier) — proven INERT since inception (3 defects: key absent from hotset.json; producer vocabulary {extreme_high,high,neutral,low,extreme_low} never contains the 'rising'/'falling' it compares against; _momentum guard compares numeric momentum_score to phase strings). 0 [Z-SCORE] lines in pipeline.log + all rotated archives.",
+      "threshold": "RE-MEASURE the would-block cell (z_score_tier='high' AND direction='LONG') at 12-05 on a fresh 30d PG window. Limb (a): report p at TWO anchors >=24h apart — if either is >=0.05 the cell is window-noise and this entry closes. Limb (b): if BOTH <0.05 and net<0 in >=14d and >=30d and fk<=20%, HAND the block to eval-long-z-midband-1-2 (do not ship here). Limb (c): otherwise DELETE the dead decider_run branches outright (they are already inert; only the documented notice remains) and close. Units pnl_usdt.",
+      "measurement": "PG: _signal_metadata->>'z_score_tier' + direction + volatility_regime on trades, rolling windows on close_time; Fisher exact 2x2 win/loss.",
+      "evidence": "2026-11-28 #312 (superseded numbers corrected in p_stability_note): 30d n=80 WR 43.8% net -2.15 | vs non-BAND LONG control fisher p=0.13694 (FAIL) | vs ALL-other control p=0.073 | 14d p=0.2934 vs non-band LONG | 7d n=16 <20 | fk14 12/130=9.2% | 5/5 ISO weeks negative (wk44 -0.72, wk45 -0.76, wk46 -0.09, wk47 -0.33, wk48 -0.25) | spread over 17 signals (r2v2-long3 -0.89 n=15, jup_yolo -0.87 n=20, pump-chain+ -0.36, bb-squeeze+ -0.32) = not a single-signal confound, but r2v2-long3|EXTREME is 14/15 of that sub-cell (regime-concentrated). SAME CELL as eval-long-z-midband-1-2 — see not_a_duplicate_of. Prior art: [gold star trades 2026-10-08] wave_phase-as-filter candidate (51d old); #261 'rsi/gap/momentum do NOT predict never-armed bleed'; stop-family-entry-filter rsi/gap cells failed too.",
+      "default_action": "NO CHANGE (block already inert — default is status quo; do not activate)",
+      "risk": "low",
+      "not_a_duplicate_of": "eval-long-z-midband-1-2 (due 12-04) owns the BLOCK SHIP decision for this exact cell. THIS entry owns only the dead-code question at decider_run.py:4230 (delete the inert branches outright vs keep the documented notice) plus a p-stability co-measure feeding that entry. NO second block proposal here.",
+      "p_stability_note": "p moved 0.0336 (11-27 12:31Z) -> 0.13694 (11-28 05:00Z) on an unchanged n=80/333 = window-sensitive. Any future ship of this cell must show p<0.05 on TWO anchors >=24h apart.",
+      "updated": "2026-11-28T05:12:00Z"
     }
   ],
   "updated_at": "2026-11-27T20:55:00+00:00",
-  "updated_by": "brain_auditor #310"
+  "updated_by": "brain_auditor #311"
 }
