@@ -6196,3 +6196,6 @@
 
 ## Error Alerts — 2026-11-28 05:40 UTC
 - **REPEATED** (4x): `Nov N N:N:N python3[TOK]: TS   TS   🚨 [TOK-TOK] TOK TOK BLOCKED — WARNING: TOK 30m momentum -N.N% — blocking TOK entries`
+
+## Error Alerts — 2026-11-28 05:55 UTC
+- **[WARN]** (health_monitor): `disk`: disk 88% used (>= 85%)
