@@ -35846,3 +35846,29 @@ BY: auto_1hr
 - unarmed cohort net -0.52 vs armed +0.25 — stall stack fix still pending
 - ai-trader-auto 14d 4T 0% net -0.94 — CEO-driven lane, flagging only
 BY: auto_1hr
+
+## [2026-11-28 17:54] Hourly Analysis
+
+**Storm:** no storm (window-min -0.49% / at-run -0.21%) — both inside ±1.5 gate
+**Trades:** 0 closed last hour | 24h 14 closed (9W 5L) | 0 open (flat)
+**PnL NET:** hour $0.00 | 24h NET -$0.08 (gross +$0.07, fees $0.15, payoff 0.63, WR 64.3%) | 7d NET -$2.74 (112T) | 14d NET -$3.80 (234T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- Kill policy: no 0%-WR signal n>=3 in last hour (0 closes); 24h worst atr-trend+ 7T 57.1% net -0.20 (wins all regimes — keep); continuum-trend+ 1T 0% n<3
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 3/14 = 21.4% (<40%); tpsl_utils deployed; profit-monster-trail 8T net +0.25 dominant, atr_sl_hit -0.34, stale_exit -0.14, hard_max_loss -0.11
+- Boost: no signal passes all 3 gates (atr-trend+ 7T 57.1% fails net -0.20; rest n<5) — skipped
+- Arm rate: unarmed 6/14 = 42.9% <70%, WR 16.7% net -0.33 vs armed 8/14 100% net +0.25 — stall stack owns fix, NO new gate (surfaced only)
+- Frequency: 0/hr — under 20
+- Entry quality: 24h winners avg MAE 0.389% < 0.5% (max 0.749), losers 0.763%
+- Negative-hour streak: only 13:00 +0.03 in last 12h — not 3 consecutive; already 0.25x
+
+**Open Questions:**
+- 24h NET -$0.08 (fees $0.15 > gross +$0.07), payoff 0.63 at WR 64.3% — payoff <1.0 remains the loss driver
+- 7d -$2.74, 14d -$3.80 — drifting down
+- unarmed cohort net -0.33 vs armed +0.25 — stall stack fix still pending
+- ai-trader-auto 14d 4T 0% net -0.94 — CEO-driven lane, flagging only
+BY: auto_1hr
