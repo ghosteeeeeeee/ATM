@@ -2965,8 +2965,64 @@
       "not_a_duplicate_of": "eval-long-z-midband-1-2 (due 12-04) owns the BLOCK SHIP decision for this exact cell. THIS entry owns only the dead-code question at decider_run.py:4230 (delete the inert branches outright vs keep the documented notice) plus a p-stability co-measure feeding that entry. NO second block proposal here.",
       "p_stability_note": "p moved 0.0336 (11-27 12:31Z) -> 0.13694 (11-28 05:00Z) on an unchanged n=80/333 = window-sensitive. Any future ship of this cell must show p<0.05 on TWO anchors >=24h apart.",
       "updated": "2026-11-28T05:12:00Z"
+    },
+    {
+      "id": "amplify-prearm-deadline-20m-shadow",
+      "kind": "amplify",
+      "proposal_type": "(a) exit-side counterfactual - per-signal pre-arm deadline (exit if never touched +0.40% by open+20m), SHADOW FIRST. Tightens the existing trail_arm_timeout family (45-90m -> 20m) and fills its coverage gap.",
+      "status": "open",
+      "created_at": "2026-11-28T09:05:00Z",
+      "created_by": "brain_auditor #312 weekly AMPLIFY emit",
+      "deadline": "2026-12-12T00:00:00Z",
+      "default": "NO CHANGE - shadow logging only until all bars clear + CEO sign-off on exit behavior",
+      "why_now": "the armed/unarmed split is the whole book: 30d armed 337T +19.55 (87.8%) vs unarmed 293T -23.21 (13.3%); 7d reached+0.40 75T 85.3% +3.25 vs never 51T 13.7% -4.31. Unarmed bleed (-23.21) exceeds the entire 30d gross deficit (-3.66). Entry metadata cannot predict arming (8 features x n=630 all land 46-62% arm-rate, noise nets) -> the lever must be time, not entry quality.",
+      "evidence": {
+        "method": "1m-close arm touch at +/-0.40% of entry; counterfactual exit price = 1m close at open+T; pnl_usdt basis (units guard, #193). 630 closed trades / 30d, 0 missing-candle tokens.",
+        "full_30d_delta": {
+          "15m": "+3.68 (cut 420)",
+          "20m": "+4.01 (cut 372)",
+          "30m": "+2.07",
+          "45m": "+1.39",
+          "60m": "+1.12",
+          "90m": "+0.01",
+          "120m": "-0.08"
+        },
+        "oos_halves": {
+          "T=15m": "train d1-15 +2.63 | test d16-30 +1.04 = SAME-SIGN",
+          "T=20m": "train +2.98 | test +1.03 = SAME-SIGN",
+          "T>=30m": "test flips NEGATIVE (-0.37/-0.64/-0.31) -> pre-registered T is 20m ONLY, no post-hoc T shopping"
+        },
+        "per_signal_T20_delta": "jup_yolo_mirrored 132T +1.09 | r2v2-long3 14T +0.68 | bb-squeeze+ 28T +0.60 | ai-trader-auto +0.34 | ai-trader-pending 28T +0.31 | continuum-osc- +0.38 | hl_copy_trader +0.29 | hh-hl+ +0.19 | rider +0.16 | warrior-sr-confirm+ +0.06 || NEGATIVE: atr-trend- 43T -1.09, pump-chain- 15T -0.36 -> EXCLUDED",
+        "named_signal_set": "jup_yolo_mirrored, bb-squeeze+, r2v2-long3, ai-trader-pending, ai-trader-auto, hl_copy_trader, hh-hl+, btc-pump-rider+, warrior-sr-confirm+, continuum-osc-, continuum-trend-, continuum+ (EXCLUDE atr-trend- and pump-chain-)",
+        "fee_neutrality": "one round trip either way (fee 0.01247 unchanged), BUT a re-fire adds a second fee - bar (iii)/(vi) counts it",
+        "prior_art": "trail_arm_timeout family: BB_SQUEEZE 60m / PUMP_CHAIN 45m / BB_BOUNCE 55m / JUP 90m shadow / VB 45m shadow (hermes_constants:2077-2129) - same mechanic, looser T, 5 signals only. NO session-brain prior art found for a 15-20m band or for this OOS sweep (14 queries run).",
+        "session_citations": [
+          "[yolo dash, 2026-11-02] 'the armed variant now beats no-arm (+34.76 vs +31.26, WR 77%, holds 0.9h)'",
+          "[mfe exit, 2026-10-31] arm edge / no-arm churn trades",
+          "[calwndar, 2026-10-31] 'headline net negative is gross of fees'",
+          "[risk-budget decision, 2026-10-21] 'kill bottom quintile cells / select WHICH combos fire'"
+        ]
+      },
+      "threshold": "SHIP (enforce) only if ALL: (i) >=30 decided shadow would-cut events pooled across the NAMED signals; (ii) joined delta pnl_usdt > +$1.00/14d (units guard, never leveraged pnl_pct); (iii) substitution >=70% of would-cut setups do NOT re-fire fresh within 30m (else the block only delays and double-pays fees); (iv) 7d and 14d same-sign positive AND both 15d halves same-sign (already +); (v) atr-trend- and pump-chain- permanently excluded unless a per-signal re-read flips sign; (vi) net computed AFTER the substitution fee; (vii) CEO sign-off (exit-behavior change). Default NO CHANGE.",
+      "measurement": "shadow log line [PREARM-DEADLINE-SHADOW] at open+20m for named signals when peak < PM_TRAIL_ACTIVATE_PCT: trade_id, token, signal, price_at_T, would_exit_pnl_usdt. Join weekly to PG by trade_id; substitution = same token+direction re-fire within 30m.",
+      "not_a_duplicate_of": "BB_/PUMP_CHAIN_/BB_BOUNCE_/JUP_/VB_TRAIL_ARM_TIMEOUT (same mechanic but T=45-90m, 5 signals, gated on live_pnl<activate) | amplify-atrtrend-short-tat-shadow (12-01, atr-trend- only = the signal this measures NEGATIVE at every T) | amplify-structure-flip-early-exit (12-05, BTC ema300 flip trigger not a deadline) | amplify-stale-block-bleed5 (12-01, entry-staleness not arm time)",
+      "risk": "medium (exit behavior); low at shadow (zero behavior)",
+      "owner": "brain_auditor weekly AMPLIFY",
+      "counter_signal": "PRE-READ: atr-trend- delta NEGATIVE at every T tested (15m -0.96 / 20m -1.09 / 30m -0.77 / 45m -0.72 / 60m -0.61 / 90m -0.58 / 120m -0.29) and pump-chain- -0.36 at 20m. The queued atr-trend- TAT shadow is therefore predicted COSTLY - run it (collection-only) but do not expect a ship."
+    },
+    {
+      "id": "monitor-r2v2-extreme-cell",
+      "kind": "eval",
+      "status": "open",
+      "created_at": "2026-11-28T09:05:00Z",
+      "created_by": "brain_auditor #312",
+      "deadline": "2026-12-20T00:00:00Z",
+      "stream": "r2v2-long3 fires ONLY in its losing regime: EXTREME 15T -0.78/30d, same-sign 7d -0.41 / 14d -0.39 / 30d -0.78, arm 6/15=40%",
+      "threshold": "n=15 < 20-trade bar TODAY -> INSUFFICIENT, monitor only. Block EXTREME for r2v2-long3 only if 30d n>=20 AND all three windows same-sign negative AND winner-kill of the EXTREME wins <=20% of 30d winners (units guard pnl_usdt). Re-measure at deadline.",
+      "default": "NO CHANGE",
+      "not_a_duplicate_of": "its validated NORMAL cell was dropped this run (dead cell) - this is the EXTREME cell, a different lever"
     }
   ],
-  "updated_at": "2026-11-27T20:55:00+00:00",
-  "updated_by": "brain_auditor #311"
+  "updated_at": "2026-11-28T09:05:00Z",
+  "updated_by": "brain_auditor #312"
 }

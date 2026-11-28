@@ -1191,9 +1191,17 @@ WINNER_CELL_SIZE_MULT_CAP = 1.5
 # Cells were VALIDATED on one direction's trades, so sizing must match it.
 # Structural guard: a 2-tuple slipping back in raises at import.
 WINNER_CELLS_VALIDATED = {
-    ('bb-squeeze+', 'NORMAL', 'LONG'),
-    ('volume-buildup-', 'HIGH', 'SHORT'),   # bug_hunter 2026-10-29: was 'volume-buildout-' (transcription typo — 0 rows ever; real signal + exact cell stats 14T/71.4%/+$0.21 confirmed on 'volume-buildup-')
-    ('r2v2-long3', 'NORMAL', 'LONG'),
+    ('volume-buildup-', 'HIGH', 'SHORT'),   # bug_hunter 2026-10-29: was 'volume-buildout-' (transcription typo — 0 rows ever; real signal + exact cell stats 14T/71.4%/+$0.21 confirmed on 'volume-buildup-'). STILL VALID 2026-11-28 #312: 30d 7T +0.32 net-of-fee +0.23, 100% WR, arm 7/7.
+    # ('bb-squeeze+', 'NORMAL', 'LONG') DROPPED 2026-11-28 brain_auditor #312 — same bar as the
+    #   pump-chain+ drop below: 30d 24T gross -0.04 / net-of-fee -0.34 <= 0 (14d 0.00, 7d -0.04;
+    #   weekly +0.32/+0.34/+0.16/+0.04/-0.04 = decayed to flat-negative). All-time 69T +1.01 is
+    #   history, not current evidence. RE-ADD: 30d gross >= +0.50 AND 2 consecutive positive weeks
+    #   AND n>=25. Zero behavior while WINNER_CELL_SIZE_MULT=1.0; corrected BEFORE the 11-30
+    #   rider/atp cell reads so a mult re-raise cannot land on a stale list.
+    # ('r2v2-long3', 'NORMAL', 'LONG') DROPPED 2026-11-28 brain_auditor #312 — DEAD CELL: 30d n=0,
+    #   14d n=0, 7d n=0 (all-time 6T +0.78, last fill ~2026-11-01). A cell with zero current trades
+    #   cannot be validated on ANY window; r2v2-long3 now fires ONLY in EXTREME (15T -0.78/30d,
+    #   same-sign 7/14/30d = its LOSING regime, not this one). RE-ADD: n>=25 AND gross >= +0.50 in 30d.
     # ('pump-chain+', 'EXTREME', 'LONG') DROPPED 2026-11-14 #259 — bar met: 30d 49T net -0.18 WR 40.8% <= 0
     # (pre-reg amplify-winner-cell-drop-pcplus; inert while mult=1.0). RE-ADD: 30d >= +0.50 AND 2 consecutive positive weeks AND n>=40.
 }

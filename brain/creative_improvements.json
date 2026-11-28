@@ -12718,5 +12718,32 @@
     "category": "process / significance hygiene",
     "status": "SHIPPED as restated bar (ii) on eval-long-z-midband-1-2 + limb (a) on zscore-long-gate-deadcode",
     "risk": "none"
+  },
+  {
+    "date": "2026-11-28T09:05:00Z",
+    "idea": "Make the FEE BAR (gross/trade > 0.01247) a first-class KPI and run offense at CELL level, not SIGNAL level",
+    "rationale": "Measured this run: 30d gross -3.66, fees 7.86, net -11.52 (fees = 215% of gross). 0 of 12 signals with n>=15 clears gross/trade > fee. Only 2 of 11 gross-positive cells (n>=10) clear it. An out-of-sample signal-level kill rule (rank d1-15, kill sub-fee n>=10, test d16-30) retained 4/252 trades - the 'improvement' is entirely from not trading. So signal-level selection is a dead end and the only levers with real magnitude are (a) cell-level concentration and (b) the fee axis (maker entries).",
+    "expected_impact": "prevents ~1 wasted signal-kill analysis per week; redirects offense to the fee axis already worth 10-40x any size-mult (#309)",
+    "category": "fee/economy",
+    "status": "suggested",
+    "risk": "low (reporting only)"
+  },
+  {
+    "date": "2026-11-28T09:05:00Z",
+    "idea": "Stop trying to PREDICT arming at entry - measure it and cut it (per-signal pre-arm deadline)",
+    "rationale": "Every entry feature tested (momentum_state, speed_percentile, momentum_score, volume_spike, gap_at_entry, rsi_exec, btc_ema300_position, btc_regime; n=630/30d) lands in a 46-62% arm-rate band with noise nets. Entry-side arming prediction is a dead end. The armed/unarmed split (+19.55 vs -23.21/30d) is an OUTCOME, so the only lever is time: exit when a trade has not touched +0.40% by T. Existing trail_arm_timeout covers 5 signals at T=45-90m; measured T=15-20m is the only band that survives a 15d/15d out-of-sample split.",
+    "expected_impact": "T=20m counterfactual delta +4.01/30d in-sample, +2.98/+1.03 same-sign across the two 15d halves (T>=30 flips sign OOS)",
+    "category": "exit engine / chop killer",
+    "status": "suggested",
+    "risk": "medium (exit-behavior change; shadow-first, 2 signals excluded, substitution fee must be counted)"
+  },
+  {
+    "date": "2026-11-28T09:05:00Z",
+    "idea": "Counter-signal: blanket early-exit HURTS atr-trend-",
+    "rationale": "Pre-read on the queued amplify-atrtrend-short-tat-shadow (due 12-01): cutting never-armed-by-T atr-trend- trades measures NEGATIVE at every T tested (15m -0.96, 20m -1.09, 30m -0.77, 45m -0.72, 60m -0.61, 90m -0.58, 120m -0.29). Its never-armed cohort realizes ~breakeven (-0.04 over 43 trades) while sitting deeper under water at T. pump-chain- likewise -0.36 at T=20.",
+    "expected_impact": "avoids shipping a cost-bearing shadow as if it were an offense candidate; the shadow stays collection-only",
+    "category": "kill/waste prevention",
+    "status": "suggested",
+    "risk": "low"
   }
 ]

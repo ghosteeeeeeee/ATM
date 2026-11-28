@@ -2059,3 +2059,9 @@ result-1: `git checkout -- scripts/signal_compactor.py` (restores both deny bran
 ### Numbers: 24h 17T +0.14 70.6% | 7d 128T -0.39 58.6%
 ### Findings: Q="What's the PnL?" — 24h green, 7d -$0.39. Loss side is stop-family: atr_sl_hit 15T -1.91, manual_sl_hit 10T -1.67, hard_max 11T -1.17 (hard_max 0% WR = definitional, cutting bleed). Disk 88% used (>=85% warn, 3rd run). Control tower: 3 items due 11-29 (tape-at, high-long-displacement, be-arm-peak).
 ### Recommendation: Disk usage is trending up (87→88%); schedule a log/disk cleanup check before it hits 90%.
+
+## CEO Status — 20261128T073840Z
+### Health: pipeline=inactive (oneshot timer just fired 07:39Z, run in progress) guardian=active open_pos=0
+### Numbers: 24h 19T -0.08 63.2% | 7d 127T -0.86 56.7%
+### Findings: disk 88% WARN x5 overnight; rotating Q (coin_tracker signals this week): 0 closed 7d — below the 5 bar
+### Recommendation: delegate coin_tracker signal build to signal_analyst; schedule disk cleanup before 90%
