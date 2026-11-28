@@ -35741,3 +35741,30 @@ BY: auto_1hr
 - unarmed cohort net -0.52 vs armed +0.22 — stall stack fix still pending
 - 1 open: HYPE SHORT jup_yolo_mirrored
 BY: auto_1hr
+
+## [2026-11-28 13:54] Hourly Analysis
+
+**Storm:** no storm (window-min +0.00% / at-run -0.29%) — both inside ±1.5 gate
+**Trades:** 1 closed last hour | 24h 15 closed (9W 6L) | 0 open (flat)
+**PnL NET:** hour +$0.03 | 24h NET -$0.26 (gross -$0.10, fees $0.16, payoff 0.57, WR 60.0%) | 7d NET -$2.77 (120T) | 14d NET -$3.27 (238T) | **size-reduce: 0.25x (file truth)**
+
+**Changes:**
+1. none this run — no config/constants change.
+
+**No Change Needed:**
+- Last hour: HYPE SHORT jup_yolo_mirrored profit-monster-trail +0.04 gross / +0.03 net (+1.89%) — winner, winner
+- Kill policy: no 0%-WR signal n>=3 (worst atr-trend+ 7T 57.1% net -0.20; atr-trend- 3T 66.7% -0.11; jup_yolo_mirrored 3T 66.7% -0.12)
+- Signal inversion: 0 mismatches (24h)
+- atr_sl_hit 4/15 = 26.7% (<40%); tpsl_utils deployed; profit-monster-trail 8T net +0.25 dominant, atr_sl_hit -0.53, stale_exit -0.14, hard_max_loss -0.11
+- Boost: no signal passes all 3 gates (atr-trend+ 7T 57.1% fails net -0.20; rest n<5) — skipped
+- Arm rate: unarmed 7/15 = 46.7% <70%, WR 14.3% net -0.52 vs armed 8/15 100% net +0.25 — stall stack owns fix, NO new gate (surfaced only)
+- Frequency: 1/hr — under 20
+- Entry quality: 24h winners avg MAE 0.389% < 0.5% (max 0.749), losers 0.756%
+- Negative-hour streak: only 13:00 +0.03 this window; 06-12 no closes — not 3 consecutive; already 0.25x
+
+**Open Questions:**
+- 24h NET -$0.26 (fees $0.16 > |gross $0.10|), payoff 0.57 at WR 60.0% — payoff <1.0 remains the loss driver
+- 7d -$2.77, 14d -$3.27 — drifting down from 12:56 run
+- unarmed cohort net -0.52 vs armed +0.25 — stall stack fix still pending
+- ai-trader-auto 14d 4T 0% net -0.94 — CEO-driven lane, flagging only
+BY: auto_1hr
