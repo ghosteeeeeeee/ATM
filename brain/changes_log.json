@@ -5237,5 +5237,29 @@
     "after": " {volume-buildup-|HIGH|SHORT}",
     "rationale": "r2v2-long3|NORMAL|LONG is a DEAD CELL (30d/14d/7d n=0, all-time 6T, last fill ~11-01) - cannot be validated on any current window. bb-squeeze+|NORMAL|LONG 30d 24T gross -0.04 / net-of-fee -0.34 <= 0 = the same bar that dropped pump-chain+ on 2026-11-14 #259 (14d 0.00, 7d -0.04, weekly +0.32/+0.34/+0.16/+0.04/-0.04 decayed to flat-negative). volume-buildup-|HIGH|SHORT KEPT: 30d 7T +0.32 net-of-fee +0.23, 100% WR, arm 7/7. Corrected BEFORE the 11-30 rider/atp cell reads so a WINNER_CELL_SIZE_MULT re-raise cannot land on a stale list. Re-add bars documented inline. Not CEO_PROTECTED (checked).",
     "impact": "Zero behavior today (WINNER_CELL_SIZE_MULT=1.0); hygiene + guard against a future size-up onto a dead cell. Import + guard assert verified."
+  },
+  {
+    "timestamp": "2026-11-28T12:45:00Z",
+    "agent": "brain_auditor",
+    "run": "#313",
+    "change": "Evidence pre-reads appended to 2 cell dispositions: amplify-atp-short-normal-cell (7d leg -0.22 = same-sign bar FAILING before 11-30 read) + amplify-rider-extreme-long-cell (all bars passing: 7d 11T 100% +0.62, 15 tokens, sibling n=0). 0 trading-constant changes.",
+    "type": "meta",
+    "file": "data/shadow_disposition.json",
+    "before": "no evidence_note_313",
+    "after": "evidence_note_313 on both; selfcheck PASS",
+    "rationale": "prevent a stale cell-add and a missed cell-add at the 11-30 reads",
+    "impact": "zero trading behavior; governance only"
+  },
+  {
+    "timestamp": "2026-11-28T12:45:00Z",
+    "agent": "brain_auditor",
+    "run": "#313",
+    "change": "Creative x2: (1) ARM-CONDITIONAL TOP-UP 0.25x at arm touch (pyramid into confirmed trends; 71T mfe>=1.0 winners +12.08/30d addressable pool; NO prior art found) pending offline CF walk; (2) weekly cell-trajectory pre-read discipline (atp decaying / rider strengthening)",
+    "type": "creative",
+    "file": "brain/creative_improvements.json",
+    "before": "1326 ideas",
+    "after": "1328 ideas",
+    "rationale": "offense mirror of the T=20m pre-arm cut — lean the trades that confirm, not just cut the ones that stall",
+    "impact": "0 trading behavior; CF walk queued for next run"
   }
 ]

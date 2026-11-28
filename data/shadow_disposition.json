@@ -2566,7 +2566,8 @@
         "fee_admission_bar_check": "btc-pump-rider+|EXTREME|LONG 30d 20T gross +0.66 fees 0.32 NET +0.34 = $0.0170/trade vs bar $0.0186 (1.5x 30d avg fee 0.0124) = FAIL by 8%. 14d n=20 NET +0.34 = 0.0170 FAIL. 7d n=13 NET +0.64 = 0.0492 CLEAR. MIXED -> the 11-30 read MUST state which window governs; on the 30d basis this cell does not clear.",
         "type_b_ceiling": "1.25x value = 0.25 x 0.34 = +$0.085/30d, far below the +$1.00/30d materiality bar used in prior winner-cell adjudications -> type-(b) is structurally inert for this cell regardless of sign.",
         "units_guard": "pnl_usdt vs pnl_usdt; fees = trades.fees JSON fee_total."
-      }
+      },
+      "evidence_note_313": "PRE-READ 2026-11-28 #313 (deadline 11-30): all bars PASSING now — 7d 11T 100% +0.62 / 14d 19T 78.9% +0.79 / 30d 20T 75% +0.66 gross, net-of-fee +0.41; 15 distinct tokens (bar iii); sibling EXTREME SHORT n=0 (bar v); armed 15/20 (75%); weekly -0.04 / +0.39 / +0.31 (first week slightly negative, next two positive). Only remaining risk: the 7d window has ~2 days to flip before the read. Cell-add is inert while WINNER_CELL_SIZE_MULT=1.0; mult re-raise stays CEO-gated. Units pnl_usdt."
     },
     {
       "id": "amplify-vbo-short-killreview",
@@ -2594,7 +2595,8 @@
       "threshold": "SHIP cell-add only if ALL: (i) CEO has ratified OR vetoed the atp SHORT RSI<35 half-size dampen first; (ii) 30d n>=10 net>0 still holds at read time (HAVE: 27T +1.00 WR 44.4%); (iii) the RSI<35 sub-cohort is separately handled so the boost cannot amplify the knife band (30d RSI<35 NORMAL = 20T -0.32, RSI>=35 NORMAL = 7T +1.32); (iv) no other open amplify on ai-trader-pending; (v) units guard pnl_usdt. Default HOLD/NO-SHIP if the dampen is vetoed without a substitute for the knife band.",
       "evidence": "PG 2026-11-23 30d cells n>=10 net>0 ranked: ai-trader-pending NORMAL SHORT 27T +1.00 WR44.4 (UNOWNED) | bb-squeeze+ NORMAL LONG 39T +0.45 (owned 11-25) | rider EXTREME LONG 13T +0.35 (owned 11-30) | jup HIGH SHORT 28T +0.29 (owned 11-28) | pump-chain- NORMAL LONG 31T +0.15 (contrarian 11-25) | atr-trend- NORMAL SHORT 19T +0.13 | jup NORMAL LONG 44T +0.07 (below materiality). Band decomposition 30d atp SHORT: RSI<35 29T -1.21 34.5% / 35-45 7T +0.13 / 45-55 3T +0.60 / >=55 1T +0.72. Cit: [ai-trader watchdog recs 2026-10-06] manual BTC drag; [signal analyst 2026-10-24] CEO disable-automated keep-manual.",
       "risk": "low while HOLD; medium if shipped before the dampen decision (could double down on the same signal)",
-      "not_a_duplicate_of": "the atp SHORT RSI<35 half-size dampen (brain_auditor #292, CEO-pending) — complementary lever, deliberately sequenced behind it"
+      "not_a_duplicate_of": "the atp SHORT RSI<35 half-size dampen (brain_auditor #292, CEO-pending) — complementary lever, deliberately sequenced behind it",
+      "evidence_note_313": "PRE-READ 2026-11-28 #313 (deadline 11-30): bar (ii) 7d/14d/30d same-sign is now FAILING on the 7d leg — 7d 3T net -0.22 (33.3% WR) vs 14d 9T +0.94 / 30d 27T +1.00. Weekly decay: +1.36 (w11-09, 22T) -> -0.16 (w11-16, 4T) -> -0.20 (w11-23, 1T); ~all of the 30d gross sits in the w11-09 cohort. Net-of-fee 30d still +0.66 (fee 0.34). CEO RSI<35 dampen still unratified; 30d knife band RSI<35 = 20T -0.32 (from entry). DEFAULT at 11-30 read: HOLD/NO-SHIP on same-sign failure unless 7d recovers positive before the read; do not add to WINNER_CELLS_VALIDATED on a decaying cell. Units pnl_usdt."
     },
     {
       "id": "entry-hl-entry-invariant",
@@ -3023,6 +3025,6 @@
       "not_a_duplicate_of": "its validated NORMAL cell was dropped this run (dead cell) - this is the EXTREME cell, a different lever"
     }
   ],
-  "updated_at": "2026-11-28T09:05:00Z",
-  "updated_by": "brain_auditor #312"
+  "updated_at": "2026-11-28T12:45:00+00:00",
+  "updated_by": "brain_auditor #313"
 }
